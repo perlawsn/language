@@ -109,28 +109,28 @@ public final class ArrayBuffer implements Buffer {
             }
             array = data;
             threshold = len;
+            hasView = true;
         } finally {
             idxLk.unlock();
             dataLk.unlock();
         }
 
         sort(array, threshold);
-        return new ArrayBufferView(array, threshold - 1, 0);
+        return new ArrayBufferView(array, threshold);
     }
 
     // Insertion sort, since we expect the content of the buffer to be
     // in chronological ordered for most of the time.
     private void sort(Object[][] ar, int threshold) {
-        Instant in;
         int j;
 
         for (int i = 1; i < threshold; i++) {
-            j = i - 1;
-            in = (Instant)ar[i][tsIdx];
-            while (j >= 0 && in.compareTo((Instant)ar[j][tsIdx]) < 0) {
-                Object[] tmp = ar[i];
-                ar[i] = ar[j];
-                ar[j] = tmp;
+            j = i;
+            while (j > 0 && ((Instant) ar[j][tsIdx])
+                    .compareTo((Instant) ar[j-1][tsIdx]) < 0) {
+                Object[] tmp = ar[j];
+                ar[j] = ar[j-1];
+                ar[j-1] = tmp;
                 j--;
             }
         }
@@ -139,13 +139,11 @@ public final class ArrayBuffer implements Buffer {
     private class ArrayBufferView implements BufferView {
 
         private final Object[][] data;
-        private final int newest;
-        private final int oldest;
+        private final int length;
 
-        private ArrayBufferView(Object[][] data, int newest, int oldest) {
+        private ArrayBufferView(Object[][] data, int length) {
             this.data = data;
-            this.newest = newest;
-            this.oldest = oldest;
+            this.length = length;
         }
 
         @Override
@@ -155,7 +153,7 @@ public final class ArrayBuffer implements Buffer {
 
         @Override
         public int length() {
-            return oldest - newest + 1;
+            return length;
         }
 
         @Override
@@ -170,10 +168,10 @@ public final class ArrayBuffer implements Buffer {
 
         @Override
         public Object[] get(int i) {
-            if (i > oldest - newest + 1) {
+            if (i > length) {
                 throw new IndexOutOfBoundsException();
             }
-            return data[newest - i];
+            return data[length - 1 - i];
         }
 
     }
