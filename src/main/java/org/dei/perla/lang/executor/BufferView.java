@@ -1,19 +1,11 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
-
 import java.time.Duration;
-import java.util.List;
 
 /**
- * @author Guido Rota 18/02/15.
+ * @author Guido Rota 23/02/15.
  */
-public interface Buffer {
-
-    public List<Attribute> attributes();
-
-    public void add(Record r);
+public interface BufferView {
 
     /**
      * {@code range} returns an unmodifiable view on part of the {@code Buffer}.
