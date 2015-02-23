@@ -15,19 +15,35 @@ public final class ArrayBuffer implements Buffer {
 
     private final List<Attribute> atts;
 
+    // Index of the timestamp attribute
+    private final int tsIdx;
+
     private final Lock idxLk = new ReentrantLock();
     private final Lock dataLk = new ReentrantLock();
-    private volatile Object[][] data;
+    private Object[][] data;
     private int cap;
     private int len;
     private int head;
     private int tail;
 
     public ArrayBuffer(List<Attribute> atts, int cap) {
+        tsIdx = timestampIndex(atts);
         this.atts = atts;
         this.cap = cap;
         data = new Object[cap][];
         len = 0;
+    }
+
+    // Retrieves the column index of the timestamp attribute
+    private int timestampIndex(List<Attribute> atts) {
+        int i = 0;
+        for (Attribute a : atts) {
+            if (a == Attribute.TIMESTAMP_ATTRIBUTE) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException(
+                "missing timestamp attribute in attribute list");
     }
 
     @Override
@@ -62,7 +78,7 @@ public final class ArrayBuffer implements Buffer {
     public void grow() {
         Object[][] newData = new Object[cap * 2][];
 
-        // copies the old data using a different thread, so that the calling
+        // Copies the old data using a different thread, so that the calling
         // thread can continue with adding new records to the head of the array.
         new Thread(() -> {
             dataLk.lock();
@@ -81,57 +97,36 @@ public final class ArrayBuffer implements Buffer {
     }
 
     @Override
-    public BufferView view() {
+    public BufferView unmodifiableView(int samples) {
         idxLk.lock();
-        dataLk.lock();
         try {
-            if (len == 0) {
-                return new EmptyBufferView();
-            } else {
-                return new ArrayBufferView(data, head - 1, tail, cap, len);
+            if (samples > len) {
+                samples = len;
             }
+
+            int newest = head - 1;
+            if (newest < 0) {
+                newest = cap - newest;
+            }
+            int oldest = head - samples;
+            if (oldest < 0) {
+                oldest = cap - oldest;
+            }
+
+            return new ArrayBufferView(data, newest, oldest, cap, len);
         } finally {
-            dataLk.unlock();
             idxLk.unlock();
         }
     }
 
-    @Override
-    public BufferView range(int samples) {
-        return null;
+    // Insertion sort, since we expect the contents of the buffer to be
+    // mostly ordered for the most of the time.
+    private void sort(int threshold) {
     }
 
     @Override
-    public BufferView range(Duration d) {
+    public BufferView unmodifiableView(Duration d) {
         return null;
-    }
-
-    private class EmptyBufferView implements BufferView {
-
-        @Override
-        public List<Attribute> attributes() {
-            return atts;
-        }
-
-        @Override
-        public int length() {
-            return 0;
-        }
-
-        @Override
-        public Object[] get(int i) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        @Override
-        public BufferView range(int samples) {
-            return new EmptyBufferView();
-        }
-
-        @Override
-        public BufferView range(Duration d) {
-            return new EmptyBufferView();
-        }
     }
 
     private class ArrayBufferView implements BufferView {
@@ -162,6 +157,11 @@ public final class ArrayBuffer implements Buffer {
         }
 
         @Override
+        public void release() {
+            throw new RuntimeException("unimplemented");
+        }
+
+        @Override
         public Object[] get(int i) {
             if (i >= len) {
                 throw new IndexOutOfBoundsException();
@@ -178,12 +178,12 @@ public final class ArrayBuffer implements Buffer {
         }
 
         @Override
-        public BufferView range(int samples) {
+        public BufferView view(int samples) {
             return null;
         }
 
         @Override
-        public BufferView range(Duration d) {
+        public BufferView view(Duration d) {
             return null;
         }
 
