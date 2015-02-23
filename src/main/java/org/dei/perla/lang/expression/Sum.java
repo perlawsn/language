@@ -6,11 +6,12 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 23/02/15.
  */
-public class Sum implements Expression {
+public final class Sum implements Expression {
 
     private final Expression e1;
     private final Expression e2;
 
+    // cached result type
     private final DataType tRes;
 
     public Sum(Expression e1, Expression e2) {
@@ -32,14 +33,31 @@ public class Sum implements Expression {
         this.e2 = e2;
     }
 
+    public Expression getOperand1() {
+        return e1;
+    }
+
+    public Expression getOperand2() {
+        return e2;
+    }
+
     @Override
     public DataType getType() {
         return tRes;
     }
 
     @Override
-    public Object compute(int index, BufferView buffer) {
-        return null;
+    public Object compute(int i, BufferView buf) {
+        if (tRes == DataType.INTEGER) {
+            Integer op1 = (Integer) e1.compute(i, buf);
+            Integer op2 = (Integer) e2.compute(i, buf);
+            return new Constant(DataType.INTEGER, op1 + op2);
+
+        } else {
+            Float op1 = (Float) e1.compute(i, buf);
+            Float op2 = (Float) e2.compute(i, buf);
+            return new Constant(DataType.FLOAT, op1 + op2);
+        }
     }
 
 }

@@ -6,7 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 23/02/15.
  */
-public class Constant implements Expression {
+public final class Constant implements Expression {
 
     private final DataType type;
     private final Object value;
