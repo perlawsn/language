@@ -6,7 +6,8 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * {@code BufferView} is a static view on a {@link Buffer} portion.
+ * {@code BufferView} is a static view on a portion of the content of a {@link
+ * Buffer}.
  *
  * @author Guido Rota 23/02/15.
  */
@@ -44,35 +45,5 @@ public interface BufferView {
      * @throws IndexOutOfBoundsException if the index if out of range
      */
     public Object[] get(int i);
-
-    /**
-     * {@code view} returns a sub-view on the {@link Buffer}. Differently
-     * from {@link Buffer.unmodifiableView}, this method can be invoked
-     * several times to create as many sub-views as desired. However, the
-     * user is still required to release each of the child {@code BufferView}
-     * objects.
-     *
-     * @param samples number of {@link Record}s to be included in the view.
-     * @return unmodifiable view of the buffer. The resulting view may
-     *         contain less records than requested if the source buffer does
-     *         not contain enough data.
-     */
-    public BufferView view(int samples);
-
-    /**
-     * {@code view} returns a sub-view on the {@link Buffer}. Differently
-     * from {@link Buffer.unmodifiableView}, this method can be invoked
-     * several times to create as many sub-views as desired. However, the
-     * user is still required to release each of the child {@code BufferView}
-     * objects.
-     *
-     * @param d the {@link Duration} parameter identifies the number of
-     *          records included in the {@code Buffer} view in terms of time
-     *          offset from the newest sample.
-     * @return view of the buffer. The resulting view may contain less
-     *         records than requested if the source buffer does not contain
-     *         enough data.
-     */
-    public BufferView view(Duration d);
 
 }

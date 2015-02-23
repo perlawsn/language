@@ -37,37 +37,15 @@ public interface Buffer {
     public void add(Record r);
 
     /**
-     * {@code unmodifiableView} returns an unmodifiable view on part of the
-     * {@code Buffer}.
+     * {@code unmodifiableView} returns an unmodifiable view of the {@code
+     * Buffer}.
      *
-     * It is important to note that only a single unmodifiable
-     * {@link BufferView} can be present at any time; hence, the user is
-     * required to release any previously-created view before invoking this
-     * method.
+     * It is important to note that only a single unmodifiable buffer view can
+     * be present at any time; hence, the user is required to release any
+     * previously-created view before invoking this method.
      *
-     * @param samples number of {@link Record}s to be included in the view.
-     * @return unmodifiable view of the {@code Buffer}. The resulting view
-     *         may contain less records than requested if the source buffer does
-     *         not contain enough data.
+     * @return unmodifiable view of the {@code Buffer}.
      */
-    public BufferView unmodifiableView(int samples);
-
-    /**
-     * {@code unmodifiableView} returns an unmodifiable view on part of the
-     * {@code Buffer}.
-     *
-     * It is important to note that only a single unmodifiable
-     * {@link BufferView} can be present at any time; hence, the user is
-     * required to release any previously-created view before invoking this
-     * method.
-     *
-     * @param d the {@link Duration} parameter identifies the number of
-     *          records included in the {@code Buffer} view in terms of time
-     *          offset from the newest sample.
-     * @return unmodifiable view of the {@code Buffer}. The resulting view
-     *         may contain less records than requested if the source buffer
-     *         does not contain enough data.
-     */
-    public BufferView unmodifiableView(Duration d);
+    public BufferView unmodifiableView();
 
 }

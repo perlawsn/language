@@ -4,6 +4,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,15 +24,15 @@ public final class ArrayBuffer implements Buffer {
     private Object[][] data;
     private int cap;
     private int len;
-    private int head;
-    private int tail;
+
+    private boolean hasView = false;
 
     public ArrayBuffer(List<Attribute> atts, int cap) {
         tsIdx = timestampIndex(atts);
         this.atts = atts;
-        this.cap = cap;
         data = new Object[cap][];
-        len = 0;
+        this.cap = cap;
+        this.len = 0;
     }
 
     // Retrieves the column index of the timestamp attribute
@@ -67,9 +68,8 @@ public final class ArrayBuffer implements Buffer {
             if (len == cap) {
                 grow();
             }
-            data[head] = r.getFields();
+            data[len] = r.getFields();
             len++;
-            head = (head + 1) % cap;
         } finally {
             idxLk.unlock();
         }
@@ -83,8 +83,8 @@ public final class ArrayBuffer implements Buffer {
         new Thread(() -> {
             dataLk.lock();
             try {
-                for (int i = tail, j = 0; j < len; i = (i + 1) % cap) {
-                    newData[j++] = data[i];
+                for (int i = 0; i < len; i++) {
+                    newData[i] = data[i];
                 }
             } finally {
                 dataLk.unlock();
@@ -92,58 +92,60 @@ public final class ArrayBuffer implements Buffer {
         }).run();
 
         cap = cap * 2;
-        tail = 0;
-        head = len;
+        data = newData;
     }
 
     @Override
-    public BufferView unmodifiableView(int samples) {
+    public BufferView unmodifiableView() {
+        Object[][] array;
+        int threshold;
+
         idxLk.lock();
+        dataLk.lock();
         try {
-            if (samples > len) {
-                samples = len;
+            if (hasView) {
+                throw new IllegalStateException("cannot create a new view " +
+                        "before releasing the old one");
             }
-
-            int newest = head - 1;
-            if (newest < 0) {
-                newest = cap - newest;
-            }
-            int oldest = head - samples;
-            if (oldest < 0) {
-                oldest = cap - oldest;
-            }
-
-            return new ArrayBufferView(data, newest, oldest, cap, len);
+            array = data;
+            threshold = len;
         } finally {
             idxLk.unlock();
+            dataLk.unlock();
         }
+
+        sort(array, threshold);
+        return new ArrayBufferView(array, threshold - 1, 0);
     }
 
-    // Insertion sort, since we expect the contents of the buffer to be
-    // mostly ordered for the most of the time.
-    private void sort(int threshold) {
-    }
+    // Insertion sort, since we expect the content of the buffer to be
+    // in chronological ordered for most of the time.
+    private void sort(Object[][] ar, int threshold) {
+        Instant in;
+        int j;
 
-    @Override
-    public BufferView unmodifiableView(Duration d) {
-        return null;
+        for (int i = 1; i < threshold; i++) {
+            j = i - 1;
+            in = (Instant)ar[i][tsIdx];
+            while (j >= 0 && in.compareTo((Instant)ar[j][tsIdx]) < 0) {
+                Object[] tmp = ar[i];
+                ar[i] = ar[j];
+                ar[j] = tmp;
+                j--;
+            }
+        }
     }
 
     private class ArrayBufferView implements BufferView {
 
         private final Object[][] data;
-        private final int cap;
-        private final int len;
         private final int newest;
         private final int oldest;
 
-        private ArrayBufferView(Object[][] data, int newest, int oldest,
-                int cap, int len) {
+        private ArrayBufferView(Object[][] data, int newest, int oldest) {
             this.data = data;
             this.newest = newest;
             this.oldest = oldest;
-            this.cap = cap;
-            this.len = len;
         }
 
         @Override
@@ -153,38 +155,25 @@ public final class ArrayBuffer implements Buffer {
 
         @Override
         public int length() {
-            return len;
+            return oldest - newest + 1;
         }
 
         @Override
         public void release() {
-            throw new RuntimeException("unimplemented");
+            idxLk.lock();
+            try {
+                hasView = false;
+            } finally {
+                idxLk.unlock();
+            }
         }
 
         @Override
         public Object[] get(int i) {
-            if (i >= len) {
+            if (i > oldest - newest + 1) {
                 throw new IndexOutOfBoundsException();
             }
-
-            i = newest - i;
-            if (i < 0) {
-                i = cap - 1 - i;
-            }
-            if (i < oldest) {
-                throw new IndexOutOfBoundsException();
-            }
-            return data[i];
-        }
-
-        @Override
-        public BufferView view(int samples) {
-            return null;
-        }
-
-        @Override
-        public BufferView view(Duration d) {
-            return null;
+            return data[newest - i];
         }
 
     }
