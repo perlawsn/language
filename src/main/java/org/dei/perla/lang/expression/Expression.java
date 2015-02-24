@@ -13,7 +13,7 @@ public interface Expression {
 
     public DataType getType();
 
-    public Set<Attribute> attributes();
+    public Set<Attribute> fields();
 
     public Object compute(int index, BufferView buffer);
 

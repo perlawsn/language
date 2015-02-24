@@ -51,10 +51,10 @@ public final class Sum implements Expression {
     }
 
     @Override
-    public Set<Attribute> attributes() {
+    public Set<Attribute> fields() {
         Set<Attribute> s = new TreeSet<>();
-        s.addAll(e1.attributes());
-        s.addAll(e2.attributes());
+        s.addAll(e1.fields());
+        s.addAll(e2.fields());
         return s;
     }
 

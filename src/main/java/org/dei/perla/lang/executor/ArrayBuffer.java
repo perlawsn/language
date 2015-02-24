@@ -3,7 +3,6 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -39,7 +38,7 @@ public final class ArrayBuffer implements Buffer {
     private int timestampIndex(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
-            if (a == Attribute.TIMESTAMP_ATTRIBUTE) {
+            if (a == Attribute.TIMESTAMP) {
                 return i;
             }
         }
@@ -127,7 +126,7 @@ public final class ArrayBuffer implements Buffer {
         for (int i = 1; i < threshold; i++) {
             j = i;
             while (j > 0 && ((Instant) ar[j][tsIdx])
-                    .compareTo((Instant) ar[j-1][tsIdx]) < 0) {
+                    .compareTo((Instant) ar[j - 1][tsIdx]) < 0) {
                 Object[] tmp = ar[j];
                 ar[j] = ar[j-1];
                 ar[j-1] = tmp;

@@ -24,10 +24,6 @@ PARSER_BEGIN(Parser)
 
 	public class Parser {
 
-		public static void main(String args[]) {
-
-		}
-
 	}
 
 PARSER_END(Parser)
@@ -50,7 +46,6 @@ SKIP :
 	"\n"
 }
 
-
 /*
 *	COMMENTI
 *
@@ -59,19 +54,18 @@ SKIP :
 
 MORE:
 {
-	"/*" : COMMENTO
+	"/*" : COMMENT
 }
 
-<COMMENTO> MORE:
+<COMMENT> MORE:
 {
 	<~[]>
 }
 
-<COMMENTO> SKIP:
+<COMMENT> SKIP:
 {
 	"*/" : DEFAULT
 }
-
 
 /*
 *	Token della clausola *CREATE*
@@ -86,7 +80,6 @@ TOKEN :
 	< KEYWORD_AS:       "AS"     >
 }
 
-
 /*
 *	Token della clausola *INSERT*
 */
@@ -97,8 +90,6 @@ TOKEN :
 |
 	< KEYWORD_INTO:     "INTO" >
 }
-
-
 
 /*
 *	Token della clausola *EVERY*
@@ -112,8 +103,6 @@ TOKEN :
 	|
 	< KEYWORD_IN:           "IN"           >
 }
-
-
 
 /*
 *	Token della clausola *SELECT*
@@ -134,8 +123,6 @@ TOKEN :
 	<KEYWORD_GROUPTS:    "GROUP_TS" >
 }
 
-
-
 /*
 *	Token della clausola *UNION*
 */
@@ -147,8 +134,6 @@ TOKEN :
 //	< KEYWORD_ALL:       "ALL"   >
 }
 
-
-
 /*
 *	Token della clausola *WHERE*
 */
@@ -157,8 +142,6 @@ TOKEN :
 {
 	< KEYWORD_WHERE:     "WHERE" >
 }
-
-
 
 /*
 *	Token della clausola *GROUP BY*
@@ -178,8 +161,6 @@ TOKEN :
 	< KEYWORD_GROUPS:    "GROUPS" >
 }
 
-
-
 /*
 *	Token della clausola *HAVING*
 */
@@ -188,8 +169,6 @@ TOKEN :
 {
 	< KEYWORD_HAVING:    "HAVING" >
 }
-
-
 
 /*
 *	Token della clausola *UP TO*
@@ -209,8 +188,8 @@ TOKEN :
 */
 TOKEN :
 {
-//	< KEYWORD_ON:        "ON"        >
-//|
+	< KEYWORD_ON:        "ON"        >
+|
 	< KEYWORD_EMPTY:     "EMPTY"     >
 |
 	< KEYWORD_SELECTION: "SELECTION" >
@@ -221,8 +200,6 @@ TOKEN :
 |
 	< KEYWORD_DEFAULT:   "DEFAULT"   >
 }
-
-
 
 /*
 *	Token della clausola *SAMPLING*
@@ -242,8 +219,6 @@ TOKEN :
 //|
 	< KEYWORD_ELSE:      "ELSE"     >
 }
-
-
 
 /*
 *	Token della clausola *ON UNSUPPORTED SAMPLING RATE*
@@ -268,8 +243,6 @@ TOKEN :
 	< KEYWORD_DOWN:        "DOWN"        >
 }
 
-
-
 /*
 *	Token della clausola *REFRESH*
 */
@@ -282,23 +255,6 @@ TOKEN :
 //|
 	< KEYWORD_NEVER:     "NEVER"   >
 }
-
-
-
-/*
-*	Token della clausola *PILOT JOIN*
-*/
-
-TOKEN :
-{
-	< KEYWORD_PILOT:     "PILOT" >
-|
-	< KEYWORD_JOIN:      "JOIN"  >
-|
-	< KEYWORD_ON:        "ON"    >
-}
-
-
 
 /*
 *	Token della clausola *EXECUTE IF*
@@ -313,9 +269,6 @@ TOKEN :
 	< KEYWORD_EXISTS :   "EXISTS" >
 }
 
-
-
-
 /*
 *	Token della clausola *TERMINATE AFTER*
 */
@@ -328,8 +281,6 @@ TOKEN :
 |
 	< KEYWORD_SELECTIONS: "SELECTIONS" >
 }
-
-
 
 /*
 *	Token della clausola *FROM*
@@ -353,7 +304,6 @@ TOKEN:
 	//< KEYWORD_ON: "ON"    >
 }
 
-
 /*
 *	Token per le STRUTTURE DATI
 */
@@ -365,20 +315,12 @@ TOKEN :
 	< KEYWORD_SNAPSHOT: "SNAPSHOT" >
 }
 
-
-
 /*
 *	Altri token
 */
 
 TOKEN :
 {
-	/* Token usato per introdurre query di basso livello */
-	< KEYWORD_LOW:      "LOW"      >
-|
-	/* Token usato per introdurre query di alto livello */
-	< KEYWORD_HIGH:     "HIGH"     >
-|
 	/* Token usato, insieme a DURATION, per introdurre un TIME QUANTUM */
 	< KEYWORD_WITH:     "WITH" >
 |
@@ -400,8 +342,6 @@ TOKEN :
 	< KEYWORD_LIKE:     "LIKE"     >
 }
 
-
-
 /*
 *	OPERATORI ALGEBRICI
 */
@@ -417,8 +357,6 @@ TOKEN :
 	< OPERATOR_MINUS:    "-" >
 }
 
-
-
 /*
 *	OPERATORI BOOLEANI
 */
@@ -433,8 +371,6 @@ TOKEN :
 |
 	< OPERATOR_OR:      "OR"  >
 }
-
-
 
 /*
 *	OPERATORI BIT A BIT
@@ -455,8 +391,6 @@ TOKEN :
 	< OPERATOR_BITWISE_OR:  "|"  >
 }
 
-
-
 /*
 *	OPERATORI DI CONFRONTO
 */
@@ -475,8 +409,6 @@ TOKEN :
 	< OPERATOR_NOT_EQUAL:     "<>" | "!=" >
 }
 
-
-
 /*
 *	FUNZIONI DI AGGREGAZIONE
 */
@@ -494,8 +426,6 @@ TOKEN :
 //|
 //	< FUNCTION_TIMESTAMP: "TIMESTAMP" >
 }
-
-
 
 /*
 *	UNITA' DI TEMPO
@@ -516,8 +446,6 @@ TOKEN :
 	< TIMEUNIT_MT: "months"       | "mt" >
 }
 
-
-
 /*
 *	TIPI DI DATO
 */
@@ -537,8 +465,6 @@ TOKEN :
 	< TYPE_STRING:  "STRING"    >
 }
 
-
-
 /*
 *	COSTANTI
 *
@@ -549,7 +475,6 @@ TOKEN :
 /*
 *	Inizializzatore di costante per tipi definiti dall'utente
 */
-
 
 TOKEN :
 {
@@ -579,7 +504,6 @@ TOKEN :
 	< CONSTANT_BOOLEAN_UNKNOWN: "UNKNOWN" >
 }
 
-
 /*
 *	Costanti NUMERICHE: servono per definire i valori di tipo intero e float.
 *
@@ -607,7 +531,6 @@ TOKEN :
 		)
 	>
 }
-
 
 /*
 *   Costanti STRINGA: servono per definire il tipo di dato stringa.
@@ -648,8 +571,6 @@ TOKEN :
 	< CONSTANT_DOUBLE_QUOTED_STRING_END: "\"" > : DEFAULT
 }
 
-
-
 /*
 *	IDENTIFICATORI
 */
@@ -667,28 +588,21 @@ TOKEN :
 	< IDENTIFIER: ( <LITERAL> | <UNDERSCORE>) ( <DIGIT> | <LITERAL> | <UNDERSCORE> )* >
 }
 
-
-
-
 /************************************************************************************************
 *     PRODUZIONI GENERICHE (Segni, Costanti, Nomi di campi, Nomi di tabelle, ecc..)             *
 *                                                                                               *
 ************************************************************************************************/
 
-
-ArrayList<Query> StatementSequence() :
-{ ArrayList<Query> queryList = new ArrayList(); Query q;}
+void StatementSequence() :
+{}
 {
-	q = Statement() { queryList.add(q); }
+	Statement()
 	(
 		";"
-		q = Statement() { queryList.add(q);}
+		Statement()
 	)*
-	<EOF> { return queryList; }
+	<EOF>
 }
-
-
-
 
 /************************************************************************************************
 *     PRODUZIONI GENERICHE (Segni, Costanti, Nomi di campi, Nomi di tabelle, ecc..)             *
@@ -696,256 +610,224 @@ ArrayList<Query> StatementSequence() :
 ************************************************************************************************/
 
 /* Ritorna un flag per indicare se c'� il segno negativo */
-boolean Sign() :
+void Sign() :
 {}
 {
-	<OPERATOR_PLUS> { return false; }
+	<OPERATOR_PLUS>
 	|
-	<OPERATOR_MINUS> { return true; }
+	<OPERATOR_MINUS>
 }
 
-
-LogicValue LogicValue() :
+void LogicValue() :
 {}
 {
-	<CONSTANT_BOOLEAN_TRUE> { return LogicValue.TRUE; }
+	<CONSTANT_BOOLEAN_TRUE>
 	|
-	<CONSTANT_BOOLEAN_FALSE> { return LogicValue.FALSE; }
+	<CONSTANT_BOOLEAN_FALSE>
 	|
-	<CONSTANT_BOOLEAN_UNKNOWN> { return LogicValue.UNKNOWN; }
+	<CONSTANT_BOOLEAN_UNKNOWN>
 }
 
-
-ConstantNull ConstantNull() :
+void ConstantNull() :
 {}
 {
 	<CONSTANT_NULL>
-	{ return new ConstantNull(); }
 }
 
-
-ConstantLogic ConstantBoolean() :
-{ Token t; }
+void ConstantBoolean() :
+{}
 {
 	(
-		t = <CONSTANT_BOOLEAN_TRUE>
+		<CONSTANT_BOOLEAN_TRUE>
 		|
-		t = <CONSTANT_BOOLEAN_FALSE>
+		<CONSTANT_BOOLEAN_FALSE>
 	)
-	{ return (ConstantLogic) ExpressionsHandler.getConstantBuiltIn("BOOLEAN", t); }
 }
 
-ConstantFloat ConstantFloat() :
-{ Token t; }
+void ConstantFloat() :
+{}
 {
 	(
-		t = <CONSTANT_INTEGER>
+		<CONSTANT_INTEGER>
 		|
-		t = <CONSTANT_FLOAT>
+		<CONSTANT_FLOAT>
 	)
-	{ return (ConstantFloat) ExpressionsHandler.getConstantBuiltIn("FLOAT", t); }
 }
 
-
-ConstantInteger ConstantInteger() :
-{ Token t; }
+void ConstantInteger() :
+{}
 {
-	t = <CONSTANT_INTEGER>
-	{ return (ConstantInteger) ExpressionsHandler.getConstantBuiltIn("INTEGER", t); }
+	<CONSTANT_INTEGER>
 }
 
-
-ConstantString ConstantString() :
-{ Token t; }
+void ConstantString() :
+{}
 {
 	(
 		(
-			<CONSTANT_SINGLE_QUOTED_STRING_START>
-		t = <CONSTANT_SINGLE_QUOTED_STRING_VALUE>
-			<CONSTANT_SINGLE_QUOTED_STRING_END>
+		<CONSTANT_SINGLE_QUOTED_STRING_START>
+		<CONSTANT_SINGLE_QUOTED_STRING_VALUE>
+		<CONSTANT_SINGLE_QUOTED_STRING_END>
 		)
 		|
 		(
-			<CONSTANT_DOUBLE_QUOTED_STRING_START>
-		t = <CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
-			<CONSTANT_DOUBLE_QUOTED_STRING_END>
+		<CONSTANT_DOUBLE_QUOTED_STRING_START>
+		<CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
+		<CONSTANT_DOUBLE_QUOTED_STRING_END>
 		)
 	)
-	{ return (ConstantString) ExpressionsHandler.getConstantBuiltIn("STRING", t); }
 }
 
-ConstantUserDefined ConstantUserDefined() :
-{ Token t; ConstantString cs; }
+void ConstantUserDefined() :
+{}
 {
 	<NEW>
 	"("
-		t = <IDENTIFIER>
+		<IDENTIFIER>
 		","
-		cs = ConstantString()
+		ConstantString()
 	")"
-
-	{ return ExpressionsHandler.getConstantUserDefined(t, cs); }
 }
 
-Constant Constant() :
-{ Constant c; }
+void Constant() :
+{}
 {
 	(
-		c = ConstantNull()
+		ConstantNull()
 		|
-		c = ConstantBoolean()
+		ConstantBoolean()
 		|
-		c = ConstantString()
+		ConstantString()
 		|
 		LOOKAHEAD(1)
-		c = ConstantInteger()
+		ConstantInteger()
 		|
-		c = ConstantFloat()
+		ConstantFloat()
 		|
-		c = ConstantUserDefined()
+		ConstantUserDefined()
 	)
-	{ return c; }
 }
 
-
-Constant SignedConstant() :
-{ Constant c; boolean isNegative = false; }
+void SignedConstant() :
+{}
 {
 	[
-		isNegative = Sign()
+		Sign()
 	]
-	c = Constant()
-	{ return ExpressionsHandler.changeConstantSign(c, isNegative); }
+	Constant()
 }
 
-
-NodeComparisonOperation ComparisonOperator() :
+void ComparisonOperator() :
 {}
 {
-	<OPERATOR_GREATER> { return new NodeStrictlyGreater(); }
+	<OPERATOR_GREATER>
 	|
-	<OPERATOR_LESS> { return new NodeStrictlyMinor(); }
+	<OPERATOR_LESS>
 	|
-	<OPERATOR_GREATER_EQUAL> { return new NodeGreater(); }
+	<OPERATOR_GREATER_EQUAL>
 	|
-	<OPERATOR_LESS_EQUAL> { return new NodeMinor(); }
+	<OPERATOR_LESS_EQUAL>
 	|
-	<OPERATOR_EQUAL> { return new NodeEqual(); }
+	<OPERATOR_EQUAL>
 	|
-	<OPERATOR_NOT_EQUAL> { return new NodeUnequal(); }
+	<OPERATOR_NOT_EQUAL>
 }
 
-
-FieldType FieldType() :
-{ Token t; }
-{
-	(
-	t = <TYPE_ID>
-	|
-	t = <TYPE_TS>
-	|
-	t = <TYPE_BOOLEAN>
-	|
-	t = <TYPE_INTEGER>
-	|
-	t = <TYPE_FLOAT>
-	|
-	t = <TYPE_STRING>
-	|
-	t = <IDENTIFIER>
-	)
-	{ return UtilHandler.getFieldTypeFromName(t); }
-}
-
-
-TimeUnit TimeUnit() :
-{ Token t; }
-{
-	(
-		t = <TIMEUNIT_S>
-	|
-		t = <TIMEUNIT_M>
-	|
-		t = <TIMEUNIT_H>
-	|
-		t = <TIMEUNIT_MS>
-	|
-		t = <TIMEUNIT_D>
-	|
-		t = <TIMEUNIT_MT>
-	)
-	{ return EnumHandler.getTimeUnitFromName(t.image); }
-}
-
-
-AggregationType AggregationOperator() :
+void FieldType() :
 {}
 {
-	<FUNCTION_AVG> { return AggregationType.AVG; }
+	(
+	<TYPE_ID>
 	|
-	<FUNCTION_MIN> { return AggregationType.MIN; }
+	<TYPE_TS>
 	|
-	<FUNCTION_MAX> { return AggregationType.MAX; }
+	<TYPE_BOOLEAN>
 	|
-	<FUNCTION_SUM> { return AggregationType.SUM; }
+	<TYPE_INTEGER>
+	|
+	<TYPE_FLOAT>
+	|
+	<TYPE_STRING>
+	|
+	<IDENTIFIER>
+	)
 }
 
-
-Duration Duration() :
-{ ConstantFloat cf; TimeUnit t; }
+void TimeUnit() :
+{}
 {
-	cf = ConstantFloat()
-	t = TimeUnit()
-	{ return UtilHandler.createDuration(cf.getValueFloat(), t); }
+	(
+		<TIMEUNIT_S>
+	|
+		<TIMEUNIT_M>
+	|
+		<TIMEUNIT_H>
+	|
+		<TIMEUNIT_MS>
+	|
+		<TIMEUNIT_D>
+	|
+		<TIMEUNIT_MT>
+	)
 }
 
+void AggregationOperator() :
+{}
+{
+	<FUNCTION_AVG>
+	|
+	<FUNCTION_MIN>
+	|
+	<FUNCTION_MAX>
+	|
+	<FUNCTION_SUM>
+}
 
-int SamplesNumber() :
-{ ConstantInteger ci; }
+void Duration() :
+{}
+{
+	ConstantFloat()
+	TimeUnit()
+}
+
+void SamplesNumber() :
+{}
 {
 	(
 		(
-			ci = ConstantInteger()
+			ConstantInteger()
 			<KEYWORD_SAMPLES>
-			{ return ci.getValueInt(); }
 		)
 		|
 		(
 			<KEYWORD_ONE>
-			{ return 1; }
 		)
 	)
 }
 
-
-int SelectionsNumber() :
-{ ConstantInteger ci; }
+void SelectionsNumber() :
+{}
 {
 	(
-		ci = ConstantInteger()
+		ConstantInteger()
 		<KEYWORD_SELECTIONS>
 	)
-	{ return ci.getValueInt(); }
 }
 
-
-Object WindowSize() :
-{ Duration interval; Integer samples; }
+void WindowSize() :
+{}
 {
 	LOOKAHEAD(2)
-	interval = Duration() { return interval; }
+	Duration()
 	|
-	samples = SamplesNumber() { return samples; }
+	SamplesNumber()
 }
 
-
-Token Identifier() :
-{ Token t; }
+void Identifier() :
+{}
 {
-	t = <IDENTIFIER>
-	{ return t; }
+	<IDENTIFIER>
 }
-
 
 void QualifiedIdentifier() :
 {}
@@ -955,20 +837,17 @@ void QualifiedIdentifier() :
 	<IDENTIFIER>
 }
 
-
-OptionallyQualifiedIdentifier OptionallyQualifiedIdentifier() :
-{ Token first; Token second = null; }
+void OptionallyQualifiedIdentifier() :
+{}
 {
-	first = <IDENTIFIER>
+	<IDENTIFIER>
 	[
 		"."
-		second = <IDENTIFIER>
+		<IDENTIFIER>
 	]
-	{ return UtilHandler.createOptionallyQualifiedIdentifier(first, second); }
 }
 
-
-NodeAggregation Aggregate(ExpressionType parExpressionType) :
+void Aggregate(ExpressionType parExpressionType) :
 { Node expression; Node filter = null; Object window = null; AggregationType type; }
 {
 	(
@@ -1008,11 +887,10 @@ NodeAggregation Aggregate(ExpressionType parExpressionType) :
 	{ return ExpressionsHandler.getNodeAggregation(type, expression, window, filter); }
 }
 
-
-NodeFunction FunctionCall(ExpressionType parExpressionType) :
-{ Node n; Token t; }
+void FunctionCall(ExpressionType parExpressionType) :
+{}
 {
-	t = <IDENTIFIER>
+	<IDENTIFIER>
 	(
 		LOOKAHEAD(2)
 		(
@@ -1022,147 +900,113 @@ NodeFunction FunctionCall(ExpressionType parExpressionType) :
 		|
 		(
 			"("
-			n = Expression(parExpressionType)
+			Expression(parExpressionType)
 			(
-				{ ExpressionsContext.addNodeToFunctionPars(n); }
 				","
-				n = Expression(parExpressionType)
+				Expression(parExpressionType)
 			)*
-			{ ExpressionsContext.addNodeToFunctionPars(n); }
 			")"
 		)
 	)
-
-	{ return ExpressionsHandler.getNodeFunction(t); }
 }
 
-
-NodeExists ExistsAttribute() :
-{ Token t; }
+void ExistsAttribute() :
+{}
 {
 	<KEYWORD_EXISTS>
 	"("
 	(
-		t = Identifier() /* LogicalObjectField */
+		Identifier() /* LogicalObjectField */
 		|
-		t = <KEYWORD_ALL>
+		<KEYWORD_ALL>
 	)
 	")"
-	{ return ExpressionsHandler.getNodeExists(t); }
 }
-
-
 
 /************************************************************************************************
 *     PRODUZIONI PER LE ESPRESSIONI                                                             *
 *                                                                                               *
 ************************************************************************************************/
 
-
-Node Expression(ExpressionType parExpressionType) :
-{ Node n; }
+void Expression(ExpressionType parExpressionType) :
+{}
 {
-	{ ExpressionsContext.addNewContext(); }
-
-	n = ExpressionBooleanTerm(parExpressionType)
+	ExpressionBooleanTerm(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.OR); }
 		<OPERATOR_OR>
-		n = ExpressionBooleanTerm(parExpressionType)
+		ExpressionBooleanTerm(parExpressionType)
 	)*
-	{
-		n = ExpressionsHandler.getLogicalNode(n, ExpressionTypes.OR);
-		ExpressionsContext.removeContext();
-		ExpressionsHandler.checkTypeValid(n);
-		return n;
-	}
 }
 
-
-Node ExpressionBooleanTerm(ExpressionType parExpressionType) :
-{ Node n; }
+void ExpressionBooleanTerm(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBooleanFactor(parExpressionType)
+	ExpressionBooleanFactor(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.AND); }
 		<OPERATOR_AND>
-		n = ExpressionBooleanFactor(parExpressionType)
+		ExpressionBooleanFactor(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getLogicalNode(n, ExpressionTypes.AND); }
 }
 
-
-Node ExpressionBooleanFactor(ExpressionType parExpressionType) :
-{ Node n; }
+void ExpressionBooleanFactor(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBooleanTest(parExpressionType)
+	ExpressionBooleanTest(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.XOR); }
 		<OPERATOR_XOR>
-		n = ExpressionBooleanTest(parExpressionType)
+		ExpressionBooleanTest(parExpressionType)
 
 	)*
-	{ return ExpressionsHandler.getLogicalNode(n, ExpressionTypes.XOR); }
 }
 
-
-Node ExpressionBooleanTest(ExpressionType parExpressionType) :
-{ Node n; boolean isNegated = false; }
+void ExpressionBooleanTest(ExpressionType parExpressionType) :
+{}
 {
 	(
-		<OPERATOR_NOT> { isNegated ^= true; }
+		<OPERATOR_NOT>
 	)*
-	n = ExpressionBooleanPrimary(parExpressionType)
-
-	{ return ExpressionsHandler.getNodeNot(n, isNegated); }
+	ExpressionBooleanPrimary(parExpressionType)
 }
 
-
-NodeLogicTest LogicTest(Node firstNode) :
-{ LogicValue logicValue; boolean isNegated = false; }
+void LogicTest(Node firstNode) :
+{}
 {
 	<KEYWORD_IS>
 	[
-		<OPERATOR_NOT> { isNegated = true; }
+		<OPERATOR_NOT>
 	]
-	logicValue = LogicValue()
-	{ return ExpressionsHandler.getNodeLogicTest(logicValue, isNegated, firstNode); }
+	LogicValue()
 }
 
-
-Node ExpressionBooleanPrimary(ExpressionType parExpressionType) :
-{ Node parentNode; NodeComparisonOperation nodeOp; Node node2; Node node3; ConstantString cs; boolean isNegated = false; LogicValue logicValue; }
+void ExpressionBooleanPrimary(ExpressionType parExpressionType) :
+{}
 {
-	parentNode = ExpressionBit(parExpressionType)
+	ExpressionBit(parExpressionType)
 	[
 		(
-			nodeOp = ComparisonOperator()
-			node2 = ExpressionBit(parExpressionType)
-
-			{ parentNode = ExpressionsHandler.setNodeOperation(nodeOp, parentNode, node2); }
+			ComparisonOperator()
+			ExpressionBit(parExpressionType)
 
 			[
-				parentNode = LogicTest(parentNode)
+				LogicTest(parentNode)
 			]
 		)
 		|
 		(
 			<KEYWORD_IS>
 			[
-				<OPERATOR_NOT> { isNegated = true; }
+				<OPERATOR_NOT>
 			]
 			(
 				(
 					<CONSTANT_NULL>
-					{ parentNode = ExpressionsHandler.getNodeIsNull(isNegated, parentNode); }
 					[
-						parentNode = LogicTest(parentNode)
+						LogicTest(parentNode)
 					]
 				)
 				|
 				(
-					logicValue = LogicValue()
-					{ parentNode = ExpressionsHandler.getNodeLogicTest(logicValue, isNegated, parentNode); }
+					LogicValue()
 				)
 
 			)
@@ -1170,224 +1014,173 @@ Node ExpressionBooleanPrimary(ExpressionType parExpressionType) :
 		|
 		(
 			<KEYWORD_BETWEEN>
-			node2 = ExpressionBit(parExpressionType)
+			ExpressionBit(parExpressionType)
 			<OPERATOR_AND>
-			node3 = ExpressionBit(parExpressionType)
-
-			{ parentNode = ExpressionsHandler.getNodeBetween(parentNode, node2, node3); }
+			ExpressionBit(parExpressionType)
 
 			[
-				parentNode = LogicTest(parentNode)
+				LogicTest(parentNode)
 			]
 		)
 		|
 		(
 			<KEYWORD_LIKE>
-			cs = ConstantString()
-
-			{ parentNode = ExpressionsHandler.getNodeLike(parentNode, cs); }
+			ConstantString()
 
 			[
-				parentNode = LogicTest(parentNode)
+				LogicTest(parentNode)
 			]
 		)
 	]
-
-	{ return parentNode; }
 }
 
-
-Node ExpressionBit(ExpressionType parExpressionType) :
-{ Node n; }
+void ExpressionBit(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBitTerm(parExpressionType)
+	ExpressionBitTerm(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.ORB); }
 		<OPERATOR_BITWISE_OR>
-		n = ExpressionBitTerm(parExpressionType)
+		ExpressionBitTerm(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getLogicalNode(n, ExpressionTypes.ORB); }
 }
 
-
-Node ExpressionBitTerm(ExpressionType parExpressionType) :
-{ Node n; }
+void ExpressionBitTerm(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBitFactor(parExpressionType)
+	ExpressionBitFactor(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.ANDB); }
 		<OPERATOR_BITWISE_AND>
-		n = ExpressionBitFactor(parExpressionType)
+		ExpressionBitFactor(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getLogicalNode(n, ExpressionTypes.ANDB); }
 }
 
-
-Node ExpressionBitFactor(ExpressionType parExpressionType) :
-{ Node n; }
+void ExpressionBitFactor(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBitShift(parExpressionType)
+	ExpressionBitShift(parExpressionType)
 	(
-		{ ExpressionsContext.addLogicalNode(n, ExpressionTypes.XORB); }
 		<OPERATOR_BITWISE_XOR>
-		n = ExpressionBitShift(parExpressionType)
+		ExpressionBitShift(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getLogicalNode(n, ExpressionTypes.XORB); }
 }
 
-
-Node ExpressionBitShift(ExpressionType parExpressionType) :
-{ Node n; ConstantInteger ci; boolean isLeftShifht; }
+void ExpressionBitShift(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionBitTest(parExpressionType)
+	ExpressionBitTest(parExpressionType)
 	[
 		(
-			<OPERATOR_BITWISE_LSH> { isLeftShifht = true; }
+			<OPERATOR_BITWISE_LSH>
 			|
-			<OPERATOR_BITWISE_RSH> { isLeftShifht = false; }
+			<OPERATOR_BITWISE_RSH>
 		)
-		ci = ConstantInteger()
-
-		{ return ExpressionsHandler.getBitwiseShift(n, ci, isLeftShifht); }
+		ConstantInteger()
 	]
-
-	{ return n; }
 }
 
-
-Node ExpressionBitTest(ExpressionType parExpressionType) :
-{ Node n; boolean isNegated = false; }
+void ExpressionBitTest(ExpressionType parExpressionType) :
+{}
 {
 	(
-		<OPERATOR_BITWISE_NOT> { isNegated ^= true; }
+		<OPERATOR_BITWISE_NOT>
 	)*
-	n = ExpressionValue(parExpressionType)
-
-	{ return ExpressionsHandler.getNodeBitwiseNot(n, isNegated); }
+	ExpressionValue(parExpressionType)
 }
 
-
-Node ExpressionValue(ExpressionType parExpressionType) :
-{ Node n; boolean isPlusOperator; }
+void ExpressionValue(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionValueTerm(parExpressionType)
+	ExpressionValueTerm(parExpressionType)
 	(
 		(
-			<OPERATOR_PLUS> { isPlusOperator = true; }
+			<OPERATOR_PLUS>
 			|
-			<OPERATOR_MINUS> { isPlusOperator = false; }
+			<OPERATOR_MINUS>
 		)
-		{ ExpressionsContext.addOperatorNode(n, isPlusOperator, ExpressionTypes.PLUS_MIN); }
 
-		n = ExpressionValueTerm(parExpressionType)
+		ExpressionValueTerm(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getOperatorNode(n, ExpressionTypes.PLUS_MIN); }
 }
 
-
-Node ExpressionValueTerm(ExpressionType parExpressionType) :
-{ Node n; boolean isMulOperator; }
+void ExpressionValueTerm(ExpressionType parExpressionType) :
+{}
 {
-	n = ExpressionValueFactor(parExpressionType)
+	ExpressionValueFactor(parExpressionType)
 	(
 		(
-			<OPERATOR_MULTIPLY> { isMulOperator = true; }
+			<OPERATOR_MULTIPLY>
 			|
-			<OPERATOR_DIVIDE> { isMulOperator = false; }
+			<OPERATOR_DIVIDE>
 		)
-		{ ExpressionsContext.addOperatorNode(n, isMulOperator, ExpressionTypes.MUL_DIV); }
 
-		n = ExpressionValueFactor(parExpressionType)
+		ExpressionValueFactor(parExpressionType)
 	)*
-	{ return ExpressionsHandler.getOperatorNode(n, ExpressionTypes.MUL_DIV); }
 }
 
-
-Node ExpressionValueFactor(ExpressionType parExpressionType) :
-{ Node n; boolean isNegative = false; }
+void ExpressionValueFactor(ExpressionType parExpressionType) :
+{}
 {
 	[
-		isNegative = Sign()
+		Sign()
 	]
-	n = ExpressionValuePrimary(parExpressionType)
-
-	{ return ExpressionsHandler.changeNodeSign(n, isNegative); }
+	ExpressionValuePrimary(parExpressionType)
 }
 
-
-Node ExpressionValuePrimary(ExpressionType parExpressionType) :
-{ Constant c; Node n; Token t; OptionallyQualifiedIdentifier id; String s; }
+void ExpressionValuePrimary(ExpressionType parExpressionType) :
+{}
 {
-	c = Constant()
-	{ return new NodeConstant(c); }
+	Constant()
 	|
-	n = ExistsAttribute()
-	{ return n; }
+	ExistsAttribute()
 	|
 	LOOKAHEAD(2)
-	n = FunctionCall(parExpressionType)
-	{ return n; }
+	FunctionCall(parExpressionType)
 	|
 	(
 		"("
-		n = Expression(parExpressionType)
+		Expression(parExpressionType)
 		")"
-
-		{ return n; }
 	)
 	|
 	LOOKAHEAD( { parExpressionType == ExpressionType.LOW_LEVEL_ALL } )
 	(
-		t = <TYPE_ID>
-		{ return ExpressionsHandler.getLogicalObjectAttribute(t); }
+		<TYPE_ID>
 		|
-		t = <KEYWORD_GROUPTS>
-		{ return ExpressionsHandler.getLogicalObjectAttribute(t); }
+		<KEYWORD_GROUPTS>
 		|
-		n = Aggregate(parExpressionType)
-		{ return n; }
+		Aggregate(parExpressionType)
 		|
-		id = OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
-		{ return ExpressionsHandler.getLogicalObjectAttribute(id); }
+		OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
 	)
 	|
 	LOOKAHEAD( { parExpressionType == ExpressionType.HIGH_LEVEL_ALL } )
 	(
-		n = Aggregate(parExpressionType)
-		{ return n; }
+		Aggregate(parExpressionType)
 		|
-		id = OptionallyQualifiedIdentifier() /* WindowField */
-		{ return ExpressionsHandler.getLogicalObjectAttribute(id); }
+		OptionallyQualifiedIdentifier() /* WindowField */
 	)
 	|
 	LOOKAHEAD( { parExpressionType == ExpressionType.LOW_LEVEL_NO_AGGR } )
 	(
-		t = <TYPE_ID>
-		{ return ExpressionsHandler.getLogicalObjectAttribute(t); }
+		<TYPE_ID>
 		|
-		id = OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
-		{ return ExpressionsHandler.getLogicalObjectAttribute(id); }
+		OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
 	)
 	|
 	LOOKAHEAD( { parExpressionType == ExpressionType. LOW_LEVEL_NO_AGGR_NO_PILOT } )
 	(
 		(
-		t = <TYPE_ID>
+		<TYPE_ID>
 		|
-		t = Identifier() /* LogicalObjectField */
+		Identifier() /* LogicalObjectField */
 		)
-		{ return ExpressionsHandler.getLogicalObjectAttribute(t); }
 	)
 }
-
-
-
 
 /************************************************************************************************
 *     PRODUZIONI RELATIVE A LISTE DI ELEMENTI                                                   *
 *                                                                                               *
 ************************************************************************************************/
-
 
 void FieldDefinitionList() :
 {}
@@ -1402,45 +1195,38 @@ void FieldDefinitionList() :
 	")"
 }
 
-
 void FieldDefinition() :
-{ Token tokenId; FieldType type; Constant defaultValue = null; }
+{}
 {
-	tokenId = Identifier() /* DataStructureField */
-	type = FieldType()
+	Identifier() /* DataStructureField */
+	FieldType()
 	[
 		<KEYWORD_DEFAULT>
-		defaultValue = SignedConstant()
+		SignedConstant()
 	]
-	{ StatementContext.addField(tokenId, type, defaultValue); }
 }
 
-
 void FieldList() :
-{ Token tokenId; }
+{}
 {
 	"("
-	tokenId = Identifier() /* DataStructureField */
-	{ StatementContext.addField(tokenId); }
+	Identifier() /* DataStructureField */
 	(
 		","
-		tokenId = Identifier() /* DataStructureField */
-		{ StatementContext.addField(tokenId); }
+		Identifier() /* DataStructureField */
 	)*
 	")"
 }
 
-
 void EventList() :
-{ Token tokenId; }
+{}
 {
-	tokenId = Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
+	Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
 	(
 		","
-		tokenId = Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
+		Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
 	)*
 }
-
 
 void CorrelatedTableList() :
 {}
@@ -1452,16 +1238,13 @@ void CorrelatedTableList() :
 	)*
 }
 
-
 void CorrelatedTable() :
-{ Token tokenId; Node n; }
+{}
 {
-	tokenId = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	<KEYWORD_ON>
-	n = Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
-	{ ClausesContext.addCorrelatedTable(tokenId, n); }
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
 }
-
 
 void WindowDefinitionList() :
 {}
@@ -1473,21 +1256,19 @@ void WindowDefinitionList() :
 	)*
 }
 
-
 void WindowDefinition() :
-{ Token table; Object windowSize = null; Token alias = null; }
+{}
 {
-	table = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	[
 		"("
-		windowSize = WindowSize()
+		WindowSize()
 		")"
 	]
 	[
 		<KEYWORD_AS>
-		alias = Identifier() /* DataStructureName */
+		Identifier() /* DataStructureName */
 	]
-	{ HLSelectionContext.addFromSource(table, windowSize, alias); }
 }
 
 void FieldGroupingByList() :
@@ -1504,380 +1285,224 @@ void FieldGroupingByList() :
 	)*
 }
 
-
 void FieldGroupingBy() :
-{ Token t; }
+{}
 {
-	t = Identifier() /* LogicalObjectField */
-	{ LLContext.addLLGroupByField(t); }
+	Identifier() /* LogicalObjectField */
 }
 
-
 void FieldGroupingByTs() :
-{ Duration interval; ConstantInteger ci; }
+{}
 {
 	<TYPE_TS>
 	"("
-	interval = Duration()
+	Duration()
 	","
-	ci = ConstantInteger()
+	ConstantInteger()
 	<KEYWORD_GROUPS>
 	")"
-	{ LLContext.addLLGroupByTS(interval, ci.getValueInt()); }
 }
 
 void WindowFieldList() :
-{ OptionallyQualifiedIdentifier i; }
+{}
 {
-	i = OptionallyQualifiedIdentifier() /* WindowField */
-	{ HLSelectionContext.addHLGroupByField(i); }
+	OptionallyQualifiedIdentifier() /* WindowField */
 	(
 		","
-		i = OptionallyQualifiedIdentifier() /* WindowField */
-		{ HLSelectionContext.addHLGroupByField(i); }
+		OptionallyQualifiedIdentifier() /* WindowField */
 	)*
 }
-
-
 
 /************************************************************************************************
 *     PRODUZIONI RELATIVE AGLI STATEMENT                                                        *
 *                                                                                               *
 ************************************************************************************************/
 
-
-Query Statement():{
-	Query q = new Query();
-}{
-  SetParametersStament(q) { return q; }
-  | CreationStatement(q) { return q; }
-  | InsertionStatement(q) { return q; }
-
+void Statement():
+{}
+{
+  SetParametersStament()
+  |
+  CreationStatement()
+  |
+  InsertionStatement()
 }
 
-void SetParametersStament(Query q):
-{ SetParametersStatement tSetParametersStatement = new SetParametersStatement(); Token tToken = null; ConstantInteger tConstantInteger; ConstantString tConstantString;}
+void SetParametersStament():
+{}
 {
   <KEYWORD_SET>
-  	SetParameterList(tSetParametersStatement)
+  	SetParameterList()
   	(
   		","
-  		SetParameterList(tSetParametersStatement)
+  		SetParameterList()
   	)*
   <KEYWORD_ON>
 	(
-		tToken = <IDENTIFIER> { tSetParametersStatement.addID(new ConstantID(tToken.image)); }
+		<IDENTIFIER>
 		|
-		tConstantInteger = ConstantInteger() { tSetParametersStatement.addID(new ConstantID(tConstantInteger.toString())); }
+		ConstantInteger()
 		|
-		tConstantString = ConstantString() { tSetParametersStatement.addID(new ConstantID(tConstantString.toString())); }
+		ConstantString()
 	)
 	(
 		","
 		(
-			tToken = <IDENTIFIER> { tSetParametersStatement.addID(new ConstantID(tToken.image)); }
+			<IDENTIFIER>
 			|
-			tConstantInteger = ConstantInteger() { tSetParametersStatement.addID(new ConstantID(tConstantInteger.toString())); }
+			ConstantInteger()
 			|
-			tConstantString = ConstantString() { tSetParametersStatement.addID(new ConstantID(tConstantString.toString())); }
+			ConstantString()
 		)
 	)*
-
-	{StatementsHandler.addStatementToQuery(q, tSetParametersStatement);}
 }
 
-void SetParameterList(SetParametersStatement parSetParametersStatement):
-{ Token t; Constant tConstant; }
+void SetParameterList():
+{}
 {
-	t = Identifier()
+	Identifier()
 	"="
-	tConstant = Constant()
-	{ parSetParametersStatement.addPairAttributeValue(t.image, tConstant); }
+	Constant()
 }
 
-
-void CreationStatement(Query q) :
+void CreationStatement() :
 {}
 {
 	<KEYWORD_CREATE>
 	[
-		<KEYWORD_OUTPUT> { StatementContext.isOutput = true; }
+		<KEYWORD_OUTPUT>
 	]
 	(
-		StreamCreationStatement(q)
-		|
-		SnapshotCreationStatement(q)
+		StreamCreationStatement()
 	)
 }
 
-
-void StreamCreationStatement(Query q) :
-{ Stream stream; Statement statement; }
+void StreamCreationStatement() :
+{}
 {
-	stream = CreateStreamClause()
+	CreateStreamClause()
 	[
-		<KEYWORD_AS> { StatementContext.buildContextForShortcut(); }
-		statement = StreamSelectionStatement()
-		{ StatementsHandler.addStatementToQuery(q, statement); }
+		<KEYWORD_AS>
+		StreamSelectionStatement()
 	]
-	{ StatementsHandler.addDataStructureToQuery(q, stream); }
 }
 
-
-void SnapshotCreationStatement(Query q) :
-{ Snapshot snapshot; Statement statement; }
-{
-	snapshot = CreateSnapshotClause()
-	[
-		<KEYWORD_AS> { StatementContext.buildContextForShortcut(snapshot.getDuration()); }
-		statement = SnapshotSelectionStatement()
-		{ StatementsHandler.addStatementToQuery(q, statement); }
-	]
-	{ StatementsHandler.addDataStructureToQuery(q, snapshot); }
-}
-
-
-Stream CreateStreamClause() :
+void CreateStreamClause() :
 {}
 {
 	<KEYWORD_STREAM>
-	StatementContext.currentStatementToken = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	FieldDefinitionList()
-	{ return DataStructuresHandler.createStream(); }
 }
 
-
-Snapshot CreateSnapshotClause() :
-{ Duration duration; }
+void CreateSnapshotClause() :
+{}
 {
 	<KEYWORD_SNAPSHOT>
-	StatementContext.currentStatementToken = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	FieldDefinitionList()
 	<KEYWORD_WITH>
 	<KEYWORD_DURATION>
-	duration = Duration()
-	{ return DataStructuresHandler.createSnapshot(duration); }
+	Duration()
 }
 
-
-void InsertionStatement(Query q) :
+void InsertionStatement() :
 {}
 {
 	<KEYWORD_INSERT>
 	<KEYWORD_INTO>
-	(
-		StreamInsertionStatement(q)
-		|
-		SnapshotInsertionStatement(q)
-	)
+	StreamInsertionStatement()
 }
 
-
-void StreamInsertionStatement(Query q) :
-{ Statement s; }
+void StreamInsertionStatement() :
+{}
 {
 	InsertStreamClause()
-	s = StreamSelectionStatement()
-	{ StatementsHandler.addStatementToQuery(q, s); }
+	StreamSelectionStatement()
 }
-
-
-void SnapshotInsertionStatement(Query q) :
-{ Statement s; }
-{
-	InsertSnapshotClause()
-	s = SnapshotSelectionStatement()
-	{ StatementsHandler.addStatementToQuery(q, s); }
-}
-
 
 void InsertStreamClause() :
 {}
 {
 	<KEYWORD_STREAM>
-	StatementContext.currentStatementToken = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	[
 		FieldList()
 	]
 }
-
 
 void InsertSnapshotClause() :
 {}
 {
 	<KEYWORD_SNAPSHOT>
-	StatementContext.currentStatementToken = Identifier() /* DataStructureName */
+	Identifier() /* DataStructureName */
 	[
 		FieldList()
 	]
 }
 
-
-Statement StreamSelectionStatement() :
-{ Statement s = null /* per rimuovere il warning */ ; HLEveryClause hlEveryClause; LLEveryClause llEveryClause; }
+void StreamSelectionStatement() :
+{}
 {
-	(
-		(
-			<KEYWORD_LOW> ":" { s = StatementsHandler.createLLStatement(); }
-			LLContext.everyClause = LowEveryClause()
-			LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
-		)
-		|
-		(
-			<KEYWORD_HIGH> ":" { s = StatementsHandler.createHLStatement(); }
-			HLContext.everyClause = HighEveryClause()
-			HighSelectionStatement(ExpressionType.HIGH_LEVEL_ALL)
-		)
-	)
-	{
-		StatementsHandler.setStatement(s);
-		return s;
-	}
+    LowEveryClause()
+    LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
 }
 
-
-Statement SnapshotSelectionStatement() :
-{ Statement s; }
-{
-	(
-		(
-			<KEYWORD_LOW> ":" { s = StatementsHandler.createLLStatement(); }
-			LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
-		)
-		|
-		(
-			<KEYWORD_HIGH> ":" { s = StatementsHandler.createHLStatement(); }
-			HighSelectionStatement(ExpressionType.HIGH_LEVEL_ALL)
-		)
-	)
-	{
-		StatementsHandler.setStatement(s);
-		return s;
-	}
-}
-
-
-LLEveryClause LowEveryClause() :
-{ Duration interval; boolean sync = false; int samples; }
+void LowEveryClause() :
+{}
 {
 	<KEYWORD_EVERY>
 	(
 		LOOKAHEAD(2)
 		(
-			interval = Duration()
+			Duration()
 			[
-				<KEYWORD_SYNCHRONIZED> { sync = true; }
+				<KEYWORD_SYNCHRONIZED>
 			]
-			{ return ClausesHandler.getLLEveryClause(interval, sync); }
 		)
 		|
 		(
-			samples = SamplesNumber()
-			{ return ClausesHandler.getLLEveryClause(samples); }
+			SamplesNumber()
 		)
 	)
 }
-
-
-HLEveryClause HighEveryClause() :
-{ Duration interval; int samples; Token tokenStream; }
-{
-	<KEYWORD_EVERY>
-	(
-		LOOKAHEAD(2)
-		(
-			interval = Duration()
-			{ return ClausesHandler.getHLEveryClause(interval); }
-		)
-		|
-		(
-			samples = SamplesNumber()
-			<KEYWORD_IN>
-			tokenStream = Identifier() /* DataStructureName */
-			{ return ClausesHandler.getHLEveryClause(samples, tokenStream); }
-		)
-	)
-}
-
 
 void LowSelectionStatement(ExpressionType parExpressionType) :
 {}
 {
-	LLContext.selectClause = SelectClause(parExpressionType)
+	SelectClause(parExpressionType)
 	[
 		GroupByClause()
 	]
 	[
-		LLContext.havingClause = HavingClause(parExpressionType)
+		HavingClause(parExpressionType)
 	]
 	[
-		LLContext.upToClause = UpToClause()
+		UpToClause()
 	]
 	[
-		LLContext.emptyClause = OnEmptySelectionClause()
+		OnEmptySelectionClause()
 	]
-	LLContext.samplingClause = SamplingClause()
+	SamplingClause()
 	[
-		LLContext.pilotJoinClause = PilotJoinClause()
-	]
-	[
-		LLContext.executeIfClause = ExecuteIfClause()
+		ExecuteIfClause()
 	]
 	[
-		LLContext.terminateAfterClause = TerminateAfterClause()
+		TerminateAfterClause()
 	]
 }
 
-
-void HighSelectionStatement(ExpressionType parExpressionType) :
+void SelectClause(ExpressionType parExpressionType) :
 {}
-{
-	HighSelectionStatementDefinition(parExpressionType)
-	(
-		<KEYWORD_UNION>
-		[
-			<KEYWORD_ALL> { HLSelectionContext.unionAll = true; }
-		]
-		HighSelectionStatementDefinition(parExpressionType)
-	)*
-	[
-		HLContext.emptyClause = OnEmptySelectionClause()
-	]
-}
-
-
-void HighSelectionStatementDefinition(ExpressionType parExpressionType) :
-{}
-{
-	HLSelectionContext.selectClause = SelectClause(parExpressionType)
-	FromClause()
-	[
-		HLSelectionContext.whereClause = WhereClause(parExpressionType)
-	]
-	[
-		GroupClause()
-		[
-			HLSelectionContext.havingClause = HavingClause(parExpressionType)
-		]
-	]
-	{ HLContext.addHLSelectionDefinition(); }
-}
-
-
-SelectClause SelectClause(ExpressionType parExpressionType) :
-{ boolean selectionDistinct = false; }
 {
 	<KEYWORD_SELECT>
 	[
-		<KEYWORD_DISTINCT> { selectionDistinct = true; }
+		<KEYWORD_DISTINCT>
 		|
 		<KEYWORD_ALL>
 	]
 	FieldSelectionList(parExpressionType)
-
-	{ return ClausesHandler.getSelectClause(selectionDistinct); }
 }
-
 
 void FieldSelectionList(ExpressionType parExpressionType) :
 {}
@@ -1889,28 +1514,22 @@ void FieldSelectionList(ExpressionType parExpressionType) :
 	)*
 }
 
-
 void FieldSelection(ExpressionType parExpressionType) :
-{ Node n; Constant c = null; }
+{}
 {
-	n = Expression(parExpressionType)
+	Expression(parExpressionType)
 	[
 		<KEYWORD_DEFAULT>
-		c = SignedConstant()
+		SignedConstant()
 	]
-
-	{ ClausesContext.addSelectField(n, c); }
 }
 
-
-WhereClause WhereClause(ExpressionType parExpressionType) :
-{ Node n; }
+void WhereClause(ExpressionType parExpressionType) :
+{}
 {
 	<KEYWORD_WHERE>
-	n = Expression(parExpressionType)
-	{ return ClausesHandler.getWhereClause(n); }
+	Expression(parExpressionType)
 }
-
 
 void GroupByClause() :
 {}
@@ -1931,34 +1550,27 @@ void GroupClause() :
 		)
 		|
 		(
-			<KEYWORD_ALL> { HLSelectionContext.setGroupAll(); }
+			<KEYWORD_ALL>
 		)
 	)
-
 }
 
-
-
-HavingClause HavingClause(ExpressionType parExpressionType) :
-{ Node n; }
+void HavingClause(ExpressionType parExpressionType) :
+{}
 {
 	<KEYWORD_HAVING>
-	n = Expression(parExpressionType)
-	{ return ClausesHandler.getHavingClause(n); }
+	Expression(parExpressionType)
 }
 
-
-UpToClause UpToClause() :
-{ Object windowSize; }
+void UpToClause() :
+{}
 {
 	<KEYWORD_UP>
 	<KEYWORD_TO>
-	windowSize = WindowSize()
-	{ return ClausesHandler.getUpToClause(windowSize); }
+	WindowSize()
 }
 
-
-OnEmptySelectionClause OnEmptySelectionClause() :
+void OnEmptySelectionClause() :
 {}
 {
 	<KEYWORD_ON>
@@ -1966,39 +1578,33 @@ OnEmptySelectionClause OnEmptySelectionClause() :
 	<KEYWORD_SELECTION>
 	<KEYWORD_INSERT>
 	(
-		<KEYWORD_NOTHING> { return ClausesHandler.getEmptyClause(OnEmptySelectionOptions.INSERT_NOTHING); }
+		<KEYWORD_NOTHING>
 		|
-	 	<KEYWORD_DEFAULT> { return ClausesHandler.getEmptyClause(OnEmptySelectionOptions.INSERT_DEFAULT); }
+	 	<KEYWORD_DEFAULT>
 	)
 }
 
-
 SamplingClause SamplingClause() :
-{ WhereClause where = null; OnUnsupportedSampleRateOptions operation = null; RefreshClause refresh = null; boolean isEventSampling; }
+{}
 {
 	<KEYWORD_SAMPLING>
 	(
-		{ isEventSampling = true; }
 		OnEventClause()
 		|
 		(
-			{ isEventSampling = false; }
 			SamplingIfEveryClause()
 			[
-				operation = OnUnsupportedSRClause()
+				OnUnsupportedSRClause()
 			]
 			[
-				refresh = RefreshClause()
+				RefreshClause()
 			]
 		)
 	)
 	[
-		where = WhereClause(ExpressionType.LOW_LEVEL_NO_AGGR)
+		WhereClause(ExpressionType.LOW_LEVEL_NO_AGGR)
 	]
-
-	{ return ClausesHandler.getSamplingClause(isEventSampling, operation, refresh, where); }
 }
-
 
 void OnEventClause() :
 {}
@@ -2007,7 +1613,6 @@ void OnEventClause() :
 	<KEYWORD_EVENT>
 	EventList()
 }
-
 
 void SamplingIfEveryClause() :
 {}
@@ -2028,24 +1633,20 @@ void SamplingIfEveryClause() :
 	)
 }
 
-
 void SamplingIfClause() :
 {}
 {
 	<KEYWORD_IF>
-	ClausesContext.samplingIfCondition = Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
 }
-
 
 void SamplingEveryClause() :
-{ Node n; TimeUnit time; }
+{}
 {
 	<KEYWORD_EVERY>
-	n = Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
-	time = TimeUnit()
-	{ ClausesContext.addSamplingIfEvery(n, time); }
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+	TimeUnit()
 }
-
 
 OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
 {}
@@ -2059,80 +1660,58 @@ OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
 		<KEYWORD_DO>
 		<OPERATOR_NOT>
 		<KEYWORD_SAMPLE>
-		{ return OnUnsupportedSampleRateOptions.DO_NOT_SAMPLE; }
 	)
 	|
 	(
 		<KEYWORD_SLOW>
 		<KEYWORD_DOWN>
-		{ return OnUnsupportedSampleRateOptions.SLOW_DOWN; }
 	)
 	)
 }
 
-
 RefreshClause RefreshClause() :
-{ Duration interval; }
+{}
 {
 	<KEYWORD_REFRESH>
 	(
 		(
 			OnEventClause()
-			{ return ClausesHandler.getRefreshClause(true); }
 		)
 		|
 		(
 			<KEYWORD_EVERY>
-			interval = Duration()
-			{ return ClausesHandler.getRefreshClause(interval); }
+			Duration()
 		)
 		|
 		(
 			<KEYWORD_NEVER>
-			{ return ClausesHandler.getRefreshClause(false); }
 		)
 	)
 }
 
-
-PilotJoinClause PilotJoinClause() :
+void ExecuteIfClause() :
 {}
-{
-	<KEYWORD_PILOT>
-	<KEYWORD_JOIN>
-	CorrelatedTableList()
-	{ return ClausesHandler.getPilotJoinClause(); }
-}
-
-
-ExecuteIfClause ExecuteIfClause() :
-{ Node n; RefreshClause refresh = null; }
 {
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
-	n = Expression(ExpressionType.LOW_LEVEL_NO_AGGR_NO_PILOT)
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR_NO_PILOT)
 	[
-		refresh = RefreshClause()
+		RefreshClause()
 	]
-	{ return ClausesHandler.getExecuteIfClause(n, refresh); }
 }
 
-
 TerminateAfterClause TerminateAfterClause() :
-{ Duration interval; int selections; }
+{}
 {
 	<KEYWORD_TERMINATE>
 	<KEYWORD_AFTER>
 	(
 		LOOKAHEAD(2)
-		interval = Duration()
-		{ return ClausesHandler.getTerminateAfterClause(interval); }
+		Duration()
 		|
-		selections = SelectionsNumber()
-		{ return ClausesHandler.getTerminateAfterClause(selections); }
+		SelectionsNumber()
 	)
 }
-
 
 void FromClause() :
 {}

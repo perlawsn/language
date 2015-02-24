@@ -25,8 +25,8 @@ public final class Average implements Expression {
     }
 
     @Override
-    public Set<Attribute> attributes() {
-        return exp.attributes();
+    public Set<Attribute> fields() {
+        return exp.fields();
     }
 
     @Override

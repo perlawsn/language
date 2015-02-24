@@ -11,7 +11,7 @@ import java.util.List;
 public interface Buffer {
 
     /**
-     * {@code attributes} returns the list of {@link Attribute}s that compose
+     * {@code fields} returns the list of {@link Attribute}s that compose
      * each record contained in this {@link BufferView}. The implementation
      * of the query executor guarantees that every record stored inside this
      * object shares the same {@link Attribute}s and {@link Attribute} order.

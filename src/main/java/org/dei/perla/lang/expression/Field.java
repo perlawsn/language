@@ -31,7 +31,7 @@ public final class Field implements Expression {
     }
 
     @Override
-    public Set<Attribute> attributes() {
+    public Set<Attribute> fields() {
         Set<Attribute> s = new TreeSet<>();
         s.add(att);
         return s;

@@ -31,7 +31,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public Set<Attribute> attributes() {
+    public Set<Attribute> fields() {
         return Collections.emptySet();
     }
 

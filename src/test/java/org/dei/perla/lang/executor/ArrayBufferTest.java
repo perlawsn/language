@@ -21,7 +21,7 @@ public class ArrayBufferTest {
     private static final List<Attribute> atts;
     static {
         Attribute[] as = new Attribute[] {
-                Attribute.TIMESTAMP_ATTRIBUTE,
+                Attribute.TIMESTAMP,
                 Attribute.create("integer", DataType.INTEGER)
         };
         atts = Arrays.asList(as);
