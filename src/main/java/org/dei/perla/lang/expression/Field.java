@@ -21,6 +21,10 @@ public final class Field implements Expression {
         this.att = att;
     }
 
+    public Attribute getAttribute() {
+        return att;
+    }
+
     @Override
     public DataType getType() {
         return att.getType();

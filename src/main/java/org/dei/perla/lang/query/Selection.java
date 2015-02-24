@@ -3,9 +3,9 @@ package org.dei.perla.lang.query;
 /**
  * @author Guido Rota 24/02/15.
  */
-public final class Selection {
+public class Selection {
 
-    public Selection() {
+    protected Selection() {
 
     }
 
