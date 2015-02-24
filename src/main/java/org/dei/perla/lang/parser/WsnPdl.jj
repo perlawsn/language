@@ -29,12 +29,8 @@ PARSER_BEGIN(Parser)
 PARSER_END(Parser)
 
 /*
-*	SEPARATORI
-*
-*   Caratteri che delimitano e separano i token e che non devono essere
-*   consegnati al parser
-*/
-
+ * SEPARATORS
+ */
 SKIP :
 {
  	" "
@@ -47,11 +43,8 @@ SKIP :
 }
 
 /*
-*	COMMENTI
-*
-*	Gestione dei commenti in stile C ( / * ... * / ), tramite stati lessicali
-*/
-
+ *	COMMENTS
+ */
 MORE:
 {
 	"/*" : COMMENT
@@ -67,401 +60,310 @@ MORE:
 	"*/" : DEFAULT
 }
 
-/*
-*	Token della clausola *CREATE*
-*/
-
 TOKEN :
 {
+/*
+ * CREATE CLAUSE
+ */
 	< KEYWORD_CREATE:   "CREATE" >
-|
+    |
 	< KEYWORD_OUTPUT:   "OUTPUT" >
-|
+    |
 	< KEYWORD_AS:       "AS"     >
-}
+    |
 
 /*
-*	Token della clausola *INSERT*
-*/
-
-TOKEN :
-{
+ * INSERT CLAUSE
+ */
 	< KEYWORD_INSERT:   "INSERT" >
-|
+    |
 	< KEYWORD_INTO:     "INTO" >
-}
+	|
 
 /*
-*	Token della clausola *EVERY*
-*/
-
-TOKEN :
-{
+ * EVERY CLAUSE
+ */
 	< KEYWORD_EVERY:        "EVERY"        >
 	|
 	< KEYWORD_SYNCHRONIZED: "SYNCHRONIZED" >
 	|
 	< KEYWORD_IN:           "IN"           >
-}
+	|
 
 /*
-*	Token della clausola *SELECT*
-*/
-
-TOKEN :
-{
+ * SELECT CLAUSE
+ */
 	< KEYWORD_SELECT:    "SELECT"   >
-|
+    |
 	< KEYWORD_DISTINCT:  "DISTINCT" >
-|
+    |
 	< KEYWORD_ALL:       "ALL"      >
-|
-	/*
-	*	Parola chiave da utilizzare nella query di basso livello
-	*	per estrarre il timestamp finale del ragguppamento
-	*/
+    |
+	// Virtual record field created by the GROUP BY clause
 	<KEYWORD_GROUPTS:    "GROUP_TS" >
-}
+    |
 
 /*
-*	Token della clausola *UNION*
-*/
-
-TOKEN :
-{
+ * UNION CLAUSE
+ */
 	< KEYWORD_UNION:     "UNION" >
-//|
+//  |
 //	< KEYWORD_ALL:       "ALL"   >
-}
+    |
 
 /*
-*	Token della clausola *WHERE*
-*/
-
-TOKEN :
-{
+ * WHERE CLAUSE  */
 	< KEYWORD_WHERE:     "WHERE" >
-}
+    |
 
 /*
-*	Token della clausola *GROUP BY*
-*/
-TOKEN :
-{
+ * GROUP BY CLAUSE
+ */
 	< KEYWORD_GROUP:     "GROUP"  >
-|
+    |
 	< KEYWORD_BY:        "BY"     >
-//|
+//  |
 //	< KEYWORD_ALL:       "ALL"    >
-|
-	/*
-	*	Parola chiave usata nell'aggragazione per timestamp nelle query
-	*	di basso livello per indicare il numero di gruppi da produrre
-	*/
+    |
+    // Keyword employed to define the number of groups created by a timestamp
+    // aggregation
 	< KEYWORD_GROUPS:    "GROUPS" >
-}
+	|
 
 /*
-*	Token della clausola *HAVING*
-*/
-
-TOKEN :
-{
+ * HAVING CLAUSE
+ */
 	< KEYWORD_HAVING:    "HAVING" >
-}
+    |
 
 /*
-*	Token della clausola *UP TO*
-*/
-
-TOKEN :
-{
+ * UP TO CLAUSE
+ */
 	< KEYWORD_UP:        "UP" >
-|
+    |
 	< KEYWORD_TO:        "TO" >
-}
-
-
+	|
 
 /*
-*	Token della clausola *ON EMPTY SELECTION*
-*/
-TOKEN :
-{
+ * ON EMPTY SELECTION CLAUSE
+ */
 	< KEYWORD_ON:        "ON"        >
-|
+    |
 	< KEYWORD_EMPTY:     "EMPTY"     >
-|
+    |
 	< KEYWORD_SELECTION: "SELECTION" >
-|
+    |
 //	< KEYWORD_INSERT:    "INSERT"    >
-//|
+//  |
 	< KEYWORD_NOTHING:   "NOTHING"   >
-|
+    |
 	< KEYWORD_DEFAULT:   "DEFAULT"   >
-}
+	|
 
 /*
-*	Token della clausola *SAMPLING*
-*/
-
-TOKEN :
-{
+ * SAMPLING CLAUSE
+ */
 	< KEYWORD_SAMPLING:  "SAMPLING" >
-|
+    |
 //	< KEYWORD_ON:        "ON"       >
-//|
+//  |
 	< KEYWORD_EVENT:     "EVENT"    >
-|
+    |
 //	< KEYWORD_IF:        "IF"       >
-//|
+//  |
 //	< KEYWORD_EVERY:     "EVERY"    >
-//|
+//  |
 	< KEYWORD_ELSE:      "ELSE"     >
-}
+	|
 
 /*
-*	Token della clausola *ON UNSUPPORTED SAMPLING RATE*
-*/
-
-TOKEN :
-{
+ *	Token della clausola *ON UNSUPPORTED SAMPLING RATE*
+ */
 //	< KEYWORD_ON:          "ON"          >
-//|
+//  |
 	< KEYWORD_UNSUPPORTED: "UNSUPPORTED" >
-|
+    |
 	< KEYWORD_SAMPLE:      "SAMPLE"      >
-|
+    |
 	< KEYWORD_RATE:        "RATE"        >
-|
+    |
 	< KEYWORD_DO:          "DO"          >
-|
+    |
 //	< KEYWORD_NOT:         "NOT"         >
-//|
+//  |
 	< KEYWORD_SLOW:        "SLOW"        >
-|
+    |
 	< KEYWORD_DOWN:        "DOWN"        >
-}
+	|
 
 /*
-*	Token della clausola *REFRESH*
-*/
-
-TOKEN :
-{
+ * REFRESH CLAUSE
+ */
 	< KEYWORD_REFRESH:   "REFRESH" >
-|
+    |
 //	< KEYWORD_EVERY:     "EVERY"   >
-//|
+//  |
 	< KEYWORD_NEVER:     "NEVER"   >
-}
+	|
 
 /*
-*	Token della clausola *EXECUTE IF*
-*/
-
-TOKEN :
-{
+ * EXECUTE IF CLAUSE
+ */
 	< KEYWORD_EXECUTE:   "EXECUTE" >
-|
+    |
 	< KEYWORD_IF:        "IF"      >
-|
+    |
 	< KEYWORD_EXISTS :   "EXISTS" >
-}
+	|
 
 /*
-*	Token della clausola *TERMINATE AFTER*
-*/
-
-TOKEN :
-{
+ * TERMINATE AFTER CLAUSE
+ */
 	< KEYWORD_TERMINATE:  "TERMINATE"  >
-|
+    |
 	< KEYWORD_AFTER:      "AFTER"      >
-|
+    |
 	< KEYWORD_SELECTIONS: "SELECTIONS" >
-}
+	|
 
 /*
-*	Token della clausola *FROM*
-*/
-
-TOKEN :
-{
+ * FROM CLAUSE
+ */
 	< KEYWORD_FROM:      "FROM" >
-//|
+    |
 //	< KEYWORD_AS:        "AS"   >
-}
-
+//  |
 
 /*
-*	Token della clausola *SET*
-*/
-TOKEN:
-{
+ * SET CLAUSE
+ */
   	< KEYWORD_SET:    "SET"  >
-  	//|
-	//< KEYWORD_ON: "ON"    >
-}
+    |
+//  < KEYWORD_ON: "ON"    >
+//  |
 
 /*
-*	Token per le STRUTTURE DATI
-*/
-
-TOKEN :
-{
+ * STREAM DATA STRUCTURE
+ */
 	< KEYWORD_STREAM:   "STREAM"   >
-|
-	< KEYWORD_SNAPSHOT: "SNAPSHOT" >
-}
+	|
 
 /*
-*	Altri token
-*/
-
-TOKEN :
-{
-	/* Token usato, insieme a DURATION, per introdurre un TIME QUANTUM */
-	< KEYWORD_WITH:     "WITH" >
-|
-	/* Token usato, insieme a WITH, per introdurre un TIME QUANTUM */
-	< KEYWORD_DURATION: "DURATION" >
-|
-	/* Token usato per indicare un numero di campioni */
+ * MISC TOKENS
+ */
 	< KEYWORD_SAMPLES:  "SAMPLES"  >
-|
-	/* Token usato per indicare un numero di campioni pari a uno */
+    |
 	< KEYWORD_ONE:      "ONE"      >
-|
-	/* Token usato all'interno delle espressioni Booleane (per verificare se sono TRUE, FALSE o UNKNOWN)
-	oppure per confrontare un valore con NULL */
+    |
 	< KEYWORD_IS:       "IS" >
-|
+    |
 	< KEYWORD_BETWEEN:  "BETWEEN"  >
-|
+    |
 	< KEYWORD_LIKE:     "LIKE"     >
-}
+	|
 
 /*
-*	OPERATORI ALGEBRICI
-*/
-
-TOKEN :
-{
+ * ALGEBRAIC OPERATORS
+ */
 	< OPERATOR_MULTIPLY: "*" >
-|
+    |
 	< OPERATOR_DIVIDE:   "/" >
-|
+    |
 	< OPERATOR_PLUS:     "+" >
-|
+    |
 	< OPERATOR_MINUS:    "-" >
-}
+	|
 
 /*
-*	OPERATORI BOOLEANI
-*/
+ * BOOLEAN OPERATORS
+ */
 
-TOKEN :
-{
 	< OPERATOR_NOT:     "NOT" >
-|
+    |
 	< OPERATOR_XOR:     "XOR" >
-|
+    |
 	< OPERATOR_AND:     "AND" >
-|
-	< OPERATOR_OR:      "OR"  >
-}
+    |
+    < OPERATOR_OR:      "OR"  >
+    |
 
 /*
-*	OPERATORI BIT A BIT
-*/
-
-TOKEN :
-{
+ * BITWISE OPERATORS
+ */
 	< OPERATOR_BITWISE_NOT: "!" >
-|
+    |
 	< OPERATOR_BITWISE_LSH: "<<" >
-|
+    |
 	< OPERATOR_BITWISE_RSH: ">>" >
-|
-	< OPERATOR_BITWISE_XOR: "^" >
-|
+    |
+    < OPERATOR_BITWISE_XOR: "^" >
+    |
 	< OPERATOR_BITWISE_AND: "&" >
-|
+    |
 	< OPERATOR_BITWISE_OR:  "|"  >
-}
+	|
 
 /*
-*	OPERATORI DI CONFRONTO
-*/
-TOKEN :
-{
+ * COMPARISON OPERATORS
+ */
 	< OPERATOR_GREATER:       ">"  >
-|
+    |
 	< OPERATOR_LESS:          "<"  >
-|
+    |
 	< OPERATOR_GREATER_EQUAL: ">=" >
-|
+    |
 	< OPERATOR_LESS_EQUAL:    "<=" >
-|
+    |
 	< OPERATOR_EQUAL:         "="  >
-|
+    |
 	< OPERATOR_NOT_EQUAL:     "<>" | "!=" >
-}
+	|
 
 /*
-*	FUNZIONI DI AGGREGAZIONE
-*/
-TOKEN :
-{
+ *	FUNZIONI DI AGGREGAZIONE
+ */
 	< FUNCTION_COUNT:     "COUNT"     >
-|
+    |
 	< FUNCTION_AVG:       "AVG"       >
-|
+    |
 	< FUNCTION_MAX:       "MAX"       >
-|
+    |
 	< FUNCTION_MIN:       "MIN"       >
-|
+    |
 	< FUNCTION_SUM:       "SUM"       >
-//|
+    |
 //	< FUNCTION_TIMESTAMP: "TIMESTAMP" >
-}
+//  |
 
 /*
-*	UNITA' DI TEMPO
-*/
-
-TOKEN :
-{
+ * TIME UNITS
+ */
 	< TIMEUNIT_S:  "seconds"      | "s"  >
-|
+    |
 	< TIMEUNIT_M:  "minutes"      | "m"  >
-|
+    |
 	< TIMEUNIT_H:  "hours"        | "h"  >
-|
+    |
 	< TIMEUNIT_MS: "milliseconds" | "ms" >
-|
+    |
 	< TIMEUNIT_D:  "days"         | "d"  >
-|
+    |
 	< TIMEUNIT_MT: "months"       | "mt" >
-}
+	|
 
 /*
-*	TIPI DI DATO
-*/
-
-TOKEN :
-{
+ * DATA TYPES
+ */
 	< TYPE_ID:      "ID"        >
-|
+    |
 	< TYPE_TS:      "TIMESTAMP" >
-|
+    |
 	< TYPE_BOOLEAN: "BOOLEAN"   >
-|
+    |
 	< TYPE_INTEGER: "INTEGER"   >
-|
+    |
 	< TYPE_FLOAT:   "FLOAT"     >
-|
+    |
 	< TYPE_STRING:  "STRING"    >
 }
 
@@ -1395,17 +1297,6 @@ void CreateStreamClause() :
 	FieldDefinitionList()
 }
 
-void CreateSnapshotClause() :
-{}
-{
-	<KEYWORD_SNAPSHOT>
-	Identifier() /* DataStructureName */
-	FieldDefinitionList()
-	<KEYWORD_WITH>
-	<KEYWORD_DURATION>
-	Duration()
-}
-
 void InsertionStatement() :
 {}
 {
@@ -1425,16 +1316,6 @@ void InsertStreamClause() :
 {}
 {
 	<KEYWORD_STREAM>
-	Identifier() /* DataStructureName */
-	[
-		FieldList()
-	]
-}
-
-void InsertSnapshotClause() :
-{}
-{
-	<KEYWORD_SNAPSHOT>
 	Identifier() /* DataStructureName */
 	[
 		FieldList()
