@@ -7,27 +7,25 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
- * @author Guido Rota 23/02/15.
+ * @author Guido Rota 24/02/15.
  */
-public final class Field implements Expression {
+public final class Average implements Expression {
 
-    private final Attribute att;
+    private final Expression exp;
+    private final Expression cond;
 
-    // cached index
-    private int idx = -1;
-
-    public Field(Attribute att) {
-        this.att = att;
+    public Average(Expression exp, Expression cond) {
+        this.exp = exp;
+        this.cond = cond;
     }
 
     @Override
     public DataType getType() {
-        return att.getType();
+        return exp.getType();
     }
 
     @Override
     public Object compute(int index, BufferView buffer) {
-
         return null;
     }
 
