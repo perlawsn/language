@@ -68,7 +68,7 @@ public final class ArrayBuffer implements Buffer {
             if (len == cap) {
                 grow();
             }
-            data[len] = r.getFields();
+            data[len] = r.values();
             len++;
         } finally {
             idxLk.unlock();
