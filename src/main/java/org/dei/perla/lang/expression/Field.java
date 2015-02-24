@@ -4,7 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Guido Rota 23/02/15.
@@ -23,6 +24,13 @@ public final class Field implements Expression {
     @Override
     public DataType getType() {
         return att.getType();
+    }
+
+    @Override
+    public Set<Attribute> attributes() {
+        Set<Attribute> s = new TreeSet<>();
+        s.add(att);
+        return s;
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.record.Attribute;
 
-import java.time.Duration;
 import java.util.List;
 
 /**

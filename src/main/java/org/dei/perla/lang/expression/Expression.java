@@ -4,7 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Guido Rota 23/02/15.
@@ -12,6 +12,8 @@ import java.util.List;
 public interface Expression {
 
     public DataType getType();
+
+    public Set<Attribute> attributes();
 
     public Object compute(int index, BufferView buffer);
 
