@@ -5,6 +5,6 @@ package org.dei.perla.lang.executor;
  */
 public abstract class ArrayBufferReleaser {
 
-    protected abstract void releaseView(BufferView v);
+    protected abstract void releaseChildView(BufferView v);
 
 }

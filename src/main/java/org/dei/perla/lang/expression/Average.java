@@ -30,7 +30,7 @@ public final class Average implements Expression {
     }
 
     @Override
-    public Object compute(int index, BufferView buffer) {
+    public Object compute(Object[] cur, BufferView buffer) {
         return null;
     }
 

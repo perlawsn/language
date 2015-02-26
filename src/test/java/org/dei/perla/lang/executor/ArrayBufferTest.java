@@ -159,7 +159,60 @@ public class ArrayBufferTest {
         BufferView v0 = b.unmodifiableView();
         assertThat(v0, notNullValue());
 
-        BufferView v1 = b.unmodifiableView();
+        b.unmodifiableView();
+    }
+
+    @Test
+    public void grandchildView() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 1}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 2}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 3}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 4}));
+
+        BufferView v0 = b.unmodifiableView();
+        assertThat(v0.length(), equalTo(5));
+        assertThat(v0.get(0)[1], equalTo(4));
+        assertThat(v0.get(1)[1], equalTo(3));
+        assertThat(v0.get(2)[1], equalTo(2));
+        assertThat(v0.get(3)[1], equalTo(1));
+        assertThat(v0.get(4)[1], equalTo(0));
+
+        BufferView v1 = v0.subView(4);
+        assertThat(v1.length(), equalTo(4));
+        assertThat(v1.get(0)[1], equalTo(4));
+        assertThat(v1.get(1)[1], equalTo(3));
+        assertThat(v1.get(2)[1], equalTo(2));
+        assertThat(v1.get(3)[1], equalTo(1));
+
+        BufferView v2 = v1.subView(3);
+        assertThat(v2.length(), equalTo(3));
+        assertThat(v2.get(0)[1], equalTo(4));
+        assertThat(v2.get(1)[1], equalTo(3));
+        assertThat(v2.get(2)[1], equalTo(2));
+
+        v2.release();
+        v1.release();
+        v0.release();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void wrongReleaseOrder() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+
+        BufferView v0 = b.unmodifiableView();
+        BufferView v1 = v0.subView(4);
+        v1.subView(3);
+
+        v1.release();
     }
 
 }

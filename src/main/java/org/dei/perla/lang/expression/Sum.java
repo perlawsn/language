@@ -59,15 +59,15 @@ public final class Sum implements Expression {
     }
 
     @Override
-    public Object compute(int i, BufferView buf) {
+    public Object compute(Object[] cur, BufferView buf) {
         if (tRes == DataType.INTEGER) {
-            Integer op1 = (Integer) e1.compute(i, buf);
-            Integer op2 = (Integer) e2.compute(i, buf);
+            Integer op1 = (Integer) e1.compute(cur, buf);
+            Integer op2 = (Integer) e2.compute(cur, buf);
             return new Constant(DataType.INTEGER, op1 + op2);
 
         } else {
-            Float op1 = (Float) e1.compute(i, buf);
-            Float op2 = (Float) e2.compute(i, buf);
+            Float op1 = (Float) e1.compute(cur, buf);
+            Float op2 = (Float) e2.compute(cur, buf);
             return new Constant(DataType.FLOAT, op1 + op2);
         }
     }

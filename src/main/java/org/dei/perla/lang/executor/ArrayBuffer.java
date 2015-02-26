@@ -136,7 +136,7 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
     }
 
     @Override
-    protected void releaseView(BufferView v) {
+    protected void releaseChildView(BufferView v) {
         idxLk.lock();
         try {
             hasView = false;

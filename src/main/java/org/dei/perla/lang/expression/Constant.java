@@ -36,7 +36,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public Object compute(int index, BufferView buffer) {
+    public Object compute(Object[] cur, BufferView buffer) {
         return value;
     }
 

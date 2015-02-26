@@ -15,6 +15,6 @@ public interface Expression {
 
     public Set<Attribute> fields();
 
-    public Object compute(int index, BufferView buffer);
+    public Object compute(Object[] current, BufferView buffer);
 
 }

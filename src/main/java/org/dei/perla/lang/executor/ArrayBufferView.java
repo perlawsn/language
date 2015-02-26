@@ -37,7 +37,7 @@ public class ArrayBufferView extends ArrayBufferReleaser implements BufferView {
         this.parent = parent;
         this.data = parent.data;
         atts = parent.attributes();
-        this.length = newest - oldest + 1;
+        this.length = newest - oldest;
         this.newest = newest;
         this.oldest = oldest;
     }
@@ -60,14 +60,14 @@ public class ArrayBufferView extends ArrayBufferReleaser implements BufferView {
                 throw new IllegalStateException("unreleased sub-views exist");
             }
             released = true;
-            parent.releaseView(this);
+            parent.releaseChildView(this);
         } finally {
             lock.unlock();
         }
     }
 
     @Override
-    protected void releaseView(BufferView v) {
+    protected void releaseChildView(BufferView v) {
         lock.lock();
         try {
             views.remove(v);

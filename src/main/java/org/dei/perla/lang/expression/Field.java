@@ -24,6 +24,10 @@ public final class Field implements Expression {
         return att;
     }
 
+    public int getIndex() {
+        return idx;
+    }
+
     @Override
     public DataType getType() {
         return att.getType();
@@ -37,8 +41,8 @@ public final class Field implements Expression {
     }
 
     @Override
-    public Object compute(int index, BufferView buffer) {
-        return null;
+    public Object compute(Object[] cur, BufferView buffer) {
+        return cur[idx];
     }
 
 }
