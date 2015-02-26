@@ -67,8 +67,6 @@ TOKEN :
 {
 	< KEYWORD_CREATE:   "CREATE" >
     |
-	< KEYWORD_OUTPUT:   "OUTPUT" >
-    |
 	< KEYWORD_AS:       "AS"     >
 }
 
@@ -134,8 +132,6 @@ TOKEN :
 	< KEYWORD_GROUP:     "GROUP"  >
     |
 	< KEYWORD_BY:        "BY"     >
-//  |
-//	< KEYWORD_ALL:       "ALL"    >
     |
     // Keyword employed to define the number of groups created by a timestamp
     // aggregation
@@ -539,24 +535,24 @@ void Statement():
 void SetParametersStament():
 {}
 {
-  <KEYWORD_SET>
-  	SetParameterList()
+    <KEYWORD_SET>
+    SetParameterList()
   	(
-  		","
+        ","
   		SetParameterList()
   	)*
-  <KEYWORD_ON>
+    <KEYWORD_ON>
 	(
-		<IDENTIFIER>
-		|
-		ConstantInteger()
-		|
-		ConstantString()
+        <IDENTIFIER>
+	    |
+	    ConstantInteger()
+	    |
+	    ConstantString()
 	)
 	(
-		","
-		(
-			<IDENTIFIER>
+	    ","
+	    (
+		    <IDENTIFIER>
 			|
 			ConstantInteger()
 			|
@@ -577,30 +573,13 @@ void CreationStatement() :
 {}
 {
 	<KEYWORD_CREATE>
-	[
-		<KEYWORD_OUTPUT>
-	]
-	(
-		StreamCreationStatement()
-	)
-}
-
-void StreamCreationStatement() :
-{}
-{
-	CreateStreamClause()
-	[
-		<KEYWORD_AS>
-		StreamSelectionStatement()
-	]
-}
-
-void CreateStreamClause() :
-{}
-{
 	<KEYWORD_STREAM>
-	Identifier() /* DataStructureName */
+	Identifier() // StreamName
 	FieldDefinitionList()
+	[
+	    <KEYWORD_AS>
+	    StreamSelectionStatement()
+	]
 }
 
 void InsertionStatement() :
@@ -609,7 +588,7 @@ void InsertionStatement() :
 	<KEYWORD_INSERT>
 	<KEYWORD_INTO>
 	<KEYWORD_STREAM>
-	Identifier() // Data structure name
+	Identifier() // StreamName
 	[
 	    FieldList()
 	]
@@ -620,7 +599,7 @@ void StreamSelectionStatement() :
 {}
 {
     LowEveryClause()
-    LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
+    LowSelectionStatement()
 }
 
 void LowEveryClause() :
@@ -642,15 +621,15 @@ void LowEveryClause() :
 	)
 }
 
-void LowSelectionStatement(ExpressionType parExpressionType) :
+void LowSelectionStatement() :
 {}
 {
-	SelectClause(parExpressionType)
+	SelectClause()
 	[
 		GroupByClause()
 	]
 	[
-		HavingClause(parExpressionType)
+		HavingClause()
 	]
 	[
 		UpToClause()
@@ -667,7 +646,7 @@ void LowSelectionStatement(ExpressionType parExpressionType) :
 	]
 }
 
-void SelectClause(ExpressionType parExpressionType) :
+void SelectClause() :
 {}
 {
 	<KEYWORD_SELECT>
@@ -676,34 +655,27 @@ void SelectClause(ExpressionType parExpressionType) :
 		|
 		<KEYWORD_ALL>
 	]
-	FieldSelectionList(parExpressionType)
+	FieldSelectionList()
 }
 
-void FieldSelectionList(ExpressionType parExpressionType) :
+void FieldSelectionList() :
 {}
 {
-	FieldSelection(parExpressionType)
+	FieldSelection()
 	(
 		","
-		FieldSelection(parExpressionType)
+		FieldSelection()
 	)*
 }
 
-void FieldSelection(ExpressionType parExpressionType) :
+void FieldSelection() :
 {}
 {
-	Expression(parExpressionType)
+	Expression(true)
 	[
 		<KEYWORD_DEFAULT>
 		SignedConstant()
 	]
-}
-
-void WhereClause(ExpressionType parExpressionType) :
-{}
-{
-	<KEYWORD_WHERE>
-	Expression(parExpressionType)
 }
 
 void GroupByClause() :
@@ -777,7 +749,8 @@ SamplingClause SamplingClause() :
 		)
 	)
 	[
-		WhereClause(ExpressionType.LOW_LEVEL_NO_AGGR)
+	    <KEYWORD_WHERE>
+	    Expression(false) // No aggregates allowed in where clause
 	]
 }
 
@@ -888,18 +861,9 @@ TerminateAfterClause TerminateAfterClause() :
 	)
 }
 
-void FromClause() :
-{}
-{
-	<KEYWORD_FROM>
-	WindowDefinitionList()
-}
-
-/************************************************************************************************
-*     PRODUZIONI GENERICHE (Segni, Costanti, Nomi di campi, Nomi di tabelle, ecc..)             *
-*                                                                                               *
-************************************************************************************************/
-
+/*
+ * SIGNS, CONSTANTS, VALUES, ETC.
+ */
 void Sign() :
 {}
 {
@@ -1034,17 +998,17 @@ void TimeUnit() :
 {}
 {
 	(
-		<TIMEUNIT_S>
+	<TIMEUNIT_S>
 	|
-		<TIMEUNIT_M>
+	<TIMEUNIT_M>
 	|
-		<TIMEUNIT_H>
+	<TIMEUNIT_H>
 	|
-		<TIMEUNIT_MS>
+	<TIMEUNIT_MS>
 	|
-		<TIMEUNIT_D>
+	<TIMEUNIT_D>
 	|
-		<TIMEUNIT_MT>
+	<TIMEUNIT_MT>
 	)
 }
 
@@ -1125,66 +1089,33 @@ void OptionallyQualifiedIdentifier() :
 }
 
 void Aggregate(ExpressionType parExpressionType) :
-{ Node expression; Node filter = null; Object window = null; AggregationType type; }
-{
-	(
-		(
-			<FUNCTION_COUNT>
-			"("
-			"*"
-			 { type = AggregationType.COUNT; expression = new NodeConstant(new ConstantString("*")); }
-		)
-		|
-		(
-			type = AggregationOperator()
-			"("
-			expression = Expression(parExpressionType)
-		)
-	)
-	(
-		LOOKAHEAD( { parExpressionType == ExpressionType.LOW_LEVEL_ALL } )
-		(
-			","
-			window = WindowSize()
-			[
-				","
-				filter = Expression(parExpressionType)
-			]
-		)
-		|
-		LOOKAHEAD( { parExpressionType == ExpressionType.HIGH_LEVEL_ALL } )
-		(
-			[
-				","
-				filter = Expression(parExpressionType)
-			]
-		)
-	)
-	")"
-	{ return ExpressionsHandler.getNodeAggregation(type, expression, window, filter); }
-}
-
-void FunctionCall(ExpressionType parExpressionType) :
 {}
 {
-	<IDENTIFIER>
-	(
-		LOOKAHEAD(2)
-		(
-			"("
-			")"
-		)
-		|
-		(
-			"("
-			Expression(parExpressionType)
-			(
-				","
-				Expression(parExpressionType)
-			)*
-			")"
-		)
-	)
+    (
+        <FUNCTION_COUNT>
+        "("
+        "*"
+        ","
+        WindowSize()
+        [
+            ","
+            Expression(parExpressionType)
+        ]
+        ")"
+    )
+    |
+    (
+        AggregationOperator()
+        "("
+        Expression(parExpressionType)
+        ","
+        WindowSize()
+        [
+            ","
+            Expression(parExpressionType)
+        ]
+        ")"
+    )
 }
 
 void ExistsAttribute() :
@@ -1193,79 +1124,65 @@ void ExistsAttribute() :
 	<KEYWORD_EXISTS>
 	"("
 	(
-		Identifier() /* LogicalObjectField */
+		Identifier() // LogicalObjectField
 		|
 		<KEYWORD_ALL>
 	)
 	")"
 }
 
-/************************************************************************************************
-*     PRODUZIONI PER LE ESPRESSIONI                                                             *
-*                                                                                               *
-************************************************************************************************/
-
-void Expression(ExpressionType parExpressionType) :
+/*
+ * EXPRESSIONS
+ */
+void Expression(boolean aggregate) :
 {}
 {
-	ExpressionBooleanTerm(parExpressionType)
+	ExpressionBooleanTerm(aggregate)
 	(
 		<OPERATOR_OR>
-		ExpressionBooleanTerm(parExpressionType)
+		ExpressionBooleanTerm(aggregate)
 	)*
 }
 
-void ExpressionBooleanTerm(ExpressionType parExpressionType) :
+void ExpressionBooleanTerm(boolean aggregate) :
 {}
 {
-	ExpressionBooleanFactor(parExpressionType)
+	ExpressionBooleanFactor(aggregate)
 	(
 		<OPERATOR_AND>
-		ExpressionBooleanFactor(parExpressionType)
+		ExpressionBooleanFactor(aggregate)
 	)*
 }
 
-void ExpressionBooleanFactor(ExpressionType parExpressionType) :
+void ExpressionBooleanFactor(boolean aggregate) :
 {}
 {
-	ExpressionBooleanTest(parExpressionType)
+	ExpressionBooleanTest(aggregate)
 	(
 		<OPERATOR_XOR>
-		ExpressionBooleanTest(parExpressionType)
-
+		ExpressionBooleanTest(aggregate)
 	)*
 }
 
-void ExpressionBooleanTest(ExpressionType parExpressionType) :
+void ExpressionBooleanTest(boolean aggregate) :
 {}
 {
 	(
 		<OPERATOR_NOT>
 	)*
-	ExpressionBooleanPrimary(parExpressionType)
+	ExpressionBooleanPrimary(aggregate)
 }
 
-void LogicTest(Node firstNode) :
+void ExpressionBooleanPrimary(boolean aggregate) :
 {}
 {
-	<KEYWORD_IS>
-	[
-		<OPERATOR_NOT>
-	]
-	LogicValue()
-}
-
-void ExpressionBooleanPrimary(ExpressionType parExpressionType) :
-{}
-{
-	ExpressionBit(parExpressionType)
+	ExpressionBit(aggregate)
 	[
 		(
 			ComparisonOperator()
-			ExpressionBit(parExpressionType)
-
+			ExpressionBit(aggregate)
 			[
-				LogicTest(parentNode)
+				LogicTest()
 			]
 		)
 		|
@@ -1278,73 +1195,80 @@ void ExpressionBooleanPrimary(ExpressionType parExpressionType) :
 				(
 					<CONSTANT_NULL>
 					[
-						LogicTest(parentNode)
+						LogicTest()
 					]
 				)
 				|
 				(
 					LogicValue()
 				)
-
 			)
 		)
 		|
 		(
 			<KEYWORD_BETWEEN>
-			ExpressionBit(parExpressionType)
+			ExpressionBit(aggregate)
 			<OPERATOR_AND>
-			ExpressionBit(parExpressionType)
-
+			ExpressionBit(aggregate)
 			[
-				LogicTest(parentNode)
+				LogicTest()
 			]
 		)
 		|
 		(
 			<KEYWORD_LIKE>
 			ConstantString()
-
 			[
-				LogicTest(parentNode)
+				LogicTest()
 			]
 		)
 	]
 }
 
-void ExpressionBit(ExpressionType parExpressionType) :
+void LogicTest() :
 {}
 {
-	ExpressionBitTerm(parExpressionType)
+	<KEYWORD_IS>
+	[
+		<OPERATOR_NOT>
+	]
+	LogicValue()
+}
+
+void ExpressionBit(boolean aggregate) :
+{}
+{
+	ExpressionBitTerm(aggregate)
 	(
 		<OPERATOR_BITWISE_OR>
-		ExpressionBitTerm(parExpressionType)
+		ExpressionBitTerm(aggregate)
 	)*
 }
 
-void ExpressionBitTerm(ExpressionType parExpressionType) :
+void ExpressionBitTerm(boolean aggregate) :
 {}
 {
-	ExpressionBitFactor(parExpressionType)
+	ExpressionBitFactor(aggregate)
 	(
 		<OPERATOR_BITWISE_AND>
-		ExpressionBitFactor(parExpressionType)
+		ExpressionBitFactor(aggregate)
 	)*
 }
 
-void ExpressionBitFactor(ExpressionType parExpressionType) :
+void ExpressionBitFactor(boolean aggregate) :
 {}
 {
-	ExpressionBitShift(parExpressionType)
+	ExpressionBitShift(aggregate)
 	(
 		<OPERATOR_BITWISE_XOR>
-		ExpressionBitShift(parExpressionType)
+		ExpressionBitShift(aggregate)
 	)*
 }
 
-void ExpressionBitShift(ExpressionType parExpressionType) :
+void ExpressionBitShift(boolean aggregate) :
 {}
 {
-	ExpressionBitTest(parExpressionType)
+	ExpressionBitTest(aggregate)
 	[
 		(
 			<OPERATOR_BITWISE_LSH>
@@ -1355,110 +1279,87 @@ void ExpressionBitShift(ExpressionType parExpressionType) :
 	]
 }
 
-void ExpressionBitTest(ExpressionType parExpressionType) :
+void ExpressionBitTest(boolean aggregate) :
 {}
 {
 	(
 		<OPERATOR_BITWISE_NOT>
 	)*
-	ExpressionValue(parExpressionType)
+	ExpressionValue(aggregate)
 }
 
-void ExpressionValue(ExpressionType parExpressionType) :
+void ExpressionValue(boolean aggregate) :
 {}
 {
-	ExpressionValueTerm(parExpressionType)
+	ExpressionValueTerm(aggregate)
 	(
 		(
 			<OPERATOR_PLUS>
 			|
 			<OPERATOR_MINUS>
 		)
-
-		ExpressionValueTerm(parExpressionType)
+		ExpressionValueTerm(aggregate)
 	)*
 }
 
-void ExpressionValueTerm(ExpressionType parExpressionType) :
+void ExpressionValueTerm(boolean aggregate) :
 {}
 {
-	ExpressionValueFactor(parExpressionType)
+	ExpressionValueFactor(aggregate)
 	(
 		(
 			<OPERATOR_MULTIPLY>
 			|
 			<OPERATOR_DIVIDE>
 		)
-
-		ExpressionValueFactor(parExpressionType)
+		ExpressionValueFactor(aggregate)
 	)*
 }
 
-void ExpressionValueFactor(ExpressionType parExpressionType) :
+void ExpressionValueFactor(boolean aggregate) :
 {}
 {
 	[
 		Sign()
 	]
-	ExpressionValuePrimary(parExpressionType)
+	ExpressionValuePrimary(aggregate)
 }
 
-void ExpressionValuePrimary(ExpressionType parExpressionType) :
+void ExpressionValuePrimary(boolean aggregate) :
 {}
 {
 	Constant()
 	|
 	ExistsAttribute()
 	|
-	LOOKAHEAD(2)
-	FunctionCall(parExpressionType)
-	|
 	(
 		"("
-		Expression(parExpressionType)
+		Expression(aggregate)
 		")"
 	)
 	|
-	LOOKAHEAD( { parExpressionType == ExpressionType.LOW_LEVEL_ALL } )
+	LOOKAHEAD( { aggregate } )
 	(
 		<TYPE_ID>
 		|
 		<KEYWORD_GROUPTS>
 		|
-		Aggregate(parExpressionType)
+		Aggregate(aggregate)
 		|
-		OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
+		Identifier() // LogicalObjectField
 	)
 	|
-	LOOKAHEAD( { parExpressionType == ExpressionType.HIGH_LEVEL_ALL } )
-	(
-		Aggregate(parExpressionType)
-		|
-		OptionallyQualifiedIdentifier() /* WindowField */
-	)
-	|
-	LOOKAHEAD( { parExpressionType == ExpressionType.LOW_LEVEL_NO_AGGR } )
+	LOOKAHEAD( { !aggregate } )
 	(
 		<TYPE_ID>
 		|
-		OptionallyQualifiedIdentifier() /* PilotJoinField, LogicalObjectField */
-	)
-	|
-	LOOKAHEAD( { parExpressionType == ExpressionType. LOW_LEVEL_NO_AGGR_NO_PILOT } )
-	(
-		(
-		<TYPE_ID>
-		|
-		Identifier() /* LogicalObjectField */
-		)
+		Identifier() // LogicalObjectField
 	)
 }
 
-/************************************************************************************************
-*     PRODUZIONI RELATIVE A LISTE DI ELEMENTI                                                   *
-*                                                                                               *
-************************************************************************************************/
-
+/*
+ * ELEMENT LISTS
+ */
 void FieldDefinitionList() :
 {}
 {
@@ -1467,7 +1368,6 @@ void FieldDefinitionList() :
 	(
 		","
 		FieldDefinition()
-
 	)*
 	")"
 }
@@ -1475,7 +1375,7 @@ void FieldDefinitionList() :
 void FieldDefinition() :
 {}
 {
-	Identifier() /* DataStructureField */
+	Identifier() // DataStructureField
 	FieldType()
 	[
 		<KEYWORD_DEFAULT>
@@ -1487,10 +1387,10 @@ void FieldList() :
 {}
 {
 	"("
-	Identifier() /* DataStructureField */
+	Identifier() // DataStructureField
 	(
 		","
-		Identifier() /* DataStructureField */
+		Identifier() // DataStructureField
 	)*
 	")"
 }
@@ -1498,10 +1398,10 @@ void FieldList() :
 void EventList() :
 {}
 {
-	Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
+	Identifier() // LogicalObjectEvent
 	(
 		","
-		Identifier() /* LogicalObjectEvent */ { ClausesContext.addEvent(tokenId); }
+		Identifier() // LogicalObjectEvent
 	)*
 }
 
@@ -1518,34 +1418,9 @@ void CorrelatedTableList() :
 void CorrelatedTable() :
 {}
 {
-	Identifier() /* DataStructureName */
+	Identifier() // StreamName
 	<KEYWORD_ON>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
-}
-
-void WindowDefinitionList() :
-{}
-{
-	WindowDefinition()
-	(
-		","
-		WindowDefinition()
-	)*
-}
-
-void WindowDefinition() :
-{}
-{
-	Identifier() /* DataStructureName */
-	[
-		"("
-		WindowSize()
-		")"
-	]
-	[
-		<KEYWORD_AS>
-		Identifier() /* DataStructureName */
-	]
+	Expression(false)
 }
 
 void FieldGroupingByList() :
@@ -1565,7 +1440,7 @@ void FieldGroupingByList() :
 void FieldGroupingBy() :
 {}
 {
-	Identifier() /* LogicalObjectField */
+	Identifier() // Logical object field
 }
 
 void FieldGroupingByTs() :
@@ -1583,9 +1458,9 @@ void FieldGroupingByTs() :
 void WindowFieldList() :
 {}
 {
-	OptionallyQualifiedIdentifier() /* WindowField */
+	OptionallyQualifiedIdentifier() // Window field
 	(
 		","
-		OptionallyQualifiedIdentifier() /* WindowField */
+		OptionallyQualifiedIdentifier() // Window field
 	)*
 }
