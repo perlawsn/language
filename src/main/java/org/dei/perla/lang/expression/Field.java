@@ -13,12 +13,11 @@ import java.util.TreeSet;
 public final class Field implements Expression {
 
     private final Attribute att;
+    private final int idx;
 
-    // cached index
-    private int idx = -1;
-
-    public Field(Attribute att) {
+    public Field(Attribute att, int idx) {
         this.att = att;
+        this.idx = idx;
     }
 
     public Attribute getAttribute() {
@@ -39,7 +38,6 @@ public final class Field implements Expression {
 
     @Override
     public Object compute(int index, BufferView buffer) {
-
         return null;
     }
 

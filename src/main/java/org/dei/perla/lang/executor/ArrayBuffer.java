@@ -11,19 +11,19 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 22/02/15.
  */
-public final class ArrayBuffer implements Buffer {
+public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
 
     private final List<Attribute> atts;
 
     // Index of the timestamp attribute
     private final int tsIdx;
 
-    private final Lock idxLk = new ReentrantLock();
     private final Lock dataLk = new ReentrantLock();
     private Object[][] data;
+
+    private final Lock idxLk = new ReentrantLock();
     private int cap;
     private int len;
-
     private boolean hasView = false;
 
     public ArrayBuffer(List<Attribute> atts, int cap) {
@@ -115,7 +115,7 @@ public final class ArrayBuffer implements Buffer {
         }
 
         sort(array, threshold);
-        return new ArrayBufferView(array, threshold);
+        return new ArrayBufferView(this, array, threshold);
     }
 
     // Insertion sort, since we expect the content of the buffer to be
@@ -135,44 +135,14 @@ public final class ArrayBuffer implements Buffer {
         }
     }
 
-    private class ArrayBufferView implements BufferView {
-
-        private final Object[][] data;
-        private final int length;
-
-        private ArrayBufferView(Object[][] data, int length) {
-            this.data = data;
-            this.length = length;
+    @Override
+    protected void releaseView(BufferView v) {
+        idxLk.lock();
+        try {
+            hasView = false;
+        } finally {
+            idxLk.unlock();
         }
-
-        @Override
-        public List<Attribute> attributes() {
-            return atts;
-        }
-
-        @Override
-        public int length() {
-            return length;
-        }
-
-        @Override
-        public void release() {
-            idxLk.lock();
-            try {
-                hasView = false;
-            } finally {
-                idxLk.unlock();
-            }
-        }
-
-        @Override
-        public Object[] get(int i) {
-            if (i > length) {
-                throw new IndexOutOfBoundsException();
-            }
-            return data[length - 1 - i];
-        }
-
     }
 
 }

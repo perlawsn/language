@@ -525,11 +525,11 @@ void StatementSequence() :
 void Statement():
 {}
 {
-  SetParametersStament()
-  |
-  CreationStatement()
-  |
-  InsertionStatement()
+    SetParametersStament()
+    |
+    CreationStatement()
+    |
+    InsertionStatement()
 }
 
 void SetParametersStament():
@@ -865,7 +865,6 @@ void OnUnsupportedSRClause() :
 	<KEYWORD_SAMPLE>
 	<KEYWORD_RATE>
 	(
-	(
 		<KEYWORD_DO>
 		<OPERATOR_NOT>
 		<KEYWORD_SAMPLE>
@@ -874,7 +873,6 @@ void OnUnsupportedSRClause() :
 	(
 		<KEYWORD_SLOW>
 		<KEYWORD_DOWN>
-	)
 	)
 }
 

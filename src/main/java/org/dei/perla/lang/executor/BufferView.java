@@ -45,4 +45,6 @@ public interface BufferView {
      */
     public Object[] get(int i);
 
+    public BufferView subView(int samples);
+
 }
