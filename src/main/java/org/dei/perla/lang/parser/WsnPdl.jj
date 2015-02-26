@@ -582,6 +582,41 @@ void CreationStatement() :
 	]
 }
 
+void FieldDefinitionList() :
+{}
+{
+	"("
+	FieldDefinition()
+	(
+		","
+		FieldDefinition()
+	)*
+	")"
+}
+
+void FieldDefinition() :
+{}
+{
+	Identifier() // DataStructureField
+	FieldType()
+	[
+		<KEYWORD_DEFAULT>
+		SignedConstant()
+	]
+}
+
+void FieldList() :
+{}
+{
+	"("
+	Identifier() // DataStructureField
+	(
+		","
+		Identifier() // DataStructureField
+	)*
+	")"
+}
+
 void InsertionStatement() :
 {}
 {
@@ -686,27 +721,43 @@ void GroupByClause() :
 	FieldGroupingByList()
 }
 
-void GroupClause() :
+void FieldGroupingByList() :
 {}
 {
-	<KEYWORD_GROUP>
 	(
-		(
-			<KEYWORD_BY>
-			WindowFieldList()
-		)
+		FieldGroupingBy()
 		|
-		(
-			<KEYWORD_ALL>
-		)
+		FieldGroupingByTs()
 	)
+	(
+		","
+		FieldGroupingBy()
+	)*
 }
 
-void HavingClause(ExpressionType parExpressionType) :
+void FieldGroupingBy() :
+{}
+{
+	Identifier() // Logical object field
+}
+
+void FieldGroupingByTs() :
+{}
+{
+	<TYPE_TS>
+	"("
+	Duration()
+	","
+	ConstantInteger()
+	<KEYWORD_GROUPS>
+	")"
+}
+
+void HavingClause() :
 {}
 {
 	<KEYWORD_HAVING>
-	Expression(parExpressionType)
+	Expression(true)
 }
 
 void UpToClause() :
@@ -731,7 +782,7 @@ void OnEmptySelectionClause() :
 	)
 }
 
-SamplingClause SamplingClause() :
+void SamplingClause() :
 {}
 {
 	<KEYWORD_SAMPLING>
@@ -750,7 +801,7 @@ SamplingClause SamplingClause() :
 	)
 	[
 	    <KEYWORD_WHERE>
-	    Expression(false) // No aggregates allowed in where clause
+	    Expression(false) // No aggregates allowed
 	]
 }
 
@@ -760,6 +811,16 @@ void OnEventClause() :
 	<KEYWORD_ON>
 	<KEYWORD_EVENT>
 	EventList()
+}
+
+void EventList() :
+{}
+{
+	Identifier() // LogicalObjectEvent
+	(
+		","
+		Identifier() // LogicalObjectEvent
+	)*
 }
 
 void SamplingIfEveryClause() :
@@ -785,18 +846,18 @@ void SamplingIfClause() :
 {}
 {
 	<KEYWORD_IF>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+	Expression(false) // No aggregations allowed
 }
 
 void SamplingEveryClause() :
 {}
 {
 	<KEYWORD_EVERY>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+	Expression(false) // No aggregations allowed
 	TimeUnit()
 }
 
-OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
+void OnUnsupportedSRClause() :
 {}
 {
 	<KEYWORD_ON>
@@ -817,7 +878,7 @@ OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
 	)
 }
 
-RefreshClause RefreshClause() :
+void RefreshClause() :
 {}
 {
 	<KEYWORD_REFRESH>
@@ -842,13 +903,13 @@ void ExecuteIfClause() :
 {
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR_NO_PILOT)
+	Expression(false) // No aggregations allowed
 	[
 		RefreshClause()
 	]
 }
 
-TerminateAfterClause TerminateAfterClause() :
+void TerminateAfterClause() :
 {}
 {
 	<KEYWORD_TERMINATE>
@@ -1068,54 +1129,6 @@ void Identifier() :
 {}
 {
 	<IDENTIFIER>
-}
-
-void QualifiedIdentifier() :
-{}
-{
-	<IDENTIFIER>
-	"."
-	<IDENTIFIER>
-}
-
-void OptionallyQualifiedIdentifier() :
-{}
-{
-	<IDENTIFIER>
-	[
-		"."
-		<IDENTIFIER>
-	]
-}
-
-void Aggregate(ExpressionType parExpressionType) :
-{}
-{
-    (
-        <FUNCTION_COUNT>
-        "("
-        "*"
-        ","
-        WindowSize()
-        [
-            ","
-            Expression(parExpressionType)
-        ]
-        ")"
-    )
-    |
-    (
-        AggregationOperator()
-        "("
-        Expression(parExpressionType)
-        ","
-        WindowSize()
-        [
-            ","
-            Expression(parExpressionType)
-        ]
-        ")"
-    )
 }
 
 void ExistsAttribute() :
@@ -1357,110 +1370,33 @@ void ExpressionValuePrimary(boolean aggregate) :
 	)
 }
 
-/*
- * ELEMENT LISTS
- */
-void FieldDefinitionList() :
+void Aggregate(boolean aggregate) :
 {}
 {
-	"("
-	FieldDefinition()
-	(
-		","
-		FieldDefinition()
-	)*
-	")"
+    (
+        <FUNCTION_COUNT>
+        "("
+        "*"
+        ","
+        WindowSize()
+        [
+            ","
+            Expression(aggregate)
+        ]
+        ")"
+    )
+    |
+    (
+        AggregationOperator()
+        "("
+        Expression(aggregate)
+        ","
+        WindowSize()
+        [
+            ","
+            Expression(aggregate)
+        ]
+        ")"
+    )
 }
 
-void FieldDefinition() :
-{}
-{
-	Identifier() // DataStructureField
-	FieldType()
-	[
-		<KEYWORD_DEFAULT>
-		SignedConstant()
-	]
-}
-
-void FieldList() :
-{}
-{
-	"("
-	Identifier() // DataStructureField
-	(
-		","
-		Identifier() // DataStructureField
-	)*
-	")"
-}
-
-void EventList() :
-{}
-{
-	Identifier() // LogicalObjectEvent
-	(
-		","
-		Identifier() // LogicalObjectEvent
-	)*
-}
-
-void CorrelatedTableList() :
-{}
-{
-	CorrelatedTable()
-	(
-		","
-		CorrelatedTable()
-	)*
-}
-
-void CorrelatedTable() :
-{}
-{
-	Identifier() // StreamName
-	<KEYWORD_ON>
-	Expression(false)
-}
-
-void FieldGroupingByList() :
-{}
-{
-	(
-		FieldGroupingBy()
-		|
-		FieldGroupingByTs()
-	)
-	(
-		","
-		FieldGroupingBy()
-	)*
-}
-
-void FieldGroupingBy() :
-{}
-{
-	Identifier() // Logical object field
-}
-
-void FieldGroupingByTs() :
-{}
-{
-	<TYPE_TS>
-	"("
-	Duration()
-	","
-	ConstantInteger()
-	<KEYWORD_GROUPS>
-	")"
-}
-
-void WindowFieldList() :
-{}
-{
-	OptionallyQualifiedIdentifier() // Window field
-	(
-		","
-		OptionallyQualifiedIdentifier() // Window field
-	)*
-}
