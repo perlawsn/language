@@ -60,39 +60,45 @@ MORE:
 	"*/" : DEFAULT
 }
 
-TOKEN :
-{
 /*
  * CREATE CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_CREATE:   "CREATE" >
     |
 	< KEYWORD_OUTPUT:   "OUTPUT" >
     |
 	< KEYWORD_AS:       "AS"     >
-    |
+}
 
 /*
  * INSERT CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_INSERT:   "INSERT" >
     |
 	< KEYWORD_INTO:     "INTO" >
-	|
+}
 
 /*
  * EVERY CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_EVERY:        "EVERY"        >
 	|
 	< KEYWORD_SYNCHRONIZED: "SYNCHRONIZED" >
 	|
 	< KEYWORD_IN:           "IN"           >
-	|
+}
 
 /*
  * SELECT CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_SELECT:    "SELECT"   >
     |
 	< KEYWORD_DISTINCT:  "DISTINCT" >
@@ -101,24 +107,30 @@ TOKEN :
     |
 	// Virtual record field created by the GROUP BY clause
 	<KEYWORD_GROUPTS:    "GROUP_TS" >
-    |
+}
 
 /*
  * UNION CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_UNION:     "UNION" >
 //  |
 //	< KEYWORD_ALL:       "ALL"   >
-    |
+}
 
 /*
  * WHERE CLAUSE  */
+TOKEN :
+{
 	< KEYWORD_WHERE:     "WHERE" >
-    |
+}
 
 /*
  * GROUP BY CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_GROUP:     "GROUP"  >
     |
 	< KEYWORD_BY:        "BY"     >
@@ -128,25 +140,31 @@ TOKEN :
     // Keyword employed to define the number of groups created by a timestamp
     // aggregation
 	< KEYWORD_GROUPS:    "GROUPS" >
-	|
+}
 
 /*
  * HAVING CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_HAVING:    "HAVING" >
-    |
+}
 
 /*
  * UP TO CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_UP:        "UP" >
     |
 	< KEYWORD_TO:        "TO" >
-	|
+}
 
 /*
  * ON EMPTY SELECTION CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_ON:        "ON"        >
     |
 	< KEYWORD_EMPTY:     "EMPTY"     >
@@ -158,11 +176,13 @@ TOKEN :
 	< KEYWORD_NOTHING:   "NOTHING"   >
     |
 	< KEYWORD_DEFAULT:   "DEFAULT"   >
-	|
+}
 
 /*
  * SAMPLING CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_SAMPLING:  "SAMPLING" >
     |
 //	< KEYWORD_ON:        "ON"       >
@@ -174,11 +194,13 @@ TOKEN :
 //	< KEYWORD_EVERY:     "EVERY"    >
 //  |
 	< KEYWORD_ELSE:      "ELSE"     >
-	|
+}
 
 /*
  *	Token della clausola *ON UNSUPPORTED SAMPLING RATE*
  */
+TOKEN :
+{
 //	< KEYWORD_ON:          "ON"          >
 //  |
 	< KEYWORD_UNSUPPORTED: "UNSUPPORTED" >
@@ -194,63 +216,77 @@ TOKEN :
 	< KEYWORD_SLOW:        "SLOW"        >
     |
 	< KEYWORD_DOWN:        "DOWN"        >
-	|
+}
 
 /*
  * REFRESH CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_REFRESH:   "REFRESH" >
     |
 //	< KEYWORD_EVERY:     "EVERY"   >
 //  |
 	< KEYWORD_NEVER:     "NEVER"   >
-	|
+}
 
 /*
  * EXECUTE IF CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_EXECUTE:   "EXECUTE" >
     |
 	< KEYWORD_IF:        "IF"      >
     |
 	< KEYWORD_EXISTS :   "EXISTS" >
-	|
+}
 
 /*
  * TERMINATE AFTER CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_TERMINATE:  "TERMINATE"  >
     |
 	< KEYWORD_AFTER:      "AFTER"      >
     |
 	< KEYWORD_SELECTIONS: "SELECTIONS" >
-	|
+}
 
 /*
  * FROM CLAUSE
  */
+TOKEN :
+{
 	< KEYWORD_FROM:      "FROM" >
-    |
-//	< KEYWORD_AS:        "AS"   >
 //  |
+//	< KEYWORD_AS:        "AS"   >
+}
 
 /*
  * SET CLAUSE
  */
+TOKEN :
+{
   	< KEYWORD_SET:    "SET"  >
-    |
-//  < KEYWORD_ON: "ON"    >
 //  |
+//  < KEYWORD_ON: "ON"    >
+}
 
 /*
  * STREAM DATA STRUCTURE
  */
+TOKEN :
+{
 	< KEYWORD_STREAM:   "STREAM"   >
-	|
+}
 
 /*
  * MISC TOKENS
  */
+TOKEN :
+{
 	< KEYWORD_SAMPLES:  "SAMPLES"  >
     |
 	< KEYWORD_ONE:      "ONE"      >
@@ -260,11 +296,13 @@ TOKEN :
 	< KEYWORD_BETWEEN:  "BETWEEN"  >
     |
 	< KEYWORD_LIKE:     "LIKE"     >
-	|
+}
 
 /*
  * ALGEBRAIC OPERATORS
  */
+TOKEN :
+{
 	< OPERATOR_MULTIPLY: "*" >
     |
 	< OPERATOR_DIVIDE:   "/" >
@@ -272,12 +310,13 @@ TOKEN :
 	< OPERATOR_PLUS:     "+" >
     |
 	< OPERATOR_MINUS:    "-" >
-	|
+}
 
 /*
  * BOOLEAN OPERATORS
  */
-
+TOKEN :
+{
 	< OPERATOR_NOT:     "NOT" >
     |
 	< OPERATOR_XOR:     "XOR" >
@@ -285,11 +324,13 @@ TOKEN :
 	< OPERATOR_AND:     "AND" >
     |
     < OPERATOR_OR:      "OR"  >
-    |
+}
 
 /*
  * BITWISE OPERATORS
  */
+TOKEN :
+{
 	< OPERATOR_BITWISE_NOT: "!" >
     |
 	< OPERATOR_BITWISE_LSH: "<<" >
@@ -301,11 +342,13 @@ TOKEN :
 	< OPERATOR_BITWISE_AND: "&" >
     |
 	< OPERATOR_BITWISE_OR:  "|"  >
-	|
+}
 
 /*
  * COMPARISON OPERATORS
  */
+TOKEN :
+{
 	< OPERATOR_GREATER:       ">"  >
     |
 	< OPERATOR_LESS:          "<"  >
@@ -317,11 +360,13 @@ TOKEN :
 	< OPERATOR_EQUAL:         "="  >
     |
 	< OPERATOR_NOT_EQUAL:     "<>" | "!=" >
-	|
+}
 
 /*
  *	FUNZIONI DI AGGREGAZIONE
  */
+TOKEN :
+{
 	< FUNCTION_COUNT:     "COUNT"     >
     |
 	< FUNCTION_AVG:       "AVG"       >
@@ -331,13 +376,15 @@ TOKEN :
 	< FUNCTION_MIN:       "MIN"       >
     |
 	< FUNCTION_SUM:       "SUM"       >
-    |
-//	< FUNCTION_TIMESTAMP: "TIMESTAMP" >
 //  |
+//	< FUNCTION_TIMESTAMP: "TIMESTAMP" >
+}
 
 /*
  * TIME UNITS
  */
+TOKEN :
+{
 	< TIMEUNIT_S:  "seconds"      | "s"  >
     |
 	< TIMEUNIT_M:  "minutes"      | "m"  >
@@ -349,11 +396,13 @@ TOKEN :
 	< TIMEUNIT_D:  "days"         | "d"  >
     |
 	< TIMEUNIT_MT: "months"       | "mt" >
-	|
+}
 
 /*
  * DATA TYPES
  */
+TOKEN :
+{
 	< TYPE_ID:      "ID"        >
     |
 	< TYPE_TS:      "TIMESTAMP" >
@@ -368,53 +417,33 @@ TOKEN :
 }
 
 /*
-*	COSTANTI
-*
-*	NB: I token introdotti in questa sezione NON devono essere usati direttamente nella grammatica.
-*	Bisogna invece usare le corrispondenti produzioni.
-*/
+ * COSTANTS
+ * Don't use these tokens, use the corresponding productions instead.
+ */
 
 /*
-*	Inizializzatore di costante per tipi definiti dall'utente
-*/
-
-TOKEN :
-{
-	< NEW:		"NEW" >
-}
-
-/*
-*	Costante NULL
-*/
-
+ * CONSTANT NULL
+ */
 TOKEN :
 {
 	< CONSTANT_NULL:     "NULL" >
 }
 
 /*
-*	Costanti BOOLEANE: servono sia per definire l'insieme di valori booleani ( TRUE e FALSE)
-*	che quello della logica a tre valori (TRUE, FALSE e UNKNOWN)
-*/
-
+ * 3-VALUE BOOLEAN LOGIC (true, false, unknown)
+ */
 TOKEN :
 {
 	< CONSTANT_BOOLEAN_TRUE:    "TRUE"    >
-|
+    |
 	< CONSTANT_BOOLEAN_FALSE:   "FALSE"   >
-|
+    |
 	< CONSTANT_BOOLEAN_UNKNOWN: "UNKNOWN" >
 }
 
 /*
-*	Costanti NUMERICHE: servono per definire i valori di tipo intero e float.
-*
-*   NB: Si noti che CONSTANT_FLOAT non corrisponde a tutti i valori numerici, ma
-*	soltanto a quelli che contengono un punto decimale ('.').
-*   Quindi, per esempio, '3.5' sar� interpretato come CONSTANT_FLOAT, ma '3' sar�
-*	interpretato come CONSTANT_INTEGER.
-*/
-
+ * NUMERIC CONSTANTS (float and integer)
+ */
 TOKEN :
 {
 	<CONSTANT_INTEGER:
@@ -424,7 +453,7 @@ TOKEN :
 		<HEXADECIMAL>
 		)
 	>
-|
+    |
 	<CONSTANT_FLOAT:
 		(
 			( <CONSTANT_INTEGER> )? "." <CONSTANT_INTEGER> ( "E" (<OPERATOR_PLUS> | <OPERATOR_MINUS>)? <CONSTANT_INTEGER> )?
@@ -435,21 +464,14 @@ TOKEN :
 }
 
 /*
-*   Costanti STRINGA: servono per definire il tipo di dato stringa.
-*
-*	 - Una stringa pu� essere delimitata sia da apici singoli (SINGLE_QUOTED_STRING)
-*      che da apici doppi (DOUBLE_QUOTED_STRING).
-*	 - Una stringa che contiene al suo interno lo stesso apice usato per delimitarla,
-*      � valida solo se questo � raddoppiato (es: 'l''apice')
-*
-*	Le stringhe sono state definite facendo uso degli stati lessicali, in modo tale
-*   da permettere di rilevare facilmente l'errore di "stringa non chiusa".
-*/
-
+ * STRING CONSTANTS
+ * Strings can be single quoted or double quoted. The quote character is
+ * escaped when doubled (e.g., 'test '' string' or "test "" string"
+ */
 TOKEN :
 {
 	< CONSTANT_SINGLE_QUOTED_STRING_START: "'"  > : NON_SINGLE_QUOTED_STRING
-|
+    |
 	< CONSTANT_DOUBLE_QUOTED_STRING_START: "\"" > : NON_DOUBLE_QUOTED_STRING
 }
 
@@ -474,26 +496,24 @@ TOKEN :
 }
 
 /*
-*	IDENTIFICATORI
-*/
-
+ * IDENTIFIERS
+ */
 TOKEN :
 {
 	< #DIGIT:      ["0" - "9"]               >
-|
+    |
 	< #LITERAL:    ["a" - "z", "A" - "Z"] >
-|
+    |
 	< #UNDERSCORE: "_"                       >
-|
+    |
 	< #HEXADECIMAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
-|
+    |
 	< IDENTIFIER: ( <LITERAL> | <UNDERSCORE>) ( <DIGIT> | <LITERAL> | <UNDERSCORE> )* >
 }
 
-/************************************************************************************************
-*     PRODUZIONI GENERICHE (Segni, Costanti, Nomi di campi, Nomi di tabelle, ecc..)             *
-*                                                                                               *
-************************************************************************************************/
+/*
+ * PRODUCTIONS
+ */
 
 void StatementSequence() :
 {}
@@ -506,12 +526,380 @@ void StatementSequence() :
 	<EOF>
 }
 
+void Statement():
+{}
+{
+  SetParametersStament()
+  |
+  CreationStatement()
+  |
+  InsertionStatement()
+}
+
+void SetParametersStament():
+{}
+{
+  <KEYWORD_SET>
+  	SetParameterList()
+  	(
+  		","
+  		SetParameterList()
+  	)*
+  <KEYWORD_ON>
+	(
+		<IDENTIFIER>
+		|
+		ConstantInteger()
+		|
+		ConstantString()
+	)
+	(
+		","
+		(
+			<IDENTIFIER>
+			|
+			ConstantInteger()
+			|
+			ConstantString()
+		)
+	)*
+}
+
+void SetParameterList():
+{}
+{
+	Identifier()
+	"="
+	Constant()
+}
+
+void CreationStatement() :
+{}
+{
+	<KEYWORD_CREATE>
+	[
+		<KEYWORD_OUTPUT>
+	]
+	(
+		StreamCreationStatement()
+	)
+}
+
+void StreamCreationStatement() :
+{}
+{
+	CreateStreamClause()
+	[
+		<KEYWORD_AS>
+		StreamSelectionStatement()
+	]
+}
+
+void CreateStreamClause() :
+{}
+{
+	<KEYWORD_STREAM>
+	Identifier() /* DataStructureName */
+	FieldDefinitionList()
+}
+
+void InsertionStatement() :
+{}
+{
+	<KEYWORD_INSERT>
+	<KEYWORD_INTO>
+	<KEYWORD_STREAM>
+	Identifier() // Data structure name
+	[
+	    FieldList()
+	]
+	StreamSelectionStatement()
+}
+
+void StreamSelectionStatement() :
+{}
+{
+    LowEveryClause()
+    LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
+}
+
+void LowEveryClause() :
+{}
+{
+	<KEYWORD_EVERY>
+	(
+		LOOKAHEAD(2)
+		(
+			Duration()
+			[
+				<KEYWORD_SYNCHRONIZED>
+			]
+		)
+		|
+		(
+			SamplesNumber()
+		)
+	)
+}
+
+void LowSelectionStatement(ExpressionType parExpressionType) :
+{}
+{
+	SelectClause(parExpressionType)
+	[
+		GroupByClause()
+	]
+	[
+		HavingClause(parExpressionType)
+	]
+	[
+		UpToClause()
+	]
+	[
+		OnEmptySelectionClause()
+	]
+	SamplingClause()
+	[
+		ExecuteIfClause()
+	]
+	[
+		TerminateAfterClause()
+	]
+}
+
+void SelectClause(ExpressionType parExpressionType) :
+{}
+{
+	<KEYWORD_SELECT>
+	[
+		<KEYWORD_DISTINCT>
+		|
+		<KEYWORD_ALL>
+	]
+	FieldSelectionList(parExpressionType)
+}
+
+void FieldSelectionList(ExpressionType parExpressionType) :
+{}
+{
+	FieldSelection(parExpressionType)
+	(
+		","
+		FieldSelection(parExpressionType)
+	)*
+}
+
+void FieldSelection(ExpressionType parExpressionType) :
+{}
+{
+	Expression(parExpressionType)
+	[
+		<KEYWORD_DEFAULT>
+		SignedConstant()
+	]
+}
+
+void WhereClause(ExpressionType parExpressionType) :
+{}
+{
+	<KEYWORD_WHERE>
+	Expression(parExpressionType)
+}
+
+void GroupByClause() :
+{}
+{
+	<KEYWORD_GROUP>
+	<KEYWORD_BY>
+	FieldGroupingByList()
+}
+
+void GroupClause() :
+{}
+{
+	<KEYWORD_GROUP>
+	(
+		(
+			<KEYWORD_BY>
+			WindowFieldList()
+		)
+		|
+		(
+			<KEYWORD_ALL>
+		)
+	)
+}
+
+void HavingClause(ExpressionType parExpressionType) :
+{}
+{
+	<KEYWORD_HAVING>
+	Expression(parExpressionType)
+}
+
+void UpToClause() :
+{}
+{
+	<KEYWORD_UP>
+	<KEYWORD_TO>
+	WindowSize()
+}
+
+void OnEmptySelectionClause() :
+{}
+{
+	<KEYWORD_ON>
+	<KEYWORD_EMPTY>
+	<KEYWORD_SELECTION>
+	<KEYWORD_INSERT>
+	(
+		<KEYWORD_NOTHING>
+		|
+	 	<KEYWORD_DEFAULT>
+	)
+}
+
+SamplingClause SamplingClause() :
+{}
+{
+	<KEYWORD_SAMPLING>
+	(
+		OnEventClause()
+		|
+		(
+			SamplingIfEveryClause()
+			[
+				OnUnsupportedSRClause()
+			]
+			[
+				RefreshClause()
+			]
+		)
+	)
+	[
+		WhereClause(ExpressionType.LOW_LEVEL_NO_AGGR)
+	]
+}
+
+void OnEventClause() :
+{}
+{
+	<KEYWORD_ON>
+	<KEYWORD_EVENT>
+	EventList()
+}
+
+void SamplingIfEveryClause() :
+{}
+{
+	(
+		(
+			SamplingIfClause()
+			SamplingEveryClause()
+		)+
+		(
+			<KEYWORD_ELSE>
+			SamplingEveryClause()
+		)
+	)
+	|
+	(
+		SamplingEveryClause()
+	)
+}
+
+void SamplingIfClause() :
+{}
+{
+	<KEYWORD_IF>
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+}
+
+void SamplingEveryClause() :
+{}
+{
+	<KEYWORD_EVERY>
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
+	TimeUnit()
+}
+
+OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
+{}
+{
+	<KEYWORD_ON>
+	<KEYWORD_UNSUPPORTED>
+	<KEYWORD_SAMPLE>
+	<KEYWORD_RATE>
+	(
+	(
+		<KEYWORD_DO>
+		<OPERATOR_NOT>
+		<KEYWORD_SAMPLE>
+	)
+	|
+	(
+		<KEYWORD_SLOW>
+		<KEYWORD_DOWN>
+	)
+	)
+}
+
+RefreshClause RefreshClause() :
+{}
+{
+	<KEYWORD_REFRESH>
+	(
+		(
+			OnEventClause()
+		)
+		|
+		(
+			<KEYWORD_EVERY>
+			Duration()
+		)
+		|
+		(
+			<KEYWORD_NEVER>
+		)
+	)
+}
+
+void ExecuteIfClause() :
+{}
+{
+	<KEYWORD_EXECUTE>
+	<KEYWORD_IF>
+	Expression(ExpressionType.LOW_LEVEL_NO_AGGR_NO_PILOT)
+	[
+		RefreshClause()
+	]
+}
+
+TerminateAfterClause TerminateAfterClause() :
+{}
+{
+	<KEYWORD_TERMINATE>
+	<KEYWORD_AFTER>
+	(
+		LOOKAHEAD(2)
+		Duration()
+		|
+		SelectionsNumber()
+	)
+}
+
+void FromClause() :
+{}
+{
+	<KEYWORD_FROM>
+	WindowDefinitionList()
+}
+
 /************************************************************************************************
 *     PRODUZIONI GENERICHE (Segni, Costanti, Nomi di campi, Nomi di tabelle, ecc..)             *
 *                                                                                               *
 ************************************************************************************************/
 
-/* Ritorna un flag per indicare se c'� il segno negativo */
 void Sign() :
 {}
 {
@@ -580,17 +968,6 @@ void ConstantString() :
 	)
 }
 
-void ConstantUserDefined() :
-{}
-{
-	<NEW>
-	"("
-		<IDENTIFIER>
-		","
-		ConstantString()
-	")"
-}
-
 void Constant() :
 {}
 {
@@ -605,8 +982,6 @@ void Constant() :
 		ConstantInteger()
 		|
 		ConstantFloat()
-		|
-		ConstantUserDefined()
 	)
 }
 
@@ -1213,390 +1588,4 @@ void WindowFieldList() :
 		","
 		OptionallyQualifiedIdentifier() /* WindowField */
 	)*
-}
-
-/************************************************************************************************
-*     PRODUZIONI RELATIVE AGLI STATEMENT                                                        *
-*                                                                                               *
-************************************************************************************************/
-
-void Statement():
-{}
-{
-  SetParametersStament()
-  |
-  CreationStatement()
-  |
-  InsertionStatement()
-}
-
-void SetParametersStament():
-{}
-{
-  <KEYWORD_SET>
-  	SetParameterList()
-  	(
-  		","
-  		SetParameterList()
-  	)*
-  <KEYWORD_ON>
-	(
-		<IDENTIFIER>
-		|
-		ConstantInteger()
-		|
-		ConstantString()
-	)
-	(
-		","
-		(
-			<IDENTIFIER>
-			|
-			ConstantInteger()
-			|
-			ConstantString()
-		)
-	)*
-}
-
-void SetParameterList():
-{}
-{
-	Identifier()
-	"="
-	Constant()
-}
-
-void CreationStatement() :
-{}
-{
-	<KEYWORD_CREATE>
-	[
-		<KEYWORD_OUTPUT>
-	]
-	(
-		StreamCreationStatement()
-	)
-}
-
-void StreamCreationStatement() :
-{}
-{
-	CreateStreamClause()
-	[
-		<KEYWORD_AS>
-		StreamSelectionStatement()
-	]
-}
-
-void CreateStreamClause() :
-{}
-{
-	<KEYWORD_STREAM>
-	Identifier() /* DataStructureName */
-	FieldDefinitionList()
-}
-
-void InsertionStatement() :
-{}
-{
-	<KEYWORD_INSERT>
-	<KEYWORD_INTO>
-	StreamInsertionStatement()
-}
-
-void StreamInsertionStatement() :
-{}
-{
-	InsertStreamClause()
-	StreamSelectionStatement()
-}
-
-void InsertStreamClause() :
-{}
-{
-	<KEYWORD_STREAM>
-	Identifier() /* DataStructureName */
-	[
-		FieldList()
-	]
-}
-
-void StreamSelectionStatement() :
-{}
-{
-    LowEveryClause()
-    LowSelectionStatement(ExpressionType.LOW_LEVEL_ALL)
-}
-
-void LowEveryClause() :
-{}
-{
-	<KEYWORD_EVERY>
-	(
-		LOOKAHEAD(2)
-		(
-			Duration()
-			[
-				<KEYWORD_SYNCHRONIZED>
-			]
-		)
-		|
-		(
-			SamplesNumber()
-		)
-	)
-}
-
-void LowSelectionStatement(ExpressionType parExpressionType) :
-{}
-{
-	SelectClause(parExpressionType)
-	[
-		GroupByClause()
-	]
-	[
-		HavingClause(parExpressionType)
-	]
-	[
-		UpToClause()
-	]
-	[
-		OnEmptySelectionClause()
-	]
-	SamplingClause()
-	[
-		ExecuteIfClause()
-	]
-	[
-		TerminateAfterClause()
-	]
-}
-
-void SelectClause(ExpressionType parExpressionType) :
-{}
-{
-	<KEYWORD_SELECT>
-	[
-		<KEYWORD_DISTINCT>
-		|
-		<KEYWORD_ALL>
-	]
-	FieldSelectionList(parExpressionType)
-}
-
-void FieldSelectionList(ExpressionType parExpressionType) :
-{}
-{
-	FieldSelection(parExpressionType)
-	(
-		","
-		FieldSelection(parExpressionType)
-	)*
-}
-
-void FieldSelection(ExpressionType parExpressionType) :
-{}
-{
-	Expression(parExpressionType)
-	[
-		<KEYWORD_DEFAULT>
-		SignedConstant()
-	]
-}
-
-void WhereClause(ExpressionType parExpressionType) :
-{}
-{
-	<KEYWORD_WHERE>
-	Expression(parExpressionType)
-}
-
-void GroupByClause() :
-{}
-{
-	<KEYWORD_GROUP>
-	<KEYWORD_BY>
-	FieldGroupingByList()
-}
-
-void GroupClause() :
-{}
-{
-	<KEYWORD_GROUP>
-	(
-		(
-			<KEYWORD_BY>
-			WindowFieldList()
-		)
-		|
-		(
-			<KEYWORD_ALL>
-		)
-	)
-}
-
-void HavingClause(ExpressionType parExpressionType) :
-{}
-{
-	<KEYWORD_HAVING>
-	Expression(parExpressionType)
-}
-
-void UpToClause() :
-{}
-{
-	<KEYWORD_UP>
-	<KEYWORD_TO>
-	WindowSize()
-}
-
-void OnEmptySelectionClause() :
-{}
-{
-	<KEYWORD_ON>
-	<KEYWORD_EMPTY>
-	<KEYWORD_SELECTION>
-	<KEYWORD_INSERT>
-	(
-		<KEYWORD_NOTHING>
-		|
-	 	<KEYWORD_DEFAULT>
-	)
-}
-
-SamplingClause SamplingClause() :
-{}
-{
-	<KEYWORD_SAMPLING>
-	(
-		OnEventClause()
-		|
-		(
-			SamplingIfEveryClause()
-			[
-				OnUnsupportedSRClause()
-			]
-			[
-				RefreshClause()
-			]
-		)
-	)
-	[
-		WhereClause(ExpressionType.LOW_LEVEL_NO_AGGR)
-	]
-}
-
-void OnEventClause() :
-{}
-{
-	<KEYWORD_ON>
-	<KEYWORD_EVENT>
-	EventList()
-}
-
-void SamplingIfEveryClause() :
-{}
-{
-	(
-		(
-			SamplingIfClause()
-			SamplingEveryClause()
-		)+
-		(
-			<KEYWORD_ELSE>
-			SamplingEveryClause()
-		)
-	)
-	|
-	(
-		SamplingEveryClause()
-	)
-}
-
-void SamplingIfClause() :
-{}
-{
-	<KEYWORD_IF>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
-}
-
-void SamplingEveryClause() :
-{}
-{
-	<KEYWORD_EVERY>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR)
-	TimeUnit()
-}
-
-OnUnsupportedSampleRateOptions OnUnsupportedSRClause() :
-{}
-{
-	<KEYWORD_ON>
-	<KEYWORD_UNSUPPORTED>
-	<KEYWORD_SAMPLE>
-	<KEYWORD_RATE>
-	(
-	(
-		<KEYWORD_DO>
-		<OPERATOR_NOT>
-		<KEYWORD_SAMPLE>
-	)
-	|
-	(
-		<KEYWORD_SLOW>
-		<KEYWORD_DOWN>
-	)
-	)
-}
-
-RefreshClause RefreshClause() :
-{}
-{
-	<KEYWORD_REFRESH>
-	(
-		(
-			OnEventClause()
-		)
-		|
-		(
-			<KEYWORD_EVERY>
-			Duration()
-		)
-		|
-		(
-			<KEYWORD_NEVER>
-		)
-	)
-}
-
-void ExecuteIfClause() :
-{}
-{
-	<KEYWORD_EXECUTE>
-	<KEYWORD_IF>
-	Expression(ExpressionType.LOW_LEVEL_NO_AGGR_NO_PILOT)
-	[
-		RefreshClause()
-	]
-}
-
-TerminateAfterClause TerminateAfterClause() :
-{}
-{
-	<KEYWORD_TERMINATE>
-	<KEYWORD_AFTER>
-	(
-		LOOKAHEAD(2)
-		Duration()
-		|
-		SelectionsNumber()
-	)
-}
-
-void FromClause() :
-{}
-{
-	<KEYWORD_FROM>
-	WindowDefinitionList()
 }
