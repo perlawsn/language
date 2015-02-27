@@ -23,7 +23,7 @@ public final class Subtraction extends BinaryExpression {
             case FLOAT:
                 return (Float) o1 - (Float) o2;
             default:
-                throw new RuntimeException("sum not define for type " + type);
+                throw new RuntimeException("subtraction not define for type " + type);
         }
     }
 

@@ -104,25 +104,25 @@ public class ExpressionTest {
     }
 
     @Test
-    public void sumIntegerTest() {
+    public void additionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
         Field e2 = new Field(1, DataType.INTEGER);
-        Sum s = new Sum(e1, e2, DataType.INTEGER);
+        Addition a = new Addition(e1, e2, DataType.INTEGER);
 
-        assertThat(s.getType(), equalTo(DataType.INTEGER));
-        assertThat(s.compute(view.get(0), view), equalTo(1 + 4));
-        assertThat(s.compute(view.get(1), view), equalTo(1 + 3));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
+        assertThat(a.compute(view.get(0), view), equalTo(1 + 4));
+        assertThat(a.compute(view.get(1), view), equalTo(1 + 3));
     }
 
     @Test
-    public void sumFloatTest() {
+    public void additionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.INTEGER);
         Field e2 = new Field(3, DataType.FLOAT);
-        Sum s = new Sum(e1, e2, DataType.FLOAT);
+        Addition a = new Addition(e1, e2, DataType.FLOAT);
 
-        assertThat(s.getType(), equalTo(DataType.FLOAT));
-        assertThat(s.compute(view.get(0), view), equalTo(4.4f + 1.5f));
-        assertThat(s.compute(view.get(1), view), equalTo(3.3f + 1.5f));
+        assertThat(a.getType(), equalTo(DataType.FLOAT));
+        assertThat(a.compute(view.get(0), view), equalTo(4.4f + 1.5f));
+        assertThat(a.compute(view.get(1), view), equalTo(3.3f + 1.5f));
     }
 
     @Test

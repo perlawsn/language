@@ -23,7 +23,7 @@ public final class Division extends BinaryExpression {
             case FLOAT:
                 return (Float) o1 / (Float) o2;
             default:
-                throw new RuntimeException("sum not define for type " + type);
+                throw new RuntimeException("division not define for type " + type);
         }
     }
 

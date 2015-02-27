@@ -6,9 +6,9 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 27/02/15.
  */
-public final class Sum extends BinaryExpression {
+public final class Addition extends BinaryExpression {
 
-    public Sum(Expression e1, Expression e2, DataType type) {
+    public Addition(Expression e1, Expression e2, DataType type) {
         super(e1, e2, type);
     }
 
@@ -23,7 +23,7 @@ public final class Sum extends BinaryExpression {
             case FLOAT:
                 return (Float) o1 + (Float) o2;
             default:
-                throw new RuntimeException("sum not define for type " + type);
+                throw new RuntimeException("addition not define for type " + type);
         }
     }
 

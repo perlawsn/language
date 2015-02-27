@@ -23,7 +23,7 @@ public final class Product extends BinaryExpression {
             case FLOAT:
                 return (Float) o1 * (Float) o2;
             default:
-                throw new RuntimeException("sum not define for type " + type);
+                throw new RuntimeException("product not define for type " + type);
         }
     }
 
