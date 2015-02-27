@@ -1,9 +1,11 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.lang.expression.Expression;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * {@code BufferView} is a static view on a portion of the content of a {@link
@@ -45,6 +47,10 @@ public interface BufferView {
      * @throws IndexOutOfBoundsException if the index if out of range
      */
     public Object[] get(int i);
+
+    public void forEach(BiConsumer<Object[], BufferView> c);
+
+    public void forEach(BiConsumer<Object[], BufferView> c, Expression cond);
 
     public BufferView subView(int samples);
 

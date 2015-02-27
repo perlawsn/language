@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.lang.expression.Expression;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
 
 /**
  * @author Guido Rota 26/02/15.
@@ -99,6 +101,24 @@ public final class ArrayBufferView extends ArrayBufferReleaser
             return data[newest - i];
         } finally {
             lock.unlock();
+        }
+    }
+
+    @Override
+    public void forEach(BiConsumer<Object[], BufferView> c) {
+        for (int i = oldest; i <= newest; i++) {
+            c.accept(data[i], this);
+        }
+    }
+
+    @Override
+    public void forEach(BiConsumer<Object[], BufferView> c, Expression e) {
+        for (int i = oldest; i <= newest; i++) {
+            Boolean cond = (Boolean) e.compute(data[i], this);
+            if (!cond) {
+                continue;
+            }
+            c.accept(data[i], this);
         }
     }
 
