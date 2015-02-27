@@ -46,6 +46,10 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
                 "missing timestamp attribute in attribute list");
     }
 
+    protected int getTimestampIndex() {
+        return tsIdx;
+    }
+
     @Override
     public List<Attribute> attributes() {
         return atts;

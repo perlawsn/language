@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.record.Attribute;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -46,5 +47,7 @@ public interface BufferView {
     public Object[] get(int i);
 
     public BufferView subView(int samples);
+
+    public BufferView subView(Duration d);
 
 }

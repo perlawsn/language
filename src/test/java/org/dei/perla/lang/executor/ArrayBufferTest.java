@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -213,6 +214,56 @@ public class ArrayBufferTest {
         v1.subView(3);
 
         v1.release();
+    }
+
+    @Test
+    public void durationView() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:32.000Z"), 6}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:39.000Z"), 7}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
+
+        BufferView v = b.unmodifiableView();
+
+        BufferView d0 = v.subView(Duration.ofSeconds(5));
+        assertThat(d0, notNullValue());
+        assertThat(d0.length(), equalTo(1));
+        d0.release();
+
+        d0 = v.subView(Duration.ofSeconds(40));
+        assertThat(d0, notNullValue());
+        assertThat(d0.length(), equalTo(8));
+        d0.release();
+
+        d0 = v.subView(Duration.ofSeconds(0));
+        assertThat(d0, notNullValue());
+        assertThat(d0.length(), equalTo(1));
+        d0.release();
+
+        d0 = v.subView(Duration.ofHours(10));
+        assertThat(d0, notNullValue());
+        assertThat(d0.length(), equalTo(v.length()));
+        d0.release();
     }
 
 }
