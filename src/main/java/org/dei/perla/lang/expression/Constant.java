@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,17 +13,12 @@ import java.util.Set;
  */
 public final class Constant implements Expression {
 
-    private final DataType type;
     private final Object value;
+    private final DataType type;
 
-    public Constant(DataType type, Object value) {
-        // TODO: add congruency test between type and value?
-        this.type = type;
+    public Constant(Object value, DataType type) {
         this.value = value;
-    }
-
-    public Object getValue() {
-        return value;
+        this.type = type;
     }
 
     @Override
@@ -31,12 +27,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public Set<Attribute> fields() {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public Object compute(Object[] cur, BufferView buffer) {
+    public Object compute(Object[] record, BufferView buffer) {
         return value;
     }
 

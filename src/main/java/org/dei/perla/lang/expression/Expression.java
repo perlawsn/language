@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,8 +14,6 @@ public interface Expression {
 
     public DataType getType();
 
-    public Set<Attribute> fields();
-
-    public Object compute(Object[] current, BufferView buffer);
+    public Object compute(Object[] record, BufferView buffer);
 
 }

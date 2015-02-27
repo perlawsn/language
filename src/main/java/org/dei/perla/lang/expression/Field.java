@@ -12,37 +12,22 @@ import java.util.TreeSet;
  */
 public final class Field implements Expression {
 
-    private final Attribute att;
+    private final DataType type;
     private final int idx;
 
-    public Field(Attribute att, int idx) {
-        this.att = att;
+    public Field(int idx, DataType type) {
         this.idx = idx;
-    }
-
-    public Attribute getAttribute() {
-        return att;
-    }
-
-    public int getIndex() {
-        return idx;
+        this.type = type;
     }
 
     @Override
     public DataType getType() {
-        return att.getType();
+        return type;
     }
 
     @Override
-    public Set<Attribute> fields() {
-        Set<Attribute> s = new TreeSet<>();
-        s.add(att);
-        return s;
-    }
-
-    @Override
-    public Object compute(Object[] cur, BufferView buffer) {
-        return cur[idx];
+    public Object compute(Object[] record, BufferView buffer) {
+        return record[idx];
     }
 
 }
