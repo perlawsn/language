@@ -34,7 +34,7 @@ public final class CastFloat implements Expression {
         case FLOAT:
             return res;
         default:
-            return null;
+            throw new RuntimeException("unexpected type " + from);
         }
     }
 

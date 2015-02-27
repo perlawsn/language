@@ -1,4 +1,4 @@
-package org.dei.perla.lang.expression.builder;
+package org.dei.perla.lang.parser.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author Guido Rota 27/02/15.
  */
-public class ConstantBuilder implements BuilderNode {
+public final class ConstantBuilder implements BuilderNode {
 
     private final Object value;
     private final DataType type;

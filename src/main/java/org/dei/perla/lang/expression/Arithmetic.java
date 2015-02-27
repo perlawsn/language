@@ -6,11 +6,11 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 27/02/15.
  */
-public class Arithmetic extends BinaryExpression {
+public final class Arithmetic extends BinaryExpression {
 
-    private final Operation op;
+    private final ArithmeticOperation op;
 
-    public Arithmetic(Operation op, Expression e1, Expression e2,
+    public Arithmetic(ArithmeticOperation op, Expression e1, Expression e2,
             DataType type) {
         super(e1, e2, type);
         this.op = op;
@@ -31,7 +31,7 @@ public class Arithmetic extends BinaryExpression {
             case FLOAT:
                 return computeFloat((Float) o1, (Float) o2);
             default:
-                return null;
+                throw new RuntimeException("unexpected type " + type);
         }
     }
 
@@ -48,7 +48,8 @@ public class Arithmetic extends BinaryExpression {
             case MODULO:
                 return o1 % o2;
             default:
-                return null;
+                throw new RuntimeException(
+                        "unknown arithmetic operation: " + op);
         }
     }
 
@@ -65,11 +66,12 @@ public class Arithmetic extends BinaryExpression {
             case MODULO:
                 throw new RuntimeException("undefined float modulo");
             default:
-                return null;
+                throw new RuntimeException(
+                        "unknown arithmetic operation: " + op);
         }
     }
 
-    public enum Operation {
+    public enum ArithmeticOperation {
         SUM,
         SUBTRACTION,
         PRODUCT,

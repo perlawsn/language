@@ -6,7 +6,7 @@ import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
-import org.dei.perla.lang.expression.Arithmetic.Operation;
+import org.dei.perla.lang.expression.Arithmetic.ArithmeticOperation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -109,7 +109,7 @@ public class ExpressionTest {
     public void sumIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
         Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic s = new Arithmetic(Operation.SUM, e1, e2, DataType.INTEGER);
+        Arithmetic s = new Arithmetic(ArithmeticOperation.SUM, e1, e2, DataType.INTEGER);
 
         assertThat(s.getType(), equalTo(DataType.INTEGER));
         assertThat(s.compute(view.get(0), view), equalTo(1 + 4));
@@ -120,7 +120,7 @@ public class ExpressionTest {
     public void sumFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.INTEGER);
         Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic s = new Arithmetic(Operation.SUM, e1, e2, DataType.FLOAT);
+        Arithmetic s = new Arithmetic(ArithmeticOperation.SUM, e1, e2, DataType.FLOAT);
 
         assertThat(s.getType(), equalTo(DataType.FLOAT));
         assertThat(s.compute(view.get(0), view), equalTo(4.4f + 1.5f));
@@ -128,27 +128,80 @@ public class ExpressionTest {
     }
 
     @Test
-    public void subtractionIntegerTest() {
+    public void productIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
         Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic s = new Arithmetic(Operation.SUBTRACTION, e1, e2,
+        Arithmetic s = new Arithmetic(ArithmeticOperation.PRODUCT, e1, e2,
                 DataType.INTEGER);
 
         assertThat(s.getType(), equalTo(DataType.INTEGER));
-        assertThat(s.compute(view.get(0), view), equalTo(1 - 4));
-        assertThat(s.compute(view.get(1), view), equalTo(1 - 3));
+        assertThat(s.compute(view.get(0), view), equalTo(1 * 4));
+        assertThat(s.compute(view.get(1), view), equalTo(1 * 3));
     }
 
     @Test
-    public void subtractionFloatTest() {
+    public void productFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.INTEGER);
         Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic s = new Arithmetic(Operation.SUBTRACTION, e1, e2,
+        Arithmetic s = new Arithmetic(ArithmeticOperation.PRODUCT, e1, e2,
                 DataType.FLOAT);
 
         assertThat(s.getType(), equalTo(DataType.FLOAT));
-        assertThat(s.compute(view.get(0), view), equalTo(1.5f - 4.4f));
-        assertThat(s.compute(view.get(1), view), equalTo(1.5f - 3.3f));
+        assertThat(s.compute(view.get(0), view), equalTo(1.5f * 4.4f));
+        assertThat(s.compute(view.get(1), view), equalTo(1.5f * 3.3f));
+    }
+
+    @Test
+    public void divisionIntegerTest() {
+        Constant e1 = new Constant(1, DataType.INTEGER);
+        Field e2 = new Field(1, DataType.INTEGER);
+        Arithmetic s = new Arithmetic(ArithmeticOperation.DIVISION, e1, e2,
+                DataType.INTEGER);
+
+        assertThat(s.getType(), equalTo(DataType.INTEGER));
+        assertThat(s.compute(view.get(0), view), equalTo(1 / 4));
+        assertThat(s.compute(view.get(1), view), equalTo(1 / 3));
+    }
+
+    @Test
+    public void divisionFloatTest() {
+        Constant e1 = new Constant(1.5f, DataType.INTEGER);
+        Field e2 = new Field(3, DataType.FLOAT);
+        Arithmetic s = new Arithmetic(ArithmeticOperation.DIVISION, e1, e2,
+                DataType.FLOAT);
+
+        assertThat(s.getType(), equalTo(DataType.FLOAT));
+        assertThat(s.compute(view.get(0), view), equalTo(1.5f / 4.4f));
+        assertThat(s.compute(view.get(1), view), equalTo(1.5f / 3.3f));
+    }
+
+    @Test
+    public void moduloTest() {
+        Constant e1 = new Constant(1, DataType.INTEGER);
+        Field e2 = new Field(1, DataType.INTEGER);
+        Arithmetic s = new Arithmetic(ArithmeticOperation.MODULO, e1, e2,
+                DataType.INTEGER);
+
+        assertThat(s.getType(), equalTo(DataType.INTEGER));
+        assertThat(s.compute(view.get(0), view), equalTo(1 % 4));
+        assertThat(s.compute(view.get(1), view), equalTo(1 % 3));
+    }
+
+    @Test
+    public void inverseTest() {
+        Constant e1 = new Constant(1, DataType.INTEGER);
+        Field e2 = new Field(3, DataType.FLOAT);
+
+        Inverse inv = new Inverse(e1, DataType.INTEGER);
+        assertThat(inv.getType(), equalTo(DataType.INTEGER));
+        assertThat(inv.compute(view.get(0), view), equalTo(-1));
+
+        inv = new Inverse(e2, DataType.FLOAT);
+        assertThat(inv.getType(), equalTo(DataType.FLOAT));
+        assertThat(inv.compute(view.get(0), view),
+                equalTo(-(Float) view.get(0)[3]));
+        assertThat(inv.compute(view.get(1), view),
+                equalTo(-(Float) view.get(1)[3]));
     }
 
 }
