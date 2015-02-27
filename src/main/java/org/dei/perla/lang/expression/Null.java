@@ -6,7 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 27/02/15.
  */
-public class Null implements Expression {
+public final class Null implements Expression {
 
     @Override
     public DataType getType() {

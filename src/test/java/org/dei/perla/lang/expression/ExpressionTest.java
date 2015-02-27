@@ -6,6 +6,7 @@ import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
+import org.dei.perla.lang.expression.Arithmetic.Operation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -102,6 +103,52 @@ public class ExpressionTest {
         assertThat(fs.getType(), equalTo(DataType.STRING));
         assertThat(fs.compute(view.get(0), view), equalTo("4"));
         assertThat(fs.compute(view.get(1), view), equalTo("3"));
+    }
+
+    @Test
+    public void sumIntegerTest() {
+        Constant e1 = new Constant(1, DataType.INTEGER);
+        Field e2 = new Field(1, DataType.INTEGER);
+        Arithmetic s = new Arithmetic(Operation.SUM, e1, e2, DataType.INTEGER);
+
+        assertThat(s.getType(), equalTo(DataType.INTEGER));
+        assertThat(s.compute(view.get(0), view), equalTo(1 + 4));
+        assertThat(s.compute(view.get(1), view), equalTo(1 + 3));
+    }
+
+    @Test
+    public void sumFloatTest() {
+        Constant e1 = new Constant(1.5f, DataType.INTEGER);
+        Field e2 = new Field(3, DataType.FLOAT);
+        Arithmetic s = new Arithmetic(Operation.SUM, e1, e2, DataType.FLOAT);
+
+        assertThat(s.getType(), equalTo(DataType.FLOAT));
+        assertThat(s.compute(view.get(0), view), equalTo(4.4f + 1.5f));
+        assertThat(s.compute(view.get(1), view), equalTo(3.3f + 1.5f));
+    }
+
+    @Test
+    public void subtractionIntegerTest() {
+        Constant e1 = new Constant(1, DataType.INTEGER);
+        Field e2 = new Field(1, DataType.INTEGER);
+        Arithmetic s = new Arithmetic(Operation.SUBTRACTION, e1, e2,
+                DataType.INTEGER);
+
+        assertThat(s.getType(), equalTo(DataType.INTEGER));
+        assertThat(s.compute(view.get(0), view), equalTo(1 - 4));
+        assertThat(s.compute(view.get(1), view), equalTo(1 - 3));
+    }
+
+    @Test
+    public void subtractionFloatTest() {
+        Constant e1 = new Constant(1.5f, DataType.INTEGER);
+        Field e2 = new Field(3, DataType.FLOAT);
+        Arithmetic s = new Arithmetic(Operation.SUBTRACTION, e1, e2,
+                DataType.FLOAT);
+
+        assertThat(s.getType(), equalTo(DataType.FLOAT));
+        assertThat(s.compute(view.get(0), view), equalTo(1.5f - 4.4f));
+        assertThat(s.compute(view.get(1), view), equalTo(1.5f - 3.3f));
     }
 
 }
