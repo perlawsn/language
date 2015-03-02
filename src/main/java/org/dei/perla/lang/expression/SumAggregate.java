@@ -30,21 +30,21 @@ public class SumAggregate extends Aggregate {
 
         switch (type) {
             case INTEGER:
-                IntAccumulator ai = new IntAccumulator(0);
+                IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    ai.value += (Integer) exp.compute(r, b);
+                    si.value += (Integer) exp.compute(r, b);
                 }, where);
+                return si.value;
             case FLOAT:
-                FloatAccumulator af = new FloatAccumulator(0f);
+                FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    af.value += (Float) exp.compute(r, b);
+                    sf.value += (Float) exp.compute(r, b);
                 }, where);
+                return sf.value;
             default:
                 throw new RuntimeException(
                         "sum aggregation not defined for type " + type);
         }
     }
-
-
 
 }

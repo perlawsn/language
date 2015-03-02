@@ -302,12 +302,15 @@ public class ArrayBufferTest {
         WrapInt sum = new WrapInt();
         v.forEach((r, view) -> sum.value += (Integer) r[1]);
         assertThat(sum.value, equalTo(55));
+
+        count.value = 0;
+        BufferView sub = v.subView(11);
+        sub.forEach((r, view) -> count.value++);
+        assertThat(count.value, equalTo(sub.length()));
     }
 
     private static final class WrapInt {
-
         public int value = 0;
-
     }
 
 }

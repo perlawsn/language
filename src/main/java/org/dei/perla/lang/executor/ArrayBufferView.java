@@ -45,7 +45,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         this.data = parent.data;
         atts = parent.attributes();
         tsIdx = parent.getTimestampIndex();
-        this.length = newest - oldest;
+        this.length = newest - oldest + 1;
         this.newest = newest;
         this.oldest = oldest;
     }
@@ -138,7 +138,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
                 samples = length;
             }
             ArrayBufferView v =
-                    new ArrayBufferView(this, newest - samples, newest);
+                    new ArrayBufferView(this, newest + 1 - samples, newest);
             views.add(v);
             return v;
         } finally {
