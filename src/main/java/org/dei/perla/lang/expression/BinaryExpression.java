@@ -39,10 +39,6 @@ public abstract class BinaryExpression implements Expression {
     public final Object compute(Object[] record, BufferView view) {
         Object o1 = e1.compute(record, view);
         Object o2 = e2.compute(record, view);
-        if (o1 == null || o2 == null) {
-            return null;
-        }
-
         return doCompute(o1, o2);
     }
 

@@ -28,12 +28,7 @@ public abstract class UnaryExpression implements Expression {
 
     @Override
     public final Object compute(Object[] record, BufferView buffer) {
-        Object o = e.compute(record, buffer);
-        if (o == null) {
-            return null;
-        }
-
-        return doCompute(o);
+        return doCompute(e.compute(record, buffer));
     }
 
     protected abstract Object doCompute(Object o);

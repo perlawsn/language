@@ -61,7 +61,30 @@ public class MiscTest {
     }
 
     @Test
-    public void CastFloat() {
+    public void castInt() {
+        Constant cInt = new Constant(12, DataType.INTEGER);
+        Constant cFloat = new Constant(2.5f, DataType.FLOAT);
+        Field fFloat = new Field(3, DataType.FLOAT);
+
+        CastInt cast = new CastInt(cInt);
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.compute(view.get(0), view), equalTo(12));
+
+        cast = new CastInt(cFloat);
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.compute(view.get(0), view),
+                equalTo(new Float(2.5).intValue()));
+
+        cast = new CastInt(fFloat);
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.compute(view.get(0), view),
+                equalTo(new Float(4.4).intValue()));
+        assertThat(cast.compute(view.get(1), view),
+                equalTo(new Float(3.3).intValue()));
+    }
+
+    @Test
+    public void castFloat() {
         Constant cInt = new Constant(1, DataType.INTEGER);
         Constant cFloat = new Constant(1.2f, DataType.FLOAT);
         Field fFloat = new Field(3, DataType.FLOAT);
@@ -78,6 +101,31 @@ public class MiscTest {
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
         assertThat(cast.compute(view.get(0), view), equalTo(4.4f));
         assertThat(cast.compute(view.get(1), view), equalTo(3.3f));
+    }
+
+    @Test
+    public void castString() {
+        Constant cInt = new Constant(12, DataType.INTEGER);
+        Constant cFloat = new Constant(2.5f, DataType.FLOAT);
+        Constant cString = new Constant("test", DataType.STRING);
+        Instant inst = Instant.now();
+        Constant cTimestamp = new Constant(inst, DataType.TIMESTAMP);
+
+        CastString cast = new CastString(cInt);
+        assertThat(cast.getType(), equalTo(DataType.STRING));
+        assertThat(cast.compute(view.get(0), view), equalTo("12"));
+
+        cast = new CastString(cFloat);
+        assertThat(cast.getType(), equalTo(DataType.STRING));
+        assertThat(cast.compute(view.get(0), view), equalTo("2.5"));
+
+        cast = new CastString(cString);
+        assertThat(cast.getType(), equalTo(DataType.STRING));
+        assertThat(cast.compute(view.get(0), view), equalTo("test"));
+
+        cast = new CastString(cTimestamp);
+        assertThat(cast.getType(), equalTo(DataType.STRING));
+        assertThat(cast.compute(view.get(0), view), equalTo(inst.toString()));
     }
 
     @Test
