@@ -3,6 +3,10 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
+import org.dei.perla.lang.expression.Constant;
+import org.dei.perla.lang.expression.Expression;
+import org.dei.perla.lang.expression.Field;
+import org.dei.perla.lang.expression.Greater;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -307,6 +311,15 @@ public class ArrayBufferTest {
         BufferView sub = v.subView(11);
         sub.forEach((r, view) -> count.value++);
         assertThat(count.value, equalTo(sub.length()));
+        sub.release();
+
+        count.value = 0;
+        sub = v.subView(11);
+        Expression where = new Greater(new Field(1, DataType.INTEGER),
+                new Constant(5, DataType.INTEGER));
+        sub.forEach((r, view) -> count.value++, where);
+        assertThat(count.value, equalTo(5));
+        sub.release();
     }
 
     private static final class WrapInt {

@@ -5,7 +5,7 @@ import org.dei.perla.core.descriptor.DataType;
 /**
  * @author Guido Rota 02/03/15.
  */
-public class NotEqual extends BinaryExpression {
+public final class NotEqual extends BinaryExpression {
 
     public NotEqual(Expression e1, Expression e2) {
         super(e1, e2, DataType.BOOLEAN);
