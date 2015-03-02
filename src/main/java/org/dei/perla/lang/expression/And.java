@@ -13,10 +13,8 @@ public final class And extends BinaryExpression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        Boolean b1 = (Boolean) e1.compute(record, buffer);
-        Boolean b2 = (Boolean) e2.compute(record, buffer);
-        return b1 && b2;
+    public Object doCompute(Object o1, Object o2) {
+        return (Boolean) o1 && (Boolean) o2;
     }
 
 }

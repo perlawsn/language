@@ -13,8 +13,8 @@ public final class Not extends UnaryExpression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        return !(Boolean) e.compute(record, buffer);
+    public Object doCompute(Object o) {
+        return !(Boolean) o;
     }
 
 }

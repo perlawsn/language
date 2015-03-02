@@ -13,9 +13,9 @@ public final class Xor extends BinaryExpression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        Boolean b1 = (Boolean) e1.compute(record, buffer);
-        Boolean b2 = (Boolean) e2.compute(record, buffer);
+    public Object doCompute(Object o1, Object o2) {
+        Boolean b1 = (Boolean) o1;
+        Boolean b2 = (Boolean) o2;
         return (b1 || b2) && !(b1 && b2);
     }
 

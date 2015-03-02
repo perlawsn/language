@@ -65,7 +65,7 @@ public class ComparisonTest {
     }
 
     @Test
-    public void intEqualTest() {
+    public void equalTest() {
         Expression eq = new Equal(intExpr, new Constant(4, DataType.INTEGER));
         assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
         Object res = eq.compute(view.get(0), view);
@@ -93,6 +93,154 @@ public class ComparisonTest {
         res = new Equal(t1, t1).compute(null, null);
         assertThat(res, equalTo(true));
         res = new Equal(t1, t2).compute(null, null);
+        assertThat(res, equalTo(false));
+    }
+
+    @Test
+    public void notEqualTest() {
+        Expression eq = new NotEqual(intExpr, new Constant(4, DataType.INTEGER));
+        assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
+        Object res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        eq = new NotEqual(floatExpr, new Constant(4.4f, DataType.FLOAT));
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        eq = new NotEqual(stringExpr, new Constant("4", DataType.STRING));
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        res = new NotEqual(trueExpr, trueExpr).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new NotEqual(trueExpr, falseExpr).compute(null, null);
+        assertThat(res, equalTo(true));
+
+        res = new NotEqual(t1, t1).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new NotEqual(t1, t2).compute(null, null);
+        assertThat(res, equalTo(true));
+    }
+
+    @Test
+    public void greaterTest() {
+        Expression eq = new Greater(new Constant(4, DataType.INTEGER), intExpr);
+        assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
+        Object res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+        eq = new Greater(intExpr, new Constant(4, DataType.INTEGER));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+
+        eq = new Greater(new Constant(4.4f, DataType.FLOAT), floatExpr);
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+        eq = new Greater(floatExpr, new Constant(4.4f, DataType.FLOAT));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+
+        res = new Greater(t1, t1).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new Greater(t1, t2).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new Greater(t2, t1).compute(null, null);
+        assertThat(res, equalTo(true));
+    }
+
+    @Test
+    public void greaterEqualTest() {
+        Expression eq = new GreaterEqual(new Constant(4, DataType.INTEGER), intExpr);
+        assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
+        Object res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(true));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+        eq = new GreaterEqual(intExpr, new Constant(4, DataType.INTEGER));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+
+        eq = new GreaterEqual(new Constant(4.4f, DataType.FLOAT), floatExpr);
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(true));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+        eq = new GreaterEqual(floatExpr, new Constant(4.4f, DataType.FLOAT));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+
+        res = new GreaterEqual(t1, t1).compute(null, null);
+        assertThat(res, equalTo(true));
+        res = new GreaterEqual(t1, t2).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new GreaterEqual(t2, t1).compute(null, null);
+        assertThat(res, equalTo(true));
+    }
+
+    @Test
+    public void lessTest() {
+        Expression eq = new Less(new Constant(4, DataType.INTEGER), intExpr);
+        assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
+        Object res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+        eq = new Less(intExpr, new Constant(4, DataType.INTEGER));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        eq = new Less(new Constant(4.4f, DataType.FLOAT), floatExpr);
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(false));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+        eq = new Less(floatExpr, new Constant(4.4f, DataType.FLOAT));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        res = new Less(t1, t1).compute(null, null);
+        assertThat(res, equalTo(false));
+        res = new Less(t1, t2).compute(null, null);
+        assertThat(res, equalTo(true));
+        res = new Less(t2, t1).compute(null, null);
+        assertThat(res, equalTo(false));
+    }
+
+    @Test
+    public void lessEqualTest() {
+        Expression eq = new LessEqual(new Constant(4, DataType.INTEGER), intExpr);
+        assertThat(eq.getType(), equalTo(DataType.BOOLEAN));
+        Object res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(true));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+        eq = new LessEqual(intExpr, new Constant(4, DataType.INTEGER));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        eq = new LessEqual(new Constant(4.4f, DataType.FLOAT), floatExpr);
+        res = eq.compute(view.get(0), view);
+        assertThat(res, equalTo(true));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(false));
+        eq = new LessEqual(floatExpr, new Constant(4.4f, DataType.FLOAT));
+        res = eq.compute(view.get(1), view);
+        assertThat(res, equalTo(true));
+
+        res = new LessEqual(t1, t1).compute(null, null);
+        assertThat(res, equalTo(true));
+        res = new LessEqual(t1, t2).compute(null, null);
+        assertThat(res, equalTo(true));
+        res = new LessEqual(t2, t1).compute(null, null);
         assertThat(res, equalTo(false));
     }
 

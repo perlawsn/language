@@ -13,8 +13,7 @@ public final class Inverse extends UnaryExpression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        Object o = e.compute(record, buffer);
+    public Object doCompute(Object o) {
         switch (type) {
             case INTEGER:
                 return - (Integer) o;

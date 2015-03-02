@@ -1,6 +1,7 @@
 package org.dei.perla.lang.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.lang.executor.BufferView;
 
 /**
  * @author Guido Rota 27/02/15.
@@ -33,5 +34,18 @@ public abstract class BinaryExpression implements Expression {
     public final DataType getType() {
         return type;
     }
+
+    @Override
+    public final Object compute(Object[] record, BufferView view) {
+        Object o1 = e1.compute(record, view);
+        Object o2 = e2.compute(record, view);
+        if (o1 == null || o2 == null) {
+            return null;
+        }
+
+        return doCompute(o1, o2);
+    }
+
+    protected abstract Object doCompute(Object o1, Object o2);
 
 }

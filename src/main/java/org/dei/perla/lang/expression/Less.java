@@ -1,26 +1,25 @@
 package org.dei.perla.lang.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.lang.executor.BufferView;
 
 /**
  * @author Guido Rota 02/03/15.
  */
-public final class Greater extends BinaryExpression {
+public final class Less extends BinaryExpression {
 
-    public Greater(Expression e1, Expression e2) {
+    public Less(Expression e1, Expression e2) {
         super(e1, e2, DataType.BOOLEAN);
     }
 
     @Override
-    public Object doCompute(Object o1, Object o2) {
+    protected Object doCompute(Object o1, Object o2) {
         switch (e1.getType()) {
             case INTEGER:
             case FLOAT:
             case STRING:
             case TIMESTAMP:
                 Comparable<Object> c1 = (Comparable<Object>) o1;
-                return c1.compareTo(o2) > 0;
+                return c1.compareTo(o2) < 0;
             default:
                 throw new RuntimeException(
                         "greater comparison not defined for type " + type);

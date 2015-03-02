@@ -13,10 +13,7 @@ public final class Addition extends BinaryExpression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        Object o1 = e1.compute(record, buffer);
-        Object o2 = e2.compute(record, buffer);
-
+    public Object doCompute(Object o1, Object o2) {
         switch (type) {
             case INTEGER:
                 return (Integer) o1 + (Integer) o2;
