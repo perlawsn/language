@@ -1,20 +1,19 @@
 package org.dei.perla.lang.expression;
 
-import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.lang.executor.BufferView;
 
 /**
  * @author Guido Rota 02/03/15.
  */
-public final class Not extends UnaryExpression {
+public final class Greater extends BinaryExpression {
 
-    public Not(Expression e) {
-        super(e);
+    public Greater(Expression e1, Expression e2) {
+        super(e1, e2);
     }
 
     @Override
     public Object compute(Object[] record, BufferView buffer) {
-        return !(Boolean) e.compute(record, buffer);
+        return null;
     }
 
 }

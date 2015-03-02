@@ -8,8 +8,8 @@ import org.dei.perla.lang.executor.BufferView;
  */
 public final class Inverse extends UnaryExpression {
 
-    public Inverse(Expression e, DataType type) {
-        super(e, type);
+    public Inverse(Expression e) {
+        super(e);
     }
 
     @Override

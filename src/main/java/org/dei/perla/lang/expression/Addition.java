@@ -8,8 +8,8 @@ import org.dei.perla.lang.executor.BufferView;
  */
 public final class Addition extends BinaryExpression {
 
-    public Addition(Expression e1, Expression e2, DataType type) {
-        super(e1, e2, type);
+    public Addition(Expression e1, Expression e2) {
+        super(e1, e2);
     }
 
     @Override

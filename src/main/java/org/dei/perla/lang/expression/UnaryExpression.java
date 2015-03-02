@@ -10,9 +10,14 @@ public abstract class UnaryExpression implements Expression {
     protected final Expression e;
     protected final DataType type;
 
-    public UnaryExpression(Expression e, DataType type) {
+    protected UnaryExpression(Expression e, DataType type) {
         this.e = e;
         this.type = type;
+    }
+
+    protected UnaryExpression(Expression e) {
+        this.e = e;
+        this.type = e.getType();
     }
 
     @Override

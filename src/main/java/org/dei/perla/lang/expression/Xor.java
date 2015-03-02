@@ -6,7 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 /**
  * @author Guido Rota 02/03/15.
  */
-public class Xor extends BinaryExpression {
+public final class Xor extends BinaryExpression {
 
     public Xor(Expression e1, Expression e2) {
         super(e1, e2, DataType.BOOLEAN);

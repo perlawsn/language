@@ -8,8 +8,8 @@ import org.dei.perla.lang.executor.BufferView;
  */
 public final class Division extends BinaryExpression {
 
-    public Division(Expression e1, Expression e2, DataType type) {
-        super(e1, e2, type);
+    public Division(Expression e1, Expression e2) {
+        super(e1, e2);
     }
 
     @Override

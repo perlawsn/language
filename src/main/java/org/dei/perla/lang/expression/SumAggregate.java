@@ -8,7 +8,7 @@ import java.time.Duration;
 /**
  * @author Guido Rota 27/02/15.
  */
-public class SumAggregate extends Aggregate {
+public final class SumAggregate extends Aggregate {
 
     public SumAggregate(Expression exp, int samples, Expression where,
             DataType type) {

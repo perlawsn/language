@@ -4,12 +4,12 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.lang.executor.BufferView;
 
 /**
- * @author Guido Rota 27/02/15.
+ * @author Guido Rota 02/03/15.
  */
-public final class Modulo extends BinaryExpression {
+public final class Equal extends BinaryExpression {
 
-    public Modulo(Expression e1, Expression e2) {
-        super(e1, e2);
+    public Equal(Expression e1, Expression e2) {
+        super(e1, e2, DataType.BOOLEAN);
     }
 
     @Override
@@ -17,7 +17,7 @@ public final class Modulo extends BinaryExpression {
         Object o1 = e1.compute(record, buffer);
         Object o2 = e2.compute(record, buffer);
 
-        return (Integer) o1 % (Integer) o2;
+        return o1.equals(o2);
     }
 
 }
