@@ -1,9 +1,8 @@
 package org.dei.perla.lang.parser.expression;
 
 import org.dei.perla.core.record.Attribute;
-import org.dei.perla.lang.expression.Expression;
-import org.dei.perla.lang.expression.Field;
-import org.dei.perla.lang.expression.Null;
+import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.Field;
 
 import java.util.List;
 
