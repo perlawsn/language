@@ -35,6 +35,7 @@ public class MiscTest {
         Attribute[] as = new Attribute[] {
                 Attribute.TIMESTAMP,
                 integerAtt,
+                stringAtt,
                 floatAtt
         };
         List<Attribute> atts = Arrays.asList(as);

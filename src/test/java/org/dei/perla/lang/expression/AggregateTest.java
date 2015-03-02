@@ -40,6 +40,7 @@ public class AggregateTest {
         Attribute[] as = new Attribute[] {
                 Attribute.TIMESTAMP,
                 integerAtt,
+                stringAtt,
                 floatAtt
         };
         List<Attribute> atts = Arrays.asList(as);
@@ -55,12 +56,29 @@ public class AggregateTest {
     }
 
     @Test
-    public void testSum() {
-        SumAggregate s1 = new SumAggregate(intExpr, 5, null, DataType.INTEGER);
-
-        Object res = s1.compute(view.get(0), view);
+    public void testIntegerSum() {
+        SumAggregate sum = new SumAggregate(intExpr, 5, null, DataType.INTEGER);
+        Object res = sum.compute(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(10));
+
+        sum = new SumAggregate(intExpr, 3, null, DataType.INTEGER);
+        res = sum.compute(null, view);
+        assertTrue(res instanceof Integer);
+        assertThat(res, equalTo(9));
+    }
+
+    @Test
+    public void testFloatSum() {
+        SumAggregate sum = new SumAggregate(floatExpr, 5, null, DataType.FLOAT);
+        Object res = sum.compute(null, view);
+        assertTrue(res instanceof Float);
+        assertThat(res, equalTo(11f));
+
+        sum = new SumAggregate(floatExpr, 3, null, DataType.FLOAT);
+        res = sum.compute(null, view);
+        assertTrue(res instanceof Float);
+        assertThat(res, equalTo(9.9f));
     }
 
 }
