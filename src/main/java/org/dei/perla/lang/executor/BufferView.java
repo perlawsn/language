@@ -52,7 +52,7 @@ public interface BufferView {
 
     public void forEach(BiConsumer<Object[], BufferView> c, Expression cond);
 
-    public int indexOf(Duration d);
+    public int recordsIn(Duration d);
 
     public BufferView subView(int samples);
 

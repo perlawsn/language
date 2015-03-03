@@ -33,7 +33,7 @@ public class DataManager {
         this.def = def;
     }
 
-    public void run(BufferView buffer, QueryHandler handler) {
+    public void select(BufferView buffer, QueryHandler handler) {
         // GROUP BY CLAUSE
         List<BufferView> bufs = splitBuffer(buffer);
 
@@ -43,7 +43,7 @@ public class DataManager {
             if (uptoSamples != -1) {
                 upto = uptoSamples;
             } else {
-                upto = buffer.indexOf(uptoDuration);
+                upto = buffer.recordsIn(uptoDuration);
             }
             for (int i = 0; i < upto && i < buffer.length(); i++) {
                 Object[] cur = b.get(i);

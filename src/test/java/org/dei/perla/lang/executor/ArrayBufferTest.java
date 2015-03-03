@@ -249,14 +249,14 @@ public class ArrayBufferTest {
 
         BufferView v = b.unmodifiableView();
 
-        int i = v.indexOf(Duration.ofSeconds(10));
+        int i = v.recordsIn(Duration.ofSeconds(10));
+        assertThat(i, equalTo(2));
+
+        i = v.recordsIn(Duration.ofSeconds(1));
         assertThat(i, equalTo(1));
 
-        i = v.indexOf(Duration.ofSeconds(1));
-        assertThat(i, equalTo(0));
-
-        i = v.indexOf(Duration.ofDays(1));
-        assertThat(i, equalTo(10));
+        i = v.recordsIn(Duration.ofDays(1));
+        assertThat(i, equalTo(11));
     }
 
     @Test

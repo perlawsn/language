@@ -128,16 +128,16 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     }
 
     @Override
-    public int indexOf(Duration d) {
+    public int recordsIn(Duration d) {
         lock.lock();
         try {
-            return fromNewest(d);
+            return countFromNewest(d);
         } finally {
             lock.unlock();
         }
     }
 
-    private int fromNewest(Duration d) {
+    private int countFromNewest(Duration d) {
         int i = 0;
         int top = newest;
         int bottom = oldest;
@@ -154,7 +154,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
                 bottom = i + 1;
             }
         }
-        return length - i - 1;
+        return length - i;
     }
 
     @Override
@@ -180,7 +180,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     public BufferView subView(Duration d) {
         lock.lock();
         try {
-            return subView(fromNewest(d) + 1);
+            return subView(countFromNewest(d));
         } finally {
             lock.unlock();
         }
