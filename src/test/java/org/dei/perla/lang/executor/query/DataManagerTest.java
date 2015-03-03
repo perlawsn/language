@@ -73,7 +73,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, false, 1, null, null, null, null);
+        DataManager dm = new DataManager(sel, 1, null, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -99,7 +99,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 3, null));
 
-        DataManager dm = new DataManager(sel, false, 1, null, null, null, null);
+        DataManager dm = new DataManager(sel, 1, null, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -126,7 +126,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, false, 3, null, null, null, null);
+        DataManager dm = new DataManager(sel, 3, null, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -153,7 +153,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, false, -1,
+        DataManager dm = new DataManager(sel, -1,
                 Duration.ofSeconds(10), null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
@@ -182,7 +182,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 5, null));
 
-        DataManager dm = new DataManager(sel, false, 3, null, null, null, null);
+        DataManager dm = new DataManager(sel, 3, null, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -214,7 +214,7 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, false, 3, null, null, having, null);
+        DataManager dm = new DataManager(sel, 3, null, null, having, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -253,7 +253,7 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, false, 3, null, null, having, null);
+        DataManager dm = new DataManager(sel, 3, null, null, having, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();

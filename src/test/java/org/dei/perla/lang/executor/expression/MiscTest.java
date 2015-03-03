@@ -152,4 +152,11 @@ public class MiscTest {
         assertThat(fs.compute(view.get(1), view), equalTo("3"));
     }
 
+    @Test
+    public void groupTSTest() {
+        Expression gts = new GroupTS(0);
+        assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
+        assertThat(gts.compute(null, view), equalTo(view.get(0)[0]));
+    }
+
 }

@@ -14,18 +14,16 @@ import java.util.List;
 public class DataManager {
 
     public final List<Expression> select;
-    public final boolean distinct;
     public final int uptoSamples;
     public final Duration uptoDuration;
     public final List<Expression> group;
     public final Expression having;
     public final Object[] def;
 
-    public DataManager(List<Expression> select, boolean distinct,
-            int uptoSamples, Duration uptoDuration, List<Expression> group,
+    public DataManager(List<Expression> select, int uptoSamples,
+            Duration uptoDuration, List<Expression> group,
             Expression having, Object[] def) {
         this.select = select;
-        this.distinct = distinct;
         this.uptoSamples = uptoSamples;
         this.uptoDuration = uptoDuration;
         this.group = group;
