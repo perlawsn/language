@@ -128,6 +128,36 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     }
 
     @Override
+    public int indexOf(Duration d) {
+        lock.lock();
+        try {
+            return fromNewest(d);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private int fromNewest(Duration d) {
+        int i = 0;
+        int top = newest;
+        int bottom = oldest;
+        Instant target = timestamp(newest).minus(d);
+
+        while (top >= bottom) {
+            i = bottom + (top - bottom) / 2;
+            int c = timestamp(i).compareTo(target);
+            if (c == 0) {
+                break;
+            } else if (c > 0) {
+                top = i - 1;
+            } else {
+                bottom = i + 1;
+            }
+        }
+        return length - i - 1;
+    }
+
+    @Override
     public BufferView subView(int samples) {
         lock.lock();
         try {
@@ -150,24 +180,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     public BufferView subView(Duration d) {
         lock.lock();
         try {
-            int i = 0;
-            int top = newest;
-            int bottom = oldest;
-            Instant target = timestamp(newest).minus(d);
-
-            while (top >= bottom) {
-                i = bottom + (top - bottom) / 2;
-                int c = timestamp(i).compareTo(target);
-                if (c == 0) {
-                    break;
-                } else if (c > 0) {
-                    top = i - 1;
-                } else {
-                    bottom = i + 1;
-                }
-            }
-
-            return subView(length - i);
+            return subView(fromNewest(d) + 1);
         } finally {
             lock.unlock();
         }
