@@ -13,19 +13,23 @@ import java.util.List;
  */
 public final class DataManager {
 
-    public final List<Expression> select;
-    public final int uptoSamples;
-    public final Duration uptoDuration;
-    public final List<Expression> group;
-    public final Expression having;
-    public final Object[] def;
+    private final List<Expression> select;
+    private final int uptoSamples;
+    private final Duration uptoDuration;
+    private final Duration tsgLen;
+    private final int tsgCount;
+    private final List<Expression> group;
+    private final Expression having;
+    private final Object[] def;
 
     public DataManager(List<Expression> select, int uptoSamples,
-            Duration uptoDuration, List<Expression> group,
-            Expression having, Object[] def) {
+            Duration uptoDuration, Duration tsgLen, int tsgCount,
+            List<Expression> group, Expression having, Object[] def) {
         this.select = select;
         this.uptoSamples = uptoSamples;
         this.uptoDuration = uptoDuration;
+        this.tsgLen = tsgLen;
+        this.tsgCount = tsgCount;
         this.group = group;
         this.having = having;
         this.def = def;
@@ -41,7 +45,7 @@ public final class DataManager {
         }
 
         boolean generated = false;
-        if (Check.nullOrEmpty(group)) {
+        if (Check.nullOrEmpty(group) && tsgLen == null && tsgCount == -1) {
             generated = selectBuffer(upto, buffer, handler);
         } else {
             // GROUP BY CLAUSE
@@ -78,8 +82,24 @@ public final class DataManager {
     }
 
     private List<BufferView> splitBuffer(BufferView buffer) {
-        //TODO: split the buffer as for group by conditions
-        throw new RuntimeException("unimplemented");
+        // Timestamp group by
+        List<BufferView> tgbs = new LinkedList<>();
+        if (tsgCount != - 1 && tsgLen != null) {
+            tgbs.addAll(buffer.groupBy(tsgLen, tsgCount));
+        } else {
+            tgbs.add(buffer);
+        }
+        if (Check.nullOrEmpty(group)) {
+            return tgbs;
+        }
+
+        // Further grouping if both timestamp and classic group by are specified
+        // in the query.
+        List<BufferView> bufs = new LinkedList<>();
+        for (BufferView tgb : tgbs) {
+            bufs.addAll(tgb.groupBy(group));
+        }
+        return bufs;
     }
 
 }

@@ -217,7 +217,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
             bfs.add(v);
             views.add(v);
 
-            int lastIdx = 10;
+            int lastIdx = length - 1;
             for (int i = 1; i < count; i++) {
                 Duration cd = d.multipliedBy(i);
                 int idx = length - count(cd) - 1;

@@ -73,7 +73,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, 1, null, null, null, null);
+        DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -99,7 +99,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 3, null));
 
-        DataManager dm = new DataManager(sel, 1, null, null, null, null);
+        DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -126,7 +126,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, 3, null, null, null, null);
+        DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -153,8 +153,8 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, -1,
-                Duration.ofSeconds(10), null, null, null);
+        DataManager dm = new DataManager(sel, -1, Duration.ofSeconds(10),
+                null, -1, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -182,7 +182,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 5, null));
 
-        DataManager dm = new DataManager(sel, 3, null, null, null, null);
+        DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -214,7 +214,7 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, 3, null, null, having, null);
+        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -253,7 +253,7 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, 3, null, null, having, null);
+        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -297,7 +297,7 @@ public class DataManagerTest {
         def[0] = Instant.now();
         def[1] = 5;
 
-        DataManager dm = new DataManager(sel, 3, null, null, having, def);
+        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, def);
         SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -308,6 +308,22 @@ public class DataManagerTest {
         assertThat(r[0], equalTo(def[0]));
         assertTrue(r[1] instanceof Integer);
         assertThat(r[1], equalTo(def[1]));
+    }
+
+    @Test
+    public void groupByTimestamp() throws InterruptedException {
+        List<Expression> sel = new ArrayList<>();
+        sel.add(tsExpr);
+        sel.add(new GroupTS(0));
+        sel.add(intExpr);
+
+        DataManager dm = new DataManager(sel, 1, null, Duration.ofSeconds(1),
+                3, null, null, null);
+        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
+        dm.select(view, qh);
+        List<Object[]> records = qh.getRecords();
+
+        assertThat(records.size(), equalTo(3));
     }
 
 }
