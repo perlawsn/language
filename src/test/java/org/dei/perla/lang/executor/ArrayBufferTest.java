@@ -255,6 +255,9 @@ public class ArrayBufferTest {
         i = v.recordsIn(Duration.ofSeconds(1));
         assertThat(i, equalTo(1));
 
+        i = v.recordsIn(Duration.ofSeconds(30));
+        assertThat(i, equalTo(6));
+
         i = v.recordsIn(Duration.ofDays(1));
         assertThat(i, equalTo(11));
     }
@@ -307,6 +310,137 @@ public class ArrayBufferTest {
         assertThat(d0, notNullValue());
         assertThat(d0.length(), equalTo(v.length()));
         d0.release();
+    }
+
+    @Test
+    public void groupByTimestamp1() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:39.500Z"), 6}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
+
+        BufferView v = b.unmodifiableView();
+
+        List<BufferView> gs = v.groupBy(Duration.ofSeconds(10), 3);
+        assertThat(gs.size(), equalTo(3));
+
+        BufferView g0 = gs.get(0);
+        assertThat(g0.length(), equalTo(11));
+        assertThat(g0.get(0)[0], equalTo(v.get(0)[0]));
+
+        BufferView g1 = gs.get(1);
+        assertThat(g1.length(), equalTo(9));
+        assertThat(g1.get(0)[0], equalTo(v.get(2)[0]));
+
+        BufferView g2 = gs.get(2);
+        assertThat(g2.length(), equalTo(6));
+        assertThat(g2.get(0)[0], equalTo(v.get(5)[0]));
+    }
+
+    @Test
+    public void groupByTimestamp2() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:39.000Z"), 6}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
+
+        BufferView v = b.unmodifiableView();
+
+        List<BufferView> gs = v.groupBy(Duration.ofSeconds(1), 3);
+        assertThat(gs.size(), equalTo(3));
+
+        BufferView g0 = gs.get(0);
+        assertThat(g0.length(), equalTo(11));
+        assertThat(g0.get(0)[0], equalTo(v.get(0)[0]));
+
+        BufferView g1 = gs.get(1);
+        assertThat(g1.length(), equalTo(10));
+        assertThat(g1.get(0)[0], equalTo(v.get(1)[0]));
+
+        BufferView g2 = gs.get(2);
+        assertThat(g2.length(), equalTo(9));
+        assertThat(g2.get(0)[0], equalTo(v.get(2)[0]));
+    }
+
+    @Test
+    public void groupByTimestamp3() {
+        Buffer b = new ArrayBuffer(atts, 512);
+
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:39.000Z"), 6}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
+
+        BufferView v = b.unmodifiableView();
+
+        List<BufferView> gs = v.groupBy(Duration.ofSeconds(30), 3);
+        assertThat(gs.size(), equalTo(2));
+
+        BufferView g0 = gs.get(0);
+        assertThat(g0.length(), equalTo(11));
+        assertThat(g0.get(0)[0], equalTo(v.get(0)[0]));
+
+        BufferView g1 = gs.get(1);
+        assertThat(g1.length(), equalTo(5));
+        assertThat(g1.get(0)[0], equalTo(v.get(6)[0]));
     }
 
     @Test

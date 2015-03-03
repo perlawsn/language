@@ -58,4 +58,8 @@ public interface BufferView {
 
     public BufferView subView(Duration d);
 
+    public List<BufferView> groupBy(Duration d, int count);
+
+    public List<BufferView> groupBy(List<Expression> fields);
+
 }

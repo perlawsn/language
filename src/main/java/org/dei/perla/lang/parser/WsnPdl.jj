@@ -34,11 +34,11 @@ PARSER_END(Parser)
 SKIP :
 {
  	" "
-|
+    |
 	"\r"
-|
+    |
 	"\t"
-|
+    |
 	"\n"
 }
 
@@ -193,7 +193,7 @@ TOKEN :
 }
 
 /*
- *	Token della clausola *ON UNSUPPORTED SAMPLING RATE*
+ * ON UNSUPPORTED SAMPLING RATE
  */
 TOKEN :
 {
@@ -359,7 +359,7 @@ TOKEN :
 }
 
 /*
- *	FUNZIONI DI AGGREGAZIONE
+ * AGGREGATES
  */
 TOKEN :
 {

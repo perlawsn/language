@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.expression.Expression;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -50,8 +51,20 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         this.oldest = oldest;
     }
 
+    /**
+     * {@code getTimestampIndex} returns the index of the column which
+     * contains the record timestamp.
+     */
     protected int getTimestampIndex() {
         return tsIdx;
+    }
+
+    /**
+     * {@code timestamp} returns the timestamp associated with the ith record
+     * in the buffer.
+     */
+    private Instant timestamp(int i) {
+        return (Instant) data[i][tsIdx];
     }
 
     @Override
@@ -131,28 +144,35 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     public int recordsIn(Duration d) {
         lock.lock();
         try {
-            return countFromNewest(d);
+            return count(d);
         } finally {
             lock.unlock();
         }
     }
 
-    private int countFromNewest(Duration d) {
+    /**
+     * {@code count} counts the number of records whose timestamp is greater
+     * or equal than (newest - d).
+     */
+    private int count(Duration d) {
         int i = 0;
         int top = newest;
         int bottom = oldest;
         Instant target = timestamp(newest).minus(d);
 
-        while (top >= bottom) {
+        while (top > bottom) {
             i = bottom + (top - bottom) / 2;
             int c = timestamp(i).compareTo(target);
             if (c == 0) {
                 break;
             } else if (c > 0) {
-                top = i - 1;
+                top = i;
             } else {
                 bottom = i + 1;
             }
+        }
+        if (top == bottom) {
+            i = top;
         }
         return length - i;
     }
@@ -180,14 +200,49 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     public BufferView subView(Duration d) {
         lock.lock();
         try {
-            return subView(countFromNewest(d));
+            return subView(count(d));
         } finally {
             lock.unlock();
         }
     }
 
-    private Instant timestamp(int i) {
-        return (Instant) data[i][tsIdx];
+    @Override
+    public List<BufferView> groupBy(Duration d, int count) {
+        lock.lock();
+        try {
+            List<BufferView> bfs = new LinkedList<>();
+
+            // The first timestamped-grouped buffer always contains all records
+            ArrayBufferView v = new ArrayBufferView(this, oldest, newest);
+            bfs.add(v);
+            views.add(v);
+
+            int lastIdx = 10;
+            for (int i = 1; i < count; i++) {
+                Duration cd = d.multipliedBy(i);
+                int idx = length - count(cd) - 1;
+                if (idx >= lastIdx && idx > oldest) {
+                    idx = lastIdx - 1;
+                } else if (idx < oldest) {
+                    idx = oldest;
+                }
+                if (timestamp(lastIdx).minus(d).compareTo(timestamp(idx)) < 0) {
+                    break;
+                }
+                v = new ArrayBufferView(this, oldest, idx);
+                bfs.add(v);
+                views.add(v); // needed for correct release of views
+                lastIdx = idx;
+            }
+            return bfs;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public List<BufferView> groupBy(List<Expression> fields) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

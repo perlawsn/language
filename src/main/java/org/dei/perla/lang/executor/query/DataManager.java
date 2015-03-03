@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Guido Rota 02/03/15.
  */
-public class DataManager {
+public final class DataManager {
 
     public final List<Expression> select;
     public final int uptoSamples;
