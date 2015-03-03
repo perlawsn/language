@@ -32,44 +32,52 @@ public class DataManager {
     }
 
     public void select(BufferView buffer, QueryHandler handler) {
-        // GROUP BY CLAUSE
-        List<BufferView> bufs = splitBuffer(buffer);
-
         int upto = 0;
-        for (BufferView b : bufs) {
-            // UPTO CLAUSE
-            if (uptoSamples != -1) {
-                upto = uptoSamples;
-            } else {
-                upto = buffer.recordsIn(uptoDuration);
+        // UPTO CLAUSE
+        if (uptoSamples != -1) {
+            upto = uptoSamples;
+        } else {
+            upto = buffer.recordsIn(uptoDuration);
+        }
+
+        boolean generated = false;
+        if (Check.nullOrEmpty(group)) {
+            generated = selectBuffer(upto, buffer, handler);
+        } else {
+            // GROUP BY CLAUSE
+            List<BufferView> groups = splitBuffer(buffer);
+            for (BufferView b : groups) {
+                generated |= selectBuffer(upto, b, handler);
+                b.release();
             }
-            for (int i = 0; i < upto && i < buffer.length(); i++) {
-                Object[] cur = b.get(i);
-                // HAVING CLAUSE
-                if (having != null && !(Boolean) having.compute(cur, b)) {
-                    if (def != null) {
-                        // ON EMPTY SELECTION INSERT DEFAULT
-                        handler.newRecord(def);
-                    }
-                    continue;
-                }
-                // SELECTION
-                Object[] out = new Object[select.size()];
-                for (int j = 0; j < select.size(); j++) {
-                    out[j] = select.get(j).compute(cur, b);
-                }
-                handler.newRecord(out);
-            }
+        }
+
+        if (def != null && !generated) {
+            // ON EMPTY SELECTION INSERT DEFAULT
+            handler.newRecord(def);
         }
     }
 
-    private List<BufferView> splitBuffer(BufferView buffer) {
-        List<BufferView> bufs = new LinkedList<>();
-        if (Check.nullOrEmpty(group)) {
-            bufs.add(buffer);
-            return bufs;
+    private boolean selectBuffer(int upto, BufferView buf, QueryHandler hand) {
+        boolean generated = false;
+        for (int i = 0; i < upto && i < buf.length(); i++) {
+            Object[] cur = buf.get(i);
+            // HAVING CLAUSE
+            if (having != null && !(Boolean) having.compute(cur, buf)) {
+                continue;
+            }
+            // SELECTION
+            Object[] out = new Object[select.size()];
+            for (int j = 0; j < select.size(); j++) {
+                out[j] = select.get(j).compute(cur, buf);
+            }
+            hand.newRecord(out);
+            generated = true;
         }
+        return generated;
+    }
 
+    private List<BufferView> splitBuffer(BufferView buffer) {
         //TODO: split the buffer as for group by conditions
         throw new RuntimeException("unimplemented");
     }

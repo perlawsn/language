@@ -284,4 +284,30 @@ public class DataManagerTest {
         assertThat(r[4], equalTo(10));
     }
 
+    @Test
+    public void insertOnEmpty() throws InterruptedException {
+        List<Expression> sel = new ArrayList<>();
+        sel.add(tsExpr);
+        sel.add(intExpr);
+
+        Expression having = new Equal(intExpr,
+                new Constant(10, DataType.INTEGER));
+
+        Object[] def = new Object[2];
+        def[0] = Instant.now();
+        def[1] = 5;
+
+        DataManager dm = new DataManager(sel, 3, null, null, having, def);
+        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
+        dm.select(view, qh);
+        List<Object[]> records = qh.getRecords();
+
+        assertThat(records.size(), equalTo(1));
+        Object[] r = records.get(0);
+        assertTrue(r[0] instanceof Instant);
+        assertThat(r[0], equalTo(def[0]));
+        assertTrue(r[1] instanceof Integer);
+        assertThat(r[1], equalTo(def[1]));
+    }
+
 }
