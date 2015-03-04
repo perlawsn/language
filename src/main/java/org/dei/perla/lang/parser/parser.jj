@@ -18,6 +18,7 @@ options
 {
     JDK_VERSION = "1.8";
     IGNORE_CASE = true;
+    STATIC = false;
 }
 
 PARSER_BEGIN(JavaccParser)
@@ -638,11 +639,14 @@ void StreamSelectionStatement() :
     LowSelectionStatement()
 }
 
-void LowEveryClause() :
-{}
+WindowSize LowEveryClause() :
+{
+    WindowSize ws;
+}
 {
 	<KEYWORD_EVERY>
-	WindowSize()
+	ws = WindowSize()
+	{ return ws; }
 }
 
 void LowSelectionStatement() :
