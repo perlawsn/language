@@ -22,6 +22,8 @@ options
 
 PARSER_BEGIN(Parser)
 
+    package org.dei.perla.lang.parser;
+
 	public class Parser {
 
 	}

@@ -35,6 +35,50 @@
                 <artifactId>maven-eclipse-plugin</artifactId>
                 <version>2.9</version>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>javacc</id>
+                        <goals>
+                            <goal>javacc</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${basedir}/src/main/java/
+                            </outputDirectory>
+                            <sourceDirectory>
+                                ${basedir}/src/main/java/org/dei/perla/lang/parser
+                            </sourceDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.6.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>
+                                ${basedir}/src/main/java/org/dei/perla/lang/parser
+                            </directory>
+                            <includes>
+                                <include>ParseException.java</include>
+                                <include>Parser.java</include>
+                                <include>ParserConstants.java</include>
+                                <include>ParserTokenManager.java</include>
+                                <include>SimpleCharStream.java</include>
+                                <include>Token.java</include>
+                                <include>TokenMgrError.java</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
