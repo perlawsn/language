@@ -24,6 +24,9 @@ public abstract class Runner {
     private final Query query;
     private final QueryHandler qh;
 
+    private Task sampTask;
+    private final TaskHandler sampHandler = new SamplingTaskHandler();
+
     public Runner(Fpc fpc, Query query, QueryHandler qh) {
         this.fpc = fpc;
         this.query = query;
@@ -32,9 +35,12 @@ public abstract class Runner {
         int tsIdx = timestampIndex(query.selectAttributes());
         //TODO: estimate buffer length
         buf = new ArrayBuffer(tsIdx, 512);
+
+        //TODO: correct termination, executeif and sampling management
+        sampTask = fpc.get(query.selectAttributes(), 1000, sampHandler);
     }
 
-    // Retrieves the column index of the timestamp attribute
+    // Retrieves the index of the timestamp column
     private int timestampIndex(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
@@ -54,7 +60,7 @@ public abstract class Runner {
 
     protected void newSample() {}
 
-    private final class EventTaskHandler implements TaskHandler {
+    private final class SamplingTaskHandler implements TaskHandler {
 
         @Override
         public void complete(Task task) {
