@@ -6,7 +6,6 @@ import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
-import org.dei.perla.lang.executor.SynchronizerQueryHandler;
 import org.dei.perla.lang.executor.expression.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Guido Rota 03/03/15.
  */
-public class DataManagerTest {
+public class SelectionTest {
 
     private static Attribute integerAtt =
             Attribute.create("integer", DataType.INTEGER);
@@ -73,7 +72,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, null, null, -1, null, null, null);
+        Selection dm = new Selection(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -99,7 +98,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 3, null));
 
-        DataManager dm = new DataManager(sel, null, null, -1, null, null, null);
+        Selection dm = new Selection(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -127,7 +126,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
 
         UpTo upto = new UpTo(3);
-        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
+        Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -155,7 +154,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
 
         UpTo upto = new UpTo(Duration.ofSeconds(10));
-        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
+        Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -184,7 +183,7 @@ public class DataManagerTest {
         sel.add(new SumAggregate(intExpr, 5, null));
 
         UpTo upto = new UpTo(3);
-        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
+        Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -217,7 +216,7 @@ public class DataManagerTest {
                 new Constant(3, DataType.INTEGER));
 
         UpTo upto = new UpTo(3);
-        DataManager dm = new DataManager(sel, upto, null, -1, null, having, null);
+        Selection dm = new Selection(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -257,7 +256,7 @@ public class DataManagerTest {
                 new Constant(3, DataType.INTEGER));
 
         UpTo upto = new UpTo(3);
-        DataManager dm = new DataManager(sel, upto, null, -1, null, having, null);
+        Selection dm = new Selection(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -302,7 +301,7 @@ public class DataManagerTest {
         def[1] = 5;
 
         UpTo upto = new UpTo(3);
-        DataManager dm = new DataManager(sel, upto, null, -1, null, having, def);
+        Selection dm = new Selection(sel, upto, null, having, def);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -322,8 +321,8 @@ public class DataManagerTest {
         sel.add(new GroupTS(0));
         sel.add(intExpr);
 
-        DataManager dm = new DataManager(sel, null, Duration.ofSeconds(1),
-                3, null, null, null);
+        GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
+        Selection dm = new Selection(sel, null, group, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();

@@ -49,6 +49,6 @@ public interface BufferView {
 
     public List<BufferView> groupBy(Duration d, int count);
 
-    public List<BufferView> groupBy(List<Expression> fields);
+    public List<BufferView> groupBy(List<? extends Expression> fields);
 
 }

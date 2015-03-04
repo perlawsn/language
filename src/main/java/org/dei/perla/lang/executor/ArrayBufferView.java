@@ -232,7 +232,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     }
 
     @Override
-    public List<BufferView> groupBy(List<Expression> fields) {
+    public List<BufferView> groupBy(List<? extends Expression> fields) {
         throw new RuntimeException("unimplemented");
     }
 

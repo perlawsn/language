@@ -9,13 +9,13 @@ import java.util.List;
  */
 public final class Query {
 
-    private final DataManager dm;
+    private final Selection dm;
 
-    public Query(DataManager dm) {
+    public Query(Selection dm) {
         this.dm = dm;
     }
 
-    public DataManager getDataManager() {
+    public Selection getDataManager() {
         return dm;
     }
 

@@ -740,7 +740,7 @@ void FieldGroupingByList() :
 void FieldGroupingBy() :
 {}
 {
-	Identifier() // Logical object field
+	Identifier() // FPC attribute
 }
 
 void FieldGroupingByTs() :
@@ -818,10 +818,10 @@ void OnEventClause() :
 void EventList() :
 {}
 {
-	Identifier() // LogicalObjectEvent
+	Identifier() // FPC Event
 	(
 		","
-		Identifier() // LogicalObjectEvent
+		Identifier() // FPC Event
 	)*
 }
 
@@ -1137,7 +1137,7 @@ void ExistsAttribute() :
 	<KEYWORD_EXISTS>
 	"("
 	(
-		Identifier() // LogicalObjectField
+		Identifier() // FPC attribute
 		|
 		<KEYWORD_ALL>
 	)
@@ -1359,14 +1359,14 @@ void ExpressionValuePrimary(boolean aggregate) :
 		|
 		Aggregate(aggregate)
 		|
-		Identifier() // LogicalObjectField
+		Identifier() // FPC attribute
 	)
 	|
 	LOOKAHEAD( { !aggregate } )
 	(
 		<TYPE_ID>
 		|
-		Identifier() // LogicalObjectField
+		Identifier() // FPC attribute
 	)
 }
 
