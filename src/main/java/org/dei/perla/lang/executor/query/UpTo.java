@@ -7,7 +7,7 @@ import java.time.Duration;
 /**
  * @author Guido Rota 04/03/15.
  */
-public class UpTo {
+public final class UpTo {
 
     private final int samples;
     private final Duration d;

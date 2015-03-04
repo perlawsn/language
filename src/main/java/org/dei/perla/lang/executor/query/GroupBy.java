@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author Guido Rota 04/03/15.
  */
-public class GroupBy {
+public final class GroupBy {
 
     private final Duration d;
     private final int count;

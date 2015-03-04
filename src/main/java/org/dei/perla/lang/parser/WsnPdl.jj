@@ -20,15 +20,24 @@ options
   IGNORE_CASE = true;
 }
 
-PARSER_BEGIN(Parser)
+PARSER_BEGIN(JavaccParser)
 
     package org.dei.perla.lang.parser;
 
-	public class Parser {
+    import java.time.temporal.TemporalUnit;
+    import java.time.temporal.ChronoUnit;
+    import java.time.Duration;
+
+    import org.dei.perla.lang.executor.query.UpTo;
+
+    import org.dei.perla.core.utils.Errors;
+    import org.dei.perla.core.descriptor.DataType;
+
+	public class JavaccParser {
 
 	}
 
-PARSER_END(Parser)
+PARSER_END(JavaccParser)
 
 /*
  * SEPARATORS
@@ -444,20 +453,12 @@ TOKEN :
  */
 TOKEN :
 {
-	<CONSTANT_INTEGER:
-		(
-		( <DIGIT> )+
-		|
-		<HEXADECIMAL>
-		)
-	>
+	<CONSTANT_INTEGER_10: ( <DIGIT> )+ >
+	|
+	<CONSTANT_INTEGER_16: ( <HEXADECIMAL> ) >
     |
 	<CONSTANT_FLOAT:
-		(
-			( <CONSTANT_INTEGER> )? "." <CONSTANT_INTEGER> ( "E" (<OPERATOR_PLUS> | <OPERATOR_MINUS>)? <CONSTANT_INTEGER> )?
-		|
-			 <CONSTANT_INTEGER> "E" (<OPERATOR_PLUS> | <OPERATOR_MINUS>)? <CONSTANT_INTEGER>
-		)
+        ( <CONSTANT_INTEGER_10> )? "." <CONSTANT_INTEGER_10>
 	>
 }
 
@@ -762,12 +763,21 @@ void HavingClause() :
 	Expression(true)
 }
 
-void UpToClause() :
-{}
+UpTo UpToClause() :
+{
+    WindowSize ws;
+}
 {
 	<KEYWORD_UP>
 	<KEYWORD_TO>
-	WindowSize()
+	ws = WindowSize()
+	{
+	    if (ws.getDuration() != null) {
+	        return new UpTo(ws.getDuration());
+	    } else {
+	        return new UpTo(ws.getSamples());
+	    }
+	}
 }
 
 void OnEmptySelectionClause() :
@@ -943,36 +953,46 @@ void LogicValue() :
 	<CONSTANT_BOOLEAN_UNKNOWN>
 }
 
-void ConstantNull() :
+Object ConstantNull() :
 {}
 {
 	<CONSTANT_NULL>
+	{ return null; }
 }
 
-void ConstantBoolean() :
+boolean ConstantBoolean() :
 {}
 {
 	(
 		<CONSTANT_BOOLEAN_TRUE>
+		{ return true; }
 		|
 		<CONSTANT_BOOLEAN_FALSE>
+		{ return false; }
 	)
 }
 
-void ConstantFloat() :
-{}
+float ConstantFloat() :
+{
+    Token value;
+}
 {
 	(
-		<CONSTANT_INTEGER>
-		|
-		<CONSTANT_FLOAT>
+		value = <CONSTANT_FLOAT>
 	)
+	{ return Float.parseFloat(value.image); }
 }
 
-void ConstantInteger() :
-{}
+int ConstantInteger() :
 {
-	<CONSTANT_INTEGER>
+    Token value;
+}
+{
+	value = <CONSTANT_INTEGER_10>
+	{ return Integer.parseInt(value.image); }
+	|
+	value = <CONSTANT_INTEGER_16>
+	{ return Integer.parseInt(value.image.substring(2), 16); }
 }
 
 void ConstantString() :
@@ -1035,41 +1055,51 @@ void ComparisonOperator() :
 	<OPERATOR_NOT_EQUAL>
 }
 
-void FieldType() :
+DataType FieldType() :
 {}
 {
 	(
 	<TYPE_ID>
+	{ return DataType.ID; }
 	|
 	<TYPE_TS>
+	{ return DataType.TIMESTAMP; }
 	|
 	<TYPE_BOOLEAN>
+	{ return DataType.BOOLEAN; }
 	|
 	<TYPE_INTEGER>
+	{ return DataType.INTEGER; }
 	|
 	<TYPE_FLOAT>
+	{ return DataType.FLOAT; }
 	|
 	<TYPE_STRING>
-	|
-	<IDENTIFIER>
+	{ return DataType.STRING; }
 	)
 }
 
-void TimeUnit() :
+TemporalUnit TimeUnit() :
 {}
 {
 	(
 	<TIMEUNIT_S>
+	{ return ChronoUnit.SECONDS; }
 	|
 	<TIMEUNIT_M>
+	{ return ChronoUnit.MINUTES; }
 	|
 	<TIMEUNIT_H>
+	{ return ChronoUnit.HOURS; }
 	|
 	<TIMEUNIT_MS>
+	{ return ChronoUnit.MILLIS; }
 	|
 	<TIMEUNIT_D>
+	{ return ChronoUnit.DAYS; }
 	|
 	<TIMEUNIT_MT>
+	{ return ChronoUnit.MONTHS; }
 	)
 }
 
@@ -1085,50 +1115,69 @@ void AggregationOperator() :
 	<FUNCTION_SUM>
 }
 
-void Duration() :
-{}
+Duration Duration() :
 {
-	ConstantFloat()
-	TimeUnit()
+    TemporalUnit tu;
+    int value;
+}
+{
+	value = ConstantInteger()
+	tu = TimeUnit()
+    { return Duration.of(value, tu); }
 }
 
-void SamplesNumber() :
-{}
+int SamplesNumber() :
+{
+    int samples;
+}
 {
 	(
 		(
-			ConstantInteger()
+			samples = ConstantInteger()
 			<KEYWORD_SAMPLES>
+			{ return samples; }
 		)
 		|
 		(
 			<KEYWORD_ONE>
+			{ return 1; }
 		)
 	)
 }
 
-void SelectionsNumber() :
-{}
+int SelectionsNumber() :
+{
+    int value;
+}
 {
 	(
-		ConstantInteger()
+		value = ConstantInteger()
 		<KEYWORD_SELECTIONS>
+		{ return value; }
 	)
 }
 
-void WindowSize() :
-{}
+WindowSize WindowSize() :
+{
+    Duration d;
+    int samples;
+}
 {
 	LOOKAHEAD(2)
-	Duration()
+	d = Duration()
+	{ return new WindowSize(d); }
 	|
-	SamplesNumber()
+	samples = SamplesNumber()
+	{ return new WindowSize(samples); }
 }
 
-void Identifier() :
-{}
+String Identifier() :
 {
-	<IDENTIFIER>
+    Token value;
+}
+{
+	value = <IDENTIFIER>
+	{ return value.image; }
 }
 
 void ExistsAttribute() :

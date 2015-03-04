@@ -40,12 +40,12 @@ public abstract class Runner {
         this.query = query;
         this.qh = qh;
 
-        int tsIdx = timestampIndex(query.selectAttributes());
+        int tsIdx = timestampIndex(query.selectedAttributes());
         // TODO: estimate buffer length
         buf = new ArrayBuffer(tsIdx, 512);
 
         // TODO: correct termination, executeif and sampling management
-        sampTask = fpc.get(query.selectAttributes(), 1000, sampHandler);
+        sampTask = fpc.get(query.selectedAttributes(), 1000, sampHandler);
     }
 
     // Retrieves the index of the timestamp column
@@ -68,7 +68,7 @@ public abstract class Runner {
         }
         pool.submit(() -> {
             BufferView view = buf.unmodifiableView();
-            query.getDataManager().select(view, selHandler);
+            query.select(view, selHandler);
             view.release();
             // TODO: delete old records from buffer
             inSelect.set(false);

@@ -1,12 +1,8 @@
 package org.dei.perla.lang.executor.query;
 
-import org.dei.perla.core.utils.Check;
 import org.dei.perla.lang.executor.BufferView;
-import org.dei.perla.lang.executor.QueryHandler;
 import org.dei.perla.lang.executor.expression.Expression;
 
-import java.time.Duration;
-import java.util.LinkedList;
 import java.util.List;
 
 /**

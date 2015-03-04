@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.query;
 
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
 
@@ -9,17 +10,17 @@ import java.util.List;
  */
 public final class Query {
 
-    private final Selection dm;
+    private final Selection selection;
 
-    public Query(Selection dm) {
-        this.dm = dm;
+    public Query(Selection selection) {
+        this.selection = selection;
     }
 
-    public Selection getDataManager() {
-        return dm;
+    public void select(BufferView buffer, SelectHandler handler) {
+        selection.select(buffer, handler);
     }
 
-    public List<Attribute> selectAttributes() {
+    public List<Attribute> selectedAttributes() {
         throw new RuntimeException("unimplemented");
     }
 
