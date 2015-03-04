@@ -33,7 +33,7 @@ public final class CountAggregate implements Expression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
+    public Object run(Object[] record, BufferView buffer) {
         IntAccumulator count = new IntAccumulator(0);
         if (samples != -1) {
             buffer = buffer.subView(samples);

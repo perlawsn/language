@@ -6,6 +6,7 @@ import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
+import org.dei.perla.lang.executor.SynchronizerQueryHandler;
 import org.dei.perla.lang.executor.expression.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -73,7 +74,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
 
         DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -99,7 +100,7 @@ public class DataManagerTest {
         sel.add(new SumAggregate(intExpr, 3, null));
 
         DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -126,7 +127,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
 
         DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -154,7 +155,7 @@ public class DataManagerTest {
 
         DataManager dm = new DataManager(sel, -1, Duration.ofSeconds(10),
                 null, -1, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -182,7 +183,7 @@ public class DataManagerTest {
         sel.add(new SumAggregate(intExpr, 5, null));
 
         DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -214,7 +215,7 @@ public class DataManagerTest {
                 new Constant(3, DataType.INTEGER));
 
         DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -253,7 +254,7 @@ public class DataManagerTest {
                 new Constant(3, DataType.INTEGER));
 
         DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(2);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -297,7 +298,7 @@ public class DataManagerTest {
         def[1] = 5;
 
         DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, def);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(1);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 
@@ -318,7 +319,7 @@ public class DataManagerTest {
 
         DataManager dm = new DataManager(sel, 1, null, Duration.ofSeconds(1),
                 3, null, null, null);
-        SynchronizerQueryHandler qh = new SynchronizerQueryHandler(3);
+        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
 

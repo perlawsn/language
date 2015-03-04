@@ -12,7 +12,7 @@ public final class BitwiseNot extends UnaryExpression {
     }
 
     @Override
-    protected Object doCompute(Object o) {
+    protected Object doRun(Object o) {
         return ~(Integer) o;
     }
 

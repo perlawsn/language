@@ -18,18 +18,18 @@ public final class SumAggregate extends Aggregate {
     }
 
     @Override
-    public Object doCompute(BufferView buffer) {
+    public Object doRun(BufferView buffer) {
         switch (type) {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) exp.compute(r, b);
+                    si.value += (Integer) exp.run(r, b);
                 }, where);
                 return si.value;
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) exp.compute(r, b);
+                    sf.value += (Float) exp.run(r, b);
                 }, where);
                 return sf.value;
             default:

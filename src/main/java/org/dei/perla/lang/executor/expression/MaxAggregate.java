@@ -18,12 +18,12 @@ public final class MaxAggregate extends Aggregate {
     }
 
     @Override
-    public Object doCompute(BufferView buffer) {
+    public Object doRun(BufferView buffer) {
         switch (type) {
             case INTEGER:
                 IntAccumulator maxi = new IntAccumulator(Integer.MIN_VALUE);
                 buffer.forEach((r, b) -> {
-                    Integer vi = (Integer) exp.compute(r, b);
+                    Integer vi = (Integer) exp.run(r, b);
                     if (maxi.value < vi) {
                         maxi.value = vi;
                     }
@@ -32,7 +32,7 @@ public final class MaxAggregate extends Aggregate {
             case FLOAT:
                 FloatAccumulator maxf = new FloatAccumulator(Float.MIN_VALUE);
                 buffer.forEach((r, b) -> {
-                    Float vf = (Float) exp.compute(r, b);
+                    Float vf = (Float) exp.run(r, b);
                     if (maxf.value < vf) {
                         maxf.value = vf;
                     }

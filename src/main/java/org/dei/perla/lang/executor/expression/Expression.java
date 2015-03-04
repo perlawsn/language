@@ -10,6 +10,6 @@ public interface Expression {
 
     public DataType getType();
 
-    public Object compute(Object[] record, BufferView buffer);
+    public Object run(Object[] record, BufferView buffer);
 
 }

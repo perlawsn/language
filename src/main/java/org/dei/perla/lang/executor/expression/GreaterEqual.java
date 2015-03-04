@@ -12,7 +12,7 @@ public final class GreaterEqual extends BinaryExpression {
     }
 
     @Override
-    protected Object doCompute(Object o1, Object o2) {
+    protected Object doRun(Object o1, Object o2) {
         switch (e1.getType()) {
             case INTEGER:
             case FLOAT:

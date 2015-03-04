@@ -23,20 +23,20 @@ public final class AvgAggregate extends Aggregate {
     }
 
     @Override
-    public Object doCompute(BufferView buffer) {
+    public Object doRun(BufferView buffer) {
         IntAccumulator count = new IntAccumulator(0);
         switch (opType) {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) exp.compute(r, b);
+                    si.value += (Integer) exp.run(r, b);
                     count.value++;
                 }, where);
                 return si.value.floatValue() / count.value;
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) exp.compute(r, b);
+                    sf.value += (Float) exp.run(r, b);
                     count.value++;
                 }, where);
                 return sf.value / count.value;

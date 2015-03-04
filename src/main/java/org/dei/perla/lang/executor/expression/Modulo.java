@@ -10,7 +10,7 @@ public final class Modulo extends BinaryExpression {
     }
 
     @Override
-    public Object doCompute(Object o1, Object o2) {
+    public Object doRun(Object o1, Object o2) {
         return (Integer) o1 % (Integer) o2;
     }
 

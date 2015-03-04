@@ -10,7 +10,7 @@ public final class Not extends UnaryExpression {
     }
 
     @Override
-    public Object doCompute(Object o) {
+    public Object doRun(Object o) {
         return !(Boolean) o;
     }
 

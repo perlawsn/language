@@ -56,25 +56,25 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
-    public final Object compute(Object[] record, BufferView view) {
+    public final Object run(Object[] record, BufferView view) {
         Object res;
 
         if (samples != -1) {
             view = view.subView(samples);
-            res = doCompute(view);
+            res = doRun(view);
             view.release();
         } else if (duration != null) {
             view = view.subView(duration);
-            res = doCompute(view);
+            res = doRun(view);
             view.release();
         } else {
-            res = doCompute(view);
+            res = doRun(view);
         }
 
         return res;
     }
 
-    protected abstract Object doCompute(BufferView view);
+    protected abstract Object doRun(BufferView view);
 
     public static final class IntAccumulator {
 

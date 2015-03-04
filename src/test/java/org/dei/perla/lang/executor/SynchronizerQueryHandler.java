@@ -1,6 +1,7 @@
-package org.dei.perla.lang.executor.query;
+package org.dei.perla.lang.executor;
 
 import org.dei.perla.lang.executor.QueryHandler;
+import org.dei.perla.lang.executor.query.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +18,14 @@ public class SynchronizerQueryHandler implements QueryHandler {
     private final Condition cond = lk.newCondition();
     private int upto;
     private final List<Object[]> records = new ArrayList<>();
+    private Throwable error = null;
 
     public SynchronizerQueryHandler(int upto) {
         this.upto = upto;
     }
 
     @Override
-    public void newRecord(Object[] r) {
+    public void newRecord(Query q, Object[] r) {
         lk.lock();
         try {
             if (upto != 0) {
@@ -36,11 +38,25 @@ public class SynchronizerQueryHandler implements QueryHandler {
         }
     }
 
+    @Override
+    public void error(Query q, Throwable cause) {
+        lk.lock();
+        try {
+            error = cause;
+            cond.signalAll();
+        } finally {
+            lk.unlock();
+        }
+    }
+
     public List<Object[]> getRecords() throws InterruptedException {
         lk.lock();
         try {
-            while (upto != 0) {
+            while (upto != 0 || error != null) {
                 cond.await();
+            }
+            if (error != null) {
+                throw new RuntimeException(error);
             }
             return records;
         } finally {

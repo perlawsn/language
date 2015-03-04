@@ -59,13 +59,13 @@ public class AggregateTest {
     public void testIntegerSum() {
         SumAggregate sum = new SumAggregate(intExpr, 5, null);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
-        Object res = sum.compute(null, view);
+        Object res = sum.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(10));
 
         sum = new SumAggregate(intExpr, 3, null);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
-        res = sum.compute(null, view);
+        res = sum.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(9));
 
@@ -73,26 +73,26 @@ public class AggregateTest {
                 new Constant(3f, DataType.FLOAT));
         sum = new SumAggregate(intExpr, 5, where);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
-        res = sum.compute(null, view);
+        res = sum.run(null, view);
         assertThat(res, equalTo(7));
     }
 
     @Test
     public void testFloatSum() {
         SumAggregate sum = new SumAggregate(floatExpr, 5, null);
-        Object res = sum.compute(null, view);
+        Object res = sum.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(11f));
 
         sum = new SumAggregate(floatExpr, 3, null);
-        res = sum.compute(null, view);
+        res = sum.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(9.9f));
 
         Expression where = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
         sum = new SumAggregate(floatExpr, 5, where);
-        res = sum.compute(null, view);
+        res = sum.run(null, view);
         assertThat(res, equalTo(7.7f));
     }
 
@@ -100,13 +100,13 @@ public class AggregateTest {
     public void testIntegerAvg() {
         AvgAggregate avg = new AvgAggregate(intExpr, 5, null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
-        Object res = avg.compute(null, view);
+        Object res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2f));
 
         avg = new AvgAggregate(intExpr, 3, null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
-        res = avg.compute(null, view);
+        res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3f));
 
@@ -114,7 +114,7 @@ public class AggregateTest {
                 new Constant(3f, DataType.FLOAT));
         avg = new AvgAggregate(intExpr, 5, where);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
-        res = avg.compute(null, view);
+        res = avg.run(null, view);
         assertThat(res, equalTo(7f / 2));
     }
 
@@ -122,19 +122,19 @@ public class AggregateTest {
     public void testFloatAvg() {
         AvgAggregate avg = new AvgAggregate(floatExpr, 5, null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
-        Object res = avg.compute(null, view);
+        Object res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(11f / 5));
 
         avg = new AvgAggregate(floatExpr, 3, null);
-        res = avg.compute(null, view);
+        res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3.3f));
 
         Expression where = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
         avg = new AvgAggregate(floatExpr, 5, where);
-        res = avg.compute(null, view);
+        res = avg.run(null, view);
         assertThat(res, equalTo(7.7f / 2));
     }
 
@@ -142,13 +142,13 @@ public class AggregateTest {
     public void testIntegerMin() {
         MinAggregate min = new MinAggregate(intExpr, 5, null);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
-        Object res = min.compute(null, view);
+        Object res = min.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(0));
 
         min = new MinAggregate(intExpr, 3, null);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
-        res = min.compute(null, view);
+        res = min.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(2));
 
@@ -156,7 +156,7 @@ public class AggregateTest {
                 new Constant(3f, DataType.FLOAT));
         min = new MinAggregate(intExpr, 5, where);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
-        res = min.compute(null, view);
+        res = min.run(null, view);
         assertThat(res, equalTo(3));
     }
 
@@ -164,19 +164,19 @@ public class AggregateTest {
     public void testFloatMin() {
         MinAggregate min = new MinAggregate(floatExpr, 5, null);
         assertThat(min.getType(), equalTo(DataType.FLOAT));
-        Object res = min.compute(null, view);
+        Object res = min.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(0f));
 
         min = new MinAggregate(floatExpr, 3, null);
-        res = min.compute(null, view);
+        res = min.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2.2f));
 
         Expression where = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
         min = new MinAggregate(floatExpr, 5, where);
-        res = min.compute(null, view);
+        res = min.run(null, view);
         assertThat(res, equalTo(3.3f));
     }
 
@@ -184,13 +184,13 @@ public class AggregateTest {
     public void testIntegerMax() {
         MaxAggregate max = new MaxAggregate(intExpr, 5, null);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
-        Object res = max.compute(null, view);
+        Object res = max.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
         max = new MaxAggregate(intExpr, 3, null);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
-        res = max.compute(null, view);
+        res = max.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
@@ -198,7 +198,7 @@ public class AggregateTest {
                 new Constant(3f, DataType.FLOAT));
         max = new MaxAggregate(intExpr, 5, where);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
-        res = max.compute(null, view);
+        res = max.run(null, view);
         assertThat(res, equalTo(2));
     }
 
@@ -206,19 +206,19 @@ public class AggregateTest {
     public void testFloatMax() {
         MaxAggregate max = new MaxAggregate(floatExpr, 5, null);
         assertThat(max.getType(), equalTo(DataType.FLOAT));
-        Object res = max.compute(null, view);
+        Object res = max.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
         max = new MaxAggregate(floatExpr, 3, null);
-        res = max.compute(null, view);
+        res = max.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
         Expression where = new Less(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
         max = new MaxAggregate(floatExpr, 5, where);
-        res = max.compute(null, view);
+        res = max.run(null, view);
         assertThat(res, equalTo(3.3f));
     }
 
@@ -226,19 +226,19 @@ public class AggregateTest {
     public void testCount() {
         CountAggregate count = new CountAggregate(5, null);
         assertThat(count.getType(), equalTo(DataType.INTEGER));
-        Object res = count.compute(null, view);
+        Object res = count.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(5));
 
         count = new CountAggregate(3, null);
-        res = count.compute(null, view);
+        res = count.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(3));
 
         Expression where = new Less(new Field(1, DataType.INTEGER),
                 new Constant(3, DataType.INTEGER));
         count = new CountAggregate(5, where);
-        res = count.compute(null, view);
+        res = count.run(null, view);
         assertThat(res, equalTo(3));
     }
 

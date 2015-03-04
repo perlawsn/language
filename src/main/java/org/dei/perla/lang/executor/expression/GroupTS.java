@@ -20,7 +20,7 @@ public final class GroupTS implements Expression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
+    public Object run(Object[] record, BufferView buffer) {
         return buffer.get(0)[tsIdx];
     }
 

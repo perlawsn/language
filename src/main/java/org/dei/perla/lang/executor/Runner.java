@@ -1,15 +1,22 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.core.fpc.Task;
+import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.query.Query;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 04/03/15.
  */
 public abstract class Runner {
+
+    private final Lock lock = new ReentrantLock();
 
     private final Buffer buf;
 
@@ -22,8 +29,8 @@ public abstract class Runner {
         this.query = query;
         this.qh = qh;
 
-        //TODO: estimate buffer length
         int tsIdx = timestampIndex(query.selectAttributes());
+        //TODO: estimate buffer length
         buf = new ArrayBuffer(tsIdx, 512);
     }
 
@@ -41,10 +48,35 @@ public abstract class Runner {
 
     protected final void doSelect() {
         BufferView view = buf.unmodifiableView();
-        query.getDataManager().select(view, qh);
+        query.getDataManager().select(view, (r) -> qh.newRecord(query, r));
         view.release();
     }
 
     protected void newSample() {}
+
+    private final class EventTaskHandler implements TaskHandler {
+
+        @Override
+        public void complete(Task task) {
+            //TODO: stop the runner
+        }
+
+        @Override
+        public void newRecord(Task task, Record record) {
+            lock.lock();
+            try {
+                buf.add(record);
+                newSample();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        @Override
+        public void error(Task task, Throwable cause) {
+            //TODO: stop the runner, notify the exception
+        }
+
+    }
 
 }

@@ -22,7 +22,7 @@ public final class Field implements Expression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
+    public Object run(Object[] record, BufferView buffer) {
         return record[idx];
     }
 

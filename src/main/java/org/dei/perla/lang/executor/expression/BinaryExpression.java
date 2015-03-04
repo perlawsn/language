@@ -36,12 +36,12 @@ public abstract class BinaryExpression implements Expression {
     }
 
     @Override
-    public final Object compute(Object[] record, BufferView view) {
-        Object o1 = e1.compute(record, view);
-        Object o2 = e2.compute(record, view);
-        return doCompute(o1, o2);
+    public final Object run(Object[] record, BufferView view) {
+        Object o1 = e1.run(record, view);
+        Object o2 = e2.run(record, view);
+        return doRun(o1, o2);
     }
 
-    protected abstract Object doCompute(Object o1, Object o2);
+    protected abstract Object doRun(Object o1, Object o2);
 
 }

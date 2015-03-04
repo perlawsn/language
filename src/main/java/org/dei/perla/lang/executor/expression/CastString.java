@@ -20,7 +20,7 @@ public final class CastString implements Expression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        return e.compute(record, buffer).toString();
+    public Object run(Object[] record, BufferView buffer) {
+        return e.run(record, buffer).toString();
     }
 }

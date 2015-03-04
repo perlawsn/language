@@ -12,7 +12,7 @@ public final class And extends BinaryExpression {
     }
 
     @Override
-    public Object doCompute(Object o1, Object o2) {
+    public Object doRun(Object o1, Object o2) {
         return (Boolean) o1 && (Boolean) o2;
     }
 

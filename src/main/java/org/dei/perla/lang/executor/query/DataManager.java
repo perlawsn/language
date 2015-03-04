@@ -36,7 +36,7 @@ public final class DataManager {
         this.def = def;
     }
 
-    public void select(BufferView buffer, QueryHandler handler) {
+    public void select(BufferView buffer, SelectHandler handler) {
         int upto = 0;
         // UPTO CLAUSE
         if (uptoSamples != -1) {
@@ -63,20 +63,20 @@ public final class DataManager {
         }
     }
 
-    private boolean selectBuffer(int upto, BufferView buf, QueryHandler hand) {
+    private boolean selectBuffer(int upto, BufferView buf, SelectHandler handler) {
         boolean generated = false;
         for (int i = 0; i < upto && i < buf.length(); i++) {
             Object[] cur = buf.get(i);
             // HAVING CLAUSE
-            if (having != null && !(Boolean) having.compute(cur, buf)) {
+            if (having != null && !(Boolean) having.run(cur, buf)) {
                 continue;
             }
             // SELECTION
             Object[] out = new Object[select.size()];
             for (int j = 0; j < select.size(); j++) {
-                out[j] = select.get(j).compute(cur, buf);
+                out[j] = select.get(j).run(cur, buf);
             }
-            hand.newRecord(out);
+            handler.newRecord(out);
             generated = true;
         }
         return generated;

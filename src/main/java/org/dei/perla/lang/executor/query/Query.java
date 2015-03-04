@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author Guido Rota 04/03/15.
  */
-public class Query {
+public final class Query {
 
     private final DataManager dm;
 

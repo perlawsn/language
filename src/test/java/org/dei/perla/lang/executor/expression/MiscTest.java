@@ -56,8 +56,8 @@ public class MiscTest {
         Null n = new Null();
 
         assertThat(n.getType(), nullValue());
-        assertThat(n.compute(view.get(0), view), nullValue());
-        assertThat(n.compute(view.get(1), view), nullValue());
+        assertThat(n.run(view.get(0), view), nullValue());
+        assertThat(n.run(view.get(1), view), nullValue());
     }
 
     @Test
@@ -68,18 +68,18 @@ public class MiscTest {
 
         CastInt cast = new CastInt(cInt);
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.compute(view.get(0), view), equalTo(12));
+        assertThat(cast.run(view.get(0), view), equalTo(12));
 
         cast = new CastInt(cFloat);
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.compute(view.get(0), view),
+        assertThat(cast.run(view.get(0), view),
                 equalTo(new Float(2.5).intValue()));
 
         cast = new CastInt(fFloat);
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.compute(view.get(0), view),
+        assertThat(cast.run(view.get(0), view),
                 equalTo(new Float(4.4).intValue()));
-        assertThat(cast.compute(view.get(1), view),
+        assertThat(cast.run(view.get(1), view),
                 equalTo(new Float(3.3).intValue()));
     }
 
@@ -91,16 +91,16 @@ public class MiscTest {
 
         CastFloat cast = new CastFloat(cInt);
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.compute(view.get(0), view), equalTo(1f));
+        assertThat(cast.run(view.get(0), view), equalTo(1f));
 
         cast = new CastFloat(cFloat);
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.compute(view.get(0), view), equalTo(1.2f));
+        assertThat(cast.run(view.get(0), view), equalTo(1.2f));
 
         cast = new CastFloat(fFloat);
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.compute(view.get(0), view), equalTo(4.4f));
-        assertThat(cast.compute(view.get(1), view), equalTo(3.3f));
+        assertThat(cast.run(view.get(0), view), equalTo(4.4f));
+        assertThat(cast.run(view.get(1), view), equalTo(3.3f));
     }
 
     @Test
@@ -113,50 +113,50 @@ public class MiscTest {
 
         CastString cast = new CastString(cInt);
         assertThat(cast.getType(), equalTo(DataType.STRING));
-        assertThat(cast.compute(view.get(0), view), equalTo("12"));
+        assertThat(cast.run(view.get(0), view), equalTo("12"));
 
         cast = new CastString(cFloat);
         assertThat(cast.getType(), equalTo(DataType.STRING));
-        assertThat(cast.compute(view.get(0), view), equalTo("2.5"));
+        assertThat(cast.run(view.get(0), view), equalTo("2.5"));
 
         cast = new CastString(cString);
         assertThat(cast.getType(), equalTo(DataType.STRING));
-        assertThat(cast.compute(view.get(0), view), equalTo("test"));
+        assertThat(cast.run(view.get(0), view), equalTo("test"));
 
         cast = new CastString(cTimestamp);
         assertThat(cast.getType(), equalTo(DataType.STRING));
-        assertThat(cast.compute(view.get(0), view), equalTo(inst.toString()));
+        assertThat(cast.run(view.get(0), view), equalTo(inst.toString()));
     }
 
     @Test
     public void constantTest() {
         Constant c1 = new Constant(1, DataType.INTEGER);
         assertThat(c1.getType(), equalTo(DataType.INTEGER));
-        assertThat(c1.compute(view.get(0), view), equalTo(1));
+        assertThat(c1.run(view.get(0), view), equalTo(1));
 
         Constant c2 = new Constant("test", DataType.STRING);
         assertThat(c2.getType(), equalTo(DataType.STRING));
-        assertThat(c2.compute(view.get(0), view), equalTo("test"));
+        assertThat(c2.run(view.get(0), view), equalTo("test"));
     }
 
     @Test
     public void fieldTest() {
         Field fi = new Field(1, integerAtt.getType());
         assertThat(fi.getType(), equalTo(DataType.INTEGER));
-        assertThat(fi.compute(view.get(0), view), equalTo(4));
-        assertThat(fi.compute(view.get(1), view), equalTo(3));
+        assertThat(fi.run(view.get(0), view), equalTo(4));
+        assertThat(fi.run(view.get(1), view), equalTo(3));
 
         Field fs = new Field(2, stringAtt.getType());
         assertThat(fs.getType(), equalTo(DataType.STRING));
-        assertThat(fs.compute(view.get(0), view), equalTo("4"));
-        assertThat(fs.compute(view.get(1), view), equalTo("3"));
+        assertThat(fs.run(view.get(0), view), equalTo("4"));
+        assertThat(fs.run(view.get(1), view), equalTo("3"));
     }
 
     @Test
     public void groupTSTest() {
         Expression gts = new GroupTS(0);
         assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
-        assertThat(gts.compute(null, view), equalTo(view.get(0)[0]));
+        assertThat(gts.run(null, view), equalTo(view.get(0)[0]));
     }
 
 }

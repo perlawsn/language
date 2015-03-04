@@ -123,7 +123,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         }
 
         for (int i = oldest; i <= newest; i++) {
-            Boolean cond = (Boolean) e.compute(data[i], this);
+            Boolean cond = (Boolean) e.run(data[i], this);
             if (!cond) {
                 continue;
             }

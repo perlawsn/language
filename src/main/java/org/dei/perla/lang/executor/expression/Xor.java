@@ -12,7 +12,7 @@ public final class Xor extends BinaryExpression {
     }
 
     @Override
-    public Object doCompute(Object o1, Object o2) {
+    public Object doRun(Object o1, Object o2) {
         Boolean b1 = (Boolean) o1;
         Boolean b2 = (Boolean) o2;
         return (b1 || b2) && !(b1 && b2);

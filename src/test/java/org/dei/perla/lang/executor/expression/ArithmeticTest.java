@@ -57,8 +57,8 @@ public class ArithmeticTest {
         Addition a = new Addition(e1, e2);
 
         assertThat(a.getType(), equalTo(DataType.INTEGER));
-        assertThat(a.compute(view.get(0), view), equalTo(1 + 4));
-        assertThat(a.compute(view.get(1), view), equalTo(1 + 3));
+        assertThat(a.run(view.get(0), view), equalTo(1 + 4));
+        assertThat(a.run(view.get(1), view), equalTo(1 + 3));
     }
 
     @Test
@@ -68,8 +68,8 @@ public class ArithmeticTest {
         Addition a = new Addition(e1, e2);
 
         assertThat(a.getType(), equalTo(DataType.FLOAT));
-        assertThat(a.compute(view.get(0), view), equalTo(4.4f + 1.5f));
-        assertThat(a.compute(view.get(1), view), equalTo(3.3f + 1.5f));
+        assertThat(a.run(view.get(0), view), equalTo(4.4f + 1.5f));
+        assertThat(a.run(view.get(1), view), equalTo(3.3f + 1.5f));
     }
 
     @Test
@@ -79,8 +79,8 @@ public class ArithmeticTest {
         Subtraction s = new Subtraction(e1, e2);
 
         assertThat(s.getType(), equalTo(DataType.INTEGER));
-        assertThat(s.compute(view.get(0), view), equalTo(1 - 4));
-        assertThat(s.compute(view.get(1), view), equalTo(1 - 3));
+        assertThat(s.run(view.get(0), view), equalTo(1 - 4));
+        assertThat(s.run(view.get(1), view), equalTo(1 - 3));
     }
 
     @Test
@@ -90,8 +90,8 @@ public class ArithmeticTest {
         Subtraction s = new Subtraction(e1, e2);
 
         assertThat(s.getType(), equalTo(DataType.FLOAT));
-        assertThat(s.compute(view.get(0), view), equalTo(1.5f - 4.4f));
-        assertThat(s.compute(view.get(1), view), equalTo(1.5f - 3.3f));
+        assertThat(s.run(view.get(0), view), equalTo(1.5f - 4.4f));
+        assertThat(s.run(view.get(1), view), equalTo(1.5f - 3.3f));
     }
 
     @Test
@@ -101,8 +101,8 @@ public class ArithmeticTest {
         Product p = new Product(e1, e2);
 
         assertThat(p.getType(), equalTo(DataType.INTEGER));
-        assertThat(p.compute(view.get(0), view), equalTo(1 * 4));
-        assertThat(p.compute(view.get(1), view), equalTo(1 * 3));
+        assertThat(p.run(view.get(0), view), equalTo(1 * 4));
+        assertThat(p.run(view.get(1), view), equalTo(1 * 3));
     }
 
     @Test
@@ -112,8 +112,8 @@ public class ArithmeticTest {
         Product p = new Product(e1, e2);
 
         assertThat(p.getType(), equalTo(DataType.FLOAT));
-        assertThat(p.compute(view.get(0), view), equalTo(1.5f * 4.4f));
-        assertThat(p.compute(view.get(1), view), equalTo(1.5f * 3.3f));
+        assertThat(p.run(view.get(0), view), equalTo(1.5f * 4.4f));
+        assertThat(p.run(view.get(1), view), equalTo(1.5f * 3.3f));
     }
 
     @Test
@@ -123,8 +123,8 @@ public class ArithmeticTest {
         Division d = new Division(e1, e2);
 
         assertThat(d.getType(), equalTo(DataType.INTEGER));
-        assertThat(d.compute(view.get(0), view), equalTo(1 / 4));
-        assertThat(d.compute(view.get(1), view), equalTo(1 / 3));
+        assertThat(d.run(view.get(0), view), equalTo(1 / 4));
+        assertThat(d.run(view.get(1), view), equalTo(1 / 3));
     }
 
     @Test
@@ -134,8 +134,8 @@ public class ArithmeticTest {
         Division d = new Division(e1, e2);
 
         assertThat(d.getType(), equalTo(DataType.FLOAT));
-        assertThat(d.compute(view.get(0), view), equalTo(1.5f / 4.4f));
-        assertThat(d.compute(view.get(1), view), equalTo(1.5f / 3.3f));
+        assertThat(d.run(view.get(0), view), equalTo(1.5f / 4.4f));
+        assertThat(d.run(view.get(1), view), equalTo(1.5f / 3.3f));
     }
 
     @Test
@@ -145,8 +145,8 @@ public class ArithmeticTest {
         Modulo m = new Modulo(e1, e2);
 
         assertThat(m.getType(), equalTo(DataType.INTEGER));
-        assertThat(m.compute(view.get(0), view), equalTo(1 % 4));
-        assertThat(m.compute(view.get(1), view), equalTo(1 % 3));
+        assertThat(m.run(view.get(0), view), equalTo(1 % 4));
+        assertThat(m.run(view.get(1), view), equalTo(1 % 3));
     }
 
     @Test
@@ -156,13 +156,13 @@ public class ArithmeticTest {
 
         Inverse inv = new Inverse(e1);
         assertThat(inv.getType(), equalTo(DataType.INTEGER));
-        assertThat(inv.compute(view.get(0), view), equalTo(-1));
+        assertThat(inv.run(view.get(0), view), equalTo(-1));
 
         inv = new Inverse(e2);
         assertThat(inv.getType(), equalTo(DataType.FLOAT));
-        assertThat(inv.compute(view.get(0), view),
+        assertThat(inv.run(view.get(0), view),
                 equalTo(-(Float) view.get(0)[3]));
-        assertThat(inv.compute(view.get(1), view),
+        assertThat(inv.run(view.get(1), view),
                 equalTo(-(Float) view.get(1)[3]));
     }
 

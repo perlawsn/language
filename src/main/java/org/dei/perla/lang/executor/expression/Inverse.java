@@ -10,7 +10,7 @@ public final class Inverse extends UnaryExpression {
     }
 
     @Override
-    public Object doCompute(Object o) {
+    public Object doRun(Object o) {
         switch (type) {
             case INTEGER:
                 return - (Integer) o;

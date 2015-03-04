@@ -12,7 +12,7 @@ public final class NotEqual extends BinaryExpression {
     }
 
     @Override
-    protected Object doCompute(Object o1, Object o2) {
+    protected Object doRun(Object o1, Object o2) {
         return !o1.equals(o2);
     }
 

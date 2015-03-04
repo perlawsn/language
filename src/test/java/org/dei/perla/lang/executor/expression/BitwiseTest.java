@@ -18,7 +18,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseAnd(e1, e2);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(12 & 5639));
     }
 
@@ -29,7 +29,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseOr(e1, e2);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(51452 | 93849));
     }
 
@@ -40,7 +40,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseXor(e1, e2);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(32112 ^ 902833));
     }
 
@@ -50,7 +50,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseNot(e1);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(~7382));
     }
 
@@ -61,7 +61,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseShiftL(e1, e2);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(7382 << 8));
     }
 
@@ -72,7 +72,7 @@ public class BitwiseTest {
 
         Expression and = new BitwiseShiftR(e1, e2);
         assertThat(and.getType(), equalTo(DataType.INTEGER));
-        Object res = and.compute(null, null);
+        Object res = and.run(null, null);
         assertThat(res, equalTo(7382 >> 8));
     }
 

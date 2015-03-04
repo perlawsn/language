@@ -20,8 +20,8 @@ public final class CastInt implements Expression {
     }
 
     @Override
-    public Object compute(Object[] record, BufferView buffer) {
-        Object res = e.compute(record, buffer);
+    public Object run(Object[] record, BufferView buffer) {
+        Object res = e.run(record, buffer);
 
         switch (e.getType()) {
             case INTEGER:

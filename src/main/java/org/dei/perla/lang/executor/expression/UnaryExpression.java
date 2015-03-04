@@ -27,10 +27,10 @@ public abstract class UnaryExpression implements Expression {
     }
 
     @Override
-    public final Object compute(Object[] record, BufferView buffer) {
-        return doCompute(e.compute(record, buffer));
+    public final Object run(Object[] record, BufferView buffer) {
+        return doRun(e.run(record, buffer));
     }
 
-    protected abstract Object doCompute(Object o);
+    protected abstract Object doRun(Object o);
 
 }
