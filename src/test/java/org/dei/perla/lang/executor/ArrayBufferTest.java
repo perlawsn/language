@@ -34,17 +34,16 @@ public class ArrayBufferTest {
 
     @Test
     public void creationTest() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        ArrayBuffer b = new ArrayBuffer(0, 512);
 
         assertThat(b, notNullValue());
-        assertTrue(b.attributes().containsAll(atts));
-        assertTrue(atts.containsAll(b.attributes()));
         assertThat(b.length(), equalTo(0));
+        assertThat(b.getTimestampIndex(), equalTo(0));
     }
 
     @Test
     public void insertionTest() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         assertThat(b.length(), equalTo(0));
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
@@ -75,7 +74,7 @@ public class ArrayBufferTest {
 
     @Test
     public void bufferGrowth() {
-        Buffer b = new ArrayBuffer(atts, 2);
+        Buffer b = new ArrayBuffer(0, 2);
 
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
         b.add(new Record(atts, new Object[]{Instant.now(), 1}));
@@ -91,7 +90,7 @@ public class ArrayBufferTest {
 
     @Test
     public void outOfOrderInsertionTest() throws InterruptedException {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         Record r0 = new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:46.000Z"), 0});
@@ -119,7 +118,7 @@ public class ArrayBufferTest {
     }
 
     public void multipleViews() {
-        Buffer b = new ArrayBuffer(atts, 521);
+        Buffer b = new ArrayBuffer(0, 521);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:46.000Z"), 1}));
@@ -155,7 +154,7 @@ public class ArrayBufferTest {
 
     @Test(expected = IllegalStateException.class)
     public void multipleViewsWithoutRelease() {
-        Buffer b = new ArrayBuffer(atts, 521);
+        Buffer b = new ArrayBuffer(0, 521);
 
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
@@ -169,7 +168,7 @@ public class ArrayBufferTest {
 
     @Test
     public void grandchildView() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
         b.add(new Record(atts, new Object[]{Instant.now(), 1}));
@@ -205,7 +204,7 @@ public class ArrayBufferTest {
 
     @Test(expected = IllegalStateException.class)
     public void wrongReleaseOrder() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
         b.add(new Record(atts, new Object[]{Instant.now(), 0}));
@@ -221,8 +220,8 @@ public class ArrayBufferTest {
     }
 
     @Test
-    public void indexOf() {
-        Buffer b = new ArrayBuffer(atts, 512);
+    public void recordsIn() {
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
@@ -249,14 +248,54 @@ public class ArrayBufferTest {
 
         BufferView v = b.unmodifiableView();
 
-        int i = v.recordsIn(Duration.ofSeconds(10));
-        assertThat(i, equalTo(2));
-
-        i = v.recordsIn(Duration.ofSeconds(1));
+        int i = v.recordsIn(Duration.ofSeconds(0));
         assertThat(i, equalTo(1));
 
+        i = v.recordsIn(Duration.ofSeconds(9));
+        assertThat(i, equalTo(2));
+        i = v.recordsIn(Duration.ofSeconds(10));
+        assertThat(i, equalTo(2));
+
+        i = v.recordsIn(Duration.ofSeconds(14));
+        assertThat(i, equalTo(3));
+        i = v.recordsIn(Duration.ofSeconds(15));
+        assertThat(i, equalTo(3));
+
+        i = v.recordsIn(Duration.ofSeconds(20));
+        assertThat(i, equalTo(4));
+        i = v.recordsIn(Duration.ofSeconds(21));
+        assertThat(i, equalTo(4));
+
+        i = v.recordsIn(Duration.ofSeconds(27));
+        assertThat(i, equalTo(5));
+        i = v.recordsIn(Duration.ofSeconds(28));
+        assertThat(i, equalTo(5));
+
+        i = v.recordsIn(Duration.ofSeconds(29));
+        assertThat(i, equalTo(6));
         i = v.recordsIn(Duration.ofSeconds(30));
         assertThat(i, equalTo(6));
+
+        i = v.recordsIn(Duration.ofSeconds(33));
+        assertThat(i, equalTo(7));
+        i = v.recordsIn(Duration.ofSeconds(34));
+        assertThat(i, equalTo(7));
+
+        i = v.recordsIn(Duration.ofSeconds(39));
+        assertThat(i, equalTo(8));
+        i = v.recordsIn(Duration.ofSeconds(40));
+        assertThat(i, equalTo(8));
+
+        i = v.recordsIn(Duration.ofSeconds(46));
+        assertThat(i, equalTo(9));
+
+        i = v.recordsIn(Duration.ofSeconds(47));
+        assertThat(i, equalTo(10));
+
+        i = v.recordsIn(Duration.ofSeconds(49));
+        assertThat(i, equalTo(11));
+        i = v.recordsIn(Duration.ofSeconds(50));
+        assertThat(i, equalTo(11));
 
         i = v.recordsIn(Duration.ofDays(1));
         assertThat(i, equalTo(11));
@@ -264,7 +303,7 @@ public class ArrayBufferTest {
 
     @Test
     public void durationView() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
@@ -314,7 +353,7 @@ public class ArrayBufferTest {
 
     @Test
     public void groupByTimestamp1() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
@@ -359,7 +398,7 @@ public class ArrayBufferTest {
 
     @Test
     public void groupByTimestamp2() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
@@ -404,7 +443,7 @@ public class ArrayBufferTest {
 
     @Test
     public void groupByTimestamp3() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
@@ -445,7 +484,7 @@ public class ArrayBufferTest {
 
     @Test
     public void forEach() {
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
 
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));

@@ -1,10 +1,8 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,8 +10,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Guido Rota 22/02/15.
  */
 public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
-
-    private final List<Attribute> atts;
 
     // Index of the timestamp attribute
     private final int tsIdx;
@@ -26,33 +22,15 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
     private int len;
     private boolean hasView = false;
 
-    public ArrayBuffer(List<Attribute> atts, int cap) {
-        tsIdx = timestampIndex(atts);
-        this.atts = atts;
+    public ArrayBuffer(int tsIdx, int cap) {
         data = new Object[cap][];
+        this.tsIdx = tsIdx;
         this.cap = cap;
         this.len = 0;
     }
 
-    // Retrieves the column index of the timestamp attribute
-    private int timestampIndex(List<Attribute> atts) {
-        int i = 0;
-        for (Attribute a : atts) {
-            if (a == Attribute.TIMESTAMP) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException(
-                "missing timestamp attribute in attribute list");
-    }
-
     protected int getTimestampIndex() {
         return tsIdx;
-    }
-
-    @Override
-    public List<Attribute> attributes() {
-        return atts;
     }
 
     public int length() {

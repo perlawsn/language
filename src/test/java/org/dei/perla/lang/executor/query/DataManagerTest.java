@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -50,7 +49,7 @@ public class DataManagerTest {
         };
         List<Attribute> atts = Arrays.asList(as);
 
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f}));
         b.add(new Record(atts, new Object[]{

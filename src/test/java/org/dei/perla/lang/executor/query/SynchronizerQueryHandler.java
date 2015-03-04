@@ -1,5 +1,7 @@
 package org.dei.perla.lang.executor.query;
 
+import org.dei.perla.lang.executor.QueryHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;

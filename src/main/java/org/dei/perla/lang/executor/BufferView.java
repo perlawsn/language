@@ -1,6 +1,5 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.time.Duration;
@@ -14,16 +13,6 @@ import java.util.function.BiConsumer;
  * @author Guido Rota 23/02/15.
  */
 public interface BufferView {
-
-    /**
-     * {@code fields} returns the list of {@link Attribute}s that compose
-     * each record contained in this {@link BufferView}. The implementation
-     * of the query executor guarantees that every record stored inside this
-     * object shares the same {@link Attribute}s and {@link Attribute} order.
-     *
-     * @return list of {@link Attribute}s that compose each buffer record
-     */
-    public List<Attribute> attributes();
 
     /**
      * {@code length} returns the number of records in the {@code BufferView}.

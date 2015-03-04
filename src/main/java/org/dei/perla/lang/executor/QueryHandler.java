@@ -1,6 +1,4 @@
-package org.dei.perla.lang.executor.query;
-
-import org.dei.perla.core.record.Record;
+package org.dei.perla.lang.executor;
 
 /**
  * @author Guido Rota 03/03/15.

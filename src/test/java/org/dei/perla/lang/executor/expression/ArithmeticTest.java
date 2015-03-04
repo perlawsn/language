@@ -40,7 +40,7 @@ public class ArithmeticTest {
         };
         List<Attribute> atts = Arrays.asList(as);
 
-        Buffer b = new ArrayBuffer(atts, 512);
+        Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
         b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f}));
         b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f}));

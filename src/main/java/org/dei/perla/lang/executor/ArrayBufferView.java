@@ -1,6 +1,5 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.time.Duration;
@@ -19,7 +18,6 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         implements BufferView {
 
     private final ArrayBufferReleaser parent;
-    private final List<Attribute> atts;
     private final int tsIdx;
     private final Object[][] data;
     private final int oldest;
@@ -33,7 +31,6 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     protected ArrayBufferView(ArrayBuffer parent, Object[][] data, int length) {
         this.parent = parent;
         this.data = data;
-        atts = parent.attributes();
         tsIdx = parent.getTimestampIndex();
         this.length = length;
         oldest = 0;
@@ -44,7 +41,6 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     protected ArrayBufferView(ArrayBufferView parent, int oldest, int newest) {
         this.parent = parent;
         this.data = parent.data;
-        atts = parent.attributes();
         tsIdx = parent.getTimestampIndex();
         this.length = newest - oldest + 1;
         this.newest = newest;
@@ -65,11 +61,6 @@ public final class ArrayBufferView extends ArrayBufferReleaser
      */
     private Instant timestamp(int i) {
         return (Instant) data[i][tsIdx];
-    }
-
-    @Override
-    public List<Attribute> attributes() {
-        return atts;
     }
 
     @Override
