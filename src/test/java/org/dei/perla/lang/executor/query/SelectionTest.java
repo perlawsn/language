@@ -125,7 +125,7 @@ public class SelectionTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        UpTo upto = new UpTo(3);
+        WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
@@ -153,7 +153,7 @@ public class SelectionTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        UpTo upto = new UpTo(Duration.ofSeconds(10));
+        WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
@@ -182,7 +182,7 @@ public class SelectionTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 5, null));
 
-        UpTo upto = new UpTo(3);
+        WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
@@ -215,7 +215,7 @@ public class SelectionTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        UpTo upto = new UpTo(3);
+        WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
@@ -255,7 +255,7 @@ public class SelectionTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        UpTo upto = new UpTo(3);
+        WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
@@ -300,7 +300,7 @@ public class SelectionTest {
         def[0] = Instant.now();
         def[1] = 5;
 
-        UpTo upto = new UpTo(3);
+        WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, having, def);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);

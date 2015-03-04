@@ -16,8 +16,8 @@
  */
 options
 {
-  JDK_VERSION = "1.8";
-  IGNORE_CASE = true;
+    JDK_VERSION = "1.8";
+    IGNORE_CASE = true;
 }
 
 PARSER_BEGIN(JavaccParser)
@@ -28,7 +28,7 @@ PARSER_BEGIN(JavaccParser)
     import java.time.temporal.ChronoUnit;
     import java.time.Duration;
 
-    import org.dei.perla.lang.executor.query.UpTo;
+    import org.dei.perla.lang.executor.query.WindowSize;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -97,8 +97,6 @@ TOKEN :
 TOKEN :
 {
 	< KEYWORD_EVERY:        "EVERY"        >
-	|
-	< KEYWORD_SYNCHRONIZED: "SYNCHRONIZED" >
 	|
 	< KEYWORD_IN:           "IN"           >
 }
@@ -644,19 +642,7 @@ void LowEveryClause() :
 {}
 {
 	<KEYWORD_EVERY>
-	(
-		LOOKAHEAD(2)
-		(
-			Duration()
-			[
-				<KEYWORD_SYNCHRONIZED>
-			]
-		)
-		|
-		(
-			SamplesNumber()
-		)
-	)
+	WindowSize()
 }
 
 void LowSelectionStatement() :
@@ -763,7 +749,7 @@ void HavingClause() :
 	Expression(true)
 }
 
-UpTo UpToClause() :
+WindowSize UpToClause() :
 {
     WindowSize ws;
 }
@@ -771,13 +757,7 @@ UpTo UpToClause() :
 	<KEYWORD_UP>
 	<KEYWORD_TO>
 	ws = WindowSize()
-	{
-	    if (ws.getDuration() != null) {
-	        return new UpTo(ws.getDuration());
-	    } else {
-	        return new UpTo(ws.getSamples());
-	    }
-	}
+	{ return ws; }
 }
 
 void OnEmptySelectionClause() :

@@ -11,9 +11,11 @@ import java.util.List;
 public final class Query {
 
     private final Selection selection;
+    private final WindowSize every;
 
-    public Query(Selection selection) {
+    public Query(Selection selection, WindowSize every) {
         this.selection = selection;
+        this.every = every;
     }
 
     public void select(BufferView buffer, SelectHandler handler) {

@@ -10,15 +10,15 @@ import java.util.List;
  */
 public final class Selection {
 
-    private static final UpTo DEFAULT_UPTO = new UpTo();
+    private static final WindowSize DEFAULT_UPTO = new WindowSize(1);
 
     private final List<Expression> select;
-    private final UpTo upto;
+    private final WindowSize upto;
     private final GroupBy group;
     private final Expression having;
     private final Object[] def;
 
-    public Selection(List<Expression> select, UpTo upto,
+    public Selection(List<Expression> select, WindowSize upto,
             GroupBy group, Expression having, Object[] def) {
         this.select = select;
         if (upto == null) {
@@ -33,7 +33,12 @@ public final class Selection {
 
     public void select(BufferView buffer, SelectHandler handler) {
         // UPTO CLAUSE
-        int ut = upto.getSamples(buffer);
+        int ut;
+        if (upto.getDuration() != null) {
+            ut = buffer.recordsIn(upto.getDuration());
+        } else {
+            ut = upto.getSamples();
+        }
 
         boolean generated = false;
         if (group == null) {
