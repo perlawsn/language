@@ -607,18 +607,6 @@ void FieldDefinition() :
 	]
 }
 
-void FieldList() :
-{}
-{
-	"("
-	Identifier() // DataStructureField
-	(
-		","
-		Identifier() // DataStructureField
-	)*
-	")"
-}
-
 void InsertionStatement() :
 {}
 {
@@ -630,6 +618,18 @@ void InsertionStatement() :
 	    FieldList()
 	]
 	StreamSelectionStatement()
+}
+
+void FieldList() :
+{}
+{
+	"("
+	Identifier() // DataStructureField
+	(
+		","
+		Identifier() // DataStructureField
+	)*
+	")"
 }
 
 void StreamSelectionStatement() :

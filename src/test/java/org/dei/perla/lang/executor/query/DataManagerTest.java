@@ -73,7 +73,7 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
+        DataManager dm = new DataManager(sel, null, null, -1, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -99,7 +99,7 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 3, null));
 
-        DataManager dm = new DataManager(sel, 1, null, null, -1, null, null, null);
+        DataManager dm = new DataManager(sel, null, null, -1, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -126,7 +126,8 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
+        UpTo upto = new UpTo(3);
+        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -153,8 +154,8 @@ public class DataManagerTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        DataManager dm = new DataManager(sel, -1, Duration.ofSeconds(10),
-                null, -1, null, null, null);
+        UpTo upto = new UpTo(Duration.ofSeconds(10));
+        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -182,7 +183,8 @@ public class DataManagerTest {
         sel.add(floatExpr);
         sel.add(new SumAggregate(intExpr, 5, null));
 
-        DataManager dm = new DataManager(sel, 3, null, null, -1, null, null, null);
+        UpTo upto = new UpTo(3);
+        DataManager dm = new DataManager(sel, upto, null, -1, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -214,7 +216,8 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
+        UpTo upto = new UpTo(3);
+        DataManager dm = new DataManager(sel, upto, null, -1, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -253,7 +256,8 @@ public class DataManagerTest {
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));
 
-        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, null);
+        UpTo upto = new UpTo(3);
+        DataManager dm = new DataManager(sel, upto, null, -1, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -297,7 +301,8 @@ public class DataManagerTest {
         def[0] = Instant.now();
         def[1] = 5;
 
-        DataManager dm = new DataManager(sel, 3, null, null, -1, null, having, def);
+        UpTo upto = new UpTo(3);
+        DataManager dm = new DataManager(sel, upto, null, -1, null, having, def);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -317,7 +322,7 @@ public class DataManagerTest {
         sel.add(new GroupTS(0));
         sel.add(intExpr);
 
-        DataManager dm = new DataManager(sel, 1, null, Duration.ofSeconds(1),
+        DataManager dm = new DataManager(sel, null, Duration.ofSeconds(1),
                 3, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);

@@ -18,6 +18,7 @@ public final class LessEqual extends BinaryExpression {
             case FLOAT:
             case STRING:
             case TIMESTAMP:
+                @SuppressWarnings("unchecked")
                 Comparable<Object> c1 = (Comparable<Object>) o1;
                 return c1.compareTo(o2) <= 0;
             default:

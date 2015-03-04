@@ -14,21 +14,25 @@ import java.util.List;
  */
 public final class DataManager {
 
+    private static final UpTo DEFAULT_UPTO = new UpTo();
+
     private final List<Expression> select;
-    private final int uptoSamples;
-    private final Duration uptoDuration;
+    private final UpTo upto;
     private final Duration tsgLen;
     private final int tsgCount;
     private final List<Expression> group;
     private final Expression having;
     private final Object[] def;
 
-    public DataManager(List<Expression> select, int uptoSamples,
-            Duration uptoDuration, Duration tsgLen, int tsgCount,
+    public DataManager(List<Expression> select, UpTo upto,
+            Duration tsgLen, int tsgCount,
             List<Expression> group, Expression having, Object[] def) {
         this.select = select;
-        this.uptoSamples = uptoSamples;
-        this.uptoDuration = uptoDuration;
+        if (upto == null) {
+            this.upto = DEFAULT_UPTO;
+        } else {
+            this.upto = upto;
+        }
         this.tsgLen = tsgLen;
         this.tsgCount = tsgCount;
         this.group = group;
@@ -37,22 +41,17 @@ public final class DataManager {
     }
 
     public void select(BufferView buffer, SelectHandler handler) {
-        int upto = 0;
         // UPTO CLAUSE
-        if (uptoSamples != -1) {
-            upto = uptoSamples;
-        } else {
-            upto = buffer.recordsIn(uptoDuration);
-        }
+        int ut = upto.getSamples(buffer);
 
         boolean generated = false;
         if (Check.nullOrEmpty(group) && tsgLen == null && tsgCount == -1) {
-            generated = selectBuffer(upto, buffer, handler);
+            generated = selectBuffer(ut, buffer, handler);
         } else {
             // GROUP BY CLAUSE
             List<BufferView> groups = splitBuffer(buffer);
             for (BufferView b : groups) {
-                generated |= selectBuffer(upto, b, handler);
+                generated |= selectBuffer(ut, b, handler);
                 b.release();
             }
         }
