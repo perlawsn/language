@@ -30,6 +30,7 @@ PARSER_BEGIN(JavaccParser)
     import java.time.Duration;
 
     import org.dei.perla.lang.executor.query.WindowSize;
+    import org.dei.perla.lang.parser.expression.*;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -919,29 +920,33 @@ void TerminateAfterClause() :
 /*
  * SIGNS, CONSTANTS, VALUES, ETC.
  */
-void Sign() :
+Sign Sign() :
 {}
 {
 	<OPERATOR_PLUS>
+	{ return Sign.PLUS; }
 	|
 	<OPERATOR_MINUS>
+	{ return Sign.MINUS; }
 }
 
-void LogicValue() :
+LogicValue LogicValue() :
 {}
 {
 	<CONSTANT_BOOLEAN_TRUE>
+	{ return LogicValue.TRUE; }
 	|
 	<CONSTANT_BOOLEAN_FALSE>
+	{ return LogicValue.FALSE; }
 	|
 	<CONSTANT_BOOLEAN_UNKNOWN>
+	{ return LogicValue.UNKNOWN; }
 }
 
-Object ConstantNull() :
+void ConstantNull() :
 {}
 {
 	<CONSTANT_NULL>
-	{ return null; }
 }
 
 boolean ConstantBoolean() :
@@ -979,38 +984,48 @@ int ConstantInteger() :
 	{ return Integer.parseInt(value.image.substring(2), 16); }
 }
 
-void ConstantString() :
-{}
+String ConstantString() :
+{
+    Token value;
+}
 {
 	(
 		(
 		<CONSTANT_SINGLE_QUOTED_STRING_START>
-		<CONSTANT_SINGLE_QUOTED_STRING_VALUE>
+		value = <CONSTANT_SINGLE_QUOTED_STRING_VALUE>
 		<CONSTANT_SINGLE_QUOTED_STRING_END>
 		)
 		|
 		(
 		<CONSTANT_DOUBLE_QUOTED_STRING_START>
-		<CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
+		value = <CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
 		<CONSTANT_DOUBLE_QUOTED_STRING_END>
 		)
 	)
+	{ return value.image; }
 }
 
-void Constant() :
-{}
+Node Constant() :
+{
+    Object value;
+}
 {
 	(
 		ConstantNull()
+		{ return new NullNode(); }
 		|
-		ConstantBoolean()
+		value = ConstantBoolean()
+		{ return new ConstantNode(value, DataType.BOOLEAN); }
 		|
-		ConstantString()
+		value = ConstantString()
+		{ return new ConstantNode(value, DataType.STRING); }
 		|
 		LOOKAHEAD(1)
-		ConstantInteger()
+		value = ConstantInteger()
+		{ return new ConstantNode(value, DataType.INTEGER); }
 		|
-		ConstantFloat()
+		value = ConstantFloat()
+		{ return new ConstantNode(value, DataType.FLOAT); }
 	)
 }
 
@@ -1023,20 +1038,26 @@ void SignedConstant() :
 	Constant()
 }
 
-void ComparisonOperator() :
+ComparisonOperator ComparisonOperator() :
 {}
 {
 	<OPERATOR_GREATER>
+	{ return ComparisonOperator.GT; }
 	|
 	<OPERATOR_LESS>
+	{ return ComparisonOperator.LT; }
 	|
 	<OPERATOR_GREATER_EQUAL>
+	{ return ComparisonOperator.GE; }
 	|
 	<OPERATOR_LESS_EQUAL>
+	{ return ComparisonOperator.LE; }
 	|
 	<OPERATOR_EQUAL>
+	{ return ComparisonOperator.EQ; }
 	|
 	<OPERATOR_NOT_EQUAL>
+	{ return ComparisonOperator.NE; }
 }
 
 DataType FieldType() :
@@ -1087,16 +1108,20 @@ TemporalUnit TimeUnit() :
 	)
 }
 
-void AggregationOperator() :
+AggregationOperator AggregationOperator() :
 {}
 {
 	<FUNCTION_AVG>
+	{ return AggregationOperator.AVG; }
 	|
 	<FUNCTION_MIN>
+	{ return AggregationOperator.MIN; }
 	|
 	<FUNCTION_MAX>
+	{ return AggregationOperator.MAX; }
 	|
 	<FUNCTION_SUM>
+	{ return AggregationOperator.SUM; }
 }
 
 Duration Duration() :
