@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor.query;
+package org.dei.perla.lang.executor.statement;
 
 import java.time.Duration;
 

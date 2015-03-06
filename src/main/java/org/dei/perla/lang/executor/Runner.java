@@ -5,8 +5,8 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
-import org.dei.perla.lang.executor.query.Query;
-import org.dei.perla.lang.executor.query.SelectHandler;
+import org.dei.perla.lang.executor.statement.Query;
+import org.dei.perla.lang.executor.statement.SelectHandler;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

@@ -1,7 +1,6 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.QueryHandler;
-import org.dei.perla.lang.executor.query.Query;
+import org.dei.perla.lang.executor.statement.Query;
 
 import java.util.ArrayList;
 import java.util.List;

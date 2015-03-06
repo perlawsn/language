@@ -2,7 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.query.WindowSize;
+import org.dei.perla.lang.executor.statement.WindowSize;
 import org.dei.perla.lang.parser.expression.ConstantNode;
 import org.dei.perla.lang.parser.expression.FieldNode;
 import org.dei.perla.lang.parser.expression.Node;

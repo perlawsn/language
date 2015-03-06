@@ -2,8 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.lang.executor.BufferView;
-
-import java.time.Duration;
+import org.dei.perla.lang.executor.statement.WindowSize;
 
 /**
  * @author Guido Rota 27/02/15.
@@ -12,13 +11,8 @@ public final class AvgAggregate extends Aggregate {
 
     public final DataType opType;
 
-    public AvgAggregate(Expression exp, int samples, Expression where) {
-        super(exp, samples, where, DataType.FLOAT);
-        opType = exp.getType();
-    }
-
-    public AvgAggregate(Expression exp, Duration d, Expression where) {
-        super(exp, d, where, DataType.FLOAT);
+    public AvgAggregate(Expression exp, WindowSize ws, Expression where) {
+        super(exp, ws, where, DataType.FLOAT);
         opType = exp.getType();
     }
 

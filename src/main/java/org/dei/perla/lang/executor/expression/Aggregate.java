@@ -2,8 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.lang.executor.BufferView;
-
-import java.time.Duration;
+import org.dei.perla.lang.executor.statement.WindowSize;
 
 /**
  * @author Guido Rota 27/02/15.
@@ -11,41 +10,21 @@ import java.time.Duration;
 public abstract class Aggregate implements Expression {
 
     protected final Expression exp;
-    protected final int samples;
-    protected final Duration duration;
+    protected final WindowSize ws;
     protected final Expression where;
     protected final DataType type;
 
-    public Aggregate(Expression exp, int samples, Expression where) {
+    public Aggregate(Expression exp, WindowSize ws, Expression where) {
         this.exp = exp;
-        this.samples = samples;
-        duration = null;
+        this.ws = ws;
         this.where = where;
         type = exp.getType();
     }
 
-    public Aggregate(Expression exp, int samples, Expression where,
+    public Aggregate(Expression exp, WindowSize ws, Expression where,
             DataType type) {
         this.exp = exp;
-        this.samples = samples;
-        duration = null;
-        this.where = where;
-        this.type = type;
-    }
-
-    public Aggregate(Expression exp, Duration d, Expression where) {
-        this.exp = exp;
-        samples = -1;
-        duration = d;
-        this.where = where;
-        type = exp.getType();
-    }
-
-    public Aggregate(Expression exp, Duration d, Expression where,
-            DataType type) {
-        this.exp = exp;
-        samples = -1;
-        duration = d;
+        this.ws = ws;
         this.where = where;
         this.type = type;
     }
@@ -59,16 +38,16 @@ public abstract class Aggregate implements Expression {
     public final Object run(Object[] record, BufferView view) {
         Object res;
 
-        if (samples != -1) {
-            view = view.subView(samples);
+        if (ws.getSamples() > 0) {
+            view = view.subView(ws.getSamples());
             res = doRun(view);
             view.release();
-        } else if (duration != null) {
-            view = view.subView(duration);
+        } else if (ws.getDuration() != null) {
+            view = view.subView(ws.getDuration());
             res = doRun(view);
             view.release();
         } else {
-            res = doRun(view);
+            throw new RuntimeException("invalid window size");
         }
 
         return res;

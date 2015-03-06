@@ -3,27 +3,18 @@ package org.dei.perla.lang.executor.expression;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Aggregate.IntAccumulator;
-
-import java.time.Duration;
+import org.dei.perla.lang.executor.statement.WindowSize;
 
 /**
  * @author Guido Rota 27/02/15.
  */
 public final class CountAggregate implements Expression {
 
-    private final int samples;
-    private final Duration duration;
+    private final WindowSize ws;
     private final Expression where;
 
-    public CountAggregate(int samples, Expression where) {
-        this.samples = samples;
-        duration = null;
-        this.where = where;
-    }
-
-    public CountAggregate(Expression exp, Duration d, Expression where) {
-        this.samples = -1;
-        duration = d;
+    public CountAggregate(WindowSize ws, Expression where) {
+        this.ws = ws;
         this.where = where;
     }
 
@@ -35,16 +26,16 @@ public final class CountAggregate implements Expression {
     @Override
     public Object run(Object[] record, BufferView buffer) {
         IntAccumulator count = new IntAccumulator(0);
-        if (samples != -1) {
-            buffer = buffer.subView(samples);
+        if (ws.getSamples() > 0) {
+            buffer = buffer.subView(ws.getSamples());
             buffer.forEach((r, b) -> count.value++, where);
             buffer.release();
-        } else if (duration != null) {
-            buffer = buffer.subView(duration);
+        } else if (ws.getDuration() != null) {
+            buffer = buffer.subView(ws.getDuration());
             buffer.forEach((r, b) -> count.value++, where);
             buffer.release();
         } else {
-            buffer.forEach((r, b) -> count.value++, where);
+            throw new RuntimeException("invalid window size");
         }
 
         return count.value;

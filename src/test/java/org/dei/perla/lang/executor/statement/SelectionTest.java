@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor.query;
+package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
@@ -96,7 +96,7 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, 3, null));
+        sel.add(new SumAggregate(intExpr, new WindowSize(3), null));
 
         Selection dm = new Selection(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
@@ -180,7 +180,7 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, 5, null));
+        sel.add(new SumAggregate(intExpr, new WindowSize(5), null));
 
         WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, null, null);
@@ -250,7 +250,7 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, 5, null));
+        sel.add(new SumAggregate(intExpr, new WindowSize(5), null));
 
         Expression having = new NotEqual(intExpr,
                 new Constant(3, DataType.INTEGER));

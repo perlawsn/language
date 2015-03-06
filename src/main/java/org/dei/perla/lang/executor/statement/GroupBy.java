@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor.query;
+package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.utils.Check;
 import org.dei.perla.lang.executor.BufferView;

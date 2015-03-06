@@ -1,20 +1,15 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.lang.executor.BufferView;
-
-import java.time.Duration;
+import org.dei.perla.lang.executor.statement.WindowSize;
 
 /**
  * @author Guido Rota 27/02/15.
  */
 public final class MaxAggregate extends Aggregate {
 
-    public MaxAggregate(Expression exp, int samples, Expression where) {
-        super(exp, samples, where);
-    }
-
-    public MaxAggregate(Expression exp, Duration d, Expression where) {
-        super(exp, d, where);
+    public MaxAggregate(Expression exp, WindowSize ws, Expression where) {
+        super(exp, ws, where);
     }
 
     @Override

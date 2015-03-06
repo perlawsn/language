@@ -1,9 +1,7 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
-import org.dei.perla.lang.executor.query.Query;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import org.dei.perla.lang.executor.statement.Query;
 
 /**
  * @author Guido Rota 04/03/15.

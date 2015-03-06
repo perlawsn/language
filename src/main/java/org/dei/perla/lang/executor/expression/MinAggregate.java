@@ -1,20 +1,15 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.lang.executor.BufferView;
-
-import java.time.Duration;
+import org.dei.perla.lang.executor.statement.WindowSize;
 
 /**
  * @author Guido Rota 27/02/15.
  */
 public final class MinAggregate extends Aggregate {
 
-    public MinAggregate(Expression exp, int samples, Expression where) {
-        super(exp, samples, where);
-    }
-
-    public MinAggregate(Expression exp, Duration d, Expression where) {
-        super(exp, d, where);
+    public MinAggregate(Expression exp, WindowSize ws, Expression where) {
+        super(exp, ws, where);
     }
 
     @Override
