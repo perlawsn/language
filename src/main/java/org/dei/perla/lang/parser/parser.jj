@@ -1207,138 +1207,133 @@ String Identifier() :
 void Expression(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanTerm(aggregate, err)
+	BooleanTerm(aggregate, err)
 	(
 		<OPERATOR_OR>
-		ExpressionBooleanTerm(aggregate, err)
+		BooleanTerm(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanTerm(boolean aggregate, Errors err) :
+void BooleanTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanFactor(aggregate, err)
+	BooleanFactor(aggregate, err)
 	(
 		<OPERATOR_AND>
-		ExpressionBooleanFactor(aggregate, err)
+		BooleanFactor(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanFactor(boolean aggregate, Errors err) :
+void BooleanFactor(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanTest(aggregate, err)
+	BooleanNegation(aggregate, err)
 	(
 		<OPERATOR_XOR>
-		ExpressionBooleanTest(aggregate, err)
+		BooleanNegation(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanTest(boolean aggregate, Errors err) :
+void BooleanNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
 		<OPERATOR_NOT>
 	)*
-	ExpressionBooleanPrimary(aggregate, err)
+	BooleanPredicate(aggregate, err)
 }
 
-void ExpressionBooleanPrimary(boolean aggregate, Errors err) :
+void BooleanPredicate(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBit(aggregate, err)
-	[
-		(
-			ComparisonOperator()
-			ExpressionBit(aggregate, err)
-			[
-				LogicTest()
-			]
-		)
-		|
-		(
-			<KEYWORD_IS>
-			[
-				<OPERATOR_NOT>
-			]
-			(
-				(
-					<CONSTANT_NULL>
-					[
-						LogicTest()
-					]
-				)
-				|
-				(
-					LogicValue()
-				)
-			)
-		)
-		|
-		(
-			<KEYWORD_BETWEEN>
-			ExpressionBit(aggregate, err)
-			<OPERATOR_AND>
-			ExpressionBit(aggregate, err)
-			[
-				LogicTest()
-			]
-		)
-		|
-		(
-			<KEYWORD_LIKE>
-			ConstantString()
-			[
-				LogicTest()
-			]
-		)
-	]
+    Comparison(aggregate, err)
+    [
+        Is(aggregate, err)
+        |
+        Like(aggregate, err)
+        |
+        Between(aggregate, err)
+    ]
 }
 
-void LogicTest() :
+void Is(boolean aggregate, Errors err) :
 {}
 {
-	<KEYWORD_IS>
-	[
-		<OPERATOR_NOT>
-	]
-	LogicValue()
+    <KEYWORD_IS>
+    [
+        <OPERATOR_NOT>
+    ]
+    (
+        <CONSTANT_BOOLEAN_TRUE>
+        |
+        <CONSTANT_BOOLEAN_FALSE>
+        |
+        <CONSTANT_BOOLEAN_UNKNOWN>
+        |
+        <CONSTANT_NULL>
+    )
 }
 
-void ExpressionBit(boolean aggregate, Errors err) :
+void Like(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitTerm(aggregate, err)
+    <KEYWORD_LIKE>
+    ConstantString()
+}
+
+void Between(boolean aggregate, Errors err) :
+{}
+{
+    <KEYWORD_BETWEEN>
+    BitwiseExpression(aggregate, err)
+    <OPERATOR_AND>
+    BitwiseExpression(aggregate, err)
+}
+
+void Comparison(boolean aggregate, Errors err) :
+{}
+{
+    BitwiseExpression(aggregate, err)
+    [
+        ComparisonOperator()
+        BitwiseExpression(aggregate, err)
+    ]
+}
+
+void BitwiseExpression(boolean aggregate, Errors err) :
+{}
+{
+	BitwiseTerm(aggregate, err)
 	(
 		<OPERATOR_BITWISE_OR>
-		ExpressionBitTerm(aggregate, err)
+		BitwiseTerm(aggregate, err)
 	)*
 }
 
-void ExpressionBitTerm(boolean aggregate, Errors err) :
+void BitwiseTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitFactor(aggregate, err)
+	BitwiseFactor(aggregate, err)
 	(
 		<OPERATOR_BITWISE_AND>
-		ExpressionBitFactor(aggregate, err)
+		BitwiseFactor(aggregate, err)
 	)*
 }
 
-void ExpressionBitFactor(boolean aggregate, Errors err) :
+void BitwiseFactor(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitShift(aggregate, err)
+	BitwiseShift(aggregate, err)
 	(
 		<OPERATOR_BITWISE_XOR>
-		ExpressionBitShift(aggregate, err)
+		BitwiseShift(aggregate, err)
 	)*
 }
 
-void ExpressionBitShift(boolean aggregate, Errors err) :
+void BitwiseShift(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitTest(aggregate, err)
+	BitwiseNegation(aggregate, err)
 	[
 		(
 			<OPERATOR_BITWISE_LSH>
@@ -1349,7 +1344,7 @@ void ExpressionBitShift(boolean aggregate, Errors err) :
 	]
 }
 
-void ExpressionBitTest(boolean aggregate, Errors err) :
+void BitwiseNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
@@ -1410,8 +1405,6 @@ void ExpressionValuePrimary(boolean aggregate, Errors err) :
 	|
 	LOOKAHEAD( { aggregate } )
 	(
-		<TYPE_ID>
-		|
 		<KEYWORD_GROUPTS>
 		|
 		Aggregate(aggregate, err)
@@ -1432,11 +1425,11 @@ void ExistsAttribute() :
 {
 	<KEYWORD_EXISTS>
 	"("
-	(
+	    (
 		Identifier() // FPC attribute
 		|
 		<KEYWORD_ALL>
-	)
+	    )
 	")"
 }
 
