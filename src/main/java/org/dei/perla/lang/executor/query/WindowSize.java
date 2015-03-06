@@ -28,4 +28,12 @@ public final class WindowSize {
         return d;
     }
 
+    public boolean isZero() {
+        if (d != null) {
+            return d.isZero();
+        } else {
+            return samples == 0;
+        }
+    }
+
 }

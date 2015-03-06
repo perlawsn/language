@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.parser.expression.ConstantNode;
 import org.dei.perla.lang.parser.expression.Node;
 import org.dei.perla.lang.parser.expression.NullNode;
@@ -327,22 +328,36 @@ public class ParserTest {
     public void testSelectionsNumber() throws Exception {
         Parser p;
         int s;
+        Errors err = new Errors();
 
         p = new Parser(new StringReader("12 selections"));
-        s = p.SelectionsNumber();
+        s = p.SelectionsNumber(err);
         assertThat(s, equalTo(12));
+        assertTrue(err.isEmpty());
 
         p = new Parser(new StringReader("1 selections"));
-        s = p.SelectionsNumber();
+        s = p.SelectionsNumber(err);
         assertThat(s, equalTo(1));
+        assertTrue(err.isEmpty());
     }
 
     @Test(expected = ParseException.class)
     public void testNegativeSelectionsNumber() throws Exception {
         Parser p;
+        Errors err = new Errors();
 
         p = new Parser(new StringReader("-1 selections"));
-        p.SelectionsNumber();
+        p.SelectionsNumber(err);
+    }
+
+    @Test
+    public void testZeroSelectionsNumber() throws Exception {
+        Parser p;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("0 selections"));
+        p.SelectionsNumber(err);
+        assertFalse(err.isEmpty());
     }
 
 }

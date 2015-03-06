@@ -37,6 +37,10 @@ PARSER_BEGIN(Parser)
 
 	public class Parser {
 
+	    private static final void addError(String msg, Token t, Errors err) {
+	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
+	    }
+
 	}
 
 PARSER_END(Parser)
@@ -512,25 +516,25 @@ TOKEN :
  * PRODUCTIONS
  */
 
-void StatementSequence() :
+void StatementSequence(Errors err) :
 {}
 {
-	Statement()
+	Statement(err)
 	(
 		";"
-		Statement()
+		Statement(err)
 	)*
 	<EOF>
 }
 
-void Statement():
+void Statement(Errors err):
 {}
 {
     SetParametersStament()
     |
-    CreationStatement()
+    CreationStatement(err)
     |
-    InsertionStatement()
+    InsertionStatement(err)
 }
 
 void SetParametersStament():
@@ -570,43 +574,43 @@ void SetParameterList():
 	Constant()
 }
 
-void CreationStatement() :
+void CreationStatement(Errors err) :
 {}
 {
 	<KEYWORD_CREATE>
 	<KEYWORD_STREAM>
 	Identifier() // StreamName
-	FieldDefinitionList()
+	FieldDefinitionList(err)
 	[
 	    <KEYWORD_AS>
-	    StreamSelectionStatement()
+	    StreamSelectionStatement(err)
 	]
 }
 
-void FieldDefinitionList() :
+void FieldDefinitionList(Errors err) :
 {}
 {
 	"("
-	FieldDefinition()
+	FieldDefinition(err)
 	(
 		","
-		FieldDefinition()
+		FieldDefinition(err)
 	)*
 	")"
 }
 
-void FieldDefinition() :
+void FieldDefinition(Errors err) :
 {}
 {
 	Identifier() // DataStructureField
 	FieldType()
 	[
 		<KEYWORD_DEFAULT>
-		Expression(false)
+		Expression(false, err)
 	]
 }
 
-void InsertionStatement() :
+void InsertionStatement(Errors err) :
 {}
 {
 	<KEYWORD_INSERT>
@@ -616,7 +620,7 @@ void InsertionStatement() :
 	[
 	    FieldList()
 	]
-	StreamSelectionStatement()
+	StreamSelectionStatement(err)
 }
 
 void FieldList() :
@@ -631,49 +635,49 @@ void FieldList() :
 	")"
 }
 
-void StreamSelectionStatement() :
+void StreamSelectionStatement(Errors err) :
 {}
 {
-    LowEveryClause()
-    LowSelectionStatement()
+    LowEveryClause(err)
+    LowSelectionStatement(err)
 }
 
-WindowSize LowEveryClause() :
+WindowSize LowEveryClause(Errors err) :
 {
     WindowSize ws;
 }
 {
 	<KEYWORD_EVERY>
-	ws = WindowSize()
+	ws = WindowSize(err)
 	{ return ws; }
 }
 
-void LowSelectionStatement() :
+void LowSelectionStatement(Errors err) :
 {}
 {
-	SelectClause()
+	SelectClause(err)
 	[
 		GroupByClause()
 	]
 	[
-		HavingClause()
+		HavingClause(err)
 	]
 	[
-		UpToClause()
+		UpToClause(err)
 	]
 	[
 		OnEmptySelectionClause()
 	]
-	SamplingClause()
+	SamplingClause(err)
 	[
-		ExecuteIfClause()
+		ExecuteIfClause(err)
 	]
 	[
-		TerminateAfterClause()
+		TerminateAfterClause(err)
 	]
 }
 
-void SelectClause() :
+void SelectClause(Errors err) :
 {}
 {
 	<KEYWORD_SELECT>
@@ -682,26 +686,26 @@ void SelectClause() :
 		|
 		<KEYWORD_ALL>
 	]
-	FieldSelectionList()
+	FieldSelectionList(err)
 }
 
-void FieldSelectionList() :
+void FieldSelectionList(Errors err) :
 {}
 {
-	FieldSelection()
+	FieldSelection(err)
 	(
 		","
-		FieldSelection()
+		FieldSelection(err)
 	)*
 }
 
-void FieldSelection() :
+void FieldSelection(Errors err) :
 {}
 {
-	Expression(true)
+	Expression(true, err)
 	[
 		<KEYWORD_DEFAULT>
-		Expression(false)
+		Expression(false, err)
 	]
 }
 
@@ -745,21 +749,21 @@ void FieldGroupingByTs() :
 	")"
 }
 
-void HavingClause() :
+void HavingClause(Errors err) :
 {}
 {
 	<KEYWORD_HAVING>
-	Expression(true)
+	Expression(true, err)
 }
 
-WindowSize UpToClause() :
+WindowSize UpToClause(Errors err) :
 {
     WindowSize ws;
 }
 {
 	<KEYWORD_UP>
 	<KEYWORD_TO>
-	ws = WindowSize()
+	ws = WindowSize(err)
 	{ return ws; }
 }
 
@@ -777,7 +781,7 @@ void OnEmptySelectionClause() :
 	)
 }
 
-void SamplingClause() :
+void SamplingClause(Errors err) :
 {}
 {
 	<KEYWORD_SAMPLING>
@@ -785,7 +789,7 @@ void SamplingClause() :
 		OnEventClause()
 		|
 		(
-			SamplingIfEveryClause()
+			SamplingIfEveryClause(err)
 			[
 				OnUnsupportedSRClause()
 			]
@@ -796,7 +800,7 @@ void SamplingClause() :
 	)
 	[
 	    <KEYWORD_WHERE>
-	    Expression(false) // No aggregates allowed
+	    Expression(false, err) // No aggregates allowed
 	]
 }
 
@@ -818,37 +822,37 @@ void EventList() :
 	)*
 }
 
-void SamplingIfEveryClause() :
+void SamplingIfEveryClause(Errors err) :
 {}
 {
 	(
 		(
-			SamplingIfClause()
-			SamplingEveryClause()
+			SamplingIfClause(err)
+			SamplingEveryClause(err)
 		)+
 		(
 			<KEYWORD_ELSE>
-			SamplingEveryClause()
+			SamplingEveryClause(err)
 		)
 	)
 	|
 	(
-		SamplingEveryClause()
+		SamplingEveryClause(err)
 	)
 }
 
-void SamplingIfClause() :
+void SamplingIfClause(Errors err) :
 {}
 {
 	<KEYWORD_IF>
-	Expression(false) // No aggregations allowed
+	Expression(false, err) // No aggregations allowed
 }
 
-void SamplingEveryClause() :
+void SamplingEveryClause(Errors err) :
 {}
 {
 	<KEYWORD_EVERY>
-	Expression(false) // No aggregations allowed
+	Expression(false, err) // No aggregations allowed
 	TimeUnit()
 }
 
@@ -891,18 +895,18 @@ void RefreshClause() :
 	)
 }
 
-void ExecuteIfClause() :
+void ExecuteIfClause(Errors err) :
 {}
 {
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
-	Expression(false) // No aggregations allowed
+	Expression(false, err) // No aggregations allowed
 	[
 		RefreshClause()
 	]
 }
 
-void TerminateAfterClause() :
+void TerminateAfterClause(Errors err) :
 {}
 {
 	<KEYWORD_TERMINATE>
@@ -911,7 +915,7 @@ void TerminateAfterClause() :
 		LOOKAHEAD(2)
 		Duration()
 		|
-		SelectionsNumber()
+		SelectionsNumber(err)
 	)
 }
 
@@ -1128,9 +1132,7 @@ int SamplesNumber() :
 		(
 			samples = ConstantInteger()
 			<KEYWORD_SAMPLES>
-			{
-			    return samples;
-			}
+			{ return samples; }
 		)
 		|
 		(
@@ -1140,30 +1142,54 @@ int SamplesNumber() :
 	)
 }
 
-int SelectionsNumber() :
+int SelectionsNumber(Errors err) :
 {
+
+    Token t;
     int value;
 }
 {
 	(
 		value = ConstantInteger()
+		{ t = token; }
 		<KEYWORD_SELECTIONS>
-		{ return value; }
+		{
+		    if (value == 0) {
+		        addError("Number of selections must be greater than zero", t, err);
+		    }
+		    return value;
+		}
 	)
 }
 
-WindowSize WindowSize() :
+WindowSize WindowSize(Errors err) :
 {
+    Token t;
     Duration d;
     int samples;
+    WindowSize ws;
 }
 {
-	LOOKAHEAD(2)
-	d = Duration()
-	{ return new WindowSize(d); }
-	|
-	samples = SamplesNumber()
-	{ return new WindowSize(samples); }
+    (
+	    LOOKAHEAD(2)
+	    d = Duration()
+	    {
+	        t = token;
+	        ws = new WindowSize(d);
+	    }
+	    |
+        samples = SamplesNumber()
+        {
+            t = token;
+            ws = new WindowSize(samples);
+        }
+	)
+	{
+	    if (ws.isZero()) {
+	        addError("Empty window size", t, err);
+	    }
+	    return ws;
+	}
 }
 
 String Identifier() :
@@ -1191,53 +1217,53 @@ void ExistsAttribute() :
 /*
  * EXPRESSIONS
  */
-void Expression(boolean aggregate) :
+void Expression(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanTerm(aggregate)
+	ExpressionBooleanTerm(aggregate, err)
 	(
 		<OPERATOR_OR>
-		ExpressionBooleanTerm(aggregate)
+		ExpressionBooleanTerm(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanTerm(boolean aggregate) :
+void ExpressionBooleanTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanFactor(aggregate)
+	ExpressionBooleanFactor(aggregate, err)
 	(
 		<OPERATOR_AND>
-		ExpressionBooleanFactor(aggregate)
+		ExpressionBooleanFactor(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanFactor(boolean aggregate) :
+void ExpressionBooleanFactor(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBooleanTest(aggregate)
+	ExpressionBooleanTest(aggregate, err)
 	(
 		<OPERATOR_XOR>
-		ExpressionBooleanTest(aggregate)
+		ExpressionBooleanTest(aggregate, err)
 	)*
 }
 
-void ExpressionBooleanTest(boolean aggregate) :
+void ExpressionBooleanTest(boolean aggregate, Errors err) :
 {}
 {
 	(
 		<OPERATOR_NOT>
 	)*
-	ExpressionBooleanPrimary(aggregate)
+	ExpressionBooleanPrimary(aggregate, err)
 }
 
-void ExpressionBooleanPrimary(boolean aggregate) :
+void ExpressionBooleanPrimary(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBit(aggregate)
+	ExpressionBit(aggregate, err)
 	[
 		(
 			ComparisonOperator()
-			ExpressionBit(aggregate)
+			ExpressionBit(aggregate, err)
 			[
 				LogicTest()
 			]
@@ -1264,9 +1290,9 @@ void ExpressionBooleanPrimary(boolean aggregate) :
 		|
 		(
 			<KEYWORD_BETWEEN>
-			ExpressionBit(aggregate)
+			ExpressionBit(aggregate, err)
 			<OPERATOR_AND>
-			ExpressionBit(aggregate)
+			ExpressionBit(aggregate, err)
 			[
 				LogicTest()
 			]
@@ -1292,40 +1318,40 @@ void LogicTest() :
 	LogicValue()
 }
 
-void ExpressionBit(boolean aggregate) :
+void ExpressionBit(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitTerm(aggregate)
+	ExpressionBitTerm(aggregate, err)
 	(
 		<OPERATOR_BITWISE_OR>
-		ExpressionBitTerm(aggregate)
+		ExpressionBitTerm(aggregate, err)
 	)*
 }
 
-void ExpressionBitTerm(boolean aggregate) :
+void ExpressionBitTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitFactor(aggregate)
+	ExpressionBitFactor(aggregate, err)
 	(
 		<OPERATOR_BITWISE_AND>
-		ExpressionBitFactor(aggregate)
+		ExpressionBitFactor(aggregate, err)
 	)*
 }
 
-void ExpressionBitFactor(boolean aggregate) :
+void ExpressionBitFactor(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitShift(aggregate)
+	ExpressionBitShift(aggregate, err)
 	(
 		<OPERATOR_BITWISE_XOR>
-		ExpressionBitShift(aggregate)
+		ExpressionBitShift(aggregate, err)
 	)*
 }
 
-void ExpressionBitShift(boolean aggregate) :
+void ExpressionBitShift(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionBitTest(aggregate)
+	ExpressionBitTest(aggregate, err)
 	[
 		(
 			<OPERATOR_BITWISE_LSH>
@@ -1336,53 +1362,53 @@ void ExpressionBitShift(boolean aggregate) :
 	]
 }
 
-void ExpressionBitTest(boolean aggregate) :
+void ExpressionBitTest(boolean aggregate, Errors err) :
 {}
 {
 	(
 		<OPERATOR_BITWISE_NOT>
 	)*
-	ExpressionValue(aggregate)
+	ExpressionValue(aggregate, err)
 }
 
-void ExpressionValue(boolean aggregate) :
+void ExpressionValue(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionValueTerm(aggregate)
+	ExpressionValueTerm(aggregate, err)
 	(
 		(
 			<OPERATOR_PLUS>
 			|
 			<OPERATOR_MINUS>
 		)
-		ExpressionValueTerm(aggregate)
+		ExpressionValueTerm(aggregate, err)
 	)*
 }
 
-void ExpressionValueTerm(boolean aggregate) :
+void ExpressionValueTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionValueFactor(aggregate)
+	ExpressionValueFactor(aggregate, err)
 	(
 		(
 			<OPERATOR_MULTIPLY>
 			|
 			<OPERATOR_DIVIDE>
 		)
-		ExpressionValueFactor(aggregate)
+		ExpressionValueFactor(aggregate, err)
 	)*
 }
 
-void ExpressionValueFactor(boolean aggregate) :
+void ExpressionValueFactor(boolean aggregate, Errors err) :
 {}
 {
 	[
 		Sign()
 	]
-	ExpressionValuePrimary(aggregate)
+	ExpressionValuePrimary(aggregate, err)
 }
 
-void ExpressionValuePrimary(boolean aggregate) :
+void ExpressionValuePrimary(boolean aggregate, Errors err) :
 {}
 {
 	Constant()
@@ -1391,7 +1417,7 @@ void ExpressionValuePrimary(boolean aggregate) :
 	|
 	(
 		"("
-		Expression(aggregate)
+		Expression(aggregate, err)
 		")"
 	)
 	|
@@ -1401,7 +1427,7 @@ void ExpressionValuePrimary(boolean aggregate) :
 		|
 		<KEYWORD_GROUPTS>
 		|
-		Aggregate(aggregate)
+		Aggregate(aggregate, err)
 		|
 		Identifier() // FPC attribute
 	)
@@ -1414,7 +1440,7 @@ void ExpressionValuePrimary(boolean aggregate) :
 	)
 }
 
-void Aggregate(boolean aggregate) :
+void Aggregate(boolean aggregate, Errors err) :
 {}
 {
     (
@@ -1422,10 +1448,10 @@ void Aggregate(boolean aggregate) :
         "("
         "*"
         ","
-        WindowSize()
+        WindowSize(err)
         [
             ","
-            Expression(aggregate)
+            Expression(aggregate, err)
         ]
         ")"
     )
@@ -1433,12 +1459,12 @@ void Aggregate(boolean aggregate) :
     (
         AggregationOperator()
         "("
-        Expression(aggregate)
+        Expression(aggregate, err)
         ","
-        WindowSize()
+        WindowSize(err)
         [
             ","
-            Expression(aggregate)
+            Expression(aggregate, err)
         ]
         ")"
     )
