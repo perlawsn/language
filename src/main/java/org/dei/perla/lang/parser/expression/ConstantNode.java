@@ -25,6 +25,10 @@ public final class ConstantNode implements Node {
         return type;
     }
 
+    public Object getValue() {
+        return value;
+    }
+
     @Override
     public Expression build(List<Attribute> atts) {
         return new Constant(value, type);

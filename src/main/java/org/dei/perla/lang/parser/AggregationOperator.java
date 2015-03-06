@@ -8,6 +8,7 @@ public enum AggregationOperator {
     MIN,
     MAX,
     SUM,
-    AVG
+    AVG,
+    COUNT
 
 }

@@ -21,7 +21,7 @@ options
     STATIC = false;
 }
 
-PARSER_BEGIN(JavaccParser)
+PARSER_BEGIN(Parser)
 
     package org.dei.perla.lang.parser;
 
@@ -35,11 +35,11 @@ PARSER_BEGIN(JavaccParser)
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
 
-	public class JavaccParser {
+	public class Parser {
 
 	}
 
-PARSER_END(JavaccParser)
+PARSER_END(Parser)
 
 /*
  * SEPARATORS
@@ -401,8 +401,6 @@ TOKEN :
 	< TIMEUNIT_MS: "milliseconds" | "ms" >
     |
 	< TIMEUNIT_D:  "days"         | "d"  >
-    |
-	< TIMEUNIT_MT: "months"       | "mt" >
 }
 
 /*
@@ -604,7 +602,7 @@ void FieldDefinition() :
 	FieldType()
 	[
 		<KEYWORD_DEFAULT>
-		SignedConstant()
+		Expression(false)
 	]
 }
 
@@ -703,7 +701,7 @@ void FieldSelection() :
 	Expression(true)
 	[
 		<KEYWORD_DEFAULT>
-		SignedConstant()
+		Expression(false)
 	]
 }
 
@@ -1029,15 +1027,6 @@ Node Constant() :
 	)
 }
 
-void SignedConstant() :
-{}
-{
-	[
-		Sign()
-	]
-	Constant()
-}
-
 ComparisonOperator ComparisonOperator() :
 {}
 {
@@ -1087,7 +1076,6 @@ DataType FieldType() :
 TemporalUnit TimeUnit() :
 {}
 {
-	(
 	<TIMEUNIT_S>
 	{ return ChronoUnit.SECONDS; }
 	|
@@ -1102,10 +1090,6 @@ TemporalUnit TimeUnit() :
 	|
 	<TIMEUNIT_D>
 	{ return ChronoUnit.DAYS; }
-	|
-	<TIMEUNIT_MT>
-	{ return ChronoUnit.MONTHS; }
-	)
 }
 
 AggregationOperator AggregationOperator() :
@@ -1144,7 +1128,9 @@ int SamplesNumber() :
 		(
 			samples = ConstantInteger()
 			<KEYWORD_SAMPLES>
-			{ return samples; }
+			{
+			    return samples;
+			}
 		)
 		|
 		(
