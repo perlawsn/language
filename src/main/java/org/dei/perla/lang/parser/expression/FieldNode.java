@@ -23,6 +23,10 @@ public final class FieldNode implements Node {
         return null;
     }
 
+    public String getId() {
+        return id;
+    }
+
     @Override
     public Expression build(List<Attribute> atts) {
         int idx = 0;

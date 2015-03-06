@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.query.WindowSize;
 import org.dei.perla.lang.parser.expression.ConstantNode;
+import org.dei.perla.lang.parser.expression.FieldNode;
 import org.dei.perla.lang.parser.expression.Node;
 import org.dei.perla.lang.parser.expression.NullNode;
 import org.junit.Test;
@@ -418,6 +419,23 @@ public class ParserTest {
 
         p = new Parser(new StringReader("select"));
         p.Identifier();
+    }
+
+    @Test
+    public void testPrimaryExpression() throws Exception {
+        Parser p;
+        Node n;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("temperature"));
+        n = p.PrimaryExpression(false, err);
+        assertTrue(n instanceof FieldNode);
+        assertThat(((FieldNode) n).getId(), equalTo("temperature"));
+
+        p.ReInit(new StringReader("pressure"));
+        n = p.PrimaryExpression(true, err);
+        assertTrue(n instanceof FieldNode);
+        assertThat(((FieldNode) n).getId(), equalTo("pressure"));
     }
 
 }

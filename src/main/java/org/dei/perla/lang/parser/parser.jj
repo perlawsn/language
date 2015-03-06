@@ -1340,7 +1340,7 @@ void BitwiseShift(boolean aggregate, Errors err) :
 			|
 			<OPERATOR_BITWISE_RSH>
 		)
-		ConstantInteger()
+		ArithmeticTerm(aggregate, err)
 	]
 }
 
@@ -1350,73 +1350,76 @@ void BitwiseNegation(boolean aggregate, Errors err) :
 	(
 		<OPERATOR_BITWISE_NOT>
 	)*
-	ExpressionValue(aggregate, err)
+	ArithmeticExpression(aggregate, err)
 }
 
-void ExpressionValue(boolean aggregate, Errors err) :
+void ArithmeticExpression(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionValueTerm(aggregate, err)
+	ArithmeticTerm(aggregate, err)
 	(
 		(
 			<OPERATOR_PLUS>
 			|
 			<OPERATOR_MINUS>
 		)
-		ExpressionValueTerm(aggregate, err)
+		ArithmeticTerm(aggregate, err)
 	)*
 }
 
-void ExpressionValueTerm(boolean aggregate, Errors err) :
+void ArithmeticTerm(boolean aggregate, Errors err) :
 {}
 {
-	ExpressionValueFactor(aggregate, err)
+	ArithmeticFactor(aggregate, err)
 	(
 		(
 			<OPERATOR_MULTIPLY>
 			|
 			<OPERATOR_DIVIDE>
 		)
-		ExpressionValueFactor(aggregate, err)
+		ArithmeticFactor(aggregate, err)
 	)*
 }
 
-void ExpressionValueFactor(boolean aggregate, Errors err) :
+void ArithmeticFactor(boolean aggregate, Errors err) :
 {}
 {
 	[
 		Sign()
 	]
-	ExpressionValuePrimary(aggregate, err)
+	PrimaryExpression(aggregate, err)
 }
 
-void ExpressionValuePrimary(boolean aggregate, Errors err) :
-{}
+Node PrimaryExpression(boolean aggregate, Errors err) :
 {
-	Constant()
+    String s;
+    Node n;
+}
+{
+	n = Constant()
+	{ return n; }
 	|
 	ExistsAttribute()
 	|
-	(
-		"("
-		Expression(aggregate, err)
-		")"
-	)
+	"("
+	Expression(aggregate, err)
+	")"
 	|
 	LOOKAHEAD( { aggregate } )
 	(
 		<KEYWORD_GROUPTS>
+		{ return new GroupTSNode(); }
 		|
 		Aggregate(aggregate, err)
 		|
-		Identifier() // FPC attribute
+		s = Identifier() // FPC attribute
+		{ return new FieldNode(s); }
 	)
 	|
 	LOOKAHEAD( { !aggregate } )
 	(
-		<TYPE_ID>
-		|
-		Identifier() // FPC attribute
+		s = Identifier() // FPC attribute
+		{ return new FieldNode(s); }
 	)
 }
 

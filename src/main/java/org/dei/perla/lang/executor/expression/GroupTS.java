@@ -19,6 +19,10 @@ public final class GroupTS implements Expression {
         return DataType.TIMESTAMP;
     }
 
+    public int getIndex() {
+        return tsIdx;
+    }
+
     @Override
     public Object run(Object[] record, BufferView buffer) {
         return buffer.get(0)[tsIdx];

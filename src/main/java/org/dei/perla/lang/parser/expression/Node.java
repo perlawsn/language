@@ -14,6 +14,16 @@ public interface Node {
 
     public static final Expression NULL_EXPRESSION = new Null();
 
+    default public int attributeIndex(String id, List<Attribute> atts) {
+        int i = 0;
+        for (Attribute a : atts) {
+            if (a.getId().equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public DataType getType();
 
     public Expression build(List<Attribute> atts);

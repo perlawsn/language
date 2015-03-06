@@ -21,6 +21,10 @@ public final class Field implements Expression {
         return type;
     }
 
+    public int getIndex() {
+        return idx;
+    }
+
     @Override
     public Object run(Object[] record, BufferView buffer) {
         return record[idx];
