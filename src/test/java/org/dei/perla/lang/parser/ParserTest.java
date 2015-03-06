@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.query.WindowSize;
 import org.dei.perla.lang.parser.expression.ConstantNode;
 import org.dei.perla.lang.parser.expression.Node;
 import org.dei.perla.lang.parser.expression.NullNode;
@@ -41,7 +42,7 @@ public class ParserTest {
         l = p.LogicValue();
         assertThat(l, equalTo(LogicValue.FALSE));
 
-        p = new Parser(new StringReader("unknown"));
+        p.ReInit(new StringReader("unknown"));
         l = p.LogicValue();
         assertThat(l, equalTo(LogicValue.UNKNOWN));
     }
@@ -78,7 +79,7 @@ public class ParserTest {
         i = p.ConstantInteger();
         assertThat(i, equalTo(45));
 
-        p = new Parser(new StringReader("0x12"));
+        p.ReInit(new StringReader("0x12"));
         i = p.ConstantInteger();
         assertThat(i, equalTo(18));
     }
@@ -104,7 +105,7 @@ public class ParserTest {
         n = p.Constant();
         assertTrue(n instanceof NullNode);
 
-        p = new Parser(new StringReader("false"));
+        p.ReInit(new StringReader("false"));
         n = p.Constant();
         assertTrue(n instanceof ConstantNode);
         cn = (ConstantNode) n;
@@ -112,7 +113,7 @@ public class ParserTest {
         assertTrue(cn.getValue() instanceof Boolean);
         assertThat(cn.getValue(), equalTo(false));
 
-        p = new Parser(new StringReader("true"));
+        p.ReInit(new StringReader("true"));
         n = p.Constant();
         assertTrue(n instanceof ConstantNode);
         cn = (ConstantNode) n;
@@ -120,7 +121,7 @@ public class ParserTest {
         assertTrue(cn.getValue() instanceof Boolean);
         assertThat(cn.getValue(), equalTo(true));
 
-        p = new Parser(new StringReader("'test_string'"));
+        p.ReInit(new StringReader("'test_string'"));
         n = p.Constant();
         assertTrue(n instanceof ConstantNode);
         cn = (ConstantNode) n;
@@ -128,7 +129,7 @@ public class ParserTest {
         assertTrue(cn.getValue() instanceof String);
         assertThat(cn.getValue(), equalTo("test_string"));
 
-        p = new Parser(new StringReader("12"));
+        p.ReInit(new StringReader("12"));
         n = p.Constant();
         assertTrue(n instanceof ConstantNode);
         cn = (ConstantNode) n;
@@ -136,7 +137,7 @@ public class ParserTest {
         assertTrue(cn.getValue() instanceof Integer);
         assertThat(cn.getValue(), equalTo(12));
 
-        p = new Parser(new StringReader("1.0"));
+        p.ReInit(new StringReader("1.0"));
         n = p.Constant();
         assertTrue(n instanceof ConstantNode);
         cn = (ConstantNode) n;
@@ -154,27 +155,27 @@ public class ParserTest {
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.GT));
 
-        p = new Parser(new StringReader(">="));
+        p.ReInit(new StringReader(">="));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.GE));
 
-        p = new Parser(new StringReader("<"));
+        p.ReInit(new StringReader("<"));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.LT));
 
-        p = new Parser(new StringReader("<="));
+        p.ReInit(new StringReader("<="));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.LE));
 
-        p = new Parser(new StringReader("="));
+        p.ReInit(new StringReader("="));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.EQ));
 
-        p = new Parser(new StringReader("!="));
+        p.ReInit(new StringReader("!="));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.NE));
 
-        p = new Parser(new StringReader("<>"));
+        p.ReInit(new StringReader("<>"));
         op = p.ComparisonOperator();
         assertThat(op, equalTo(ComparisonOperator.NE));
     }
@@ -188,23 +189,23 @@ public class ParserTest {
         d = p.FieldType();
         assertThat(d, equalTo(DataType.ID));
 
-        p = new Parser(new StringReader("timestamp"));
+        p.ReInit(new StringReader("timestamp"));
         d = p.FieldType();
         assertThat(d, equalTo(DataType.TIMESTAMP));
 
-        p = new Parser(new StringReader("boolean"));
+        p.ReInit(new StringReader("boolean"));
         d = p.FieldType();
         assertThat(d, equalTo(DataType.BOOLEAN));
 
-        p = new Parser(new StringReader("integer"));
+        p.ReInit(new StringReader("integer"));
         d = p.FieldType();
         assertThat(d, equalTo(DataType.INTEGER));
 
-        p = new Parser(new StringReader("float"));
+        p.ReInit(new StringReader("float"));
         d = p.FieldType();
         assertThat(d, equalTo(DataType.FLOAT));
 
-        p = new Parser(new StringReader("string"));
+        p.ReInit(new StringReader("string"));
         d = p.FieldType();
         assertThat(d, equalTo(DataType.STRING));
     }
@@ -217,35 +218,35 @@ public class ParserTest {
         p = new Parser(new StringReader("seconds"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.SECONDS));
-        p = new Parser(new StringReader("s"));
+        p.ReInit(new StringReader("s"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.SECONDS));
 
-        p = new Parser(new StringReader("minutes"));
+        p.ReInit(new StringReader("minutes"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.MINUTES));
-        p = new Parser(new StringReader("m"));
+        p.ReInit(new StringReader("m"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.MINUTES));
 
-        p = new Parser(new StringReader("hours"));
+        p.ReInit(new StringReader("hours"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.HOURS));
-        p = new Parser(new StringReader("h"));
+        p.ReInit(new StringReader("h"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.HOURS));
 
-        p = new Parser(new StringReader("milliseconds"));
+        p.ReInit(new StringReader("milliseconds"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.MILLIS));
-        p = new Parser(new StringReader("ms"));
+        p.ReInit(new StringReader("ms"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.MILLIS));
 
-        p = new Parser(new StringReader("days"));
+        p.ReInit(new StringReader("days"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.DAYS));
-        p = new Parser(new StringReader("d"));
+        p.ReInit(new StringReader("d"));
         t = p.TimeUnit();
         assertThat(t, equalTo(ChronoUnit.DAYS));
     }
@@ -259,15 +260,15 @@ public class ParserTest {
         op = p.AggregationOperator();
         assertThat(op, equalTo(AggregationOperator.MIN));
 
-        p = new Parser(new StringReader("max"));
+        p.ReInit(new StringReader("max"));
         op = p.AggregationOperator();
         assertThat(op, equalTo(AggregationOperator.MAX));
 
-        p = new Parser(new StringReader("sum"));
+        p.ReInit(new StringReader("sum"));
         op = p.AggregationOperator();
         assertThat(op, equalTo(AggregationOperator.SUM));
 
-        p = new Parser(new StringReader("avg"));
+        p.ReInit(new StringReader("avg"));
         op = p.AggregationOperator();
         assertThat(op, equalTo(AggregationOperator.AVG));
     }
@@ -281,11 +282,11 @@ public class ParserTest {
         d = p.Duration();
         assertThat(d, equalTo(Duration.ofSeconds(10)));
 
-        p = new Parser(new StringReader("10 s"));
+        p.ReInit(new StringReader("10 s"));
         d = p.Duration();
         assertThat(d, equalTo(Duration.ofSeconds(10)));
 
-        p = new Parser(new StringReader("24 h"));
+        p.ReInit(new StringReader("24 h"));
         d = p.Duration();
         assertThat(d, equalTo(Duration.ofHours(24)));
     }
@@ -307,11 +308,11 @@ public class ParserTest {
         s = p.SamplesNumber();
         assertThat(s, equalTo(32));
 
-        p = new Parser(new StringReader("2 samples"));
+        p.ReInit(new StringReader("2 samples"));
         s = p.SamplesNumber();
         assertThat(s, equalTo(2));
 
-        p = new Parser(new StringReader("one"));
+        p.ReInit(new StringReader("one"));
         s = p.SamplesNumber();
         assertThat(s, equalTo(1));
     }
@@ -335,7 +336,7 @@ public class ParserTest {
         assertThat(s, equalTo(12));
         assertTrue(err.isEmpty());
 
-        p = new Parser(new StringReader("1 selections"));
+        p.ReInit(new StringReader("1 selections"));
         s = p.SelectionsNumber(err);
         assertThat(s, equalTo(1));
         assertTrue(err.isEmpty());
@@ -358,6 +359,65 @@ public class ParserTest {
         p = new Parser(new StringReader("0 selections"));
         p.SelectionsNumber(err);
         assertFalse(err.isEmpty());
+    }
+
+    @Test
+    public void testWindowSize() throws Exception {
+        Parser p;
+        WindowSize ws;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("10 seconds"));
+        ws = p.WindowSize(err);
+        assertTrue(err.isEmpty());
+        assertThat(ws.getDuration(), equalTo(Duration.ofSeconds(10)));
+
+        p.ReInit(new StringReader("2 samples"));
+        ws = p.WindowSize(err);
+        assertTrue(err.isEmpty());
+        assertThat(ws.getSamples(), equalTo(2));
+
+        p.ReInit(new StringReader("one"));
+        ws = p.WindowSize(err);
+        assertTrue(err.isEmpty());
+        assertThat(ws.getSamples(), equalTo(1));
+    }
+
+    @Test
+    public void testZeroWindowSize() throws Exception {
+        Parser p;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("0 days"));
+        p.WindowSize(err);
+        assertFalse(err.isEmpty());
+
+        err = new Errors();
+        p.ReInit(new StringReader("0 samples"));
+        p.WindowSize(err);
+        assertFalse(err.isEmpty());
+    }
+
+    @Test
+    public void testIdentifier() throws Exception {
+        Parser p;
+        String id;
+
+        p = new Parser(new StringReader("temperature"));
+        id = p.Identifier();
+        assertThat(id, equalTo("temperature"));
+
+        p.ReInit(new StringReader("pressure"));
+        id = p.Identifier();
+        assertThat(id, equalTo("pressure"));
+    }
+
+    @Test(expected = ParseException.class)
+    public void testKeywordIdentifier() throws Exception {
+        Parser p;
+
+        p = new Parser(new StringReader("select"));
+        p.Identifier();
     }
 
 }

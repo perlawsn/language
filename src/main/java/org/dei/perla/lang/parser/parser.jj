@@ -1201,19 +1201,6 @@ String Identifier() :
 	{ return value.image; }
 }
 
-void ExistsAttribute() :
-{}
-{
-	<KEYWORD_EXISTS>
-	"("
-	(
-		Identifier() // FPC attribute
-		|
-		<KEYWORD_ALL>
-	)
-	")"
-}
-
 /*
  * EXPRESSIONS
  */
@@ -1438,6 +1425,19 @@ void ExpressionValuePrimary(boolean aggregate, Errors err) :
 		|
 		Identifier() // FPC attribute
 	)
+}
+
+void ExistsAttribute() :
+{}
+{
+	<KEYWORD_EXISTS>
+	"("
+	(
+		Identifier() // FPC attribute
+		|
+		<KEYWORD_ALL>
+	)
+	")"
 }
 
 void Aggregate(boolean aggregate, Errors err) :
