@@ -434,6 +434,7 @@ public class ParserTest {
         n = p.PrimaryExpression(true, err);
         assertTrue(n instanceof FieldNode);
         assertThat(((FieldNode) n).getId(), equalTo("pressure"));
+        // TODO: continue with the remaining expressions
     }
 
     @Test

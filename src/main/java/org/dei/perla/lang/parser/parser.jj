@@ -1212,14 +1212,19 @@ String Identifier() :
  * EXPRESSIONS
  */
 Node Expression(boolean aggregate, Errors err) :
-{}
 {
-	BooleanTerm(aggregate, err)
+    Token t;
+    Node n;
+    Node n2 = null;
+}
+{
+    { t = token; }
+	n = BooleanTerm(aggregate, err)
 	(
 		<OPERATOR_OR>
-		BooleanTerm(aggregate, err)
+		n2 = BooleanTerm(aggregate, err)
 	)*
-	{ return null; }
+	{ return n; }
 }
 
 Node BooleanTerm(boolean aggregate, Errors err) :
@@ -1423,18 +1428,21 @@ Node PrimaryExpression(boolean aggregate, Errors err) :
 	n = Constant()
 	{ return n; }
 	|
-	ExistsAttribute()
+	n = ExistsAttribute()
+	{ return n; }
 	|
 	"("
-	Expression(aggregate, err)
+	n = Expression(aggregate, err)
 	")"
+	{ return n; }
 	|
 	LOOKAHEAD( { aggregate } )
 	(
 		<KEYWORD_GROUPTS>
 		{ return new GroupTSNode(); }
 		|
-		Aggregate(err)
+		n = Aggregate(err)
+		{ return n; }
 		|
 		s = Identifier() // FPC attribute
 		{ return new FieldNode(s); }
@@ -1447,7 +1455,7 @@ Node PrimaryExpression(boolean aggregate, Errors err) :
 	)
 }
 
-void ExistsAttribute() :
+Node ExistsAttribute() :
 {}
 {
 	<KEYWORD_EXISTS>
@@ -1458,6 +1466,7 @@ void ExistsAttribute() :
 		<KEYWORD_ALL>
 	    )
 	")"
+	{ return null; }
 }
 
 Node Aggregate(Errors err) :
