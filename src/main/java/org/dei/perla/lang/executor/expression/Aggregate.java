@@ -43,6 +43,18 @@ public abstract class Aggregate implements Expression {
         this.type = type;
     }
 
+    public Expression getOperand() {
+        return op;
+    }
+
+    public WindowSize getWindowSize() {
+        return this.ws;
+    }
+
+    public Expression getFilter() {
+        return filter;
+    }
+
     @Override
     public final DataType getType() {
         return type;

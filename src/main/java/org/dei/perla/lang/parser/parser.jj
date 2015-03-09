@@ -1434,7 +1434,7 @@ Node PrimaryExpression(boolean aggregate, Errors err) :
 		<KEYWORD_GROUPTS>
 		{ return new GroupTSNode(); }
 		|
-		Aggregate(aggregate, err)
+		Aggregate(err)
 		|
 		s = Identifier() // FPC attribute
 		{ return new FieldNode(s); }
@@ -1460,7 +1460,7 @@ void ExistsAttribute() :
 	")"
 }
 
-Node Aggregate(boolean aggregate, Errors err) :
+Node Aggregate(Errors err) :
 {
     Token t;
 
@@ -1473,6 +1473,7 @@ Node Aggregate(boolean aggregate, Errors err) :
 }
 {
     (
+        (
         <FUNCTION_COUNT>
         { t = token; }
         { op = AggregationOperator.COUNT; }
@@ -1482,26 +1483,27 @@ Node Aggregate(boolean aggregate, Errors err) :
         ws = WindowSize(err)
         [
             ","
-            filter = Expression(aggregate, err)
+            filter = Expression(false, err)
         ]
         ")"
-    )
-    |
-    (
+        )
+        |
+        (
         op = AggregationOperator()
         { t = token; }
         "("
-        exp = Expression(aggregate, err)
+        exp = Expression(false, err)
         ","
         ws = WindowSize(err)
         [
             ","
-            filter = Expression(aggregate, err)
+            filter = Expression(false, err)
         ]
         ")"
+        )
     )
     {
-        n = AggregationNode.create(op, exp, ws, filter);
+        n = AggregateNode.create(op, exp, ws, filter);
         addIfError(n, t, err);
         return n;
     }

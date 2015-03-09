@@ -70,9 +70,9 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(9));
 
-        Expression where = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = new Greater(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        sum = new SumAggregate(intExpr, new WindowSize(5), where);
+        sum = new SumAggregate(intExpr, new WindowSize(5), filter);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
         res = sum.run(null, view);
         assertThat(res, equalTo(7));
@@ -90,9 +90,9 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(9.9f));
 
-        Expression where = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        sum = new SumAggregate(floatExpr, new WindowSize(5), where);
+        sum = new SumAggregate(floatExpr, new WindowSize(5), filter);
         res = sum.run(null, view);
         assertThat(res, equalTo(7.7f));
     }
@@ -111,9 +111,9 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3f));
 
-        Expression where = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = new Greater(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        avg = new AvgAggregate(intExpr, new WindowSize(5), where);
+        avg = new AvgAggregate(intExpr, new WindowSize(5), filter);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
         res = avg.run(null, view);
         assertThat(res, equalTo(7f / 2));
@@ -132,9 +132,9 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3.3f));
 
-        Expression where = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        avg = new AvgAggregate(floatExpr, new WindowSize(5), where);
+        avg = new AvgAggregate(floatExpr, new WindowSize(5), filter);
         res = avg.run(null, view);
         assertThat(res, equalTo(7.7f / 2));
     }
@@ -153,9 +153,9 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(2));
 
-        Expression where = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = new Greater(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        min = new MinAggregate(intExpr, new WindowSize(5), where);
+        min = new MinAggregate(intExpr, new WindowSize(5), filter);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
         res = min.run(null, view);
         assertThat(res, equalTo(3));
@@ -174,11 +174,31 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2.2f));
 
-        Expression where = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = new Greater(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        min = new MinAggregate(floatExpr, new WindowSize(5), where);
+        min = new MinAggregate(floatExpr, new WindowSize(5), filter);
         res = min.run(null, view);
         assertThat(res, equalTo(3.3f));
+    }
+
+    @Test
+    public void testInstantMin() {
+        MinAggregate min = new MinAggregate(tsExpr, new WindowSize(5), null);
+        assertThat(min.getType(), equalTo(DataType.TIMESTAMP));
+        Object res = min.run(null, view);
+        assertTrue(res instanceof Instant);
+        assertThat(res, equalTo(view.get(4)[0]));
+
+        min = new MinAggregate(tsExpr, new WindowSize(3), null);
+        res = min.run(null, view);
+        assertTrue(res instanceof Instant);
+        assertThat(res, equalTo(view.get(2)[0]));
+
+        Expression filter = new Less(new Field(1, DataType.INTEGER),
+                new Constant(4, DataType.INTEGER));
+        min = new MinAggregate(tsExpr, new WindowSize(5), filter);
+        res = min.run(null, view);
+        assertThat(res, equalTo(view.get(4)[0]));
     }
 
     @Test
@@ -195,9 +215,9 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
-        Expression where = new Less(new Field(3, DataType.FLOAT),
+        Expression filter = new Less(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        max = new MaxAggregate(intExpr, new WindowSize(5), where);
+        max = new MaxAggregate(intExpr, new WindowSize(5), filter);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
         res = max.run(null, view);
         assertThat(res, equalTo(2));
@@ -238,9 +258,9 @@ public class AggregateTest {
 
         Expression filter = new Less(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
-        max = new MaxAggregate(floatExpr, new WindowSize(5), filter);
+        max = new MaxAggregate(tsExpr, new WindowSize(5), filter);
         res = max.run(null, view);
-        assertThat(res, equalTo(3.3f));
+        assertThat(res, equalTo(view.get(1)[0]));
     }
 
     @Test
@@ -256,9 +276,9 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(3));
 
-        Expression where = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = new Less(new Field(1, DataType.INTEGER),
                 new Constant(3, DataType.INTEGER));
-        count = new CountAggregate(new WindowSize(5), where);
+        count = new CountAggregate(new WindowSize(5), filter);
         res = count.run(null, view);
         assertThat(res, equalTo(3));
     }

@@ -18,6 +18,14 @@ public final class CountAggregate implements Expression {
         this.filter = filter;
     }
 
+    public WindowSize getWindowSize() {
+        return ws;
+    }
+
+    public Expression getFilter() {
+        return filter;
+    }
+
     @Override
     public DataType getType() {
         return DataType.INTEGER;

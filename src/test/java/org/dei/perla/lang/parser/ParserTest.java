@@ -3,10 +3,7 @@ package org.dei.perla.lang.parser;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.statement.WindowSize;
-import org.dei.perla.lang.parser.expression.ConstantNode;
-import org.dei.perla.lang.parser.expression.FieldNode;
-import org.dei.perla.lang.parser.expression.Node;
-import org.dei.perla.lang.parser.expression.NullNode;
+import org.dei.perla.lang.parser.expression.*;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -15,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -436,6 +434,32 @@ public class ParserTest {
         n = p.PrimaryExpression(true, err);
         assertTrue(n instanceof FieldNode);
         assertThat(((FieldNode) n).getId(), equalTo("pressure"));
+    }
+
+    @Test
+    public void testAggregateCount() throws Exception {
+        Parser p;
+        Node n;
+        AggregateNode an;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("count(*, 10 samples)"));
+        n = p.Aggregate(err);
+        assertTrue(n instanceof AggregateNode);
+        an = (AggregateNode) n;
+        assertThat(an.getAggregation(), equalTo(AggregationOperator.COUNT));
+        assertThat(an.getOperand(), nullValue());
+        assertThat(an.getWindowSize(), equalTo(new WindowSize(10)));
+        assertThat(an.getFilter(), nullValue());
+
+        p = new Parser(new StringReader("count(*, 10 seconds, true)"));
+        n = p.Aggregate(err);
+        assertTrue(n instanceof AggregateNode);
+        an = (AggregateNode) n;
+        assertThat(an.getAggregation(), equalTo(AggregationOperator.COUNT));
+        assertThat(an.getOperand(), nullValue());
+        assertThat(an.getWindowSize(),
+                equalTo(new WindowSize(Duration.ofSeconds(10))));
     }
 
 }

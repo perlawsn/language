@@ -36,4 +36,18 @@ public final class WindowSize {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof WindowSize)) {
+            return false;
+        }
+
+        WindowSize other = (WindowSize) o;
+        if (samples != -1) {
+            return samples == other.samples;
+        } else {
+            return other.d != null && d.equals(other.d);
+        }
+    }
+
 }

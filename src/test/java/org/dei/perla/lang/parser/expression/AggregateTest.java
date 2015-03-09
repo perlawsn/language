@@ -33,14 +33,25 @@ public class AggregateTest {
         assertThat(n, notNullValue());
         assertThat(n.getType(), equalTo(DataType.INTEGER));
         assertTrue(n instanceof AggregateNode);
+
         AggregateNode a = (AggregateNode) n;
-        assertThat(a.getAggregationOperator(),
+        assertThat(a.getAggregation(),
                 equalTo(AggregationOperator.COUNT));
-        assertThat(a.getExpression(), nullValue());
+        assertThat(a.getOperand(), nullValue());
         assertThat(a.getWindowSize(), equalTo(samples));
         assertThat(a.getFilter(), equalTo(trueNode));
+
         Expression e = n.build(Collections.emptyList());
         assertTrue(e instanceof CountAggregate);
+        CountAggregate ca = (CountAggregate) e;
+
+        assertThat(ca.getType(), equalTo(DataType.INTEGER));
+        assertThat(ca.getWindowSize(), equalTo(samples));
+        assertThat(ca.getFilter(), notNullValue());
+    }
+
+    @Test
+    public void testAvg() {
     }
 
 }

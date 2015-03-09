@@ -13,15 +13,15 @@ import java.util.List;
  */
 public final class AggregateNode implements Node {
 
-    private final AggregationOperator op;
-    private final Node exp;
+    private final AggregationOperator agg;
+    private final Node op;
     private final WindowSize ws;
     private final Node filter;
 
-    private AggregateNode(AggregationOperator op, Node exp,
+    private AggregateNode(AggregationOperator agg, Node op,
             WindowSize ws, Node filter) {
+        this.agg = agg;
         this.op = op;
-        this.exp = exp;
         this.ws = ws;
         this.filter = filter;
     }
@@ -63,15 +63,24 @@ public final class AggregateNode implements Node {
     private static boolean validExpressionType(AggregationOperator op,
             DataType type) {
         // TODO: Allow MAX and MIN to be performed on TIMESTAMP expressions too
-        return type == DataType.INTEGER || type == DataType.FLOAT;
+        switch (op) {
+            case COUNT:
+                return true;
+            case MIN:
+            case MAX:
+                return type == DataType.INTEGER || type == DataType.FLOAT ||
+                        type == DataType.TIMESTAMP;
+            default:
+                return type == DataType.INTEGER || type == DataType.FLOAT;
+        }
     }
 
-    public AggregationOperator getAggregationOperator() {
+    public AggregationOperator getAggregation() {
+        return agg;
+    }
+
+    public Node getOperand() {
         return op;
-    }
-
-    public Node getExpression() {
-        return exp;
     }
 
     public WindowSize getWindowSize() {
@@ -84,10 +93,10 @@ public final class AggregateNode implements Node {
 
     @Override
     public DataType getType() {
-        if (op == AggregationOperator.COUNT) {
+        if (agg == AggregationOperator.COUNT) {
             return DataType.INTEGER;
         } else {
-            return exp.getType();
+            return op.getType();
         }
     }
 
@@ -103,14 +112,14 @@ public final class AggregateNode implements Node {
             }
         }
 
-        if (exp != null) {
-            cExp = exp.build(atts);
-            if (!validExpressionType(op, cExp.getType())) {
+        if (op != null) {
+            cExp = op.build(atts);
+            if (!validExpressionType(agg, cExp.getType())) {
                 return Null.INSTANCE;
             }
         }
 
-        switch (op) {
+        switch (agg) {
             case COUNT:
                 return new CountAggregate(ws, cWhere);
             case SUM:
