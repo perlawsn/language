@@ -93,10 +93,13 @@ public final class AggregateNode implements Node {
 
     @Override
     public DataType getType() {
-        if (agg == AggregationOperator.COUNT) {
-            return DataType.INTEGER;
-        } else {
-            return op.getType();
+        switch (agg) {
+            case COUNT:
+                return DataType.INTEGER;
+            case AVG:
+                return DataType.FLOAT;
+            default:
+                return op.getType();
         }
     }
 
