@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.Field;
+import org.dei.perla.lang.executor.expression.Null;
 
 import java.util.List;
 
@@ -18,13 +19,13 @@ public final class FieldNode implements Node {
         this.id = id;
     }
 
+    public String getId() {
+        return id;
+    }
+
     @Override
     public DataType getType() {
         return null;
-    }
-
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -40,7 +41,7 @@ public final class FieldNode implements Node {
         }
 
         if (att == null) {
-            return Node.NULL_EXPRESSION;
+            return Null.INSTANCE;
         }
 
         return new Field(idx, att.getType());

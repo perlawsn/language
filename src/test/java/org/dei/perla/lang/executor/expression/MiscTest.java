@@ -53,7 +53,7 @@ public class MiscTest {
 
     @Test
     public void nullTest() {
-        Null n = new Null();
+        Null n = Null.INSTANCE;
 
         assertThat(n.getType(), nullValue());
         assertThat(n.run(view.get(0), view), nullValue());

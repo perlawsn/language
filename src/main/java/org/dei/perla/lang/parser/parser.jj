@@ -29,7 +29,7 @@ PARSER_BEGIN(Parser)
     import java.time.temporal.ChronoUnit;
     import java.time.Duration;
 
-    import org.dei.perla.lang.executor.query.WindowSize;
+    import org.dei.perla.lang.executor.statement.WindowSize;
     import org.dei.perla.lang.parser.expression.*;
 
     import org.dei.perla.core.utils.Errors;
@@ -39,6 +39,13 @@ PARSER_BEGIN(Parser)
 
 	    private static final void addError(String msg, Token t, Errors err) {
 	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
+	    }
+
+	    private static final void addIfError(Node n, Token t, Errors err) {
+	        if (!(n instanceof ErrorNode)) {
+	            return;
+	        }
+	        addError(((ErrorNode) n).getError(), t, err);
 	    }
 
 	}
@@ -1014,7 +1021,7 @@ Node Constant() :
 {
 	(
 		ConstantNull()
-		{ return new NullNode(); }
+		{ return NullNode.INSTANCE; }
 		|
 		value = ConstantBoolean()
 		{ return new ConstantNode(value, DataType.BOOLEAN); }
@@ -1204,7 +1211,7 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-void Expression(boolean aggregate, Errors err) :
+Node Expression(boolean aggregate, Errors err) :
 {}
 {
 	BooleanTerm(aggregate, err)
@@ -1212,9 +1219,10 @@ void Expression(boolean aggregate, Errors err) :
 		<OPERATOR_OR>
 		BooleanTerm(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BooleanTerm(boolean aggregate, Errors err) :
+Node BooleanTerm(boolean aggregate, Errors err) :
 {}
 {
 	BooleanFactor(aggregate, err)
@@ -1222,9 +1230,10 @@ void BooleanTerm(boolean aggregate, Errors err) :
 		<OPERATOR_AND>
 		BooleanFactor(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BooleanFactor(boolean aggregate, Errors err) :
+Node BooleanFactor(boolean aggregate, Errors err) :
 {}
 {
 	BooleanNegation(aggregate, err)
@@ -1232,18 +1241,20 @@ void BooleanFactor(boolean aggregate, Errors err) :
 		<OPERATOR_XOR>
 		BooleanNegation(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BooleanNegation(boolean aggregate, Errors err) :
+Node BooleanNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
 		<OPERATOR_NOT>
 	)*
 	BooleanPredicate(aggregate, err)
+	{ return null; }
 }
 
-void BooleanPredicate(boolean aggregate, Errors err) :
+Node BooleanPredicate(boolean aggregate, Errors err) :
 {}
 {
     Comparison(aggregate, err)
@@ -1254,9 +1265,10 @@ void BooleanPredicate(boolean aggregate, Errors err) :
         |
         Between(aggregate, err)
     ]
+    { return null; }
 }
 
-void Is(boolean aggregate, Errors err) :
+Node Is(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_IS>
@@ -1272,25 +1284,28 @@ void Is(boolean aggregate, Errors err) :
         |
         <CONSTANT_NULL>
     )
+    { return null; }
 }
 
-void Like(boolean aggregate, Errors err) :
+Node Like(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_LIKE>
     ConstantString()
+    { return null; }
 }
 
-void Between(boolean aggregate, Errors err) :
+Node Between(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_BETWEEN>
     BitwiseExpression(aggregate, err)
     <OPERATOR_AND>
     BitwiseExpression(aggregate, err)
+    { return null; }
 }
 
-void Comparison(boolean aggregate, Errors err) :
+Node Comparison(boolean aggregate, Errors err) :
 {}
 {
     BitwiseExpression(aggregate, err)
@@ -1298,9 +1313,10 @@ void Comparison(boolean aggregate, Errors err) :
         ComparisonOperator()
         BitwiseExpression(aggregate, err)
     ]
+    { return null; }
 }
 
-void BitwiseExpression(boolean aggregate, Errors err) :
+Node BitwiseExpression(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseTerm(aggregate, err)
@@ -1308,9 +1324,10 @@ void BitwiseExpression(boolean aggregate, Errors err) :
 		<OPERATOR_BITWISE_OR>
 		BitwiseTerm(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BitwiseTerm(boolean aggregate, Errors err) :
+Node BitwiseTerm(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseFactor(aggregate, err)
@@ -1318,9 +1335,10 @@ void BitwiseTerm(boolean aggregate, Errors err) :
 		<OPERATOR_BITWISE_AND>
 		BitwiseFactor(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BitwiseFactor(boolean aggregate, Errors err) :
+Node BitwiseFactor(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseShift(aggregate, err)
@@ -1328,9 +1346,10 @@ void BitwiseFactor(boolean aggregate, Errors err) :
 		<OPERATOR_BITWISE_XOR>
 		BitwiseShift(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void BitwiseShift(boolean aggregate, Errors err) :
+Node BitwiseShift(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseNegation(aggregate, err)
@@ -1342,18 +1361,20 @@ void BitwiseShift(boolean aggregate, Errors err) :
 		)
 		ArithmeticTerm(aggregate, err)
 	]
+	{ return null; }
 }
 
-void BitwiseNegation(boolean aggregate, Errors err) :
+Node BitwiseNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
 		<OPERATOR_BITWISE_NOT>
 	)*
 	ArithmeticExpression(aggregate, err)
+	{ return null; }
 }
 
-void ArithmeticExpression(boolean aggregate, Errors err) :
+Node ArithmeticExpression(boolean aggregate, Errors err) :
 {}
 {
 	ArithmeticTerm(aggregate, err)
@@ -1365,9 +1386,10 @@ void ArithmeticExpression(boolean aggregate, Errors err) :
 		)
 		ArithmeticTerm(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void ArithmeticTerm(boolean aggregate, Errors err) :
+Node ArithmeticTerm(boolean aggregate, Errors err) :
 {}
 {
 	ArithmeticFactor(aggregate, err)
@@ -1379,15 +1401,17 @@ void ArithmeticTerm(boolean aggregate, Errors err) :
 		)
 		ArithmeticFactor(aggregate, err)
 	)*
+	{ return null; }
 }
 
-void ArithmeticFactor(boolean aggregate, Errors err) :
+Node ArithmeticFactor(boolean aggregate, Errors err) :
 {}
 {
 	[
 		Sign()
 	]
 	PrimaryExpression(aggregate, err)
+	{ return null; }
 }
 
 Node PrimaryExpression(boolean aggregate, Errors err) :
@@ -1436,33 +1460,50 @@ void ExistsAttribute() :
 	")"
 }
 
-void Aggregate(boolean aggregate, Errors err) :
-{}
+Node Aggregate(boolean aggregate, Errors err) :
+{
+    Token t;
+
+    AggregationOperator op;
+    Node exp = null;
+    WindowSize ws;
+    Node where = null;
+
+    Node n;
+}
 {
     (
         <FUNCTION_COUNT>
+        { t = token; }
+        { op = AggregationOperator.COUNT; }
         "("
         "*"
         ","
-        WindowSize(err)
+        ws = WindowSize(err)
         [
             ","
-            Expression(aggregate, err)
+            where = Expression(aggregate, err)
         ]
         ")"
     )
     |
     (
-        AggregationOperator()
+        op = AggregationOperator()
+        { t = token; }
         "("
-        Expression(aggregate, err)
+        exp = Expression(aggregate, err)
         ","
-        WindowSize(err)
+        ws = WindowSize(err)
         [
             ","
-            Expression(aggregate, err)
+            where = Expression(aggregate, err)
         ]
         ")"
     )
+    {
+        n = AggregationNode.create(op, exp, ws, where);
+        addIfError(n, t, err);
+        return n;
+    }
 }
 

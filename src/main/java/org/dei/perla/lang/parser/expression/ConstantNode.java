@@ -20,13 +20,13 @@ public final class ConstantNode implements Node {
         this.type = type;
     }
 
+    public Object getValue() {
+        return value;
+    }
+
     @Override
     public DataType getType() {
         return type;
-    }
-
-    public Object getValue() {
-        return value;
     }
 
     @Override

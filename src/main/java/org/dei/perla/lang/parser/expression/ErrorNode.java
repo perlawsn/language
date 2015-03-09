@@ -3,19 +3,23 @@ package org.dei.perla.lang.parser.expression;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
-import org.dei.perla.lang.executor.expression.Null;
 
 import java.util.List;
 
 /**
- * @author Guido Rota 05/03/15.
+ * @author Guido Rota 09/03/15.
  */
-public final class NullNode implements Node {
+public class ErrorNode implements Node {
 
-    // There can only be a single NullNode instance
-    public static final NullNode INSTANCE = new NullNode();
+    private final String msg;
 
-    private NullNode() {}
+    public ErrorNode(String msg) {
+        this.msg = msg;
+    }
+
+    public String getError() {
+        return msg;
+    }
 
     @Override
     public DataType getType() {
@@ -24,7 +28,7 @@ public final class NullNode implements Node {
 
     @Override
     public Expression build(List<Attribute> atts) {
-        return Null.INSTANCE;
+        throw new RuntimeException("Cannot build expression with error");
     }
 
 }
