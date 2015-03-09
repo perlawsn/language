@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 /**
  * @author Guido Rota 06/03/15.
  */
-public class ExpressionTest {
+public class MiscTest {
 
     private static final Attribute tsAtt =
             Attribute.create("timestamp", DataType.TIMESTAMP);

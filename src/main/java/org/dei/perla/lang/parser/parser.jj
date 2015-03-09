@@ -1467,7 +1467,7 @@ Node Aggregate(boolean aggregate, Errors err) :
     AggregationOperator op;
     Node exp = null;
     WindowSize ws;
-    Node where = null;
+    Node filter = null;
 
     Node n;
 }
@@ -1482,7 +1482,7 @@ Node Aggregate(boolean aggregate, Errors err) :
         ws = WindowSize(err)
         [
             ","
-            where = Expression(aggregate, err)
+            filter = Expression(aggregate, err)
         ]
         ")"
     )
@@ -1496,12 +1496,12 @@ Node Aggregate(boolean aggregate, Errors err) :
         ws = WindowSize(err)
         [
             ","
-            where = Expression(aggregate, err)
+            filter = Expression(aggregate, err)
         ]
         ")"
     )
     {
-        n = AggregationNode.create(op, exp, ws, where);
+        n = AggregationNode.create(op, exp, ws, filter);
         addIfError(n, t, err);
         return n;
     }

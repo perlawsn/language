@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Guido Rota 09/03/15.
  */
-public class ErrorNode implements Node {
+public final class ErrorNode implements Node {
 
     private final String msg;
 
