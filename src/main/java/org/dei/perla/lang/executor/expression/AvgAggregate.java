@@ -11,9 +11,9 @@ public final class AvgAggregate extends Aggregate {
 
     public final DataType opType;
 
-    public AvgAggregate(Expression exp, WindowSize ws, Expression where) {
-        super(exp, ws, where, DataType.FLOAT);
-        opType = exp.getType();
+    public AvgAggregate(Expression op, WindowSize ws, Expression filter) {
+        super(op, ws, filter, DataType.FLOAT);
+        opType = op.getType();
     }
 
     @Override
@@ -23,20 +23,20 @@ public final class AvgAggregate extends Aggregate {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) exp.run(r, b);
+                    si.value += (Integer) op.run(r, b);
                     count.value++;
-                }, where);
+                }, filter);
                 return si.value.floatValue() / count.value;
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) exp.run(r, b);
+                    sf.value += (Float) op.run(r, b);
                     count.value++;
-                }, where);
+                }, filter);
                 return sf.value / count.value;
             default:
                 throw new RuntimeException(
-                        "sum aggregation not defined for type " + type);
+                        "avg aggregation not defined for type " + type);
         }
     }
 

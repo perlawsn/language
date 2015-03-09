@@ -8,8 +8,8 @@ import org.dei.perla.lang.executor.statement.WindowSize;
  */
 public final class SumAggregate extends Aggregate {
 
-    public SumAggregate(Expression exp, WindowSize ws, Expression where) {
-        super(exp, ws, where);
+    public SumAggregate(Expression op, WindowSize ws, Expression filter) {
+        super(op, ws, filter);
     }
 
     @Override
@@ -18,14 +18,14 @@ public final class SumAggregate extends Aggregate {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) exp.run(r, b);
-                }, where);
+                    si.value += (Integer) op.run(r, b);
+                }, filter);
                 return si.value;
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) exp.run(r, b);
-                }, where);
+                    sf.value += (Float) op.run(r, b);
+                }, filter);
                 return sf.value;
             default:
                 throw new RuntimeException(

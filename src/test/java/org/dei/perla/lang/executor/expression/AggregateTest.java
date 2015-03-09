@@ -32,6 +32,7 @@ public class AggregateTest {
 
     private static BufferView view;
 
+    private static Expression tsExpr = new Field(0, DataType.TIMESTAMP);
     private static Expression intExpr = new Field(1, DataType.INTEGER);
     private static Expression floatExpr = new Field(3, DataType.FLOAT);
 
@@ -215,9 +216,29 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
-        Expression where = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = new Less(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
-        max = new MaxAggregate(floatExpr, new WindowSize(5), where);
+        max = new MaxAggregate(floatExpr, new WindowSize(5), filter);
+        res = max.run(null, view);
+        assertThat(res, equalTo(3.3f));
+    }
+
+    @Test
+    public void testInstantMax() {
+        MaxAggregate max = new MaxAggregate(tsExpr, new WindowSize(5), null);
+        assertThat(max.getType(), equalTo(DataType.TIMESTAMP));
+        Object res = max.run(null, view);
+        assertTrue(res instanceof Instant);
+        assertThat(res, equalTo(view.get(0)[0]));
+
+        max = new MaxAggregate(tsExpr, new WindowSize(3), null);
+        res = max.run(null, view);
+        assertTrue(res instanceof Instant);
+        assertThat(res, equalTo(view.get(0)[0]));
+
+        Expression filter = new Less(new Field(1, DataType.INTEGER),
+                new Constant(4, DataType.INTEGER));
+        max = new MaxAggregate(floatExpr, new WindowSize(5), filter);
         res = max.run(null, view);
         assertThat(res, equalTo(3.3f));
     }

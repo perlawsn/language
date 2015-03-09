@@ -11,11 +11,11 @@ import org.dei.perla.lang.executor.statement.WindowSize;
 public final class CountAggregate implements Expression {
 
     private final WindowSize ws;
-    private final Expression where;
+    private final Expression filter;
 
-    public CountAggregate(WindowSize ws, Expression where) {
+    public CountAggregate(WindowSize ws, Expression filter) {
         this.ws = ws;
-        this.where = where;
+        this.filter = filter;
     }
 
     @Override
@@ -28,11 +28,11 @@ public final class CountAggregate implements Expression {
         IntAccumulator count = new IntAccumulator(0);
         if (ws.getSamples() > 0) {
             buffer = buffer.subView(ws.getSamples());
-            buffer.forEach((r, b) -> count.value++, where);
+            buffer.forEach((r, b) -> count.value++, filter);
             buffer.release();
         } else if (ws.getDuration() != null) {
             buffer = buffer.subView(ws.getDuration());
-            buffer.forEach((r, b) -> count.value++, where);
+            buffer.forEach((r, b) -> count.value++, filter);
             buffer.release();
         } else {
             throw new RuntimeException("invalid window size");

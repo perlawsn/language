@@ -3,13 +3,15 @@ package org.dei.perla.lang.executor.expression;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
+import java.time.Instant;
+
 /**
  * @author Guido Rota 27/02/15.
  */
 public final class MinAggregate extends Aggregate {
 
-    public MinAggregate(Expression exp, WindowSize ws, Expression where) {
-        super(exp, ws, where);
+    public MinAggregate(Expression op, WindowSize ws, Expression filter) {
+        super(op, ws, filter);
     }
 
     @Override
@@ -18,24 +20,33 @@ public final class MinAggregate extends Aggregate {
             case INTEGER:
                 IntAccumulator mini = new IntAccumulator(Integer.MAX_VALUE);
                 buffer.forEach((r, b) -> {
-                    Integer vi = (Integer) exp.run(r, b);
+                    Integer vi = (Integer) op.run(r, b);
                     if (mini.value > vi) {
                         mini.value = vi;
                     }
-                }, where);
+                }, filter);
                 return mini.value;
             case FLOAT:
                 FloatAccumulator minf = new FloatAccumulator(Float.MAX_VALUE);
                 buffer.forEach((r, b) -> {
-                    Float vf = (Float) exp.run(r, b);
+                    Float vf = (Float) op.run(r, b);
                     if (minf.value > vf) {
                         minf.value = vf;
                     }
-                }, where);
+                }, filter);
                 return minf.value;
+            case TIMESTAMP:
+                InstantAccumulator mint = new InstantAccumulator(Instant.MAX);
+                buffer.forEach((r, b) -> {
+                    Instant vt = (Instant) op.run(r, b);
+                    if (mint.value.compareTo(vt) > 0) {
+                        mint.value = vt;
+                    }
+                }, filter);
+                return mint.value;
             default:
                 throw new RuntimeException(
-                        "sum aggregation not defined for type " + type);
+                        "min aggregation not defined for type " + type);
         }
     }
 
