@@ -3,17 +3,17 @@ package org.dei.perla.lang.executor.expression;
 /**
  * @author Guido Rota 10/03/15.
  */
-public enum BitwiseOperator {
+public enum BitwiseOperation {
 
-    AND("bitwise and"),
-    OR("bitwise or"),
-    XOR("bitwise xor"),
-    RSH("right shift"),
-    LSH("left shift");
+    AND("&"),
+    OR("|"),
+    XOR("^"),
+    RSH(">>"),
+    LSH("<<");
 
     private final String name;
 
-    BitwiseOperator(String name) {
+    BitwiseOperation(String name) {
         this.name = name;
     }
 

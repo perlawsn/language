@@ -27,11 +27,6 @@ public final class Null implements Expression {
     }
 
     @Override
-    public boolean hasError() {
-        return false;
-    }
-
-    @Override
     public Expression rebuild(List<Attribute> atts) {
         return this;
     }

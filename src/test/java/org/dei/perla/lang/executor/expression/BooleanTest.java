@@ -22,68 +22,68 @@ public class BooleanTest {
     @Test
     public void testNot() {
         Object res = new Not(trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
         res = new Not(falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
     }
 
     @Test
     public void testAnd() {
         Object res = new And(trueExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new And(falseExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
         res = new And(trueExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
         res = new And(falseExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }
 
     @Test
     public void testOr() {
         Object res = new Or(trueExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new Or(falseExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new Or(trueExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new Or(falseExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }
 
     @Test
     public void testXor() {
         Object res = new Xor(trueExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
         res = new Xor(falseExpr, trueExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new Xor(trueExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
         res = new Xor(falseExpr, falseExpr).run(null, null);
-        assertTrue(res instanceof Boolean);
+        assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }
 

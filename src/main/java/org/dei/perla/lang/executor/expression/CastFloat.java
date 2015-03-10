@@ -13,8 +13,30 @@ public final class CastFloat implements Expression {
 
     private final Expression e;
 
-    public CastFloat(Expression e) {
+    private CastFloat(Expression e) {
         this.e = e;
+    }
+
+    public static Expression create(Expression e) {
+        DataType t = e.getType();
+        if (t == DataType.FLOAT) {
+            return e;
+        }
+
+        if (t != null && t != DataType.INTEGER) {
+            return new ErrorExpression("Cannot cast " + t + " to float");
+        }
+
+        if (e instanceof Null || e instanceof ErrorExpression) {
+            return e;
+        }
+
+        if (e instanceof Constant) {
+            Integer value = (Integer) ((Constant) e).getValue();
+            return new Constant(value.floatValue(), DataType.FLOAT);
+        }
+
+        return new CastFloat(e);
     }
 
     @Override
@@ -29,21 +51,15 @@ public final class CastFloat implements Expression {
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
+        if (e.isComplete()) {
+            return this;
+        }
         return new CastFloat(e.rebuild(atts));
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        Object res = e.run(record, buffer);
-
-        switch (e.getType()) {
-        case INTEGER:
-            return ((Integer) res).floatValue();
-        case FLOAT:
-            return res;
-        default:
-            throw new RuntimeException("unexpected type " + e.getType());
-        }
+        return ((Integer) e.run(record, buffer)).floatValue();
     }
 
 }

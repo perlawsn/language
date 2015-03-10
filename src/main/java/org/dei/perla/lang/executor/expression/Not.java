@@ -1,9 +1,6 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
-
-import java.util.List;
 
 /**
  * @author Guido Rota 02/03/15.
@@ -27,7 +24,7 @@ public final class Not extends UnaryExpression {
         }
 
         if (e instanceof Constant) {
-            Boolean b = (Boolean) ((Constant) e).getValue();
+            Bool b = (Bool) ((Constant) e).getValue();
             if (b == null) {
                 return Null.INSTANCE;
             }
@@ -39,7 +36,7 @@ public final class Not extends UnaryExpression {
 
     @Override
     public Object doRun(DataType type, Object o) {
-        return !(Boolean) o;
+        return !(Bool) o;
     }
 
 }

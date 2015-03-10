@@ -2,7 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.expression.ComparisonOperator;
+import org.dei.perla.lang.executor.expression.ComparisonOperation;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.dei.perla.lang.parser.expression.*;
 import org.junit.Test;
@@ -149,35 +149,35 @@ public class ParserTest {
     @Test
     public void testComparisonOperator() throws Exception {
         Parser p;
-        ComparisonOperator op;
+        ComparisonOperation op;
 
         p = new Parser(new StringReader(">"));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.GT));
+        assertThat(op, equalTo(ComparisonOperation.GT));
 
         p.ReInit(new StringReader(">="));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.GE));
+        assertThat(op, equalTo(ComparisonOperation.GE));
 
         p.ReInit(new StringReader("<"));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.LT));
+        assertThat(op, equalTo(ComparisonOperation.LT));
 
         p.ReInit(new StringReader("<="));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.LE));
+        assertThat(op, equalTo(ComparisonOperation.LE));
 
         p.ReInit(new StringReader("="));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.EQ));
+        assertThat(op, equalTo(ComparisonOperation.EQ));
 
         p.ReInit(new StringReader("!="));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.NE));
+        assertThat(op, equalTo(ComparisonOperation.NE));
 
         p.ReInit(new StringReader("<>"));
         op = p.ComparisonOperator();
-        assertThat(op, equalTo(ComparisonOperator.NE));
+        assertThat(op, equalTo(ComparisonOperation.NE));
     }
 
     @Test

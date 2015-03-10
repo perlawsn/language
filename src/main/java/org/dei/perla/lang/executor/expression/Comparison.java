@@ -13,15 +13,39 @@ public final class Comparison implements Expression {
 
     private final Expression e1;
     private final Expression e2;
-    private final ComparisonOperator op;
+    private final ComparisonOperation op;
 
-    private Comparison(ComparisonOperator op, Expression e1, Expression e2) {
+    private Comparison(ComparisonOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
-    public static Expression create(ComparisonOperator op,
+    public static Expression createLT(Expression e1, Expression e2) {
+        return create(ComparisonOperation.LT, e1, e2);
+    }
+
+    public static Expression createLE(Expression e1, Expression e2) {
+        return create(ComparisonOperation.LE, e1, e2);
+    }
+
+    public static Expression createGT(Expression e1, Expression e2) {
+        return create(ComparisonOperation.GT, e1, e2);
+    }
+
+    public static Expression createGE(Expression e1, Expression e2) {
+        return create(ComparisonOperation.GE, e1, e2);
+    }
+
+    public static Expression createEQ(Expression e1, Expression e2) {
+        return create(ComparisonOperation.EQ, e1, e2);
+    }
+
+    public static Expression createNE(Expression e1, Expression e2) {
+        return create(ComparisonOperation.NE, e1, e2);
+    }
+
+    public static Expression create(ComparisonOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
@@ -30,9 +54,13 @@ public final class Comparison implements Expression {
             return new ErrorExpression("Incompatible operand types");
         }
 
-        // Defer to later rebuild if something's missing
-        if (!e1.isComplete() || !e2.isComplete()) {
-            return new Comparison(op, e1, e2);
+        if (e1 instanceof Null || e2 instanceof Null) {
+            return Null.INSTANCE;
+        }
+        if (e1 instanceof ErrorExpression) {
+            return e1;
+        } else if (e2 instanceof ErrorExpression) {
+            return e2;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -73,7 +101,7 @@ public final class Comparison implements Expression {
         return (doRun(op, o1, o2));
     }
 
-    private static Object doRun(ComparisonOperator op, Object o1, Object o2) {
+    private static Object doRun(ComparisonOperation op, Object o1, Object o2) {
         Comparable<Object> c1 = (Comparable<Object>) o1;
         Comparable<Object> c2 = (Comparable<Object>) o2;
         switch (op) {

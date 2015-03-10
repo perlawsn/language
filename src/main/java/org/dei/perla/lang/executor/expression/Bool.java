@@ -9,47 +9,39 @@ import java.util.List;
 /**
  * @author Guido Rota 10/03/15.
  */
-public final class Bitwise implements Expression {
+public final class Bool implements Expression {
 
-    private final BitwiseOperation op;
+    private final BooleanOperation op;
     private final Expression e1;
     private final Expression e2;
 
-    private Bitwise(BitwiseOperation op, Expression e1, Expression e2) {
+    private Bool(BooleanOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
     public static Expression createAND(Expression e1, Expression e2) {
-        return create(BitwiseOperation.AND, e1, e2);
+        return create(BooleanOperation.AND, e1, e2);
     }
 
     public static Expression createOR(Expression e1, Expression e2) {
-        return create(BitwiseOperation.OR, e1, e2);
+        return create(BooleanOperation.OR, e1, e2);
     }
 
     public static Expression createXOR(Expression e1, Expression e2) {
-        return create(BitwiseOperation.OR, e1, e2);
+        return create(BooleanOperation.OR, e1, e2);
     }
 
-    public static Expression createRSH(Expression e1, Expression e2) {
-        return create(BitwiseOperation.RSH, e1, e2);
-    }
-
-    public static Expression createLSH(Expression e1, Expression e2) {
-        return create(BitwiseOperation.LSH, e1, e2);
-    }
-
-    public static Expression create(BitwiseOperation op,
+    public static Expression create(BooleanOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
 
-        if (t1 != null && t1 != DataType.INTEGER ||
-                t2 != null && t2 != DataType.INTEGER) {
+        if (t1 != null && t1 != DataType.BOOLEAN ||
+                t2 != null && t2 != DataType.BOOLEAN) {
             return new ErrorExpression("Incompatible operand type: only " +
-                    "integer operands are allowed in " + op + " comparisons");
+                    "boolean operands are allowed in boolean operations");
         }
 
         if (e1 instanceof Null || e2 instanceof Null) {
@@ -67,15 +59,15 @@ public final class Bitwise implements Expression {
             if (o1 == null || o2 == null) {
                 return Null.INSTANCE;
             }
-            return new Constant(compute(op, o1, o2), DataType.INTEGER);
+            return new Constant(compute(op, o1, o2), DataType.BOOLEAN);
         }
 
-        return new Bitwise(op, e1, e2);
+        return new Bool(op, e1, e2);
     }
 
     @Override
     public DataType getType() {
-        return DataType.INTEGER;
+        return DataType.BOOLEAN;
     }
 
     @Override
@@ -85,10 +77,10 @@ public final class Bitwise implements Expression {
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        if (e1.isComplete() && e2.isComplete()) {
+        if (isComplete()) {
             return this;
         }
-        return create(op, e1.rebuild(atts), e2.rebuild(atts));
+        return new Bool(op, e1.rebuild(atts), e2.rebuild(atts));
     }
 
     @Override
@@ -98,24 +90,22 @@ public final class Bitwise implements Expression {
         return compute(op, o1, o2);
     }
 
-    private static Object compute(BitwiseOperation op, Object o1, Object o2) {
+    private static Object compute(BooleanOperation op, Object o1, Object o2) {
         if (o1 == null || o2 == null) {
             return null;
         }
 
+        Boolean b1 = (Boolean) o1;
+        Boolean b2 = (Boolean) o2;
         switch (op) {
             case AND:
-                return (Integer) o1 & (Integer) o2;
+                return b1 && b2;
             case OR:
-                return (Integer) o1 | (Integer) o2;
+                return b1 || b2;
             case XOR:
-                return (Integer) o1 ^ (Integer) o2;
-            case RSH:
-                return (Integer) o1 >> (Integer) o2;
-            case LSH:
-                return (Integer) o1 >> (Integer) o2;
+                return (b1 || b2) && !(b1 && b2);
             default:
-                throw new RuntimeException("unknown bitwise operator " + op);
+                throw new RuntimeException("unknown boolean operation " + op);
         }
     }
 
