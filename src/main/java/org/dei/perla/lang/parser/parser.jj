@@ -30,7 +30,7 @@ PARSER_BEGIN(Parser)
     import java.time.Duration;
 
     import org.dei.perla.lang.executor.statement.WindowSize;
-    import org.dei.perla.lang.parser.expression.*;
+    import org.dei.perla.lang.executor.expression.*;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -41,11 +41,11 @@ PARSER_BEGIN(Parser)
 	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
 	    }
 
-	    private static final void addIfError(Node n, Token t, Errors err) {
-	        if (!(n instanceof ErrorNode)) {
+	    private static final void addIfError(Expression e, Token t, Errors err) {
+	        if (!(e instanceof ErrorExpression)) {
 	            return;
 	        }
-	        addError(((ErrorNode) n).getError(), t, err);
+	        addError(((ErrorExpression) e).getError(), t, err);
 	    }
 
 	}
@@ -1014,50 +1014,50 @@ String ConstantString() :
 	{ return value.image; }
 }
 
-Node Constant() :
+Expression Constant() :
 {
     Object value;
 }
 {
 	(
 		ConstantNull()
-		{ return NullNode.INSTANCE; }
+		{ return Null.INSTANCE; }
 		|
 		value = ConstantBoolean()
-		{ return new ConstantNode(value, DataType.BOOLEAN); }
+		{ return new Constant(value, DataType.BOOLEAN); }
 		|
 		value = ConstantString()
-		{ return new ConstantNode(value, DataType.STRING); }
+		{ return new Constant(value, DataType.STRING); }
 		|
 		LOOKAHEAD(1)
 		value = ConstantInteger()
-		{ return new ConstantNode(value, DataType.INTEGER); }
+		{ return new Constant(value, DataType.INTEGER); }
 		|
 		value = ConstantFloat()
-		{ return new ConstantNode(value, DataType.FLOAT); }
+		{ return new Constant(value, DataType.FLOAT); }
 	)
 }
 
-ComparisonOperator ComparisonOperator() :
+ComparisonOperation ComparisonOperation() :
 {}
 {
 	<OPERATOR_GREATER>
-	{ return ComparisonOperator.GT; }
+	{ return ComparisonOperation.GT; }
 	|
 	<OPERATOR_LESS>
-	{ return ComparisonOperator.LT; }
+	{ return ComparisonOperation.LT; }
 	|
 	<OPERATOR_GREATER_EQUAL>
-	{ return ComparisonOperator.GE; }
+	{ return ComparisonOperation.GE; }
 	|
 	<OPERATOR_LESS_EQUAL>
-	{ return ComparisonOperator.LE; }
+	{ return ComparisonOperation.LE; }
 	|
 	<OPERATOR_EQUAL>
-	{ return ComparisonOperator.EQ; }
+	{ return ComparisonOperation.EQ; }
 	|
 	<OPERATOR_NOT_EQUAL>
-	{ return ComparisonOperator.NE; }
+	{ return ComparisonOperation.NE; }
 }
 
 DataType FieldType() :
@@ -1103,20 +1103,20 @@ TemporalUnit TimeUnit() :
 	{ return ChronoUnit.DAYS; }
 }
 
-AggregationOperator AggregationOperator() :
+AggregateOperation AggregateOperation() :
 {}
 {
 	<FUNCTION_AVG>
-	{ return AggregationOperator.AVG; }
+	{ return AggregateOperation.AVG; }
 	|
 	<FUNCTION_MIN>
-	{ return AggregationOperator.MIN; }
+	{ return AggregateOperation.MIN; }
 	|
 	<FUNCTION_MAX>
-	{ return AggregationOperator.MAX; }
+	{ return AggregateOperation.MAX; }
 	|
 	<FUNCTION_SUM>
-	{ return AggregationOperator.SUM; }
+	{ return AggregateOperation.SUM; }
 }
 
 Duration Duration() :
@@ -1211,11 +1211,11 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-Node Expression(boolean aggregate, Errors err) :
+Expression Expression(boolean aggregate, Errors err) :
 {
     Token t;
-    Node n;
-    Node n2 = null;
+    Expression n;
+    Expression n2 = null;
 }
 {
     { t = token; }
@@ -1227,7 +1227,7 @@ Node Expression(boolean aggregate, Errors err) :
 	{ return n; }
 }
 
-Node BooleanTerm(boolean aggregate, Errors err) :
+Expression BooleanTerm(boolean aggregate, Errors err) :
 {}
 {
 	BooleanFactor(aggregate, err)
@@ -1238,7 +1238,7 @@ Node BooleanTerm(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BooleanFactor(boolean aggregate, Errors err) :
+Expression BooleanFactor(boolean aggregate, Errors err) :
 {}
 {
 	BooleanNegation(aggregate, err)
@@ -1249,7 +1249,7 @@ Node BooleanFactor(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BooleanNegation(boolean aggregate, Errors err) :
+Expression BooleanNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
@@ -1259,7 +1259,7 @@ Node BooleanNegation(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BooleanPredicate(boolean aggregate, Errors err) :
+Expression BooleanPredicate(boolean aggregate, Errors err) :
 {}
 {
     Comparison(aggregate, err)
@@ -1273,7 +1273,7 @@ Node BooleanPredicate(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Node Is(boolean aggregate, Errors err) :
+Expression Is(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_IS>
@@ -1292,7 +1292,7 @@ Node Is(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Node Like(boolean aggregate, Errors err) :
+Expression Like(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_LIKE>
@@ -1300,7 +1300,7 @@ Node Like(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Node Between(boolean aggregate, Errors err) :
+Expression Between(boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_BETWEEN>
@@ -1310,18 +1310,18 @@ Node Between(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Node Comparison(boolean aggregate, Errors err) :
+Expression Comparison(boolean aggregate, Errors err) :
 {}
 {
     BitwiseExpression(aggregate, err)
     [
-        ComparisonOperator()
+        ComparisonOperation()
         BitwiseExpression(aggregate, err)
     ]
     { return null; }
 }
 
-Node BitwiseExpression(boolean aggregate, Errors err) :
+Expression BitwiseExpression(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseTerm(aggregate, err)
@@ -1332,7 +1332,7 @@ Node BitwiseExpression(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BitwiseTerm(boolean aggregate, Errors err) :
+Expression BitwiseTerm(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseFactor(aggregate, err)
@@ -1343,7 +1343,7 @@ Node BitwiseTerm(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BitwiseFactor(boolean aggregate, Errors err) :
+Expression BitwiseFactor(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseShift(aggregate, err)
@@ -1354,7 +1354,7 @@ Node BitwiseFactor(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BitwiseShift(boolean aggregate, Errors err) :
+Expression BitwiseShift(boolean aggregate, Errors err) :
 {}
 {
 	BitwiseNegation(aggregate, err)
@@ -1369,7 +1369,7 @@ Node BitwiseShift(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node BitwiseNegation(boolean aggregate, Errors err) :
+Expression BitwiseNegation(boolean aggregate, Errors err) :
 {}
 {
 	(
@@ -1379,7 +1379,7 @@ Node BitwiseNegation(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node ArithmeticExpression(boolean aggregate, Errors err) :
+Expression ArithmeticExpression(boolean aggregate, Errors err) :
 {}
 {
 	ArithmeticTerm(aggregate, err)
@@ -1394,7 +1394,7 @@ Node ArithmeticExpression(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node ArithmeticTerm(boolean aggregate, Errors err) :
+Expression ArithmeticTerm(boolean aggregate, Errors err) :
 {}
 {
 	ArithmeticFactor(aggregate, err)
@@ -1409,7 +1409,7 @@ Node ArithmeticTerm(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node ArithmeticFactor(boolean aggregate, Errors err) :
+Expression ArithmeticFactor(boolean aggregate, Errors err) :
 {}
 {
 	[
@@ -1419,43 +1419,43 @@ Node ArithmeticFactor(boolean aggregate, Errors err) :
 	{ return null; }
 }
 
-Node PrimaryExpression(boolean aggregate, Errors err) :
+Expression PrimaryExpression(boolean aggregate, Errors err) :
 {
     String s;
-    Node n;
+    Expression e;
 }
 {
-	n = Constant()
-	{ return n; }
+	e = Constant()
+	{ return e; }
 	|
-	n = ExistsAttribute()
-	{ return n; }
+	e = ExistsAttribute()
+	{ return e; }
 	|
 	"("
-	n = Expression(aggregate, err)
+	e = Expression(aggregate, err)
 	")"
-	{ return n; }
+	{ return e; }
 	|
 	LOOKAHEAD( { aggregate } )
 	(
 		<KEYWORD_GROUPTS>
-		{ return new GroupTSNode(); }
+		{ return new GroupTS(); }
 		|
-		n = Aggregate(err)
-		{ return n; }
+		e = Aggregate(err)
+		{ return e; }
 		|
 		s = Identifier() // FPC attribute
-		{ return new FieldNode(s); }
+		{ return new Field(s); }
 	)
 	|
 	LOOKAHEAD( { !aggregate } )
 	(
 		s = Identifier() // FPC attribute
-		{ return new FieldNode(s); }
+		{ return new Field(s); }
 	)
 }
 
-Node ExistsAttribute() :
+Expression ExistsAttribute() :
 {}
 {
 	<KEYWORD_EXISTS>
@@ -1469,23 +1469,23 @@ Node ExistsAttribute() :
 	{ return null; }
 }
 
-Node Aggregate(Errors err) :
+Expression Aggregate(Errors err) :
 {
     Token t;
 
-    AggregationOperator op;
-    Node exp = null;
+    AggregateOperation op;
+    Expression exp = null;
     WindowSize ws;
-    Node filter = null;
+    Expression filter = null;
 
-    Node n;
+    Expression n;
 }
 {
     (
         (
         <FUNCTION_COUNT>
         { t = token; }
-        { op = AggregationOperator.COUNT; }
+        { op = AggregateOperation.COUNT; }
         "("
         "*"
         ","
@@ -1498,7 +1498,7 @@ Node Aggregate(Errors err) :
         )
         |
         (
-        op = AggregationOperator()
+        op = AggregateOperation()
         { t = token; }
         "("
         exp = Expression(false, err)
@@ -1512,7 +1512,7 @@ Node Aggregate(Errors err) :
         )
     )
     {
-        n = AggregateNode.create(op, exp, ws, filter);
+        n = Aggregate.create(op, exp, ws, filter);
         addIfError(n, t, err);
         return n;
     }

@@ -2,9 +2,10 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.expression.AggregateOperation;
 import org.dei.perla.lang.executor.expression.ComparisonOperation;
+import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.statement.WindowSize;
-import org.dei.perla.lang.parser.expression.*;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -98,11 +99,11 @@ public class ParserTest {
     @Test
     public void testConstant() throws Exception {
         Parser p;
-        Node n;
+        Expression e;
         ConstantNode cn;
 
         p = new Parser(new StringReader("null"));
-        n = p.Constant();
+        e = p.Constant();
         assertTrue(n instanceof NullNode);
 
         p.ReInit(new StringReader("false"));
@@ -254,23 +255,23 @@ public class ParserTest {
     @Test
     public void testAggregationOperation() throws Exception {
         Parser p;
-        AggregationOperator op;
+        AggregateOperation op;
 
         p = new Parser(new StringReader("min"));
         op = p.AggregationOperator();
-        assertThat(op, equalTo(AggregationOperator.MIN));
+        assertThat(op, equalTo(AggregateOperation.MIN));
 
         p.ReInit(new StringReader("max"));
         op = p.AggregationOperator();
-        assertThat(op, equalTo(AggregationOperator.MAX));
+        assertThat(op, equalTo(AggregateOperation.MAX));
 
         p.ReInit(new StringReader("sum"));
         op = p.AggregationOperator();
-        assertThat(op, equalTo(AggregationOperator.SUM));
+        assertThat(op, equalTo(AggregateOperation.SUM));
 
         p.ReInit(new StringReader("avg"));
         op = p.AggregationOperator();
-        assertThat(op, equalTo(AggregationOperator.AVG));
+        assertThat(op, equalTo(AggregateOperation.AVG));
     }
 
     @Test
@@ -449,7 +450,7 @@ public class ParserTest {
         n = p.Aggregate(err);
         assertTrue(n instanceof AggregateNode);
         an = (AggregateNode) n;
-        assertThat(an.getAggregation(), equalTo(AggregationOperator.COUNT));
+        assertThat(an.getAggregation(), equalTo(AggregateOperation.COUNT));
         assertThat(an.getOperand(), nullValue());
         assertThat(an.getWindowSize(), equalTo(new WindowSize(10)));
         assertThat(an.getFilter(), nullValue());
@@ -458,7 +459,7 @@ public class ParserTest {
         n = p.Aggregate(err);
         assertTrue(n instanceof AggregateNode);
         an = (AggregateNode) n;
-        assertThat(an.getAggregation(), equalTo(AggregationOperator.COUNT));
+        assertThat(an.getAggregation(), equalTo(AggregateOperation.COUNT));
         assertThat(an.getOperand(), nullValue());
         assertThat(an.getWindowSize(),
                 equalTo(new WindowSize(Duration.ofSeconds(10))));

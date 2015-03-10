@@ -11,12 +11,6 @@ import java.util.List;
  */
 public final class GroupTS implements Expression {
 
-    private final int tsIdx;
-
-    public GroupTS(int tsIdx) {
-        this.tsIdx = tsIdx;
-    }
-
     @Override
     public DataType getType() {
         return DataType.TIMESTAMP;
@@ -24,24 +18,33 @@ public final class GroupTS implements Expression {
 
     @Override
     public boolean isComplete() {
-        return true;
+        return false;
     }
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
+        int i = 0;
+        for (Attribute a : atts) {
+            if (a == Attribute.TIMESTAMP) {
+                return new ConcreteGroupTS(i);
+            }
+            i++;
+        }
         return this;
-    }
-
-    public int getIndex() {
-        return tsIdx;
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        return buffer.get(0)[tsIdx];
+        return null;
     }
 
-    private static final class IncompleteGroupTS implements Expression {
+    private static final class ConcreteGroupTS implements Expression {
+
+        private final int tsIdx;
+
+        private ConcreteGroupTS(int tsIdx) {
+            this.tsIdx = tsIdx;
+        }
 
         @Override
         public DataType getType() {
@@ -50,24 +53,17 @@ public final class GroupTS implements Expression {
 
         @Override
         public boolean isComplete() {
-            return false;
+            return true;
         }
 
         @Override
         public Expression rebuild(List<Attribute> atts) {
-            int i = 0;
-            for (Attribute a : atts) {
-                if (a == Attribute.TIMESTAMP) {
-                    return new GroupTS(i);
-                }
-                i++;
-            }
             return this;
         }
 
         @Override
         public Object run(Object[] record, BufferView buffer) {
-            return null;
+            return buffer.get(0)[tsIdx];
         }
 
     }

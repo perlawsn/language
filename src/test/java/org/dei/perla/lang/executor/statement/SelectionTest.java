@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectionTest {
 
+    private static Attribute tsAtt = Attribute.TIMESTAMP;
     private static Attribute integerAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static Attribute stringAtt =
@@ -34,20 +35,27 @@ public class SelectionTest {
 
     private static BufferView view;
 
-    private static Expression tsExpr = new Field(0, DataType.TIMESTAMP);
-    private static Expression intExpr = new Field(1, DataType.INTEGER);
-    private static Expression stringExpr = new Field(2, DataType.STRING);
-    private static Expression floatExpr = new Field(3, DataType.FLOAT);
+    private static List<Attribute> atts;
+
+    private static Expression tsExpr;
+    private static Expression intExpr;
+    private static Expression stringExpr;
+    private static Expression floatExpr;
 
     @BeforeClass
     public static void setupBuffer() {
         Attribute[] as = new Attribute[] {
-                Attribute.TIMESTAMP,
+                tsAtt,
                 integerAtt,
                 stringAtt,
                 floatAtt
         };
-        List<Attribute> atts = Arrays.asList(as);
+        atts = Arrays.asList(as);
+
+        tsExpr = new Field(tsAtt.getId()).rebuild(atts);
+        intExpr = new Field(integerAtt.getId()).rebuild(atts);
+        stringExpr = new Field(stringAtt.getId()).rebuild(atts);
+        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{
@@ -318,7 +326,7 @@ public class SelectionTest {
     public void groupByTimestamp() throws InterruptedException {
         List<Expression> sel = new ArrayList<>();
         sel.add(tsExpr);
-        sel.add(new GroupTS(0));
+        sel.add(new GroupTS());
         sel.add(intExpr);
 
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);

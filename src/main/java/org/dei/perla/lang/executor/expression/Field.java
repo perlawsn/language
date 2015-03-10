@@ -11,75 +11,67 @@ import java.util.List;
  */
 public final class Field implements Expression {
 
-    private final DataType type;
-    private final int idx;
+    private final String id;
 
-    public Field(int idx, DataType type) {
-        this.idx = idx;
-        this.type = type;
-    }
-
-    public static Expression create(String id) {
-        return new IncompleteField(id);
+    public Field(String id) {
+        this.id = id;
     }
 
     @Override
     public DataType getType() {
-        return type;
+        return null;
     }
 
     @Override
     public boolean isComplete() {
-        return true;
+        return false;
     }
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
+        int i = 0;
+        for (Attribute a : atts) {
+            if (a.getId().equals(id)) {
+                return new ConcreteField(i, a.getType());
+            }
+            i++;
+        }
         return this;
-    }
-
-    public int getIndex() {
-        return idx;
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        return record[idx];
+        return null;
     }
 
-    private static final class IncompleteField implements Expression {
+    private static final class ConcreteField implements Expression {
 
-        private final String id;
+        private final DataType type;
+        private final int idx;
 
-        private IncompleteField(String id) {
-            this.id = id;
+        private ConcreteField(int idx, DataType type) {
+            this.idx = idx;
+            this.type = type;
         }
 
         @Override
         public DataType getType() {
-            return null;
+            return type;
         }
 
         @Override
         public boolean isComplete() {
-            return false;
+            return true;
         }
 
         @Override
         public Expression rebuild(List<Attribute> atts) {
-            int i = 0;
-            for (Attribute a : atts) {
-                if (a.getId().equals(id)) {
-                    return new Field(i, a.getType());
-                }
-                i++;
-            }
             return this;
         }
 
         @Override
         public Object run(Object[] record, BufferView buffer) {
-            return null;
+            return record[idx];
         }
 
     }

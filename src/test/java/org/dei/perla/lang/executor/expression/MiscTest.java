@@ -15,7 +15,9 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guido Rota 23/02/15.
@@ -29,6 +31,8 @@ public class MiscTest {
     private static Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
 
+    private static List<Attribute> atts;
+
     private static BufferView view;
 
     @BeforeClass
@@ -39,7 +43,7 @@ public class MiscTest {
                 stringAtt,
                 floatAtt
         };
-        List<Attribute> atts = Arrays.asList(as);
+        atts = Arrays.asList(as);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
@@ -64,7 +68,7 @@ public class MiscTest {
     public void castFloat() {
         Constant cInt = new Constant(1, DataType.INTEGER);
         Constant cFloat = new Constant(1.2f, DataType.FLOAT);
-        Field fFloat = new Field(3, DataType.FLOAT);
+        Expression fFloat = new Field(floatAtt.getId()).rebuild(atts);
 
         Expression cast = CastFloat.create(cInt);
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
@@ -93,12 +97,18 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        Field fi = new Field(1, integerAtt.getType());
+        Expression fi = new Field(integerAtt.getId());
+        assertFalse(fi.isComplete());
+        fi = fi.rebuild(atts);
+        assertTrue(fi.isComplete());
         assertThat(fi.getType(), equalTo(DataType.INTEGER));
         assertThat(fi.run(view.get(0), view), equalTo(4));
         assertThat(fi.run(view.get(1), view), equalTo(3));
 
-        Field fs = new Field(2, stringAtt.getType());
+        Expression fs = new Field(stringAtt.getId());
+        assertFalse(fs.isComplete());
+        fs = fs.rebuild(atts);
+        assertTrue(fi.isComplete());
         assertThat(fs.getType(), equalTo(DataType.STRING));
         assertThat(fs.run(view.get(0), view), equalTo("4"));
         assertThat(fs.run(view.get(1), view), equalTo("3"));
@@ -106,7 +116,10 @@ public class MiscTest {
 
     @Test
     public void groupTSTest() {
-        Expression gts = new GroupTS(0);
+        Expression gts = new GroupTS();
+        assertFalse(gts.isComplete());
+        gts = gts.rebuild(atts);
+        assertTrue(gts.isComplete());
         assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
         assertThat(gts.run(null, view), equalTo(view.get(0)[0]));
     }

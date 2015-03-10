@@ -45,6 +45,24 @@ public abstract class Aggregate implements Expression {
         this.type = type;
     }
 
+    public static Expression create(AggregateOperation op, Expression e,
+            WindowSize ws, Expression filter) {
+        switch (op) {
+            case AVG:
+                return AvgAggregate.create(e, ws, filter);
+            case MIN:
+                return MinAggregate.create(e, ws, filter);
+            case MAX:
+                return MaxAggregate.create(e, ws, filter);
+            case SUM:
+                return SumAggregate.create(e, ws, filter);
+            case COUNT:
+                return CountAggregate.create(ws, filter);
+            default:
+                throw new RuntimeException("unknown aggregate " + op);
+        }
+    }
+
     public static Expression createAvg(Expression e, WindowSize ws,
             Expression filter) {
         return AvgAggregate.create(e, ws, filter);

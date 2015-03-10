@@ -527,8 +527,8 @@ public class ArrayBufferTest {
 
         count.value = 0;
         sub = v.subView(11);
-        Expression where = Comparison.createGT(new Field(1, DataType.INTEGER),
-                new Constant(5, DataType.INTEGER));
+        Expression where = Comparison.createGT(new Field("integer"),
+                new Constant(5, DataType.INTEGER)).rebuild(atts);
         sub.forEach((r, view) -> count.value++, where);
         assertThat(count.value, equalTo(5));
         sub.release();

@@ -10,12 +10,16 @@ import java.util.List;
  * @author Guido Rota 09/03/15.
  */
 
-final public class ErrorExpression implements Expression {
+public final class ErrorExpression implements Expression {
 
     private final String error;
 
     public ErrorExpression(String error) {
         this.error = error;
+    }
+
+    public String getError() {
+        return error;
     }
 
     @Override

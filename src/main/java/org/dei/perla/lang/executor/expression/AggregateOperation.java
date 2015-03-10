@@ -1,9 +1,9 @@
-package org.dei.perla.lang.parser;
+package org.dei.perla.lang.executor.expression;
 
 /**
  * @author Guido Rota 05/03/15.
  */
-public enum AggregationOperator {
+public enum AggregateOperation {
 
     MIN,
     MAX,
