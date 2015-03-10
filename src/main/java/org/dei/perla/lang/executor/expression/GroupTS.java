@@ -24,17 +24,12 @@ public final class GroupTS implements Expression {
 
     @Override
     public boolean isComplete() {
-        return false;
-    }
-
-    @Override
-    public boolean hasError() {
-        return false;
+        return true;
     }
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        return null;
+        return this;
     }
 
     public int getIndex() {
@@ -44,6 +39,37 @@ public final class GroupTS implements Expression {
     @Override
     public Object run(Object[] record, BufferView buffer) {
         return buffer.get(0)[tsIdx];
+    }
+
+    private static final class IncompleteGroupTS implements Expression {
+
+        @Override
+        public DataType getType() {
+            return DataType.TIMESTAMP;
+        }
+
+        @Override
+        public boolean isComplete() {
+            return false;
+        }
+
+        @Override
+        public Expression rebuild(List<Attribute> atts) {
+            int i = 0;
+            for (Attribute a : atts) {
+                if (a == Attribute.TIMESTAMP) {
+                    return new GroupTS(i);
+                }
+                i++;
+            }
+            return this;
+        }
+
+        @Override
+        public Object run(Object[] record, BufferView buffer) {
+            return null;
+        }
+
     }
 
 }
