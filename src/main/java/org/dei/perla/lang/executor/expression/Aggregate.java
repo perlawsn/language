@@ -1,10 +1,12 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * General template for the implementation of an aggregation {@link Expression}.
@@ -23,36 +25,49 @@ import java.time.Instant;
  */
 public abstract class Aggregate implements Expression {
 
-    protected final Expression op;
+    protected final Expression e;
     protected final WindowSize ws;
     protected final Expression filter;
     protected final DataType type;
 
-    public Aggregate(Expression op, WindowSize ws, Expression filter) {
-        this.op = op;
+    protected Aggregate(Expression e, WindowSize ws, Expression filter) {
+        this.e = e;
         this.ws = ws;
         this.filter = filter;
-        type = op.getType();
+        this.type = e.getType();
     }
 
-    public Aggregate(Expression op, WindowSize ws, Expression filter,
+    protected Aggregate(Expression e, WindowSize ws, Expression filter,
             DataType type) {
-        this.op = op;
+        this.e = e;
         this.ws = ws;
         this.filter = filter;
         this.type = type;
     }
 
-    public Expression getOperand() {
-        return op;
+    public static Expression createAverage(Expression e, WindowSize ws,
+            Expression filter) {
+        return AvgAggregate.create(e, ws, filter);
     }
 
-    public WindowSize getWindowSize() {
-        return this.ws;
+    public static Expression createMin(Expression e, WindowSize ws,
+            Expression filter) {
+        return MinAggregate.create(e, ws, filter);
     }
 
-    public Expression getFilter() {
-        return filter;
+    public static Expression createMax(Expression e, WindowSize ws,
+            Expression filter) {
+        return MaxAggregate.create(e, ws, filter);
+    }
+
+    public static Expression createSum(Expression e, WindowSize ws,
+            Expression filter) {
+        return SumAggregate.create(e, ws, filter);
+    }
+
+    public static Expression createCount(WindowSize ws,
+            Expression filter) {
+        return CountAggregate.create(ws, filter);
     }
 
     @Override
@@ -61,16 +76,21 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
+    public boolean isComplete() {
+        return e.isComplete() && filter.isComplete();
+    }
+
+    @Override
     public final Object run(Object[] record, BufferView view) {
         Object res;
 
         if (ws.getSamples() > 0) {
             view = view.subView(ws.getSamples());
-            res = doRun(view);
+            res = compute(view);
             view.release();
         } else if (ws.getDuration() != null) {
             view = view.subView(ws.getDuration());
-            res = doRun(view);
+            res = compute(view);
             view.release();
         } else {
             throw new RuntimeException("invalid window size");
@@ -79,7 +99,7 @@ public abstract class Aggregate implements Expression {
         return res;
     }
 
-    protected abstract Object doRun(BufferView view);
+    protected abstract Object compute(BufferView view);
 
     /**
      * A simple wrapper class employed to allow the modification of final

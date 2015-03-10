@@ -7,20 +7,21 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
- * @author Guido Rota 02/03/15.
+ * @author Guido Rota 27/02/15.
  */
-public final class Not implements Expression {
+public final class BitwiseNot implements Expression {
 
     private final Expression e;
 
-    private Not(Expression e) {
+    private BitwiseNot(Expression e) {
         this.e = e;
     }
 
     public static Expression create(Expression e) {
-        if (e.getType() != null && e.getType() != DataType.BOOLEAN) {
+        DataType t = e.getType();
+        if (t != null && t != DataType.INTEGER) {
             return new ErrorExpression("Incompatible operand type: only " +
-                    "boolean values are allowed");
+                    "integer values are allowed in bitwise not operations");
         }
 
         if (e instanceof Null) {
@@ -31,19 +32,19 @@ public final class Not implements Expression {
         }
 
         if (e instanceof Constant) {
-            Boolean b = (Boolean) ((Constant) e).getValue();
-            if (b == null) {
+            Object o = ((Constant) e).getValue();
+            if (o == null) {
                 return Null.INSTANCE;
             }
-            return new Constant(!b, DataType.BOOLEAN);
+            return new Constant(~(Integer) o, t);
         }
 
-        return new Not(e);
+        return new BitwiseNot(e);
     }
 
     @Override
     public DataType getType() {
-        return DataType.BOOLEAN;
+        return e.getType();
     }
 
     @Override
@@ -56,16 +57,16 @@ public final class Not implements Expression {
         if (e.isComplete()) {
             return this;
         }
-        return create(e);
+        return create(e.rebuild(atts));
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        Boolean b = (Boolean) e.run(record, buffer);
-        if (b == null) {
+        Object o = e.run(record, buffer);
+        if (o == null) {
             return null;
         }
-        return !b;
+        return ~(Integer) o;
     }
 
 }

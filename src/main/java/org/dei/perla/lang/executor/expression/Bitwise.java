@@ -41,6 +41,10 @@ public final class Bitwise implements Expression {
         return create(BitwiseOperation.LSH, e1, e2);
     }
 
+    public static Expression createNOT(Expression e) {
+        return BitwiseNot.create(e);
+    }
+
     public static Expression create(BitwiseOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -85,7 +89,7 @@ public final class Bitwise implements Expression {
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        if (e1.isComplete() && e2.isComplete()) {
+        if (isComplete()) {
             return this;
         }
         return create(op, e1.rebuild(atts), e2.rebuild(atts));

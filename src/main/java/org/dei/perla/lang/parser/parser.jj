@@ -349,7 +349,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< OPERATOR_BITWISE_NOT: "!" >
+	< OPERATOR_BITWISE_NOT: "~" >
     |
 	< OPERATOR_BITWISE_LSH: "<<" >
     |

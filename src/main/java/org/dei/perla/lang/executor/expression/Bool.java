@@ -33,6 +33,10 @@ public final class Bool implements Expression {
         return create(BooleanOperation.OR, e1, e2);
     }
 
+    public static Expression createNOT(Expression e) {
+        return Not.create(e);
+    }
+
     public static Expression create(BooleanOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -80,7 +84,7 @@ public final class Bool implements Expression {
         if (isComplete()) {
             return this;
         }
-        return new Bool(op, e1.rebuild(atts), e2.rebuild(atts));
+        return create(op, e1.rebuild(atts), e2.rebuild(atts));
     }
 
     @Override

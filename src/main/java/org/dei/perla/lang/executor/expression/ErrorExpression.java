@@ -29,11 +29,6 @@ final public class ErrorExpression implements Expression {
     }
 
     @Override
-    public boolean hasError() {
-        return true;
-    }
-
-    @Override
     public Expression rebuild(List<Attribute> atts) {
         return this;
     }

@@ -44,6 +44,10 @@ public final class Arithmetic implements Expression {
         return create(ArithmeticOperation.MODULO, e1, e2);
     }
 
+    public static Expression createInverse(Expression e) {
+        return Inverse.create(e);
+    }
+
     public static Expression create(ArithmeticOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -107,7 +111,7 @@ public final class Arithmetic implements Expression {
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        if (e1.isComplete() && e2.isComplete()) {
+        if (isComplete()) {
             return this;
         }
         return create(op, e1.rebuild(atts), e2.rebuild(atts));

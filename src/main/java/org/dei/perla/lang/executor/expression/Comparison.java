@@ -87,7 +87,10 @@ public final class Comparison implements Expression {
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        return null;
+        if (isComplete()) {
+            return this;
+        }
+        return new Comparison(op, e1.rebuild(atts), e2.rebuild(atts));
     }
 
     @Override
