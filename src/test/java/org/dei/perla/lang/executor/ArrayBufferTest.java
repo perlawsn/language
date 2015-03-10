@@ -3,10 +3,10 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
+import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.Field;
-import org.dei.perla.lang.executor.expression.Greater;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -527,7 +527,7 @@ public class ArrayBufferTest {
 
         count.value = 0;
         sub = v.subView(11);
-        Expression where = new Greater(new Field(1, DataType.INTEGER),
+        Expression where = Comparison.createGT(new Field(1, DataType.INTEGER),
                 new Constant(5, DataType.INTEGER));
         sub.forEach((r, view) -> count.value++, where);
         assertThat(count.value, equalTo(5));

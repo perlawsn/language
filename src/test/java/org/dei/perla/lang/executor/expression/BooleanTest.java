@@ -21,68 +21,96 @@ public class BooleanTest {
 
     @Test
     public void testNot() {
-        Object res = new Not(trueExpr).run(null, null);
+        Expression not = Bool.createNOT(trueExpr);
+        assertTrue(not.isComplete());
+        Object res = not.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
-        res = new Not(falseExpr).run(null, null);
+        not = Bool.createNOT(falseExpr);
+        assertTrue(not.isComplete());
+        res = not.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
     }
 
     @Test
     public void testAnd() {
-        Object res = new And(trueExpr, trueExpr).run(null, null);
+        Expression and = Bool.createAND(trueExpr, trueExpr);
+        assertTrue(and.isComplete());
+        Object res = and.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new And(falseExpr, trueExpr).run(null, null);
+        and = Bool.createAND(falseExpr, trueExpr);
+        assertTrue(and.isComplete());
+        res = res = and.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
-        res = new And(trueExpr, falseExpr).run(null, null);
+        and = Bool.createAND(trueExpr, falseExpr);
+        assertTrue(and.isComplete());
+        res = res = and.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
-        res = new And(falseExpr, falseExpr).run(null, null);
+        and = Bool.createAND(falseExpr, falseExpr);
+        assertTrue(and.isComplete());
+        res = res = and.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }
 
     @Test
     public void testOr() {
-        Object res = new Or(trueExpr, trueExpr).run(null, null);
+        Expression or = Bool.createOR(trueExpr, trueExpr);
+        assertTrue(or.isComplete());
+        Object res = or.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new Or(falseExpr, trueExpr).run(null, null);
+        or = Bool.createOR(falseExpr, trueExpr);
+        assertTrue(or.isComplete());
+        res = or.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new Or(trueExpr, falseExpr).run(null, null);
+        or = Bool.createOR(trueExpr, falseExpr);
+        assertTrue(or.isComplete());
+        res = or.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new Or(falseExpr, falseExpr).run(null, null);
+        or = Bool.createOR(falseExpr, falseExpr);
+        assertTrue(or.isComplete());
+        res = or.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }
 
     @Test
     public void testXor() {
-        Object res = new Xor(trueExpr, trueExpr).run(null, null);
+        Expression xor = Bool.createXOR(trueExpr, trueExpr);
+        assertTrue(xor.isComplete());
+        Object res = xor.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
 
-        res = new Xor(falseExpr, trueExpr).run(null, null);
+        xor = Bool.createXOR(falseExpr, trueExpr);
+        assertTrue(xor.isComplete());
+        res = xor.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new Xor(trueExpr, falseExpr).run(null, null);
+        xor = Bool.createXOR(trueExpr, falseExpr);
+        assertTrue(xor.isComplete());
+        res = xor.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(true));
 
-        res = new Xor(falseExpr, falseExpr).run(null, null);
+        xor = Bool.createXOR(falseExpr, falseExpr);
+        assertTrue(xor.isComplete());
+        res = xor.run(null, null);
         assertTrue(res instanceof Bool);
         assertThat(res, equalTo(false));
     }

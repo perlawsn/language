@@ -5,7 +5,7 @@ package org.dei.perla.lang.executor.expression;
  */
 public enum ArithmeticOperation {
 
-    SUM("+"),
+    ADDITION("+"),
     SUBTRACTION("-"),
     PRODUCT("*"),
     DIVISION("/"),

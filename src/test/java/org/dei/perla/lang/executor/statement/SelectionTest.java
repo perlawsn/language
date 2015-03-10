@@ -96,7 +96,7 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, new WindowSize(3), null));
+        sel.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
 
         Selection dm = new Selection(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
@@ -180,7 +180,7 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, new WindowSize(5), null));
+        sel.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
 
         WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, null, null);
@@ -212,7 +212,7 @@ public class SelectionTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        Expression having = new NotEqual(intExpr,
+        Expression having = Comparison.createNE(intExpr,
                 new Constant(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
@@ -250,9 +250,9 @@ public class SelectionTest {
         sel.add(intExpr);
         sel.add(stringExpr);
         sel.add(floatExpr);
-        sel.add(new SumAggregate(intExpr, new WindowSize(5), null));
+        sel.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
 
-        Expression having = new NotEqual(intExpr,
+        Expression having = Comparison.createNE(intExpr,
                 new Constant(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
@@ -293,7 +293,7 @@ public class SelectionTest {
         sel.add(tsExpr);
         sel.add(intExpr);
 
-        Expression having = new Equal(intExpr,
+        Expression having = Comparison.createNE(intExpr,
                 new Constant(10, DataType.INTEGER));
 
         Object[] def = new Object[2];

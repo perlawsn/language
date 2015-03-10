@@ -45,7 +45,7 @@ public abstract class Aggregate implements Expression {
         this.type = type;
     }
 
-    public static Expression createAverage(Expression e, WindowSize ws,
+    public static Expression createAvg(Expression e, WindowSize ws,
             Expression filter) {
         return AvgAggregate.create(e, ws, filter);
     }

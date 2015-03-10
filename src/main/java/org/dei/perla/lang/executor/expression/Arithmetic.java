@@ -24,8 +24,8 @@ public final class Arithmetic implements Expression {
         this.type = type;
     }
 
-    public static Expression createSum(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.SUM, e1, e2);
+    public static Expression createAddition(Expression e1, Expression e2) {
+        return create(ArithmeticOperation.ADDITION, e1, e2);
     }
 
     public static Expression createSubtraction(Expression e1, Expression e2) {
@@ -140,7 +140,7 @@ public final class Arithmetic implements Expression {
         }
 
         switch(op) {
-            case SUM:
+            case ADDITION:
                 return (Integer) o1 + (Integer) o2;
             case SUBTRACTION:
                 return (Integer) o1 - (Integer) o2;
@@ -162,7 +162,7 @@ public final class Arithmetic implements Expression {
         }
 
         switch(op) {
-            case SUM:
+            case ADDITION:
                 return (Float) o1 + (Float) o2;
             case SUBTRACTION:
                 return (Float) o1 - (Float) o2;

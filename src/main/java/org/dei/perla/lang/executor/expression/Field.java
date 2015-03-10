@@ -14,7 +14,7 @@ public final class Field implements Expression {
     private final DataType type;
     private final int idx;
 
-    private Field(int idx, DataType type) {
+    public Field(int idx, DataType type) {
         this.idx = idx;
         this.type = type;
     }

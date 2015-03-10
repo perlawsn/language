@@ -13,7 +13,7 @@ public final class GroupTS implements Expression {
 
     private final int tsIdx;
 
-    private GroupTS(int tsIdx) {
+    public GroupTS(int tsIdx) {
         this.tsIdx = tsIdx;
     }
 

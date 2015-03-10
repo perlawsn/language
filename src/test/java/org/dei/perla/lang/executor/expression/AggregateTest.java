@@ -58,227 +58,267 @@ public class AggregateTest {
 
     @Test
     public void testIntegerSum() {
-        SumAggregate sum = new SumAggregate(intExpr, new WindowSize(5), null);
+        SumAggregate sum = (SumAggregate) Aggregate.createSum(intExpr, new
+                WindowSize(5), null);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
+        assertTrue(sum.isComplete());
         Object res = sum.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(10));
 
-        sum = new SumAggregate(intExpr, new WindowSize(3), null);
+        sum = (SumAggregate) Aggregate.createSum (intExpr, new WindowSize(3),
+                null);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
+        assertTrue(sum.isComplete());
         res = sum.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(9));
 
-        Expression filter = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        sum = new SumAggregate(intExpr, new WindowSize(5), filter);
+        sum = (SumAggregate) Aggregate.createSum(intExpr, new WindowSize(5),
+                filter);
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
+        assertTrue(sum.isComplete());
         res = sum.run(null, view);
         assertThat(res, equalTo(7));
     }
 
     @Test
     public void testFloatSum() {
-        SumAggregate sum = new SumAggregate(floatExpr, new WindowSize(5), null);
+        SumAggregate sum = (SumAggregate) Aggregate.createSum(floatExpr, new
+                WindowSize(5), null);
+        assertThat(sum.getType(), equalTo(DataType.FLOAT));
+        assertTrue(sum.isComplete());
         Object res = sum.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(11f));
 
-        sum = new SumAggregate(floatExpr, new WindowSize(3), null);
+        sum = (SumAggregate) Aggregate.createSum(floatExpr, new WindowSize(3),
+                null);
+        assertThat(sum.getType(), equalTo(DataType.FLOAT));
+        assertTrue(sum.isComplete());
         res = sum.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(9.9f));
 
-        Expression filter = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        sum = new SumAggregate(floatExpr, new WindowSize(5), filter);
+        sum = (SumAggregate) Aggregate.createSum(floatExpr, new WindowSize(5),
+                filter);
+        assertThat(sum.getType(), equalTo(DataType.FLOAT));
+        assertTrue(sum.isComplete());
         res = sum.run(null, view);
         assertThat(res, equalTo(7.7f));
     }
 
     @Test
     public void testIntegerAvg() {
-        AvgAggregate avg = new AvgAggregate(intExpr, new WindowSize(5), null);
+        AvgAggregate avg = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(5), null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
+        assertTrue(avg.isComplete());
         Object res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2f));
 
-        avg = new AvgAggregate(intExpr, new WindowSize(3), null);
+        avg = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(3), null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
+        assertTrue(avg.isComplete());
         res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3f));
 
-        Expression filter = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        avg = new AvgAggregate(intExpr, new WindowSize(5), filter);
+        avg = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(5), filter);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
+        assertTrue(avg.isComplete());
         res = avg.run(null, view);
         assertThat(res, equalTo(7f / 2));
     }
 
     @Test
     public void testFloatAvg() {
-        AvgAggregate avg = new AvgAggregate(floatExpr, new WindowSize(5), null);
+        AvgAggregate avg = (AvgAggregate) Aggregate.createAvg(floatExpr, new WindowSize(5), null);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
+        assertTrue(avg.isComplete());
         Object res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(11f / 5));
 
-        avg = new AvgAggregate(floatExpr, new WindowSize(3), null);
+        avg = (AvgAggregate) Aggregate.createAvg(floatExpr, new WindowSize(3), null);
         res = avg.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3.3f));
 
-        Expression filter = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        avg = new AvgAggregate(floatExpr, new WindowSize(5), filter);
+        avg = (AvgAggregate) Aggregate.createAvg(floatExpr, new WindowSize(5), filter);
         res = avg.run(null, view);
         assertThat(res, equalTo(7.7f / 2));
     }
 
     @Test
     public void testIntegerMin() {
-        MinAggregate min = new MinAggregate(intExpr, new WindowSize(5), null);
+        MinAggregate min = (MinAggregate) Aggregate.createMin(intExpr, new WindowSize(5), null);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
+        assertTrue(min.isComplete());
         Object res = min.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(0));
 
-        min = new MinAggregate(intExpr, new WindowSize(3), null);
+        min = (MinAggregate) Aggregate.createMin(intExpr, new WindowSize(3), null);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(2));
 
-        Expression filter = new Greater(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        min = new MinAggregate(intExpr, new WindowSize(5), filter);
+        min = (MinAggregate) Aggregate.createMin(intExpr, new WindowSize(5), filter);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertThat(res, equalTo(3));
     }
 
     @Test
     public void testFloatMin() {
-        MinAggregate min = new MinAggregate(floatExpr, new WindowSize(5), null);
+        MinAggregate min = (MinAggregate) Aggregate.createMin(floatExpr, new WindowSize(5), null);
         assertThat(min.getType(), equalTo(DataType.FLOAT));
+        assertTrue(min.isComplete());
         Object res = min.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(0f));
 
-        min = new MinAggregate(floatExpr, new WindowSize(3), null);
+        min = (MinAggregate) Aggregate.createMin(floatExpr, new WindowSize(3), null);
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2.2f));
 
-        Expression filter = new Greater(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
                 new Constant(2, DataType.INTEGER));
-        min = new MinAggregate(floatExpr, new WindowSize(5), filter);
+        min = (MinAggregate) Aggregate.createMin(floatExpr, new WindowSize(5), filter);
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertThat(res, equalTo(3.3f));
     }
 
     @Test
     public void testInstantMin() {
-        MinAggregate min = new MinAggregate(tsExpr, new WindowSize(5), null);
+        MinAggregate min = (MinAggregate) Aggregate.createMin(tsExpr, new WindowSize(5), null);
         assertThat(min.getType(), equalTo(DataType.TIMESTAMP));
+        assertTrue(min.isComplete());
         Object res = min.run(null, view);
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(4)[0]));
 
-        min = new MinAggregate(tsExpr, new WindowSize(3), null);
+        min = (MinAggregate) Aggregate.createMin(tsExpr, new WindowSize(3), null);
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(2)[0]));
 
-        Expression filter = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
-        min = new MinAggregate(tsExpr, new WindowSize(5), filter);
+        min = (MinAggregate) Aggregate.createMin(tsExpr, new WindowSize(5), filter);
+        assertTrue(min.isComplete());
         res = min.run(null, view);
         assertThat(res, equalTo(view.get(4)[0]));
     }
 
     @Test
     public void testIntegerMax() {
-        MaxAggregate max = new MaxAggregate(intExpr, new WindowSize(5), null);
+        MaxAggregate max = (MaxAggregate) Aggregate.createMax(intExpr, new WindowSize(5), null);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
+        assertTrue(max.isComplete());
         Object res = max.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
-        max = new MaxAggregate(intExpr, new WindowSize(3), null);
+        max = (MaxAggregate) Aggregate.createMax(intExpr, new WindowSize(3), null);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
-        Expression filter = new Less(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createLT(new Field(3, DataType.FLOAT),
                 new Constant(3f, DataType.FLOAT));
-        max = new MaxAggregate(intExpr, new WindowSize(5), filter);
+        max = (MaxAggregate) Aggregate.createMax(intExpr, new WindowSize(5), filter);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertThat(res, equalTo(2));
     }
 
     @Test
     public void testFloatMax() {
-        MaxAggregate max = new MaxAggregate(floatExpr, new WindowSize(5), null);
+        MaxAggregate max = (MaxAggregate) Aggregate.createMax(floatExpr, new WindowSize(5), null);
         assertThat(max.getType(), equalTo(DataType.FLOAT));
+        assertTrue(max.isComplete());
         Object res = max.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
-        max = new MaxAggregate(floatExpr, new WindowSize(3), null);
+        max = (MaxAggregate) Aggregate.createMax(floatExpr, new WindowSize(3), null);
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
-        Expression filter = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
-        max = new MaxAggregate(floatExpr, new WindowSize(5), filter);
+        max = (MaxAggregate) Aggregate.createMax(floatExpr, new WindowSize(5), filter);
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertThat(res, equalTo(3.3f));
     }
 
     @Test
     public void testInstantMax() {
-        MaxAggregate max = new MaxAggregate(tsExpr, new WindowSize(5), null);
+        MaxAggregate max = (MaxAggregate) Aggregate.createMax(tsExpr, new WindowSize(5), null);
         assertThat(max.getType(), equalTo(DataType.TIMESTAMP));
+        assertTrue(max.isComplete());
         Object res = max.run(null, view);
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(0)[0]));
 
-        max = new MaxAggregate(tsExpr, new WindowSize(3), null);
+        max = (MaxAggregate) Aggregate.createMax(tsExpr, new WindowSize(3), null);
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(0)[0]));
 
-        Expression filter = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
                 new Constant(4, DataType.INTEGER));
-        max = new MaxAggregate(tsExpr, new WindowSize(5), filter);
+        max = (MaxAggregate) Aggregate.createMax(tsExpr, new WindowSize(5), filter);
+        assertTrue(max.isComplete());
         res = max.run(null, view);
         assertThat(res, equalTo(view.get(1)[0]));
     }
 
     @Test
     public void testCount() {
-        CountAggregate count = new CountAggregate(new WindowSize(5), null);
+        CountAggregate count = (CountAggregate) Aggregate.createCount(new WindowSize(5), null);
         assertThat(count.getType(), equalTo(DataType.INTEGER));
+        assertTrue(count.isComplete());
         Object res = count.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(5));
 
-        count = new CountAggregate(new WindowSize(3), null);
+        count = (CountAggregate) Aggregate.createCount(new WindowSize(3), null);
+        assertTrue(count.isComplete());
         res = count.run(null, view);
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(3));
 
-        Expression filter = new Less(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
                 new Constant(3, DataType.INTEGER));
-        count = new CountAggregate(new WindowSize(5), filter);
+        count = (CountAggregate) Aggregate.createCount(new WindowSize(5), filter);
+        assertTrue(count.isComplete());
         res = count.run(null, view);
         assertThat(res, equalTo(3));
     }
