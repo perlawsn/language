@@ -7,33 +7,40 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
- * @author Guido Rota 02/03/15.
+ * @author Guido Rota 09/03/15.
  */
-public final class CastString implements Expression {
 
-    private final Expression e;
+final public class ErrorExpression implements Expression {
 
-    public CastString(Expression e) {
-        this.e = e;
+    private final String error;
+
+    public ErrorExpression(String error) {
+        this.error = error;
     }
 
     @Override
     public DataType getType() {
-        return DataType.STRING;
+        return null;
     }
 
     @Override
     public boolean isComplete() {
-        return e.isComplete();
+        return true;
+    }
+
+    @Override
+    public boolean hasError() {
+        return true;
     }
 
     @Override
     public Expression rebuild(List<Attribute> atts) {
-        return new CastString(e.rebuild(atts));
+        return this;
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        return e.run(record, buffer).toString();
+        throw new RuntimeException("Cannot run ErrorExpression");
     }
+
 }

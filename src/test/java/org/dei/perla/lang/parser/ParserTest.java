@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.expression.ComparisonOperator;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.dei.perla.lang.parser.expression.*;
 import org.junit.Test;

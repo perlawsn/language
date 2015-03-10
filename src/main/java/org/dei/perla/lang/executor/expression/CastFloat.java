@@ -1,7 +1,10 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
+
+import java.util.List;
 
 /**
  * @author Guido Rota 27/02/15.
@@ -17,6 +20,16 @@ public final class CastFloat implements Expression {
     @Override
     public DataType getType() {
         return DataType.FLOAT;
+    }
+
+    @Override
+    public boolean isComplete() {
+        return e.isComplete();
+    }
+
+    @Override
+    public Expression rebuild(List<Attribute> atts) {
+        return new CastFloat(e.rebuild(atts));
     }
 
     @Override
