@@ -57,11 +57,6 @@ public final class Comparison implements Expression {
         if (e1 instanceof Null || e2 instanceof Null) {
             return Null.INSTANCE;
         }
-        if (e1 instanceof ErrorExpression) {
-            return e1;
-        } else if (e2 instanceof ErrorExpression) {
-            return e2;
-        }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
             Object o1 = ((Constant) e1).getValue();
@@ -83,6 +78,11 @@ public final class Comparison implements Expression {
     @Override
     public boolean isComplete() {
         return e1.isComplete() && e2.isComplete();
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return e1.hasErrors() || e2.hasErrors();
     }
 
     @Override

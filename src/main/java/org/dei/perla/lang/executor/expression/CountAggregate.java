@@ -30,9 +30,6 @@ public final class CountAggregate extends Aggregate {
         if (filter instanceof Null) {
             return Null.INSTANCE;
         }
-        if (filter instanceof ErrorExpression) {
-            return filter;
-        }
 
         return new CountAggregate(ws, filter);
     }

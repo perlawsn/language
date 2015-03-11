@@ -33,6 +33,11 @@ public final class ErrorExpression implements Expression {
     }
 
     @Override
+    public boolean hasErrors() {
+        return true;
+    }
+
+    @Override
     public Expression rebuild(List<Attribute> atts) {
         return this;
     }

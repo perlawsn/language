@@ -67,11 +67,6 @@ public final class Arithmetic implements Expression {
         if (e1 instanceof Null || e2 instanceof Null) {
             return Null.INSTANCE;
         }
-        if (e1 instanceof ErrorExpression) {
-            return e1;
-        } else if (e2 instanceof ErrorExpression) {
-            return e2;
-        }
 
         if (t1 != t2) {
             if (t1 == DataType.INTEGER) {
@@ -107,6 +102,11 @@ public final class Arithmetic implements Expression {
     @Override
     public boolean isComplete() {
         return e1.isComplete() && e2.isComplete();
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return e1.hasErrors() || e2.hasErrors();
     }
 
     @Override

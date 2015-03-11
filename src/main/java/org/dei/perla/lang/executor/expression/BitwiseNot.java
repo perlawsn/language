@@ -53,6 +53,11 @@ public final class BitwiseNot implements Expression {
     }
 
     @Override
+    public boolean hasErrors() {
+        return e.hasErrors();
+    }
+
+    @Override
     public Expression rebuild(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;

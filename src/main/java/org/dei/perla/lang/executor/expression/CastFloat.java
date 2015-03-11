@@ -27,7 +27,7 @@ public final class CastFloat implements Expression {
             return new ErrorExpression("Cannot cast " + t + " to float");
         }
 
-        if (e instanceof Null || e instanceof ErrorExpression) {
+        if (e instanceof Null) {
             return e;
         }
 
@@ -47,6 +47,11 @@ public final class CastFloat implements Expression {
     @Override
     public boolean isComplete() {
         return e.isComplete();
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return e.hasErrors();
     }
 
     @Override

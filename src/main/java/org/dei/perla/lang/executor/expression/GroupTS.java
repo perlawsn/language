@@ -22,6 +22,11 @@ public final class GroupTS implements Expression {
     }
 
     @Override
+    public boolean hasErrors() {
+        return false;
+    }
+
+    @Override
     public Expression rebuild(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
@@ -54,6 +59,11 @@ public final class GroupTS implements Expression {
         @Override
         public boolean isComplete() {
             return true;
+        }
+
+        @Override
+        public boolean hasErrors() {
+            return false;
         }
 
         @Override

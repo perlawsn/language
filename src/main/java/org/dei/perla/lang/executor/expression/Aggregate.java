@@ -117,6 +117,17 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
+    public boolean hasErrors() {
+        if (e != null && e.hasErrors()) {
+            return true;
+        } else if (filter != null && filter.hasErrors()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public final Object run(Object[] record, BufferView view) {
         Object res;
 

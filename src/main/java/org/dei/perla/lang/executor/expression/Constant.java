@@ -34,6 +34,11 @@ public final class Constant implements Expression {
     }
 
     @Override
+    public boolean hasErrors() {
+        return false;
+    }
+
+    @Override
     public Expression rebuild(List<Attribute> atts) {
         return this;
     }

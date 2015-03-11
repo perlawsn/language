@@ -1213,63 +1213,64 @@ String Identifier() :
  */
 Expression Expression(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BooleanTerm(aggregate, err)
 	(
 		<OPERATOR_OR>
 		e2 = BooleanTerm(aggregate, err)
-		{ e1 = Bool.createOR(e1, e2); }
+		{
+		    e1 = Bool.createOR(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BooleanTerm(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BooleanFactor(aggregate, err)
 	(
 		<OPERATOR_AND>
 		e2 = BooleanFactor(aggregate, err)
-		{ e1 = Bool.createAND(e1, e2); }
+		{
+		    e1 = Bool.createAND(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BooleanFactor(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BooleanNegation(aggregate, err)
 	(
 		<OPERATOR_XOR>
 		e2 = BooleanNegation(aggregate, err)
-		{ e1 = Bool.createXOR(e1, e2); }
+		{
+		    e1 = Bool.createXOR(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BooleanNegation(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e;
     boolean invert = false;
 }
 {
-    { t = token; }
 	(
 		<OPERATOR_NOT>
 		{ invert = true; }
@@ -1278,6 +1279,7 @@ Expression BooleanNegation(boolean aggregate, Errors err) :
 	{
 	    if (invert) {
 	        return Bool.createNOT(e);
+	        addIfError(e, token, err);
 	    }
 	    return e;
 	}
@@ -1285,11 +1287,9 @@ Expression BooleanNegation(boolean aggregate, Errors err) :
 
 Expression BooleanPredicate(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e;
 }
 {
-    { t = token; }
     e = Comparison(aggregate, err)
     [
         Is(aggregate, err)
@@ -1340,82 +1340,84 @@ Expression Between(boolean aggregate, Errors err) :
 
 Expression Comparison(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
     ComparisonOperation op;
 }
 {
-    { t = token; }
     e1 = BitwiseExpression(aggregate, err)
     [
         op = ComparisonOperation()
         e2 = BitwiseExpression(aggregate, err)
-        { e1 = Comparison.create(op, e1, e2); }
+        {
+            e1 = Comparison.create(op, e1, e2);
+            addIfError(e1, token, err);
+        }
     ]
     { return e1; }
 }
 
 Expression BitwiseExpression(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BitwiseTerm(aggregate, err)
 	(
 		<OPERATOR_BITWISE_OR>
 		e2 = BitwiseTerm(aggregate, err)
-		{ e1 = Bitwise.createOR(e1, e2); }
+		{
+		    e1 = Bitwise.createOR(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BitwiseTerm(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BitwiseFactor(aggregate, err)
 	(
 		<OPERATOR_BITWISE_AND>
 		e2 = BitwiseFactor(aggregate, err)
-		{ e1 = Bitwise.createAND(e1, e2); }
+		{
+		    e1 = Bitwise.createAND(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BitwiseFactor(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
 }
 {
-    { t = token; }
 	e1 = BitwiseShift(aggregate, err)
 	(
 		<OPERATOR_BITWISE_XOR>
 		e2 = BitwiseShift(aggregate, err)
-		{ e1 = Bitwise.createXOR(e1, e2); }
+		{
+		    e1 = Bitwise.createXOR(e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression BitwiseShift(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
     BitwiseOperation op;
 }
 {
-    { t = token; }
 	e1 = BitwiseNegation(aggregate, err)
 	[
 		(
@@ -1426,19 +1428,20 @@ Expression BitwiseShift(boolean aggregate, Errors err) :
 			{ op = BitwiseOperation.RSH; }
 		)
 		e2 = BitwiseNegation(aggregate, err)
-		{ e1 = Bitwise.create(op, e1, e2); }
+		{
+		    e1 = Bitwise.create(op, e1, e2);
+		    addIfError(e1, token, err);
+		}
 	]
 	{ return e1; }
 }
 
 Expression BitwiseNegation(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e;
     boolean not = false;
 }
 {
-    { t = token; }
 	(
 		<OPERATOR_BITWISE_NOT>
 		{ not = true; }
@@ -1446,7 +1449,8 @@ Expression BitwiseNegation(boolean aggregate, Errors err) :
 	e = ArithmeticExpression(aggregate, err)
 	{
 	    if (not) {
-	        return Bitwise.createNOT(e);
+	        e = Bitwise.createNOT(e);
+	        addIfError(e, token, err);
 	    }
 	    return e;
 	}
@@ -1454,13 +1458,11 @@ Expression BitwiseNegation(boolean aggregate, Errors err) :
 
 Expression ArithmeticExpression(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-    { t = token; }
 	e1 = ArithmeticTerm(aggregate, err)
 	(
 		(
@@ -1471,20 +1473,21 @@ Expression ArithmeticExpression(boolean aggregate, Errors err) :
 			{ op = ArithmeticOperation.SUBTRACTION; }
 		)
 		e2 = ArithmeticTerm(aggregate, err)
-		{ e1 = Arithmetic.create(op, e1, e2); }
+		{
+		    e1 = Arithmetic.create(op, e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression ArithmeticTerm(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-    { t = token; }
 	e1 = ArithmeticFactor(aggregate, err)
 	(
 		(
@@ -1495,29 +1498,30 @@ Expression ArithmeticTerm(boolean aggregate, Errors err) :
 			{ op = ArithmeticOperation.DIVISION; }
 		)
 		e2 = ArithmeticFactor(aggregate, err)
-		{ e1 = Arithmetic.create(op, e1, e2); }
+		{
+		    e1 = Arithmetic.create(op, e1, e2);
+		    addIfError(e1, token, err);
+		}
 	)*
 	{ return e1; }
 }
 
 Expression ArithmeticFactor(boolean aggregate, Errors err) :
 {
-    Token t;
     Expression e;
     Sign s = Sign.PLUS;
 }
 {
-    { t = token; }
 	[
 		s = Sign()
 	]
 	e = PrimaryExpression(aggregate, err)
 	{
 	    if (s == Sign.MINUS) {
-	        return Arithmetic.createInverse(e);
-	    } else {
-	        return e;
+	        e = Arithmetic.createInverse(e);
+	        addIfError(e, token, err);
 	    }
+	    return e;
 	}
 }
 
@@ -1528,15 +1532,24 @@ Expression PrimaryExpression(boolean aggregate, Errors err) :
 }
 {
 	e = Constant()
-	{ return e; }
+	{
+	    addIfError(e, token, err);
+	    return e;
+	}
 	|
 	e = ExistsAttribute()
-	{ return e; }
+	{
+	    addIfError(e, token, err);
+	    return e;
+	}
 	|
 	"("
 	e = Expression(aggregate, err)
+	{
+	    addIfError(e, token, err);
+	    return e;
+	}
 	")"
-	{ return e; }
 	|
 	LOOKAHEAD( { aggregate } )
 	(
@@ -1574,13 +1587,11 @@ Expression ExistsAttribute() :
 Expression Aggregate(Errors err) :
 {
     Token t;
-
     AggregateOperation op;
     Expression exp = null;
     WindowSize ws;
     Expression filter = null;
-
-    Expression n;
+    Expression e;
 }
 {
     (
@@ -1614,9 +1625,9 @@ Expression Aggregate(Errors err) :
         )
     )
     {
-        n = Aggregate.create(op, exp, ws, filter);
-        addIfError(n, t, err);
-        return n;
+        e = Aggregate.create(op, exp, ws, filter);
+        addIfError(e, t, err);
+        return e;
     }
 }
 

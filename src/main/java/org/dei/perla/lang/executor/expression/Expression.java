@@ -15,6 +15,8 @@ public interface Expression {
 
     public boolean isComplete();
 
+    public boolean hasErrors();
+
     public Expression rebuild(List<Attribute> atts);
 
     public Object run(Object[] record, BufferView buffer);

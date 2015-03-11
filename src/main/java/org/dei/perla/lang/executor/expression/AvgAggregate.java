@@ -36,11 +36,6 @@ public final class AvgAggregate extends Aggregate {
         if (e instanceof Null || filter instanceof Null) {
             return Null.INSTANCE;
         }
-        if (e instanceof ErrorExpression) {
-            return e;
-        } else if (filter instanceof ErrorExpression) {
-            return filter;
-        }
 
         return new AvgAggregate(e, ws, filter);
     }

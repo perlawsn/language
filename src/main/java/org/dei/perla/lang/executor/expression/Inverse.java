@@ -27,9 +27,6 @@ public final class Inverse implements Expression {
         if (e instanceof Null) {
             return Null.INSTANCE;
         }
-        if (e instanceof ErrorExpression) {
-            return e;
-        }
 
         if (e instanceof Constant) {
             Object o = ((Constant) e).getValue();
@@ -50,6 +47,11 @@ public final class Inverse implements Expression {
     @Override
     public boolean isComplete() {
         return e.isComplete();
+    }
+
+    @Override
+    public boolean hasErrors() {
+        return e.hasErrors();
     }
 
     @Override
