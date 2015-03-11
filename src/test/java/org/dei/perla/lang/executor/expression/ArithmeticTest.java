@@ -66,6 +66,7 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createAddition(e1, intField);
 
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(view.get(0), view), equalTo(1 + 4));
         assertThat(e.run(view.get(1), view), equalTo(1 + 3));
@@ -77,6 +78,7 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createAddition(e1, floatField);
 
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(view.get(0), view), equalTo(4.4f + 1.5f));
         assertThat(e.run(view.get(1), view), equalTo(3.3f + 1.5f));
@@ -88,9 +90,11 @@ public class ArithmeticTest {
         Constant e2 = new Constant(5, DataType.INTEGER);
 
         Expression e = Arithmetic.createAddition(e1, e2);
+        assertFalse(e.hasErrors());
         assertThat(e.run(null, null), equalTo(1.5f + 5f));
 
         e = Arithmetic.createAddition(e2, e1);
+        assertFalse(e.hasErrors());
         assertThat(e.run(null, null), equalTo(1.5f + 5f));
     }
 
@@ -100,18 +104,39 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createAddition(c, Null.INSTANCE);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
         e = Arithmetic.createAddition(Null.INSTANCE, c);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
         e = Arithmetic.createAddition(Null.INSTANCE, Null.INSTANCE);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
+    }
+
+    @Test
+    public void additionErrorTest() {
+        Expression err = new ErrorExpression("test");
+        Expression c = new Constant(85, DataType.INTEGER);
+
+        Expression e = Arithmetic.createAddition(err, c);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createAddition(c, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createAddition(err, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
     }
 
     @Test
@@ -122,18 +147,24 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createAddition(c1, f1);
         assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
 
         e = Arithmetic.createAddition(f1, c1);
         assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
 
         e = Arithmetic.createAddition(f1, f2);
         assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
     }
 
     @Test
@@ -188,6 +219,24 @@ public class ArithmeticTest {
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
+    }
+
+    @Test
+    public void subtractionErrorTest() {
+        Expression err = new ErrorExpression("test");
+        Expression c = new Constant(85, DataType.INTEGER);
+
+        Expression e = Arithmetic.createSubtraction(err, c);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createSubtraction(c, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createSubtraction(err, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
     }
 
     @Test
@@ -267,6 +316,24 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void productErrorTest() {
+        Expression err = new ErrorExpression("test");
+        Expression c = new Constant(85, DataType.INTEGER);
+
+        Expression e = Arithmetic.createProduct(err, c);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createProduct(c, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createProduct(err, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+    }
+
+    @Test
     public void productRebuildTest() {
         Constant c1 = new Constant(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
@@ -343,6 +410,24 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void divisionErrorTest() {
+        Expression err = new ErrorExpression("test");
+        Expression c = new Constant(85, DataType.INTEGER);
+
+        Expression e = Arithmetic.createDivision(err, c);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createDivision(c, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createDivision(err, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+    }
+
+    @Test
     public void divisionRebuildTest() {
         Constant c1 = new Constant(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
@@ -393,6 +478,24 @@ public class ArithmeticTest {
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
+    }
+
+    @Test
+    public void moduloErrorTest() {
+        Expression err = new ErrorExpression("test");
+        Expression c = new Constant(85, DataType.INTEGER);
+
+        Expression e = Arithmetic.createModulo(err, c);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createModulo(c, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Arithmetic.createModulo(err, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
     }
 
     @Test
@@ -448,6 +551,15 @@ public class ArithmeticTest {
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
+    }
+
+    @Test
+    public void inverseErrorTest() {
+        Expression err = new ErrorExpression("test");
+
+        Expression e = Arithmetic.createInverse(err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
     }
 
 }
