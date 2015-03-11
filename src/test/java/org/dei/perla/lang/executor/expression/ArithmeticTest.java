@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -61,116 +63,391 @@ public class ArithmeticTest {
     @Test
     public void additionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, intField);
+        Expression e = Arithmetic.createAddition(e1, intField);
 
-        assertTrue(a.isComplete());
-        assertThat(a.getType(), equalTo(DataType.INTEGER));
-        assertThat(a.run(view.get(0), view), equalTo(1 + 4));
-        assertThat(a.run(view.get(1), view), equalTo(1 + 3));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(1 + 4));
+        assertThat(e.run(view.get(1), view), equalTo(1 + 3));
     }
 
     @Test
     public void additionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, floatField);
+        Expression e = Arithmetic.createAddition(e1, floatField);
 
-        assertTrue(a.isComplete());
-        assertThat(a.getType(), equalTo(DataType.FLOAT));
-        assertThat(a.run(view.get(0), view), equalTo(4.4f + 1.5f));
-        assertThat(a.run(view.get(1), view), equalTo(3.3f + 1.5f));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.run(view.get(0), view), equalTo(4.4f + 1.5f));
+        assertThat(e.run(view.get(1), view), equalTo(3.3f + 1.5f));
+    }
+
+    @Test
+    public void additionMixedTest() {
+        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Constant e2 = new Constant(5, DataType.INTEGER);
+
+        Expression e = Arithmetic.createAddition(e1, e2);
+        assertThat(e.run(null, null), equalTo(1.5f + 5f));
+
+        e = Arithmetic.createAddition(e2, e1);
+        assertThat(e.run(null, null), equalTo(1.5f + 5f));
+    }
+
+    @Test
+    public void additionNullTest() {
+        Expression c = new Constant(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createAddition(c, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createAddition(Null.INSTANCE, c);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createAddition(Null.INSTANCE, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
+    public void additionRebuildTest() {
+        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Field f1 = new Field("integer");
+        Field f2 = new Field("float");
+
+        Expression e = Arithmetic.createAddition(c1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createAddition(f1, c1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createAddition(f1, f2);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
     }
 
     @Test
     public void subtractionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, intField);
+        Expression e = Arithmetic.createSubtraction(e1, intField);
 
-        assertTrue(s.isComplete());
-        assertThat(s.getType(), equalTo(DataType.INTEGER));
-        assertThat(s.run(view.get(0), view), equalTo(1 - 4));
-        assertThat(s.run(view.get(1), view), equalTo(1 - 3));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(1 - 4));
+        assertThat(e.run(view.get(1), view), equalTo(1 - 3));
     }
 
     @Test
     public void subtractionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, floatField);
+        Expression e = Arithmetic.createSubtraction(e1, floatField);
 
-        assertTrue(s.isComplete());
-        assertThat(s.getType(), equalTo(DataType.FLOAT));
-        assertThat(s.run(view.get(0), view), equalTo(1.5f - 4.4f));
-        assertThat(s.run(view.get(1), view), equalTo(1.5f - 3.3f));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.run(view.get(0), view), equalTo(1.5f - 4.4f));
+        assertThat(e.run(view.get(1), view), equalTo(1.5f - 3.3f));
+    }
+
+    @Test
+    public void subtractionMixedTest() {
+        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Constant e2 = new Constant(5, DataType.INTEGER);
+
+        Expression e = Arithmetic.createSubtraction(e1, e2);
+        assertThat(e.run(null, null), equalTo(1.5f - 5f));
+
+        e = Arithmetic.createSubtraction(e2, e1);
+        assertThat(e.run(null, null), equalTo(5f - 1.5f));
+    }
+
+    @Test
+    public void subtractionNullTest() {
+        Expression c = new Constant(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createSubtraction(c, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createSubtraction(Null.INSTANCE, c);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createSubtraction(Null.INSTANCE, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
+    public void subtractionRebuildTest() {
+        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Field f1 = new Field("integer");
+        Field f2 = new Field("float");
+
+        Expression e = Arithmetic.createSubtraction(c1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createSubtraction(f1, c1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createSubtraction(f1, f2);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
     }
 
     @Test
     public void productIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, intField);
+        Expression e = Arithmetic.createProduct(e1, intField);
 
-        assertTrue(p.isComplete());
-        assertThat(p.getType(), equalTo(DataType.INTEGER));
-        assertThat(p.run(view.get(0), view), equalTo(1 * 4));
-        assertThat(p.run(view.get(1), view), equalTo(1 * 3));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(1 * 4));
+        assertThat(e.run(view.get(1), view), equalTo(1 * 3));
     }
 
     @Test
     public void productFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, floatField);
+        Expression e = Arithmetic.createProduct(e1, floatField);
 
-        assertTrue(p.isComplete());
-        assertThat(p.getType(), equalTo(DataType.FLOAT));
-        assertThat(p.run(view.get(0), view), equalTo(1.5f * 4.4f));
-        assertThat(p.run(view.get(1), view), equalTo(1.5f * 3.3f));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.run(view.get(0), view), equalTo(1.5f * 4.4f));
+        assertThat(e.run(view.get(1), view), equalTo(1.5f * 3.3f));
+    }
+
+    @Test
+    public void productMixedTest() {
+        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Constant e2 = new Constant(5, DataType.INTEGER);
+
+        Expression e = Arithmetic.createProduct(e1, e2);
+        assertThat(e.run(null, null), equalTo(1.5f * 5f));
+
+        e = Arithmetic.createProduct(e2, e1);
+        assertThat(e.run(null, null), equalTo(5f * 1.5f));
+    }
+
+    @Test
+    public void productNullTest() {
+        Expression c = new Constant(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createProduct(c, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createProduct(Null.INSTANCE, c);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createProduct(Null.INSTANCE, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
+    public void productRebuildTest() {
+        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Field f1 = new Field("integer");
+        Field f2 = new Field("float");
+
+        Expression e = Arithmetic.createProduct(c1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createProduct(f1, c1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createProduct(f1, f2);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
     }
 
     @Test
     public void divisionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, intField);
+        Expression e = Arithmetic.createDivision(e1, intField);
 
-        assertTrue(d.isComplete());
-        assertThat(d.getType(), equalTo(DataType.INTEGER));
-        assertThat(d.run(view.get(0), view), equalTo(1 / 4));
-        assertThat(d.run(view.get(1), view), equalTo(1 / 3));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(1 / 4));
+        assertThat(e.run(view.get(1), view), equalTo(1 / 3));
     }
 
     @Test
     public void divisionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, floatField);
+        Expression e = Arithmetic.createDivision(e1, floatField);
 
-        assertTrue(d.isComplete());
-        assertThat(d.getType(), equalTo(DataType.FLOAT));
-        assertThat(d.run(view.get(0), view), equalTo(1.5f / 4.4f));
-        assertThat(d.run(view.get(1), view), equalTo(1.5f / 3.3f));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.run(view.get(0), view), equalTo(1.5f / 4.4f));
+        assertThat(e.run(view.get(1), view), equalTo(1.5f / 3.3f));
+    }
+
+    @Test
+    public void divisionMixedTest() {
+        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Constant e2 = new Constant(5, DataType.INTEGER);
+
+        Expression e = Arithmetic.createDivision(e1, e2);
+        assertThat(e.run(null, null), equalTo(1.5f / 5f));
+
+        e = Arithmetic.createDivision(e2, e1);
+        assertThat(e.run(null, null), equalTo(5f / 1.5f));
+    }
+
+    @Test
+    public void divisionNullTest() {
+        Expression c = new Constant(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createDivision(c, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createDivision(Null.INSTANCE, c);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createDivision(Null.INSTANCE, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
+    public void divisionRebuildTest() {
+        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Field f1 = new Field("integer");
+        Field f2 = new Field("float");
+
+        Expression e = Arithmetic.createDivision(c1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createDivision(f1, c1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createDivision(f1, f2);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
     }
 
     @Test
     public void moduloTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Arithmetic m = (Arithmetic) Arithmetic.createModulo(e1, intField);
+        Expression e = Arithmetic.createModulo(e1, intField);
 
-        assertTrue(m.isComplete());
-        assertThat(m.getType(), equalTo(DataType.INTEGER));
-        assertThat(m.run(view.get(0), view), equalTo(1 % 4));
-        assertThat(m.run(view.get(1), view), equalTo(1 % 3));
+        assertTrue(e.isComplete());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(1 % 4));
+        assertThat(e.run(view.get(1), view), equalTo(1 % 3));
+    }
+
+    @Test
+    public void moduloNullTest() {
+        Expression c = new Constant(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createModulo(c, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createModulo(Null.INSTANCE, c);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createModulo(Null.INSTANCE, Null.INSTANCE);
+        assertTrue(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
+    public void moduloRebuildTest() {
+        Constant c1 = new Constant(1, DataType.INTEGER);
+        Field f1 = new Field("integer");
+
+        Expression e = Arithmetic.createModulo(c1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createModulo(f1, c1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+
+        e = Arithmetic.createModulo(f1, f1);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
     }
 
     @Test
     public void inverseTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
 
-        Arithmetic inv = (Arithmetic) Arithmetic.createInverse(e1);
-        assertThat(inv.getType(), equalTo(DataType.INTEGER));
-        assertThat(inv.run(view.get(0), view), equalTo(-1));
+        Expression e = Arithmetic.createInverse(e1);
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.run(view.get(0), view), equalTo(-1));
 
-        inv = (Arithmetic) Arithmetic.createInverse(floatField);
-        assertThat(inv.getType(), equalTo(DataType.FLOAT));
-        assertThat(inv.run(view.get(0), view),
+        e = Arithmetic.createInverse(floatField);
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.run(view.get(0), view),
                 equalTo(-(Float) view.get(0)[3]));
-        assertThat(inv.run(view.get(1), view),
+        assertThat(e.run(view.get(1), view),
                 equalTo(-(Float) view.get(1)[3]));
+    }
+
+    @Test
+    public void inverseRebuildTest() {
+        Expression f = new Field("integer");
+
+        Expression e = Arithmetic.createInverse(f);
+        assertFalse(e.isComplete());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+    }
+
+    @Test
+    public void inverseNullTest() {
+        Expression e = Arithmetic.createInverse(Null.INSTANCE);
+        assertTrue(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
 }

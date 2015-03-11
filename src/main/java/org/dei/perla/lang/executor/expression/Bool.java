@@ -30,7 +30,7 @@ public final class Bool implements Expression {
     }
 
     public static Expression createXOR(Expression e1, Expression e2) {
-        return create(BooleanOperation.OR, e1, e2);
+        return create(BooleanOperation.XOR, e1, e2);
     }
 
     public static Expression createNOT(Expression e) {

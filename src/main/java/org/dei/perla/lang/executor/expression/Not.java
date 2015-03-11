@@ -56,7 +56,7 @@ public final class Not implements Expression {
         if (e.isComplete()) {
             return this;
         }
-        return create(e);
+        return create(e.rebuild(atts));
     }
 
     @Override

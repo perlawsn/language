@@ -30,7 +30,7 @@ public final class Bitwise implements Expression {
     }
 
     public static Expression createXOR(Expression e1, Expression e2) {
-        return create(BitwiseOperation.OR, e1, e2);
+        return create(BitwiseOperation.XOR, e1, e2);
     }
 
     public static Expression createRSH(Expression e1, Expression e2) {
@@ -117,7 +117,7 @@ public final class Bitwise implements Expression {
             case RSH:
                 return (Integer) o1 >> (Integer) o2;
             case LSH:
-                return (Integer) o1 >> (Integer) o2;
+                return (Integer) o1 << (Integer) o2;
             default:
                 throw new RuntimeException("unknown bitwise operator " + op);
         }

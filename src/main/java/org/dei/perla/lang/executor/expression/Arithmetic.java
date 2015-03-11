@@ -53,7 +53,7 @@ public final class Arithmetic implements Expression {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
 
-        if (op == ArithmeticOperation.MODULO &&
+        if (op == ArithmeticOperation.MODULO && t1 != null && t2 != null &&
                 t1 != DataType.INTEGER && t2 != DataType.INTEGER) {
             return new ErrorExpression("Modulo operation is only allowed on " +
                     "integer values");
