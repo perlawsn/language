@@ -301,7 +301,7 @@ public class SelectionTest {
         sel.add(tsExpr);
         sel.add(intExpr);
 
-        Expression having = Comparison.createNE(intExpr,
+        Expression having = Comparison.createEQ(intExpr,
                 new Constant(10, DataType.INTEGER));
 
         Object[] def = new Object[2];

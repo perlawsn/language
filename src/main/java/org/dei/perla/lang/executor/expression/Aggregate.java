@@ -95,7 +95,13 @@ public abstract class Aggregate implements Expression {
 
     @Override
     public boolean isComplete() {
-        return e.isComplete() && filter.isComplete();
+        if (e != null && !e.isComplete()) {
+            return false;
+        } else if (filter != null && !filter.isComplete()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
