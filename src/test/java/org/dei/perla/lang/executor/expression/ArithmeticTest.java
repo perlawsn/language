@@ -22,24 +22,31 @@ import static org.junit.Assert.assertTrue;
  */
 public class ArithmeticTest {
 
-    private static Attribute integerAtt =
+    private static Attribute intAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
     private static Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
 
+    private static List<Attribute> atts;
     private static BufferView view;
+
+    private static Expression intField;
+    private static Expression floatField;
 
     @BeforeClass
     public static void setupBuffer() {
         Attribute[] as = new Attribute[] {
                 Attribute.TIMESTAMP,
-               integerAtt,
+                intAtt,
                 stringAtt,
                 floatAtt
         };
-        List<Attribute> atts = Arrays.asList(as);
+        atts = Arrays.asList(as);
+
+        intField = new Field(intAtt.getId()).rebuild(atts);
+        floatField = new Field(floatAtt.getId()).rebuild(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
@@ -54,8 +61,7 @@ public class ArithmeticTest {
     @Test
     public void additionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, e2);
+        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, intField);
 
         assertTrue(a.isComplete());
         assertThat(a.getType(), equalTo(DataType.INTEGER));
@@ -66,8 +72,7 @@ public class ArithmeticTest {
     @Test
     public void additionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, e2);
+        Arithmetic a = (Arithmetic) Arithmetic.createAddition(e1, floatField);
 
         assertTrue(a.isComplete());
         assertThat(a.getType(), equalTo(DataType.FLOAT));
@@ -78,8 +83,7 @@ public class ArithmeticTest {
     @Test
     public void subtractionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, e2);
+        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, intField);
 
         assertTrue(s.isComplete());
         assertThat(s.getType(), equalTo(DataType.INTEGER));
@@ -90,8 +94,7 @@ public class ArithmeticTest {
     @Test
     public void subtractionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, e2);
+        Arithmetic s = (Arithmetic) Arithmetic.createSubtraction(e1, floatField);
 
         assertTrue(s.isComplete());
         assertThat(s.getType(), equalTo(DataType.FLOAT));
@@ -102,8 +105,7 @@ public class ArithmeticTest {
     @Test
     public void productIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, e2);
+        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, intField);
 
         assertTrue(p.isComplete());
         assertThat(p.getType(), equalTo(DataType.INTEGER));
@@ -114,8 +116,7 @@ public class ArithmeticTest {
     @Test
     public void productFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, e2);
+        Arithmetic p = (Arithmetic) Arithmetic.createProduct(e1, floatField);
 
         assertTrue(p.isComplete());
         assertThat(p.getType(), equalTo(DataType.FLOAT));
@@ -126,8 +127,7 @@ public class ArithmeticTest {
     @Test
     public void divisionIntegerTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, e2);
+        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, intField);
 
         assertTrue(d.isComplete());
         assertThat(d.getType(), equalTo(DataType.INTEGER));
@@ -138,8 +138,7 @@ public class ArithmeticTest {
     @Test
     public void divisionFloatTest() {
         Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Field e2 = new Field(3, DataType.FLOAT);
-        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, e2);
+        Arithmetic d = (Arithmetic) Arithmetic.createDivision(e1, floatField);
 
         assertTrue(d.isComplete());
         assertThat(d.getType(), equalTo(DataType.FLOAT));
@@ -150,8 +149,7 @@ public class ArithmeticTest {
     @Test
     public void moduloTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(1, DataType.INTEGER);
-        Arithmetic m = (Arithmetic) Arithmetic.createModulo(e1, e2);
+        Arithmetic m = (Arithmetic) Arithmetic.createModulo(e1, intField);
 
         assertTrue(m.isComplete());
         assertThat(m.getType(), equalTo(DataType.INTEGER));
@@ -162,13 +160,12 @@ public class ArithmeticTest {
     @Test
     public void inverseTest() {
         Constant e1 = new Constant(1, DataType.INTEGER);
-        Field e2 = new Field(3, DataType.FLOAT);
 
         Arithmetic inv = (Arithmetic) Arithmetic.createInverse(e1);
         assertThat(inv.getType(), equalTo(DataType.INTEGER));
         assertThat(inv.run(view.get(0), view), equalTo(-1));
 
-        inv = (Arithmetic) Arithmetic.createInverse(e2);
+        inv = (Arithmetic) Arithmetic.createInverse(floatField);
         assertThat(inv.getType(), equalTo(DataType.FLOAT));
         assertThat(inv.run(view.get(0), view),
                 equalTo(-(Float) view.get(0)[3]));

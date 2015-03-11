@@ -124,9 +124,9 @@ public final class Arithmetic implements Expression {
 
         switch (type) {
             case INTEGER:
-                computeInteger(op, o1, o2);
+                return computeInteger(op, o1, o2);
             case FLOAT:
-                computeFloat(op, o1, o2);
+                return computeFloat(op, o1, o2);
             default:
                 throw new RuntimeException(
                         "Unsupported arithmetic operand type");

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AggregateTest {
 
-    private static Attribute integerAtt =
+    private static Attribute intAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
@@ -32,19 +32,23 @@ public class AggregateTest {
 
     private static BufferView view;
 
-    private static Expression tsExpr = new Field(0, DataType.TIMESTAMP);
-    private static Expression intExpr = new Field(1, DataType.INTEGER);
-    private static Expression floatExpr = new Field(3, DataType.FLOAT);
+    private static Expression tsExpr;
+    private static Expression intExpr;
+    private static Expression floatExpr;
 
     @BeforeClass
     public static void setupBuffer() {
         Attribute[] as = new Attribute[] {
                 Attribute.TIMESTAMP,
-                integerAtt,
+                intAtt,
                 stringAtt,
                 floatAtt
         };
         List<Attribute> atts = Arrays.asList(as);
+
+        tsExpr = new Field(Attribute.TIMESTAMP.getId()).rebuild(atts);
+        intExpr = new Field(intAtt.getId()).rebuild(atts);
+        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
@@ -74,7 +78,7 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(9));
 
-        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(floatExpr,
                 new Constant(3f, DataType.FLOAT));
         sum = (SumAggregate) Aggregate.createSum(intExpr, new WindowSize(5),
                 filter);
@@ -102,7 +106,7 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(9.9f));
 
-        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(intExpr,
                 new Constant(2, DataType.INTEGER));
         sum = (SumAggregate) Aggregate.createSum(floatExpr, new WindowSize(5),
                 filter);
@@ -128,7 +132,7 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3f));
 
-        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(floatExpr,
                 new Constant(3f, DataType.FLOAT));
         avg = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(5), filter);
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
@@ -151,7 +155,7 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3.3f));
 
-        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(intExpr,
                 new Constant(2, DataType.INTEGER));
         avg = (AvgAggregate) Aggregate.createAvg(floatExpr, new WindowSize(5), filter);
         res = avg.run(null, view);
@@ -174,7 +178,7 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(2));
 
-        Expression filter = Comparison.createGT(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createGT(floatExpr,
                 new Constant(3f, DataType.FLOAT));
         min = (MinAggregate) Aggregate.createMin(intExpr, new WindowSize(5), filter);
         assertThat(min.getType(), equalTo(DataType.INTEGER));
@@ -198,7 +202,7 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(2.2f));
 
-        Expression filter = Comparison.createGT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createGT(intExpr,
                 new Constant(2, DataType.INTEGER));
         min = (MinAggregate) Aggregate.createMin(floatExpr, new WindowSize(5), filter);
         assertTrue(min.isComplete());
@@ -221,7 +225,7 @@ public class AggregateTest {
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(2)[0]));
 
-        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(intExpr,
                 new Constant(4, DataType.INTEGER));
         min = (MinAggregate) Aggregate.createMin(tsExpr, new WindowSize(5), filter);
         assertTrue(min.isComplete());
@@ -245,7 +249,7 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(4));
 
-        Expression filter = Comparison.createLT(new Field(3, DataType.FLOAT),
+        Expression filter = Comparison.createLT(floatExpr,
                 new Constant(3f, DataType.FLOAT));
         max = (MaxAggregate) Aggregate.createMax(intExpr, new WindowSize(5), filter);
         assertThat(max.getType(), equalTo(DataType.INTEGER));
@@ -269,7 +273,7 @@ public class AggregateTest {
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(4.4f));
 
-        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(intExpr,
                 new Constant(4, DataType.INTEGER));
         max = (MaxAggregate) Aggregate.createMax(floatExpr, new WindowSize(5), filter);
         assertTrue(max.isComplete());
@@ -292,7 +296,7 @@ public class AggregateTest {
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(0)[0]));
 
-        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(intExpr,
                 new Constant(4, DataType.INTEGER));
         max = (MaxAggregate) Aggregate.createMax(tsExpr, new WindowSize(5), filter);
         assertTrue(max.isComplete());
@@ -315,7 +319,7 @@ public class AggregateTest {
         assertTrue(res instanceof Integer);
         assertThat(res, equalTo(3));
 
-        Expression filter = Comparison.createLT(new Field(1, DataType.INTEGER),
+        Expression filter = Comparison.createLT(intExpr,
                 new Constant(3, DataType.INTEGER));
         count = (CountAggregate) Aggregate.createCount(new WindowSize(5), filter);
         assertTrue(count.isComplete());

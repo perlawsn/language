@@ -60,6 +60,7 @@ public class MiscTest {
         Null n = Null.INSTANCE;
 
         assertThat(n.getType(), nullValue());
+        assertTrue(n.isComplete());
         assertThat(n.run(view.get(0), view), nullValue());
         assertThat(n.run(view.get(1), view), nullValue());
     }
@@ -69,28 +70,40 @@ public class MiscTest {
         Constant cInt = new Constant(1, DataType.INTEGER);
         Constant cFloat = new Constant(1.2f, DataType.FLOAT);
         Expression fFloat = new Field(floatAtt.getId()).rebuild(atts);
+        Expression incomplete = new Field("integer");
 
         Expression cast = CastFloat.create(cInt);
+        assertTrue(cast.isComplete());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
         assertThat(cast.run(view.get(0), view), equalTo(1f));
 
         cast = CastFloat.create(cFloat);
+        assertTrue(cast.isComplete());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
         assertThat(cast.run(view.get(0), view), equalTo(1.2f));
 
         cast = CastFloat.create(fFloat);
+        assertTrue(cast.isComplete());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
         assertThat(cast.run(view.get(0), view), equalTo(4.4f));
         assertThat(cast.run(view.get(1), view), equalTo(3.3f));
+
+        cast = CastFloat.create(incomplete);
+        assertFalse(cast.isComplete());
+        cast = cast.rebuild(atts);
+        assertTrue(cast.isComplete());
+        assertThat(cast.run(view.get(0), view), equalTo(4f));
     }
 
     @Test
     public void constantTest() {
         Constant c1 = new Constant(1, DataType.INTEGER);
+        assertTrue(c1.isComplete());
         assertThat(c1.getType(), equalTo(DataType.INTEGER));
         assertThat(c1.run(view.get(0), view), equalTo(1));
 
         Constant c2 = new Constant("test", DataType.STRING);
+        assertTrue(c1.isComplete());
         assertThat(c2.getType(), equalTo(DataType.STRING));
         assertThat(c2.run(view.get(0), view), equalTo("test"));
     }

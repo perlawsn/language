@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class ComparisonTest {
 
-    private static Attribute integerAtt =
+    private static Attribute intAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
@@ -32,10 +31,9 @@ public class ComparisonTest {
 
     private static BufferView view;
 
-    private static final Expression tsExpr = new Field(0, DataType.TIMESTAMP);
-    private static final Expression intExpr = new Field(1, DataType.INTEGER);
-    private static final Expression stringExpr = new Field(2, DataType.STRING);
-    private static final Expression floatExpr = new Field(3, DataType.FLOAT);
+    private static Expression intExpr;
+    private static Expression stringExpr;
+    private static Expression floatExpr;
 
     private static final Expression trueExpr = new Constant(true, DataType.BOOLEAN);
     private static final Expression falseExpr = new Constant(false, DataType.BOOLEAN);
@@ -49,11 +47,15 @@ public class ComparisonTest {
     public static void setupBuffer() {
         Attribute[] as = new Attribute[]{
                 Attribute.TIMESTAMP,
-                integerAtt,
+                intAtt,
                 stringAtt,
                 floatAtt
         };
         List<Attribute> atts = Arrays.asList(as);
+
+        intExpr = new Field(intAtt.getId()).rebuild(atts);
+        stringExpr = new Field(stringAtt.getId()).rebuild(atts);
+        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));

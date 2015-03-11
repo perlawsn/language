@@ -15,7 +15,6 @@ public class SynchronizerSelectHandler implements SelectHandler {
     private final Condition cond = lk.newCondition();
     private int upto;
     private final List<Object[]> records = new ArrayList<>();
-    private Throwable error = null;
 
     public SynchronizerSelectHandler(int upto) {
         this.upto = upto;
