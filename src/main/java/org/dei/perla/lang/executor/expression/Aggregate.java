@@ -88,6 +88,18 @@ public abstract class Aggregate implements Expression {
         return CountAggregate.create(ws, filter);
     }
 
+    public Expression getOperand() {
+        return e;
+    }
+
+    public WindowSize getWindowSize() {
+        return ws;
+    }
+
+    public Expression getFilter() {
+        return filter;
+    }
+
     @Override
     public final DataType getType() {
         return type;

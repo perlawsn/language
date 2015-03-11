@@ -2,9 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.expression.AggregateOperation;
-import org.dei.perla.lang.executor.expression.ComparisonOperation;
-import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.junit.Test;
 
@@ -95,56 +93,53 @@ public class ParserTest {
         s = p.ConstantString();
         assertThat(s, equalTo("test"));
     }
-/*
+
     @Test
     public void testConstant() throws Exception {
         Parser p;
         Expression e;
-        ConstantNode cn;
 
         p = new Parser(new StringReader("null"));
         e = p.Constant();
-        assertTrue(n instanceof NullNode);
+        assertTrue(e instanceof Null);
 
         p.ReInit(new StringReader("false"));
-        n = p.Constant();
-        assertTrue(n instanceof ConstantNode);
-        cn = (ConstantNode) n;
-        assertThat(cn.getType(), equalTo(DataType.BOOLEAN));
-        assertTrue(cn.getValue() instanceof Boolean);
-        assertThat(cn.getValue(), equalTo(false));
+        e = p.Constant();
+        assertTrue(e instanceof Constant);
+        Constant c = (Constant) e;
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(false));
 
         p.ReInit(new StringReader("true"));
-        n = p.Constant();
-        assertTrue(n instanceof ConstantNode);
-        cn = (ConstantNode) n;
-        assertThat(cn.getType(), equalTo(DataType.BOOLEAN));
-        assertTrue(cn.getValue() instanceof Boolean);
-        assertThat(cn.getValue(), equalTo(true));
+        e = p.Constant();
+        assertTrue(e instanceof Constant);
+        c = (Constant) e;
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(true));
 
         p.ReInit(new StringReader("'test_string'"));
-        n = p.Constant();
-        assertTrue(n instanceof ConstantNode);
-        cn = (ConstantNode) n;
-        assertThat(cn.getType(), equalTo(DataType.STRING));
-        assertTrue(cn.getValue() instanceof String);
-        assertThat(cn.getValue(), equalTo("test_string"));
+        e = p.Constant();
+        assertTrue(e instanceof Constant);
+        c = (Constant) e;
+        assertThat(c.getType(), equalTo(DataType.STRING));
+        assertTrue(c.getValue() instanceof String);
+        assertThat(c.getValue(), equalTo("test_string"));
 
         p.ReInit(new StringReader("12"));
-        n = p.Constant();
-        assertTrue(n instanceof ConstantNode);
-        cn = (ConstantNode) n;
-        assertThat(cn.getType(), equalTo(DataType.INTEGER));
-        assertTrue(cn.getValue() instanceof Integer);
-        assertThat(cn.getValue(), equalTo(12));
+        e = p.Constant();
+        assertTrue(e instanceof Constant);
+        c = (Constant) e;
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertTrue(c.getValue() instanceof Integer);
+        assertThat(c.getValue(), equalTo(12));
 
         p.ReInit(new StringReader("1.0"));
-        n = p.Constant();
-        assertTrue(n instanceof ConstantNode);
-        cn = (ConstantNode) n;
-        assertThat(cn.getType(), equalTo(DataType.FLOAT));
-        assertTrue(cn.getValue() instanceof Float);
-        assertThat(cn.getValue(), equalTo(1.0f));
+        e = p.Constant();
+        assertTrue(e instanceof Constant);
+        c = (Constant) e;
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertTrue(c.getValue() instanceof Float);
+        assertThat(c.getValue(), equalTo(1.0f));
     }
 
     @Test
@@ -153,31 +148,31 @@ public class ParserTest {
         ComparisonOperation op;
 
         p = new Parser(new StringReader(">"));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.GT));
 
         p.ReInit(new StringReader(">="));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.GE));
 
         p.ReInit(new StringReader("<"));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.LT));
 
         p.ReInit(new StringReader("<="));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.LE));
 
         p.ReInit(new StringReader("="));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.EQ));
 
         p.ReInit(new StringReader("!="));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.NE));
 
         p.ReInit(new StringReader("<>"));
-        op = p.ComparisonOperator();
+        op = p.ComparisonOperation();
         assertThat(op, equalTo(ComparisonOperation.NE));
     }
 
@@ -258,19 +253,19 @@ public class ParserTest {
         AggregateOperation op;
 
         p = new Parser(new StringReader("min"));
-        op = p.AggregationOperator();
+        op = p.AggregateOperation();
         assertThat(op, equalTo(AggregateOperation.MIN));
 
         p.ReInit(new StringReader("max"));
-        op = p.AggregationOperator();
+        op = p.AggregateOperation();
         assertThat(op, equalTo(AggregateOperation.MAX));
 
         p.ReInit(new StringReader("sum"));
-        op = p.AggregationOperator();
+        op = p.AggregateOperation();
         assertThat(op, equalTo(AggregateOperation.SUM));
 
         p.ReInit(new StringReader("avg"));
-        op = p.AggregationOperator();
+        op = p.AggregateOperation();
         assertThat(op, equalTo(AggregateOperation.AVG));
     }
 
@@ -424,45 +419,43 @@ public class ParserTest {
     @Test
     public void testPrimaryExpression() throws Exception {
         Parser p;
-        Node n;
+        Expression e;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("temperature"));
-        n = p.PrimaryExpression(false, err);
-        assertTrue(n instanceof FieldNode);
-        assertThat(((FieldNode) n).getId(), equalTo("temperature"));
+        e = p.PrimaryExpression(false, err);
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("temperature"));
 
         p.ReInit(new StringReader("pressure"));
-        n = p.PrimaryExpression(true, err);
-        assertTrue(n instanceof FieldNode);
-        assertThat(((FieldNode) n).getId(), equalTo("pressure"));
+        e = p.PrimaryExpression(true, err);
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
         // TODO: continue with the remaining expressions
     }
 
     @Test
     public void testAggregateCount() throws Exception {
         Parser p;
-        Node n;
-        AggregateNode an;
+        Expression e;
+        Aggregate agg;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("count(*, 10 samples)"));
-        n = p.Aggregate(err);
-        assertTrue(n instanceof AggregateNode);
-        an = (AggregateNode) n;
-        assertThat(an.getAggregation(), equalTo(AggregateOperation.COUNT));
-        assertThat(an.getOperand(), nullValue());
-        assertThat(an.getWindowSize(), equalTo(new WindowSize(10)));
-        assertThat(an.getFilter(), nullValue());
+        e = p.Aggregate(err);
+        assertTrue(e instanceof CountAggregate);
+        agg = (Aggregate) e;
+        assertThat(agg.getOperand(), nullValue());
+        assertThat(agg.getWindowSize(), equalTo(new WindowSize(10)));
+        assertThat(agg.getFilter(), nullValue());
 
         p = new Parser(new StringReader("count(*, 10 seconds, true)"));
-        n = p.Aggregate(err);
-        assertTrue(n instanceof AggregateNode);
-        an = (AggregateNode) n;
-        assertThat(an.getAggregation(), equalTo(AggregateOperation.COUNT));
-        assertThat(an.getOperand(), nullValue());
-        assertThat(an.getWindowSize(),
+        e = p.Aggregate(err);
+        assertTrue(e instanceof CountAggregate);
+        agg = (Aggregate) e;
+        assertThat(agg.getOperand(), nullValue());
+        assertThat(agg.getWindowSize(),
                 equalTo(new WindowSize(Duration.ofSeconds(10))));
     }
-*/
+
 }

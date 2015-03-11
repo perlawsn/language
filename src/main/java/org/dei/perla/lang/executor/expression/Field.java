@@ -17,6 +17,10 @@ public final class Field implements Expression {
         this.id = id;
     }
 
+    public String getId() {
+        return id;
+    }
+
     @Override
     public DataType getType() {
         return null;
