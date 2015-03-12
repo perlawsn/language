@@ -84,11 +84,7 @@ public class ParserTest {
         Parser p;
         Expression e;
 
-        p = new Parser(new StringReader("null"));
-        e = p.Constant();
-        assertTrue(e instanceof Null);
-
-        p.ReInit(new StringReader("false"));
+        p = new Parser(new StringReader("false"));
         e = p.Constant();
         assertTrue(e instanceof Constant);
         Constant c = (Constant) e;

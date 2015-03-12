@@ -539,21 +539,21 @@ void StatementSequence(Errors err) :
 void Statement(Errors err):
 {}
 {
-    SetParametersStament()
+    SetParametersStament(err)
     |
     CreationStatement(err)
     |
     InsertionStatement(err)
 }
 
-void SetParametersStament():
+void SetParametersStament(Errors err):
 {}
 {
     <KEYWORD_SET>
-    SetParameterList()
+    SetParameterList(err)
   	(
         ","
-  		SetParameterList()
+  		SetParameterList(err)
   	)*
     <KEYWORD_ON>
 	(
@@ -575,12 +575,12 @@ void SetParametersStament():
 	)*
 }
 
-void SetParameterList():
+void SetParameterList(Errors err):
 {}
 {
 	Identifier()
 	"="
-	Constant()
+	Expression(false, err)
 }
 
 void CreationStatement(Errors err) :
@@ -714,7 +714,11 @@ void FieldSelection(Errors err) :
 	Expression(true, err)
 	[
 		<KEYWORD_DEFAULT>
-		Expression(false, err)
+		(
+            Expression(false, err)
+            |
+            <CONSTANT_NULL>
+		)
 	]
 }
 
@@ -941,12 +945,6 @@ Sign Sign() :
 	{ return Sign.MINUS; }
 }
 
-void ConstantNull() :
-{}
-{
-	<CONSTANT_NULL>
-}
-
 LogicValue ConstantBoolean() :
 {}
 {
@@ -1009,9 +1007,6 @@ Expression Constant() :
 }
 {
 	(
-		ConstantNull()
-		{ return Null.INSTANCE; }
-		|
 		value = ConstantBoolean()
 		{ return new Constant(value, DataType.BOOLEAN); }
 		|
@@ -1543,31 +1538,36 @@ Expression PrimaryExpression(boolean aggregate, Errors err) :
 	    return e;
 	}
 	|
+	(
 	"("
-	e = Expression(aggregate, err)
-	{
-	    addIfError(e, token, err);
-	    return e;
-	}
-	")"
-	|
-	LOOKAHEAD( { aggregate } )
-	(
-		<KEYWORD_GROUPTS>
-		{ return new GroupTS(); }
-		|
-		e = Aggregate(err)
-		{ return e; }
-		|
-		s = Identifier() // FPC attribute
-		{ return new Field(s); }
+        e = Expression(aggregate, err)
+        {
+            addIfError(e, token, err);
+            return e;
+        }
+        ")"
 	)
 	|
-	LOOKAHEAD( { !aggregate } )
-	(
-		s = Identifier() // FPC attribute
-		{ return new Field(s); }
-	)
+    <KEYWORD_GROUPTS>
+    {
+        if (!aggregate) {
+            addError("aggregation not allowed", token, err);
+            return new ErrorExpression("aggregation not allowed");
+        }
+        return new GroupTS();
+    }
+    |
+    e = Aggregate(err)
+    {
+        if (!aggregate) {
+            addError("aggregation not allowed", token, err);
+            return new ErrorExpression("aggregation not allowed");
+        }
+        return e;
+    }
+    |
+    s = Identifier() // FPC attribute
+    { return new Field(s); }
 }
 
 Expression ExistsAttribute() :
