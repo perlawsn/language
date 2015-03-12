@@ -115,20 +115,21 @@ public class ComparisonTest {
     @Test
     public void testEQNull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createEQ(c, Null.INSTANCE);
+        Expression e = Comparison.createEQ(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createEQ(Null.INSTANCE, c);
+        e = Comparison.createEQ(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createEQ(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createEQ(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -228,20 +229,21 @@ public class ComparisonTest {
     @Test
     public void testNENull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createNE(c, Null.INSTANCE);
+        Expression e = Comparison.createNE(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createNE(Null.INSTANCE, c);
+        e = Comparison.createNE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createNE(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createNE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -331,20 +333,21 @@ public class ComparisonTest {
     @Test
     public void testGTNull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createGT(c, Null.INSTANCE);
+        Expression e = Comparison.createGT(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createGT(Null.INSTANCE, c);
+        e = Comparison.createGT(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createGT(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createGT(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -438,20 +441,21 @@ public class ComparisonTest {
     @Test
     public void testGENull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createGE(c, Null.INSTANCE);
+        Expression e = Comparison.createGE(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createGE(Null.INSTANCE, c);
+        e = Comparison.createGE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createGE(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createGE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -545,20 +549,21 @@ public class ComparisonTest {
     @Test
     public void testLTNull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createLT(c, Null.INSTANCE);
+        Expression e = Comparison.createLT(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createLT(Null.INSTANCE, c);
+        e = Comparison.createLT(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createLT(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createLT(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -652,20 +657,21 @@ public class ComparisonTest {
     @Test
     public void testLENull() {
         Expression c = new Constant(4, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Comparison.createLE(c, Null.INSTANCE);
+        Expression e = Comparison.createLE(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createLE(Null.INSTANCE, c);
+        e = Comparison.createLE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Comparison.createLE(Null.INSTANCE, Null.INSTANCE);
+        e = Comparison.createLE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);

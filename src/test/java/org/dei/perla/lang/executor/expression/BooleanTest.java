@@ -52,7 +52,7 @@ public class BooleanTest {
 
     @Test
     public void testNOTUnknown() {
-        Expression e = Bool.createNOT(Null.INSTANCE);
+        Expression e = Bool.createNOT(Constant.NULL_BOOLEAN);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
@@ -113,31 +113,33 @@ public class BooleanTest {
 
     @Test
     public void testANDUnknown() {
-        Expression e = Bool.createAND(trueExpr, Null.INSTANCE);
+        Expression nul = Constant.NULL_BOOLEAN;
+
+        Expression e = Bool.createAND(trueExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createAND(falseExpr, Null.INSTANCE);
+        e = Bool.createAND(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createAND(Null.INSTANCE, trueExpr);
+        e = Bool.createAND(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createAND(Null.INSTANCE, falseExpr);
+        e = Bool.createAND(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createAND(Null.INSTANCE, Null.INSTANCE);
+        e = Bool.createAND(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -222,31 +224,33 @@ public class BooleanTest {
 
     @Test
     public void testORUnknown() {
-        Expression e = Bool.createOR(trueExpr, Null.INSTANCE);
+        Expression nul = Constant.NULL_BOOLEAN;
+
+        Expression e = Bool.createOR(trueExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createOR(falseExpr, Null.INSTANCE);
+        e = Bool.createOR(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createOR(Null.INSTANCE, trueExpr);
+        e = Bool.createOR(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createOR(Null.INSTANCE, falseExpr);
+        e = Bool.createOR(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createOR(Null.INSTANCE, Null.INSTANCE);
+        e = Bool.createOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -331,31 +335,33 @@ public class BooleanTest {
 
     @Test
     public void testXORUnknown() {
-        Expression e = Bool.createXOR(trueExpr, Null.INSTANCE);
+        Expression nul = Constant.NULL_BOOLEAN;
+
+        Expression e = Bool.createXOR(trueExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createXOR(falseExpr, Null.INSTANCE);
+        e = Bool.createXOR(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createXOR(Null.INSTANCE, trueExpr);
+        e = Bool.createXOR(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createXOR(Null.INSTANCE, falseExpr);
+        e = Bool.createXOR(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bool.createXOR(Null.INSTANCE, Null.INSTANCE);
+        e = Bool.createXOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);

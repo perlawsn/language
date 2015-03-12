@@ -101,20 +101,21 @@ public class ArithmeticTest {
     @Test
     public void additionNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Arithmetic.createAddition(c, Null.INSTANCE);
+        Expression e = Arithmetic.createAddition(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createAddition(Null.INSTANCE, c);
+        e = Arithmetic.createAddition(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createAddition(Null.INSTANCE, Null.INSTANCE);
+        e = Arithmetic.createAddition(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -204,18 +205,19 @@ public class ArithmeticTest {
     @Test
     public void subtractionNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Arithmetic.createSubtraction(c, Null.INSTANCE);
+        Expression e = Arithmetic.createSubtraction(c, nul);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createSubtraction(Null.INSTANCE, c);
+        e = Arithmetic.createSubtraction(nul, c);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createSubtraction(Null.INSTANCE, Null.INSTANCE);
+        e = Arithmetic.createSubtraction(nul, nul);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -298,18 +300,19 @@ public class ArithmeticTest {
     @Test
     public void productNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Arithmetic.createProduct(c, Null.INSTANCE);
+        Expression e = Arithmetic.createProduct(c, nul);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createProduct(Null.INSTANCE, c);
+        e = Arithmetic.createProduct(nul, c);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createProduct(Null.INSTANCE, Null.INSTANCE);
+        e = Arithmetic.createProduct(nul, nul);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -392,18 +395,19 @@ public class ArithmeticTest {
     @Test
     public void divisionNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Arithmetic.createDivision(c, Null.INSTANCE);
+        Expression e = Arithmetic.createDivision(c, nul);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createDivision(Null.INSTANCE, c);
+        e = Arithmetic.createDivision(nul, c);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createDivision(Null.INSTANCE, Null.INSTANCE);
+        e = Arithmetic.createDivision(nul, nul);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -463,18 +467,19 @@ public class ArithmeticTest {
     @Test
     public void moduloNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Arithmetic.createModulo(c, Null.INSTANCE);
+        Expression e = Arithmetic.createModulo(c, nul);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createModulo(Null.INSTANCE, c);
+        e = Arithmetic.createModulo(nul, c);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createModulo(Null.INSTANCE, Null.INSTANCE);
+        e = Arithmetic.createModulo(nul, nul);
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -547,7 +552,7 @@ public class ArithmeticTest {
 
     @Test
     public void inverseNullTest() {
-        Expression e = Arithmetic.createInverse(Null.INSTANCE);
+        Expression e = Arithmetic.createInverse(Constant.NULL_INTEGER);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());

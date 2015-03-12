@@ -33,10 +33,6 @@ public final class SumAggregate extends Aggregate {
             }
         }
 
-        if (e instanceof Null || filter instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         return new SumAggregate(e, ws, filter);
     }
 
@@ -60,13 +56,19 @@ public final class SumAggregate extends Aggregate {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) e.run(r, b);
+                    Integer v = (Integer) e.run(r, b);
+                    if (v != null) {
+                        si.value += v;
+                    }
                 }, filter);
                 return si.value;
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) e.run(r, b);
+                    Float v = (Float) e.run(r, b);
+                    if (v != null) {
+                        sf.value += v;
+                    }
                 }, filter);
                 return sf.value;
             default:

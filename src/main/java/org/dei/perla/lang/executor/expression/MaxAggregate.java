@@ -35,10 +35,6 @@ public final class MaxAggregate extends Aggregate {
             }
         }
 
-        if (e instanceof Null || filter instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         return new MaxAggregate(e, ws, filter);
     }
 
@@ -58,34 +54,50 @@ public final class MaxAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
+        BooleanAccumulator found = new BooleanAccumulator(false);
         switch (type) {
             case INTEGER:
                 IntAccumulator maxi = new IntAccumulator(Integer.MIN_VALUE);
                 buffer.forEach((r, b) -> {
                     Integer vi = (Integer) e.run(r, b);
-                    if (maxi.value < vi) {
+                    if (vi != null && maxi.value < vi) {
+                        found.value = true;
                         maxi.value = vi;
                     }
                 }, filter);
-                return maxi.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return maxi.value;
+                }
             case FLOAT:
                 FloatAccumulator maxf = new FloatAccumulator(Float.MIN_VALUE);
                 buffer.forEach((r, b) -> {
                     Float vf = (Float) e.run(r, b);
-                    if (maxf.value < vf) {
+                    if (vf != null && maxf.value < vf) {
+                        found.value = true;
                         maxf.value = vf;
                     }
                 }, filter);
-                return maxf.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return maxf.value;
+                }
             case TIMESTAMP:
                 InstantAccumulator maxt = new InstantAccumulator(Instant.MIN);
                 buffer.forEach((r, b) -> {
                     Instant vt = (Instant) e.run(r, b);
-                    if (maxt.value.compareTo(vt) < 0) {
+                    if (vt != null && maxt.value.compareTo(vt) < 0) {
+                        found.value = true;
                         maxt.value = vt;
                     }
                 }, filter);
-                return maxt.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return maxt.value;
+                }
             default:
                 throw new RuntimeException(
                         "max aggregation not defined for type " + type);

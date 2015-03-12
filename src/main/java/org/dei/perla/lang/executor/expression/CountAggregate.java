@@ -27,10 +27,6 @@ public final class CountAggregate extends Aggregate {
             }
         }
 
-        if (filter instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         return new CountAggregate(ws, filter);
     }
 

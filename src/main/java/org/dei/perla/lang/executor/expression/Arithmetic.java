@@ -64,10 +64,6 @@ public final class Arithmetic implements Expression {
                     "integer operands are allowed in " + op + " operations");
         }
 
-        if (e1 instanceof Null || e2 instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         if (t1 != t2) {
             if (t1 == DataType.INTEGER) {
                 e1 = CastFloat.create(e1);
@@ -82,7 +78,11 @@ public final class Arithmetic implements Expression {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
             if (o1 == null || o2 == null) {
-                return Null.INSTANCE;
+                if (t1 == DataType.INTEGER) {
+                    return Constant.NULL_INTEGER;
+                } else {
+                    return Constant.NULL_FLOAT;
+                }
             }
             if (t1 == DataType.INTEGER) {
                 return new Constant(computeInteger(op, o1, o2), t1);

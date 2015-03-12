@@ -123,19 +123,20 @@ public class AggregateTest {
 
     @Test
     public void testSumNull() {
-        Expression e = Aggregate.createSum(Null.INSTANCE, new WindowSize(3),
-                null);
+        Expression nuli = Constant.NULL_INTEGER;
+        Expression nulb = Constant.NULL_BOOLEAN;
+
+        Expression e = Aggregate.createSum(nuli, new WindowSize(3), null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, view);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(0));
 
-        e = Aggregate.createSum(Null.INSTANCE, new WindowSize(3),
-                Null.INSTANCE);
+        e = Aggregate.createSum(nuli, new WindowSize(3), nulb);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, view);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(0));
     }
 
     @Test
@@ -246,19 +247,20 @@ public class AggregateTest {
 
     @Test
     public void testAvgNull() {
-        Expression e = Aggregate.createAvg(Null.INSTANCE, new WindowSize(3),
-                null);
+        Expression nulf = Constant.NULL_FLOAT;
+        Expression nulb = Constant.NULL_BOOLEAN;
+
+        Expression e = Aggregate.createAvg(nulf, new WindowSize(3), null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, view);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(0));
 
-        e = Aggregate.createAvg(Null.INSTANCE, new WindowSize(3),
-                Null.INSTANCE);
+        e = Aggregate.createAvg(nulf, new WindowSize(3), nulb);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, view);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(0));
     }
 
     @Test
@@ -397,15 +399,16 @@ public class AggregateTest {
 
     @Test
     public void testMinNull() {
-        Expression e = Aggregate.createMin(Null.INSTANCE, new WindowSize(3),
-                null);
+        Expression nuli = Constant.NULL_INTEGER;
+        Expression nulb = Constant.NULL_BOOLEAN;
+
+        Expression e = Aggregate.createMin(nuli, new WindowSize(3), null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, view);
         assertThat(res, nullValue());
 
-        e = Aggregate.createMin(Null.INSTANCE, new WindowSize(3),
-                Null.INSTANCE);
+        e = Aggregate.createMin(nuli, new WindowSize(3), nulb);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, view);
@@ -549,15 +552,16 @@ public class AggregateTest {
 
     @Test
     public void testMaxNull() {
-        Expression e = Aggregate.createMax(Null.INSTANCE, new WindowSize(3),
-                null);
+        Expression nulf = Constant.NULL_FLOAT;
+        Expression nulb = Constant.NULL_BOOLEAN;
+
+        Expression e = Aggregate.createMax(nulf, new WindowSize(3), null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, view);
         assertThat(res, nullValue());
 
-        e = Aggregate.createMax(Null.INSTANCE, new WindowSize(3),
-                Null.INSTANCE);
+        e = Aggregate.createMax(nulf, new WindowSize(3), nulb);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, view);
@@ -647,18 +651,19 @@ public class AggregateTest {
 
     @Test
     public void testCountNull() {
-        Expression e = Aggregate.createCount(new WindowSize(3), Null.INSTANCE);
+        Expression nulb = Constant.NULL_BOOLEAN;
+
+        Expression e = Aggregate.createCount(new WindowSize(3), nulb);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, view);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(0));
     }
 
     @Test
     public void testCountError() {
         WindowSize ws = new WindowSize(10);
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
 
         Expression e = Aggregate.createCount(ws, err);
         assertTrue(e.isComplete());
@@ -668,7 +673,6 @@ public class AggregateTest {
     @Test
     public void testCountRebuild() {
         Expression c = new Constant(12, DataType.INTEGER);
-        Expression cFilt = new Constant(true, DataType.BOOLEAN);
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 

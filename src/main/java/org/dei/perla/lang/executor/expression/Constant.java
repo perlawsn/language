@@ -11,6 +11,13 @@ import java.util.List;
  */
 public final class Constant implements Expression {
 
+    public static final Constant NULL_INTEGER =
+            new Constant(null, DataType.INTEGER);
+    public static final Constant NULL_FLOAT =
+            new Constant(null, DataType.FLOAT);
+    public static final Constant NULL_BOOLEAN =
+            new Constant(null, DataType.BOOLEAN);
+
     public static final Constant UNKNOWN =
             new Constant(LogicValue.UNKNOWN, DataType.BOOLEAN);
 

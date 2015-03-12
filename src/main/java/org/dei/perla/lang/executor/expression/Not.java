@@ -23,14 +23,10 @@ public final class Not implements Expression {
                     "boolean values are allowed");
         }
 
-        if (e instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         if (e instanceof Constant) {
             Boolean b = (Boolean) ((Constant) e).getValue();
             if (b == null) {
-                return Null.INSTANCE;
+                return Constant.NULL_BOOLEAN;
             }
             return new Constant(!b, DataType.BOOLEAN);
         }

@@ -27,12 +27,11 @@ public final class CastFloat implements Expression {
             return new ErrorExpression("Cannot cast " + t + " to float");
         }
 
-        if (e instanceof Null) {
-            return e;
-        }
-
         if (e instanceof Constant) {
             Integer value = (Integer) ((Constant) e).getValue();
+            if (value == null) {
+                return Constant.NULL_FLOAT;
+            }
             return new Constant(value.floatValue(), DataType.FLOAT);
         }
 

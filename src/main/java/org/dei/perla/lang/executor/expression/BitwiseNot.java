@@ -24,17 +24,10 @@ public final class BitwiseNot implements Expression {
                     "integer values are allowed in bitwise not operations");
         }
 
-        if (e instanceof Null) {
-            return Null.INSTANCE;
-        }
-        if (e instanceof ErrorExpression) {
-            return e;
-        }
-
         if (e instanceof Constant) {
             Object o = ((Constant) e).getValue();
             if (o == null) {
-                return Null.INSTANCE;
+                return Constant.NULL_INTEGER;
             }
             return new Constant(~(Integer) o, t);
         }

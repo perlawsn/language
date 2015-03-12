@@ -190,4 +190,18 @@ public abstract class Aggregate implements Expression {
 
     }
 
+    /**
+     * A simple wrapper class employed to allow the modification of final
+     * closure variables in aggregation lambdas
+     */
+    public static final class BooleanAccumulator {
+
+        protected boolean value;
+
+        protected BooleanAccumulator(boolean value) {
+            this.value = value;
+        }
+
+    }
+
 }

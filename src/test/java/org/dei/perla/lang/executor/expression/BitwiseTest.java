@@ -44,20 +44,21 @@ public class BitwiseTest {
     @Test
     public void bitwiseANDNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Bitwise.createAND(c, Null.INSTANCE);
+        Expression e = Bitwise.createAND(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createAND(Null.INSTANCE, c);
+        e = Bitwise.createAND(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createAND(Null.INSTANCE, Null.INSTANCE);
+        e = Bitwise.createAND(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -125,20 +126,21 @@ public class BitwiseTest {
     @Test
     public void bitwiseORNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Bitwise.createOR(c, Null.INSTANCE);
+        Expression e = Bitwise.createOR(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createOR(Null.INSTANCE, c);
+        e = Bitwise.createOR(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createOR(Null.INSTANCE, Null.INSTANCE);
+        e = Bitwise.createOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -206,20 +208,21 @@ public class BitwiseTest {
     @Test
     public void bitwiseXORNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Bitwise.createXOR(c, Null.INSTANCE);
+        Expression e = Bitwise.createXOR(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createXOR(Null.INSTANCE, c);
+        e = Bitwise.createXOR(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createXOR(Null.INSTANCE, Null.INSTANCE);
+        e = Bitwise.createXOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -285,7 +288,7 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseNOTNullTest() {
-        Expression e = Bitwise.createNOT(Null.INSTANCE);
+        Expression e = Bitwise.createNOT(Constant.NULL_INTEGER);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
@@ -329,20 +332,21 @@ public class BitwiseTest {
     @Test
     public void bitwiseLSHNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Bitwise.createLSH(c, Null.INSTANCE);
+        Expression e = Bitwise.createLSH(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createLSH(Null.INSTANCE, c);
+        e = Bitwise.createLSH(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createLSH(Null.INSTANCE, Null.INSTANCE);
+        e = Bitwise.createLSH(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
@@ -410,20 +414,21 @@ public class BitwiseTest {
     @Test
     public void bitwiseRSHNullTest() {
         Expression c = new Constant(43, DataType.INTEGER);
+        Expression nul = Constant.NULL_INTEGER;
 
-        Expression e = Bitwise.createRSH(c, Null.INSTANCE);
+        Expression e = Bitwise.createRSH(c, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createRSH(Null.INSTANCE, c);
+        e = Bitwise.createRSH(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createRSH(Null.INSTANCE, Null.INSTANCE);
+        e = Bitwise.createRSH(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);

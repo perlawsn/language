@@ -35,10 +35,6 @@ public final class MinAggregate extends Aggregate {
             }
         }
 
-        if (e instanceof Null || filter instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         return new MinAggregate(e, ws, filter);
     }
 
@@ -58,34 +54,50 @@ public final class MinAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
+        BooleanAccumulator found = new BooleanAccumulator(false);
         switch (type) {
             case INTEGER:
                 IntAccumulator mini = new IntAccumulator(Integer.MAX_VALUE);
                 buffer.forEach((r, b) -> {
                     Integer vi = (Integer) e.run(r, b);
-                    if (mini.value > vi) {
+                    if (vi != null && mini.value > vi) {
+                        found.value = true;
                         mini.value = vi;
                     }
                 }, filter);
-                return mini.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return mini.value;
+                }
             case FLOAT:
                 FloatAccumulator minf = new FloatAccumulator(Float.MAX_VALUE);
                 buffer.forEach((r, b) -> {
                     Float vf = (Float) e.run(r, b);
-                    if (minf.value > vf) {
+                    if (vf != null && minf.value > vf) {
+                        found.value = true;
                         minf.value = vf;
                     }
                 }, filter);
-                return minf.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return minf.value;
+                }
             case TIMESTAMP:
                 InstantAccumulator mint = new InstantAccumulator(Instant.MAX);
                 buffer.forEach((r, b) -> {
                     Instant vt = (Instant) e.run(r, b);
-                    if (mint.value.compareTo(vt) > 0) {
+                    if (vt != null && mint.value.compareTo(vt) > 0) {
+                        found.value = true;
                         mint.value = vt;
                     }
                 }, filter);
-                return mint.value;
+                if (!found.value) {
+                    return null;
+                } else {
+                    return mint.value;
+                }
             default:
                 throw new RuntimeException(
                         "min aggregation not defined for type " + type);

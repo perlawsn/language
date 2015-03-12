@@ -33,10 +33,6 @@ public final class AvgAggregate extends Aggregate {
             }
         }
 
-        if (e instanceof Null || filter instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         return new AvgAggregate(e, ws, filter);
     }
 
@@ -61,17 +57,31 @@ public final class AvgAggregate extends Aggregate {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);
                 buffer.forEach((r, b) -> {
-                    si.value += (Integer) e.run(r, b);
-                    count.value++;
+                    Integer v = (Integer) e.run(r, b);
+                    if (v != null) {
+                        si.value += (Integer) e.run(r, b);
+                        count.value++;
+                    }
                 }, filter);
-                return si.value.floatValue() / count.value;
+                if (count.value == 0) {
+                    return 0;
+                } else {
+                    return si.value.floatValue() / count.value;
+                }
             case FLOAT:
                 FloatAccumulator sf = new FloatAccumulator(0f);
                 buffer.forEach((r, b) -> {
-                    sf.value += (Float) e.run(r, b);
-                    count.value++;
+                    Float v = (Float) e.run(r, b);
+                    if (v != null) {
+                        sf.value += (Float) e.run(r, b);
+                        count.value++;
+                    }
                 }, filter);
-                return sf.value / count.value;
+                if (count.value == 0) {
+                    return 0;
+                } else {
+                    return sf.value / count.value;
+                }
             default:
                 throw new RuntimeException(
                         "avg aggregation not defined for type " + type);

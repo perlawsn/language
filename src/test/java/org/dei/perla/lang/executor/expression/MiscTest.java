@@ -59,17 +59,6 @@ public class MiscTest {
     }
 
     @Test
-    public void nullTest() {
-        Null n = Null.INSTANCE;
-
-        assertThat(n.getType(), nullValue());
-        assertTrue(n.isComplete());
-        assertFalse(n.hasErrors());
-        assertThat(n.run(view.get(0), view), nullValue());
-        assertThat(n.run(view.get(1), view), nullValue());
-    }
-
-    @Test
     public void castFloat() {
         Constant cInt = new Constant(1, DataType.INTEGER);
         Constant cFloat = new Constant(1.2f, DataType.FLOAT);

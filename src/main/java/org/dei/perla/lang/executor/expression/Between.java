@@ -32,14 +32,14 @@ public final class Between implements Expression {
             return new ErrorExpression("Incompatible operand types");
         }
 
-        if (e instanceof Null || min instanceof Null || max instanceof Null) {
-            return Constant.UNKNOWN;
-        }
         if (e instanceof Constant && min instanceof Constant && max
                 instanceof Constant) {
             Object o = ((Constant) e).getValue();
             Object omin = ((Constant) min).getValue();
             Object omax = ((Constant) max).getValue();
+            if (o == null || omin == null || omax == null) {
+                return Constant.UNKNOWN;
+            }
             return new Constant(compute(o, omin, omax), DataType.BOOLEAN);
         }
 

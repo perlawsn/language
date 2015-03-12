@@ -48,15 +48,11 @@ public final class Bool implements Expression {
                     "boolean operands are allowed in boolean operations");
         }
 
-        if (e1 instanceof Null || e2 instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         if (e1 instanceof Constant && e2 instanceof Constant) {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
             if (o1 == null || o2 == null) {
-                return Null.INSTANCE;
+                return Constant.NULL_BOOLEAN;
             }
             return new Constant(compute(op, o1, o2), DataType.BOOLEAN);
         }

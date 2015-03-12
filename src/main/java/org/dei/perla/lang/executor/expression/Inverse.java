@@ -24,14 +24,14 @@ public final class Inverse implements Expression {
                     "integer and float values are allowed");
         }
 
-        if (e instanceof Null) {
-            return Null.INSTANCE;
-        }
-
         if (e instanceof Constant) {
             Object o = ((Constant) e).getValue();
             if (o == null) {
-                return Null.INSTANCE;
+                if (t == DataType.INTEGER) {
+                    return Constant.NULL_INTEGER;
+                } else {
+                    return Constant.NULL_FLOAT;
+                }
             }
             return new Constant(compute(t, o), t);
         }
