@@ -40,10 +40,15 @@ public final class Field implements Expression {
     public Expression rebuild(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
-            if (a.getId().equals(id)) {
+            if (!a.getId().equals(id)) {
+                i++;
+                continue;
+            }
+            if (a.getType() == DataType.BOOLEAN) {
+                return new ConcreteBooleanField(i);
+            } else {
                 return new ConcreteField(i, a.getType());
             }
-            i++;
         }
         return this;
     }
@@ -86,6 +91,55 @@ public final class Field implements Expression {
         @Override
         public Object run(Object[] record, BufferView buffer) {
             return record[idx];
+        }
+
+    }
+
+    /**
+     * A special concrete field type deisgned to handle boolean values. This
+     * field is responsible for translating the boolean data received from
+     * the {@link Fpc} object into a {@link LogicValue}, which can then be
+     * used in PerLa query expressions.
+     */
+    private static final class ConcreteBooleanField implements Expression {
+
+        private final int idx;
+
+        private ConcreteBooleanField(int idx) {
+            this.idx = idx;
+        }
+
+        @Override
+        public DataType getType() {
+            return DataType.BOOLEAN;
+        }
+
+        @Override
+        public boolean isComplete() {
+            return true;
+        }
+
+        @Override
+        public boolean hasErrors() {
+            return false;
+        }
+
+        @Override
+        public Expression rebuild(List<Attribute> atts) {
+            return this;
+        }
+
+        @Override
+        public Object run(Object[] record, BufferView buffer) {
+            Object o = record[idx];
+
+            if (o == null) {
+                return null;
+            } else if ((Boolean) o) {
+                return LogicValue.TRUE;
+            } else {
+                return LogicValue.FALSE;
+            }
         }
 
     }

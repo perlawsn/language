@@ -727,31 +727,31 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.run(null, null), equalTo(true));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
         e = Between.create(min, min, max);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.run(null, null), equalTo(true));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
         e = Between.create(max, min, max);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.run(null, null), equalTo(true));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
         e = Between.create(min, middle, max);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.run(null, null), equalTo(false));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
 
         e = Between.create(min, middle, max);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.run(null, null), equalTo(false));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
     }
 
     @Test

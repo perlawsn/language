@@ -11,6 +11,9 @@ import java.util.List;
  */
 public final class Constant implements Expression {
 
+    public static final Constant UNKNOWN =
+            new Constant(LogicValue.UNKNOWN, DataType.BOOLEAN);
+
     private final Object value;
     private final DataType type;
 

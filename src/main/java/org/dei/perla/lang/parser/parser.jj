@@ -941,34 +941,21 @@ Sign Sign() :
 	{ return Sign.MINUS; }
 }
 
-LogicValue LogicValue() :
-{}
-{
-	<CONSTANT_BOOLEAN_TRUE>
-	{ return LogicValue.TRUE; }
-	|
-	<CONSTANT_BOOLEAN_FALSE>
-	{ return LogicValue.FALSE; }
-	|
-	<CONSTANT_BOOLEAN_UNKNOWN>
-	{ return LogicValue.UNKNOWN; }
-}
-
 void ConstantNull() :
 {}
 {
 	<CONSTANT_NULL>
 }
 
-boolean ConstantBoolean() :
+LogicValue ConstantBoolean() :
 {}
 {
 	(
 		<CONSTANT_BOOLEAN_TRUE>
-		{ return true; }
+		{ return LogicValue.TRUE; }
 		|
 		<CONSTANT_BOOLEAN_FALSE>
-		{ return false; }
+		{ return LogicValue.FALSE; }
 	)
 }
 

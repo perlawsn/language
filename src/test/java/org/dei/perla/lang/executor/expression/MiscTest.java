@@ -30,6 +30,8 @@ public class MiscTest {
             Attribute.create("string", DataType.STRING);
     private static Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
+    private static Attribute boolAtt =
+            Attribute.create("boolean", DataType.BOOLEAN);
 
     private static List<Attribute> atts;
 
@@ -41,16 +43,17 @@ public class MiscTest {
                 Attribute.TIMESTAMP,
                 integerAtt,
                 stringAtt,
-                floatAtt
+                floatAtt,
+                boolAtt
         };
         atts = Arrays.asList(as);
 
         Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f, true}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f, false}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f, false}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f, null}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f, true}));
 
         view = b.unmodifiableView();
     }
@@ -118,6 +121,12 @@ public class MiscTest {
         assertFalse(c1.hasErrors());
         assertThat(c2.getType(), equalTo(DataType.STRING));
         assertThat(c2.run(view.get(0), view), equalTo("test"));
+
+        Constant u = Constant.UNKNOWN;
+        assertTrue(u.isComplete());
+        assertFalse(u.hasErrors());
+        assertThat(u.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(u.run(null, null), equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -139,6 +148,16 @@ public class MiscTest {
         assertThat(fs.getType(), equalTo(DataType.STRING));
         assertThat(fs.run(view.get(0), view), equalTo("4"));
         assertThat(fs.run(view.get(1), view), equalTo("3"));
+
+        Expression fb = new Field(boolAtt.getId());
+        assertFalse(fb.isComplete());
+        assertFalse(fb.hasErrors());
+        fb = fb.rebuild(atts);
+        assertTrue(fb.isComplete());
+        assertThat(fb.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(fb.run(view.get(0), view), equalTo(LogicValue.TRUE));
+        assertThat(fb.run(view.get(1), view), nullValue());
+        assertThat(fb.run(view.get(2), view), equalTo(LogicValue.FALSE));
     }
 
     @Test

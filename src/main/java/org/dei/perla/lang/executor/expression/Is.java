@@ -3,7 +3,6 @@ package org.dei.perla.lang.executor.expression;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
-import org.dei.perla.lang.parser.LogicValue;
 
 import java.util.List;
 

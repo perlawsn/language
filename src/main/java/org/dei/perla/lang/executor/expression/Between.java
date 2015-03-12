@@ -33,7 +33,7 @@ public final class Between implements Expression {
         }
 
         if (e instanceof Null || min instanceof Null || max instanceof Null) {
-            return Null.INSTANCE;
+            return Constant.UNKNOWN;
         }
         if (e instanceof Constant && min instanceof Constant && max
                 instanceof Constant) {
@@ -83,12 +83,18 @@ public final class Between implements Expression {
 
     private static Object compute(Object o, Object omin, Object omax) {
         if (o == null || omin == null || omax == null) {
-            return null;
+            return LogicValue.UNKNOWN;
         }
 
         Comparable<Object> cmin = (Comparable<Object>) omin;
         Comparable<Object> cmax = (Comparable<Object>) omax;
-        return cmin.compareTo(o) <= 0 && cmax.compareTo(o) >= 0;
+        Boolean res = cmin.compareTo(o) <= 0 &&
+                cmax.compareTo(o) >= 0;
+        if (res) {
+            return LogicValue.TRUE;
+        } else {
+            return LogicValue.FALSE;
+        }
     }
 
 }

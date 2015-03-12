@@ -32,29 +32,14 @@ public class ParserTest {
     }
 
     @Test
-    public void testLogicValue() throws Exception {
-        Parser p = new Parser(new StringReader("true"));
-        LogicValue l = p.LogicValue();
-        assertThat(l, equalTo(LogicValue.TRUE));
-
-        p = new Parser(new StringReader("false"));
-        l = p.LogicValue();
-        assertThat(l, equalTo(LogicValue.FALSE));
-
-        p.ReInit(new StringReader("unknown"));
-        l = p.LogicValue();
-        assertThat(l, equalTo(LogicValue.UNKNOWN));
-    }
-
-    @Test
     public void testConstantBoolean() throws Exception {
         Parser p = new Parser(new StringReader("true"));
-        boolean b = p.ConstantBoolean();
-        assertTrue(b);
+        LogicValue b = p.ConstantBoolean();
+        assertThat(b, equalTo(LogicValue.TRUE));
 
         p = new Parser(new StringReader("false"));
         b = p.ConstantBoolean();
-        assertFalse(b);
+        assertThat(b, equalTo(LogicValue.FALSE));
     }
 
     @Test
@@ -108,14 +93,14 @@ public class ParserTest {
         assertTrue(e instanceof Constant);
         Constant c = (Constant) e;
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(c.getValue(), equalTo(false));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         p.ReInit(new StringReader("true"));
         e = p.Constant();
         assertTrue(e instanceof Constant);
         c = (Constant) e;
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(c.getValue(), equalTo(true));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("'test_string'"));
         e = p.Constant();
@@ -893,7 +878,7 @@ public class ParserTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Constant);
-        assertThat(((Constant) e).getValue(), equalTo(true));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("between -12 and 45"));
         e = p.Between(f, false, err);
