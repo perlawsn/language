@@ -25,10 +25,7 @@ public final class Not implements Expression {
 
         if (e instanceof Constant) {
             LogicValue l = (LogicValue) ((Constant) e).getValue();
-            if (l == null) {
-                return Constant.UNKNOWN;
-            }
-            return Constant.create(l.not(), DataType.BOOLEAN);
+            return Constant.create(LogicValue.not(l), DataType.BOOLEAN);
         }
 
         return new Not(e);

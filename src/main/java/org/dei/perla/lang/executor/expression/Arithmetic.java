@@ -77,13 +77,6 @@ public final class Arithmetic implements Expression {
         if (e1 instanceof Constant && e2 instanceof Constant) {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
-            if (o1 == null || o2 == null) {
-                if (t1 == DataType.INTEGER) {
-                    return Constant.NULL_INTEGER;
-                } else {
-                    return Constant.NULL_FLOAT;
-                }
-            }
             if (t1 == DataType.INTEGER) {
                 return Constant.create(computeInteger(op, o1, o2), t1);
             } else {

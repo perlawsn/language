@@ -37,9 +37,6 @@ public final class Between implements Expression {
             Object o = ((Constant) e).getValue();
             Object omin = ((Constant) min).getValue();
             Object omax = ((Constant) max).getValue();
-            if (o == null || omin == null || omax == null) {
-                return Constant.UNKNOWN;
-            }
             return Constant.create(compute(o, omin, omax), DataType.BOOLEAN);
         }
 

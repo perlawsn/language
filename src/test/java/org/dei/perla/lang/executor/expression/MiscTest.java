@@ -119,6 +119,171 @@ public class MiscTest {
     }
 
     @Test
+    public void constantNullTest() {
+        Expression e = Constant.NULL_INTEGER;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.INTEGER);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_INTEGER));
+
+        e = Constant.NULL_FLOAT;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.FLOAT);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_FLOAT));
+
+        e = Constant.NULL_STRING;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.STRING));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.STRING);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.STRING));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_STRING));
+
+        e = Constant.NULL_BOOLEAN;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.BOOLEAN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_BOOLEAN));
+
+        e = Constant.NULL_TIMESTAMP;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.TIMESTAMP);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_TIMESTAMP));
+
+        e = Constant.NULL_ID;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.ID));
+        assertThat(((Constant) e).getValue(), nullValue());
+
+        e = Constant.create(null, DataType.ID);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.ID));
+        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL_ID));
+    }
+
+    @Test
+    public void testConstantLogic() {
+        Expression e = Constant.TRUE;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
+
+        e = Constant.create(LogicValue.TRUE, DataType.BOOLEAN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
+        assertThat(e, equalTo(Constant.TRUE));
+
+        e = Constant.FALSE;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
+
+        e = Constant.create(LogicValue.FALSE, DataType.BOOLEAN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
+        assertThat(e, equalTo(Constant.FALSE));
+
+        e = Constant.UNKNOWN;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.UNKNOWN));
+
+        e = Constant.create(LogicValue.UNKNOWN, DataType.BOOLEAN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.UNKNOWN));
+        assertThat(e, equalTo(Constant.UNKNOWN));
+    }
+
+    @Test
+    public void testConstantInteger() {
+        Expression e = Constant.INTEGER_0;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(0));
+
+        e = Constant.create(0, DataType.INTEGER);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(0));
+        assertThat(e, equalTo(Constant.INTEGER_0));
+
+        e = Constant.INTEGER_1;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(1));
+
+        e = Constant.create(1, DataType.INTEGER);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(1));
+        assertThat(e, equalTo(Constant.INTEGER_1));
+
+        e = Constant.INTEGER_2;
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(2));
+
+        e = Constant.create(2, DataType.INTEGER);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(((Constant) e).getValue(), equalTo(2));
+        assertThat(e, equalTo(Constant.INTEGER_2));
+    }
+
+    @Test
     public void fieldTest() {
         Expression fi = new Field(integerAtt.getId());
         assertFalse(fi.isComplete());

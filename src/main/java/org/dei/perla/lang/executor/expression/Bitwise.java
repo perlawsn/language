@@ -59,9 +59,6 @@ public final class Bitwise implements Expression {
         if (e1 instanceof Constant && e2 instanceof Constant) {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
-            if (o1 == null || o2 == null) {
-                return Constant.NULL_INTEGER;
-            }
             return Constant.create(compute(op, o1, o2), DataType.INTEGER);
         }
 
