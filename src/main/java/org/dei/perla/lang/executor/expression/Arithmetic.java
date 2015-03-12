@@ -94,6 +94,10 @@ public final class Arithmetic implements Expression {
         return new Arithmetic(op, e1, e2, t1);
     }
 
+    public ArithmeticOperation getOperation() {
+        return op;
+    }
+
     @Override
     public DataType getType() {
         return type;

@@ -449,13 +449,341 @@ public class ParserTest {
         assertThat(agg.getWindowSize(), equalTo(new WindowSize(10)));
         assertThat(agg.getFilter(), nullValue());
 
-        p = new Parser(new StringReader("count(*, 10 seconds, true)"));
+        p.ReInit(new StringReader("count(*, 10 seconds, true)"));
         e = p.Aggregate(err);
         assertTrue(e instanceof CountAggregate);
         agg = (Aggregate) e;
         assertThat(agg.getOperand(), nullValue());
         assertThat(agg.getWindowSize(),
                 equalTo(new WindowSize(Duration.ofSeconds(10))));
+    }
+
+    @Test
+    public void testArithmeticFactor() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("-10"));
+        e = p.ArithmeticFactor(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(-10));
+
+        p.ReInit(new StringReader("-temperature"));
+        e = p.ArithmeticFactor(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Inverse);
+    }
+
+    @Test
+    public void testArithmeticTerm() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("pressure"));
+        e = p.ArithmeticTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
+
+        p.ReInit(new StringReader("10 * -32"));
+        e = p.ArithmeticTerm(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(-320));
+
+        p.ReInit(new StringReader("100 / 10"));
+        e = p.ArithmeticTerm(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(10));
+
+        p.ReInit(new StringReader("temperature * 10"));
+        e = p.ArithmeticTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.PRODUCT));
+
+        p.ReInit(new StringReader("23 / pressure"));
+        e = p.ArithmeticTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.DIVISION));
+
+        p.ReInit(new StringReader("23 % pressure"));
+        e = p.ArithmeticTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.MODULO));
+
+        p.ReInit(new StringReader("23 * pressure / 25"));
+        e = p.ArithmeticTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.DIVISION));
+    }
+
+    @Test
+    public void testArithmeticExpression() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("pressure"));
+        e = p.ArithmeticExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
+
+        p.ReInit(new StringReader("10 + -32"));
+        e = p.ArithmeticExpression(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(-22));
+
+        p.ReInit(new StringReader("100 - 10"));
+        e = p.ArithmeticExpression(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(90));
+
+        p.ReInit(new StringReader("temperature + 10"));
+        e = p.ArithmeticExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.ADDITION));
+
+        p.ReInit(new StringReader("23 - pressure"));
+        e = p.ArithmeticExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.SUBTRACTION));
+
+        p.ReInit(new StringReader("11 - 23 + pressure / 25"));
+        e = p.ArithmeticExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Arithmetic);
+        assertThat(((Arithmetic) e).getOperation(),
+                equalTo(ArithmeticOperation.ADDITION));
+    }
+
+    @Test
+    public void testBitwiseShift() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("pressure"));
+        e = p.BitwiseShift(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
+
+        p.ReInit(new StringReader("10 << 32"));
+        e = p.BitwiseShift(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(10 << 32));
+
+        p.ReInit(new StringReader("100 >> 10"));
+        e = p.BitwiseShift(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(100 >> 10));
+
+        p.ReInit(new StringReader("temperature << 10"));
+        e = p.BitwiseShift(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.LSH));
+
+        p.ReInit(new StringReader("23 >> pressure"));
+        e = p.BitwiseShift(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.RSH));
+
+        p.ReInit(new StringReader("11 << pressure / 25"));
+        e = p.BitwiseShift(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.LSH));
+    }
+
+    @Test
+    public void testBitwiseFactor() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("pressure"));
+        e = p.BitwiseFactor(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
+
+        p.ReInit(new StringReader("10 ^ 32"));
+        e = p.BitwiseFactor(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(10 ^ 32));
+
+        p.ReInit(new StringReader("temperature ^ 10"));
+        e = p.BitwiseFactor(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.XOR));
+
+        p.ReInit(new StringReader("11 ^ pressure - 25"));
+        e = p.BitwiseFactor(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.XOR));
+    }
+
+    @Test
+    public void testBitwiseTerm() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("light"));
+        e = p.BitwiseTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("light"));
+
+        p.ReInit(new StringReader("10 & 32"));
+        e = p.BitwiseTerm(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(10 & 32));
+
+        p.ReInit(new StringReader("temperature & 10"));
+        e = p.BitwiseTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.AND));
+
+        p.ReInit(new StringReader("23 & pressure * 74"));
+        e = p.BitwiseTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.AND));
+    }
+
+    @Test
+    public void testBitwiseExpression() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("sound_level"));
+        e = p.BitwiseExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("sound_level"));
+
+        p.ReInit(new StringReader("10 | 32"));
+        e = p.BitwiseExpression(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(10 | 32));
+
+        p.ReInit(new StringReader("temperature | 10"));
+        e = p.BitwiseExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.OR));
+
+        p.ReInit(new StringReader("23 | pressure & 74"));
+        e = p.BitwiseExpression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Bitwise);
+        assertThat(((Bitwise) e).getOperation(),
+                equalTo(BitwiseOperation.OR));
     }
 
 }

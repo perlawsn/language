@@ -72,6 +72,10 @@ public final class Bitwise implements Expression {
         return new Bitwise(op, e1, e2);
     }
 
+    public BitwiseOperation getOperation() {
+        return op;
+    }
+
     @Override
     public DataType getType() {
         return DataType.INTEGER;
