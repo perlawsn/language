@@ -1294,16 +1294,16 @@ Expression BooleanPredicate(boolean aggregate, Errors err) :
 {
     e = Comparison(aggregate, err)
     [
-        Is(aggregate, err)
+        e = Is(e, aggregate, err)
         |
-        Like(aggregate, err)
+        e = Like(e, aggregate, err)
         |
-        Between(aggregate, err)
+        e = Between(e, aggregate, err)
     ]
     { return e; }
 }
 
-Expression Is(boolean aggregate, Errors err) :
+Expression Is(Expression e, boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_IS>
@@ -1322,7 +1322,7 @@ Expression Is(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Expression Like(boolean aggregate, Errors err) :
+Expression Like(Expression e, boolean aggregate, Errors err) :
 {}
 {
     <KEYWORD_LIKE>
@@ -1330,14 +1330,22 @@ Expression Like(boolean aggregate, Errors err) :
     { return null; }
 }
 
-Expression Between(boolean aggregate, Errors err) :
-{}
+Expression Between(Expression e, boolean aggregate, Errors err) :
+{
+    Expression b;
+    Expression min;
+    Expression max;
+}
 {
     <KEYWORD_BETWEEN>
-    BitwiseExpression(aggregate, err)
+    min = BitwiseExpression(aggregate, err)
     <OPERATOR_AND>
-    BitwiseExpression(aggregate, err)
-    { return null; }
+    max = BitwiseExpression(aggregate, err)
+    {
+        b = Between.create(e, min, max);
+        addIfError(b, token, err);
+        return b;
+    }
 }
 
 Expression Comparison(boolean aggregate, Errors err) :

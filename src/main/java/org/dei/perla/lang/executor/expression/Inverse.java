@@ -65,13 +65,14 @@ public final class Inverse implements Expression {
     @Override
     public Object run(Object[] record, BufferView buffer) {
         Object o = e.run(record, buffer);
-        if (o == null) {
-            return null;
-        }
         return compute(e.getType(), o);
     }
 
     public static Object compute(DataType type, Object o) {
+        if (o == null) {
+            return null;
+        }
+
         switch (type) {
             case INTEGER:
                 return - (Integer) o;

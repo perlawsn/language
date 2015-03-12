@@ -786,4 +786,120 @@ public class ParserTest {
                 equalTo(BitwiseOperation.OR));
     }
 
+    @Test
+    public void testComparisonExpression() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Field);
+        assertThat(((Field) e).getId(), equalTo("pressure"));
+
+        p.ReInit(new StringReader("10 < 32"));
+        e = p.Comparison(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(true));
+
+        p.ReInit(new StringReader("1 > 10"));
+        e = p.Comparison(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(false));
+
+        p.ReInit(new StringReader("temperature < 10"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.LT));
+
+        p.ReInit(new StringReader("23 <= pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.LE));
+
+        p.ReInit(new StringReader("23 > pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.GT));
+
+        p.ReInit(new StringReader("23 >= pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.GE));
+
+        p.ReInit(new StringReader("23 = pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.EQ));
+
+        p.ReInit(new StringReader("23 != pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.NE));
+
+        p.ReInit(new StringReader("23 <> pressure"));
+        e = p.Comparison(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Comparison);
+        assertThat(((Comparison) e).getOperation(),
+                equalTo(ComparisonOperation.NE));
+    }
+
+    @Test
+    public void testBetween() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+        Constant c = new Constant(12, DataType.INTEGER);
+        Field f = new Field("test");
+
+        p = new Parser(new StringReader("between 0 and 43"));
+        e = p.Between(c, false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(true));
+
+        p.ReInit(new StringReader("between -12 and 45"));
+        e = p.Between(f, false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Between);
+    }
+
 }

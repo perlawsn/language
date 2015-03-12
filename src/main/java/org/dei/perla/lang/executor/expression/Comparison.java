@@ -64,10 +64,14 @@ public final class Comparison implements Expression {
             if (o1 == null || o2 == null) {
                 return Null.INSTANCE;
             }
-            return new Constant(doRun(op, o1, o2), DataType.BOOLEAN);
+            return new Constant(compute(op, o1, o2), DataType.BOOLEAN);
         }
 
         return new Comparison(op, e1, e2);
+    }
+
+    public ComparisonOperation getOperation() {
+        return op;
     }
 
     @Override
@@ -97,16 +101,16 @@ public final class Comparison implements Expression {
     public Object run(Object[] record, BufferView buffer) {
         Object o1 = e1.run(record, buffer);
         Object o2 = e2.run(record, buffer);
+
+        return (compute(op, o1, o2));
+    }
+
+    private static Object compute(ComparisonOperation op, Object o1, Object o2) {
         if (o1 == null || o2 == null) {
             return null;
         }
 
-        return (doRun(op, o1, o2));
-    }
-
-    private static Object doRun(ComparisonOperation op, Object o1, Object o2) {
         Comparable<Object> c1 = (Comparable<Object>) o1;
-        Comparable<Object> c2 = (Comparable<Object>) o2;
         switch (op) {
             case LT:
                 return c1.compareTo(o2) < 0;

@@ -717,4 +717,88 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
     }
 
+    @Test
+    public void testBetween() {
+        Constant min = new Constant(-0.5f, DataType.FLOAT);
+        Constant max = new Constant(456f, DataType.FLOAT);
+        Constant middle = new Constant(23f, DataType.FLOAT);
+
+        Expression e = Between.create(middle, min, max);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(true));
+
+        e = Between.create(min, min, max);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(true));
+
+        e = Between.create(max, min, max);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(true));
+
+        e = Between.create(min, middle, max);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(false));
+
+        e = Between.create(min, middle, max);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(false));
+    }
+
+    @Test
+    public void testBetweenError() {
+        Constant c1 = new Constant(-0.5f, DataType.FLOAT);
+        Constant c2 = new Constant(456f, DataType.FLOAT);
+        Expression err = new ErrorExpression("test");
+
+        Expression e = Between.create(err, c1, c2);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Between.create(c1, err, c2);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+
+        e = Between.create(c1, c2, err);
+        assertTrue(e.isComplete());
+        assertTrue(e.hasErrors());
+    }
+
+    @Test
+    public void testBetweenRebuild() {
+        Constant c1 = new Constant(12, DataType.INTEGER);
+        Constant c2 = new Constant(54, DataType.INTEGER);
+        Field f = new Field("integer");
+
+        Expression e = Between.create(f, c1, c2);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+
+        e = Between.create(c1, f, c2);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+
+        e = Between.create(c1, c2, f);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+    }
+
 }
