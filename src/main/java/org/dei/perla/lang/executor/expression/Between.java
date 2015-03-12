@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Guido Rota 12/03/15.
  */
-public class Between implements Expression {
+public final class Between implements Expression {
 
     private final Expression e;
     private final Expression min;
