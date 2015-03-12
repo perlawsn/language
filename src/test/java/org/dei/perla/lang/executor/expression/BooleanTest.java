@@ -20,9 +20,11 @@ import static org.junit.Assert.assertTrue;
 public class BooleanTest {
 
     private static final Expression trueExpr =
-            new Constant(true, DataType.BOOLEAN);
+            Constant.TRUE;
     private static final Expression falseExpr =
-            new Constant(false, DataType.BOOLEAN);
+            Constant.FALSE;
+    private static final Expression unknownExpr =
+            Constant.UNKNOWN;
 
     private static List<Attribute> atts;
 
@@ -39,15 +41,22 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createNOT(falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
+
+        e = Bool.createNOT(unknownExpr);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        res = e.run(null, null);
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -56,7 +65,7 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -86,29 +95,29 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createAND(falseExpr, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createAND(trueExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createAND(falseExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
@@ -119,37 +128,37 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createAND(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createAND(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createAND(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createAND(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
     public void testANDError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Bool.createAND(err, c);
         assertTrue(e.isComplete());
@@ -166,17 +175,16 @@ public class BooleanTest {
 
     @Test
     public void testANDRebuild() {
-        Constant c = new Constant(true, DataType.BOOLEAN);
         Field f = new Field("boolean");
 
-        Expression e = Bool.createAND(c, f);
+        Expression e = Bool.createAND(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
-        e = Bool.createAND(f, c);
+        e = Bool.createAND(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);
@@ -197,29 +205,29 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createOR(falseExpr, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createOR(trueExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createOR(falseExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
@@ -230,37 +238,37 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createOR(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createOR(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createOR(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
     public void testORError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Bool.createOR(err, c);
         assertTrue(e.isComplete());
@@ -277,17 +285,16 @@ public class BooleanTest {
 
     @Test
     public void testORRebuild() {
-        Constant c = new Constant(true, DataType.BOOLEAN);
         Field f = new Field("boolean");
 
-        Expression e = Bool.createOR(c, f);
+        Expression e = Bool.createOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
-        e = Bool.createOR(f, c);
+        e = Bool.createOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);
@@ -308,29 +315,29 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = Bool.createXOR(falseExpr, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createXOR(trueExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(true));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = Bool.createXOR(falseExpr, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertTrue(res instanceof Boolean);
-        assertThat(res, equalTo(false));
+        assertTrue(res instanceof LogicValue);
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
@@ -341,37 +348,37 @@ public class BooleanTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createXOR(falseExpr, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createXOR(nul, trueExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createXOR(nul, falseExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Bool.createXOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
     public void testXORError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Bool.createXOR(err, c);
         assertTrue(e.isComplete());
@@ -388,17 +395,16 @@ public class BooleanTest {
 
     @Test
     public void testXORRebuild() {
-        Constant c = new Constant(true, DataType.BOOLEAN);
         Field f = new Field("boolean");
 
-        Expression e = Bool.createXOR(c, f);
+        Expression e = Bool.createXOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
-        e = Bool.createXOR(f, c);
+        e = Bool.createXOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);

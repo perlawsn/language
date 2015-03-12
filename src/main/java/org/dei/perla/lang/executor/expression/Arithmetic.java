@@ -85,9 +85,9 @@ public final class Arithmetic implements Expression {
                 }
             }
             if (t1 == DataType.INTEGER) {
-                return new Constant(computeInteger(op, o1, o2), t1);
+                return Constant.create(computeInteger(op, o1, o2), t1);
             } else {
-                return new Constant(computeFloat(op, o1, o2), t1);
+                return Constant.create(computeFloat(op, o1, o2), t1);
             }
         }
 

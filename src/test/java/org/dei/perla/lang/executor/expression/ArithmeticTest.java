@@ -62,7 +62,7 @@ public class ArithmeticTest {
 
     @Test
     public void additionIntegerTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
         Expression e = Arithmetic.createAddition(e1, intField);
 
         assertTrue(e.isComplete());
@@ -74,7 +74,7 @@ public class ArithmeticTest {
 
     @Test
     public void additionFloatTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e = Arithmetic.createAddition(e1, floatField);
 
         assertTrue(e.isComplete());
@@ -86,8 +86,8 @@ public class ArithmeticTest {
 
     @Test
     public void additionMixedTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Constant e2 = new Constant(5, DataType.INTEGER);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
+        Expression e2 = Constant.create(5, DataType.INTEGER);
 
         Expression e = Arithmetic.createAddition(e1, e2);
         assertFalse(e.hasErrors());
@@ -100,7 +100,7 @@ public class ArithmeticTest {
 
     @Test
     public void additionNullTest() {
-        Expression c = new Constant(43, DataType.INTEGER);
+        Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Arithmetic.createAddition(c, nul);
@@ -125,7 +125,7 @@ public class ArithmeticTest {
     @Test
     public void additionErrorTest() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Arithmetic.createAddition(err, c);
         assertTrue(e.isComplete());
@@ -142,7 +142,7 @@ public class ArithmeticTest {
 
     @Test
     public void additionRebuildTest() {
-        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
@@ -170,7 +170,7 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionIntegerTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
         Expression e = Arithmetic.createSubtraction(e1, intField);
 
         assertTrue(e.isComplete());
@@ -181,7 +181,7 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionFloatTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e = Arithmetic.createSubtraction(e1, floatField);
 
         assertTrue(e.isComplete());
@@ -192,8 +192,8 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionMixedTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Constant e2 = new Constant(5, DataType.INTEGER);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
+        Expression e2 = Constant.create(5, DataType.INTEGER);
 
         Expression e = Arithmetic.createSubtraction(e1, e2);
         assertThat(e.run(null, null), equalTo(1.5f - 5f));
@@ -204,7 +204,7 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionNullTest() {
-        Expression c = new Constant(43, DataType.INTEGER);
+        Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Arithmetic.createSubtraction(c, nul);
@@ -226,7 +226,7 @@ public class ArithmeticTest {
     @Test
     public void subtractionErrorTest() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Arithmetic.createSubtraction(err, c);
         assertTrue(e.isComplete());
@@ -243,7 +243,7 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionRebuildTest() {
-        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
@@ -265,7 +265,7 @@ public class ArithmeticTest {
 
     @Test
     public void productIntegerTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
         Expression e = Arithmetic.createProduct(e1, intField);
 
         assertTrue(e.isComplete());
@@ -276,7 +276,7 @@ public class ArithmeticTest {
 
     @Test
     public void productFloatTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e = Arithmetic.createProduct(e1, floatField);
 
         assertTrue(e.isComplete());
@@ -287,8 +287,8 @@ public class ArithmeticTest {
 
     @Test
     public void productMixedTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Constant e2 = new Constant(5, DataType.INTEGER);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
+        Expression e2 = Constant.create(5, DataType.INTEGER);
 
         Expression e = Arithmetic.createProduct(e1, e2);
         assertThat(e.run(null, null), equalTo(1.5f * 5f));
@@ -299,7 +299,7 @@ public class ArithmeticTest {
 
     @Test
     public void productNullTest() {
-        Expression c = new Constant(43, DataType.INTEGER);
+        Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Arithmetic.createProduct(c, nul);
@@ -321,7 +321,7 @@ public class ArithmeticTest {
     @Test
     public void productErrorTest() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Arithmetic.createProduct(err, c);
         assertTrue(e.isComplete());
@@ -338,7 +338,7 @@ public class ArithmeticTest {
 
     @Test
     public void productRebuildTest() {
-        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
@@ -360,7 +360,7 @@ public class ArithmeticTest {
 
     @Test
     public void divisionIntegerTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
         Expression e = Arithmetic.createDivision(e1, intField);
 
         assertTrue(e.isComplete());
@@ -371,7 +371,7 @@ public class ArithmeticTest {
 
     @Test
     public void divisionFloatTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e = Arithmetic.createDivision(e1, floatField);
 
         assertTrue(e.isComplete());
@@ -382,8 +382,8 @@ public class ArithmeticTest {
 
     @Test
     public void divisionMixedTest() {
-        Constant e1 = new Constant(1.5f, DataType.FLOAT);
-        Constant e2 = new Constant(5, DataType.INTEGER);
+        Expression e1 = Constant.create(1.5f, DataType.FLOAT);
+        Expression e2 = Constant.create(5, DataType.INTEGER);
 
         Expression e = Arithmetic.createDivision(e1, e2);
         assertThat(e.run(null, null), equalTo(1.5f / 5f));
@@ -394,7 +394,7 @@ public class ArithmeticTest {
 
     @Test
     public void divisionNullTest() {
-        Expression c = new Constant(43, DataType.INTEGER);
+        Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Arithmetic.createDivision(c, nul);
@@ -416,7 +416,7 @@ public class ArithmeticTest {
     @Test
     public void divisionErrorTest() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Arithmetic.createDivision(err, c);
         assertTrue(e.isComplete());
@@ -433,7 +433,7 @@ public class ArithmeticTest {
 
     @Test
     public void divisionRebuildTest() {
-        Constant c1 = new Constant(1.5f, DataType.FLOAT);
+        Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
@@ -455,7 +455,7 @@ public class ArithmeticTest {
 
     @Test
     public void moduloTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
         Expression e = Arithmetic.createModulo(e1, intField);
 
         assertTrue(e.isComplete());
@@ -466,7 +466,7 @@ public class ArithmeticTest {
 
     @Test
     public void moduloNullTest() {
-        Expression c = new Constant(43, DataType.INTEGER);
+        Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Arithmetic.createModulo(c, nul);
@@ -488,7 +488,7 @@ public class ArithmeticTest {
     @Test
     public void moduloErrorTest() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Arithmetic.createModulo(err, c);
         assertTrue(e.isComplete());
@@ -505,7 +505,7 @@ public class ArithmeticTest {
 
     @Test
     public void moduloRebuildTest() {
-        Constant c1 = new Constant(1, DataType.INTEGER);
+        Expression c1 = Constant.create(1, DataType.INTEGER);
         Field f1 = new Field("integer");
 
         Expression e = Arithmetic.createModulo(c1, f1);
@@ -526,7 +526,7 @@ public class ArithmeticTest {
 
     @Test
     public void inverseTest() {
-        Constant e1 = new Constant(1, DataType.INTEGER);
+        Expression e1 = Constant.create(1, DataType.INTEGER);
 
         Expression e = Arithmetic.createInverse(e1);
         assertThat(e.getType(), equalTo(DataType.INTEGER));

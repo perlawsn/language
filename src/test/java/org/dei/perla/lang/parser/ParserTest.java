@@ -787,7 +787,7 @@ public class ParserTest {
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
         assertTrue(e instanceof Constant);
-        assertThat(((Constant) e).getValue(), equalTo(true));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("1 > 10"));
         e = p.Comparison(false, err);
@@ -795,7 +795,7 @@ public class ParserTest {
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
         assertTrue(e instanceof Constant);
-        assertThat(((Constant) e).getValue(), equalTo(false));
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
 
         p.ReInit(new StringReader("temperature < 10"));
         e = p.Comparison(false, err);
@@ -866,7 +866,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
         Field f = new Field("test");
 
         p = new Parser(new StringReader("between 0 and 43"));

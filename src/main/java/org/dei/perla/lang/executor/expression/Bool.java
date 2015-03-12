@@ -10,7 +10,6 @@ import java.util.List;
  * @author Guido Rota 10/03/15.
  */
 public final class Bool implements Expression {
-
     private final BooleanOperation op;
     private final Expression e1;
     private final Expression e2;
@@ -51,10 +50,7 @@ public final class Bool implements Expression {
         if (e1 instanceof Constant && e2 instanceof Constant) {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
-            if (o1 == null || o2 == null) {
-                return Constant.NULL_BOOLEAN;
-            }
-            return new Constant(compute(op, o1, o2), DataType.BOOLEAN);
+            return Constant.create(compute(op, o1, o2), DataType.BOOLEAN);
         }
 
         return new Bool(op, e1, e2);
@@ -91,19 +87,21 @@ public final class Bool implements Expression {
     }
 
     private static Object compute(BooleanOperation op, Object o1, Object o2) {
-        if (o1 == null || o2 == null) {
-            return null;
+        LogicValue l1 = (LogicValue) o1;
+        LogicValue l2 = (LogicValue) o2;
+        if (l1 == null) {
+            l1 = LogicValue.UNKNOWN;
         }
-
-        Boolean b1 = (Boolean) o1;
-        Boolean b2 = (Boolean) o2;
+        if (l2 == null) {
+            l2 = LogicValue.UNKNOWN;
+        }
         switch (op) {
             case AND:
-                return b1 && b2;
+                return l1.and(l2);
             case OR:
-                return b1 || b2;
+                return l1.or(l2);
             case XOR:
-                return (b1 || b2) && !(b1 && b2);
+                return l1.xor(l2);
             default:
                 throw new RuntimeException("unknown boolean operation " + op);
         }

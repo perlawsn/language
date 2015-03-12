@@ -221,7 +221,7 @@ public class SelectionTest {
         sel.add(floatExpr);
 
         Expression having = Comparison.createNE(intExpr,
-                new Constant(3, DataType.INTEGER));
+                Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, having, null);
@@ -261,7 +261,7 @@ public class SelectionTest {
         sel.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
 
         Expression having = Comparison.createNE(intExpr,
-                new Constant(3, DataType.INTEGER));
+                Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
         Selection dm = new Selection(sel, upto, null, having, null);
@@ -302,7 +302,7 @@ public class SelectionTest {
         sel.add(intExpr);
 
         Expression having = Comparison.createEQ(intExpr,
-                new Constant(10, DataType.INTEGER));
+                Constant.create(10, DataType.INTEGER));
 
         Object[] def = new Object[2];
         def[0] = Instant.now();

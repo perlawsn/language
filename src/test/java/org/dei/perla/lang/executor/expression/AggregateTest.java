@@ -83,7 +83,7 @@ public class AggregateTest {
         assertThat(res, equalTo(9));
 
         Expression filter = Comparison.createGT(floatExpr,
-                new Constant(3f, DataType.FLOAT));
+                Constant.create(3f, DataType.FLOAT));
         e = Aggregate.createSum(intExpr, new WindowSize(5), filter);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
@@ -112,7 +112,7 @@ public class AggregateTest {
         assertThat(res, equalTo(9.9f));
 
         Expression filter = Comparison.createGT(intExpr,
-                new Constant(2, DataType.INTEGER));
+                Constant.create(2, DataType.INTEGER));
         e = Aggregate.createSum(floatExpr, new WindowSize(5), filter);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
@@ -143,7 +143,7 @@ public class AggregateTest {
     public void testSumError() {
         WindowSize ws = new WindowSize(10);
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Aggregate.createSum(err, ws, null);
         assertTrue(e.isComplete());
@@ -160,8 +160,8 @@ public class AggregateTest {
 
     @Test
     public void testSumRebuild() {
-        Expression c = new Constant(12, DataType.INTEGER);
-        Expression cFilt = new Constant(true, DataType.BOOLEAN);
+        Expression c = Constant.create(12, DataType.INTEGER);
+        Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 
@@ -214,7 +214,7 @@ public class AggregateTest {
         assertThat(res, equalTo(3f));
 
         Expression filter = Comparison.createGT(floatExpr,
-                new Constant(3f, DataType.FLOAT));
+                Constant.create(3f, DataType.FLOAT));
         e = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(5), filter);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
@@ -239,7 +239,7 @@ public class AggregateTest {
         assertThat(res, equalTo(3.3f));
 
         Expression filter = Comparison.createGT(intExpr,
-                new Constant(2, DataType.INTEGER));
+                Constant.create(2, DataType.INTEGER));
         e = Aggregate.createAvg(floatExpr, new WindowSize(5), filter);
         res = e.run(null, view);
         assertThat(res, equalTo(7.7f / 2));
@@ -267,7 +267,7 @@ public class AggregateTest {
     public void testAvgError() {
         WindowSize ws = new WindowSize(10);
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Aggregate.createAvg(err, ws, null);
         assertTrue(e.isComplete());
@@ -284,8 +284,8 @@ public class AggregateTest {
 
     @Test
     public void testAvgRebuild() {
-        Expression c = new Constant(12, DataType.INTEGER);
-        Expression cFilt = new Constant(true, DataType.BOOLEAN);
+        Expression c = Constant.create(12, DataType.INTEGER);
+        Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 
@@ -337,7 +337,7 @@ public class AggregateTest {
         assertThat(res, equalTo(2));
 
         Expression filter = Comparison.createGT(floatExpr,
-                new Constant(3f, DataType.FLOAT));
+                Constant.create(3f, DataType.FLOAT));
         e = Aggregate.createMin(intExpr, new WindowSize(5), filter);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
@@ -364,7 +364,7 @@ public class AggregateTest {
         assertThat(res, equalTo(2.2f));
 
         Expression filter = Comparison.createGT(intExpr,
-                new Constant(2, DataType.INTEGER));
+                Constant.create(2, DataType.INTEGER));
         e = Aggregate.createMin(floatExpr, new WindowSize(5), filter);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -389,7 +389,7 @@ public class AggregateTest {
         assertTrue(res instanceof Instant);
         assertThat(res, equalTo(view.get(2)[0]));
 
-        Expression filter = Comparison.createLT(intExpr, new Constant(4, DataType.INTEGER));
+        Expression filter = Comparison.createLT(intExpr, Constant.create(4, DataType.INTEGER));
         e = Aggregate.createMin(tsExpr, new WindowSize(5), filter);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -419,7 +419,7 @@ public class AggregateTest {
     public void testMinError() {
         WindowSize ws = new WindowSize(10);
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Aggregate.createMin(err, ws, null);
         assertTrue(e.isComplete());
@@ -436,8 +436,8 @@ public class AggregateTest {
 
     @Test
     public void testMinRebuild() {
-        Expression c = new Constant(12, DataType.INTEGER);
-        Expression cFilt = new Constant(true, DataType.BOOLEAN);
+        Expression c = Constant.create(12, DataType.INTEGER);
+        Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 
@@ -489,7 +489,7 @@ public class AggregateTest {
         assertThat(res, equalTo(4));
 
         Expression filter = Comparison.createLT(floatExpr,
-                new Constant(3f, DataType.FLOAT));
+                Constant.create(3f, DataType.FLOAT));
         e = Aggregate.createMax(intExpr, new WindowSize(5), filter);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
@@ -516,7 +516,7 @@ public class AggregateTest {
         assertThat(res, equalTo(4.4f));
 
         Expression filter = Comparison.createLT(intExpr,
-                new Constant(4, DataType.INTEGER));
+                Constant.create(4, DataType.INTEGER));
         e = Aggregate.createMax(floatExpr, new WindowSize(5), filter);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -542,7 +542,7 @@ public class AggregateTest {
         assertThat(res, equalTo(view.get(0)[0]));
 
         Expression filter = Comparison.createLT(intExpr,
-                new Constant(4, DataType.INTEGER));
+                Constant.create(4, DataType.INTEGER));
         e = Aggregate.createMax(tsExpr, new WindowSize(5), filter);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -572,7 +572,7 @@ public class AggregateTest {
     public void testMaxError() {
         WindowSize ws = new WindowSize(10);
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Aggregate.createMax(err, ws, null);
         assertTrue(e.isComplete());
@@ -589,8 +589,8 @@ public class AggregateTest {
 
     @Test
     public void testMaxRebuild() {
-        Expression c = new Constant(12, DataType.INTEGER);
-        Expression cFilt = new Constant(true, DataType.BOOLEAN);
+        Expression c = Constant.create(12, DataType.INTEGER);
+        Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 
@@ -641,7 +641,7 @@ public class AggregateTest {
         assertThat(res, equalTo(3));
 
         Expression filter = Comparison.createLT(intExpr,
-                new Constant(3, DataType.INTEGER));
+                Constant.create(3, DataType.INTEGER));
         e = Aggregate.createCount(new WindowSize(5), filter);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -672,7 +672,7 @@ public class AggregateTest {
 
     @Test
     public void testCountRebuild() {
-        Expression c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
 

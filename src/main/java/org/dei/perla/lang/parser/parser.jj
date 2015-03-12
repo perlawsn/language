@@ -1008,17 +1008,17 @@ Expression Constant() :
 {
 	(
 		value = ConstantBoolean()
-		{ return new Constant(value, DataType.BOOLEAN); }
+		{ return Constant.create(value, DataType.BOOLEAN); }
 		|
 		value = ConstantString()
-		{ return new Constant(value, DataType.STRING); }
+		{ return Constant.create(value, DataType.STRING); }
 		|
 		LOOKAHEAD(1)
 		value = ConstantInteger()
-		{ return new Constant(value, DataType.INTEGER); }
+		{ return Constant.create(value, DataType.INTEGER); }
 		|
 		value = ConstantFloat()
-		{ return new Constant(value, DataType.FLOAT); }
+		{ return Constant.create(value, DataType.FLOAT); }
 	)
 }
 

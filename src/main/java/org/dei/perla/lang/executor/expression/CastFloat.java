@@ -32,7 +32,7 @@ public final class CastFloat implements Expression {
             if (value == null) {
                 return Constant.NULL_FLOAT;
             }
-            return new Constant(value.floatValue(), DataType.FLOAT);
+            return Constant.create(value.floatValue(), DataType.FLOAT);
         }
 
         return new CastFloat(e);

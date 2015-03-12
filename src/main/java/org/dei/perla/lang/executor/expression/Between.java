@@ -40,7 +40,7 @@ public final class Between implements Expression {
             if (o == null || omin == null || omax == null) {
                 return Constant.UNKNOWN;
             }
-            return new Constant(compute(o, omin, omax), DataType.BOOLEAN);
+            return Constant.create(compute(o, omin, omax), DataType.BOOLEAN);
         }
 
         return new Between(e, min, max);

@@ -60,8 +60,8 @@ public class MiscTest {
 
     @Test
     public void castFloat() {
-        Constant cInt = new Constant(1, DataType.INTEGER);
-        Constant cFloat = new Constant(1.2f, DataType.FLOAT);
+        Expression cInt = Constant.create(1, DataType.INTEGER);
+        Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
         Expression fFloat = new Field(floatAtt.getId()).rebuild(atts);
         Expression incomplete = new Field("integer");
         Expression error = new ErrorExpression("test");
@@ -99,13 +99,13 @@ public class MiscTest {
 
     @Test
     public void constantTest() {
-        Constant c1 = new Constant(1, DataType.INTEGER);
+        Expression c1 = Constant.create(1, DataType.INTEGER);
         assertTrue(c1.isComplete());
         assertFalse(c1.hasErrors());
         assertThat(c1.getType(), equalTo(DataType.INTEGER));
         assertThat(c1.run(view.get(0), view), equalTo(1));
 
-        Constant c2 = new Constant("test", DataType.STRING);
+        Expression c2 = Constant.create("test", DataType.STRING);
         assertTrue(c1.isComplete());
         assertFalse(c1.hasErrors());
         assertThat(c2.getType(), equalTo(DataType.STRING));

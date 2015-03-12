@@ -33,7 +33,7 @@ public final class Inverse implements Expression {
                     return Constant.NULL_FLOAT;
                 }
             }
-            return new Constant(compute(t, o), t);
+            return Constant.create(compute(t, o), t);
         }
 
         return new Inverse(e);

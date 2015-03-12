@@ -29,7 +29,7 @@ public final class BitwiseNot implements Expression {
             if (o == null) {
                 return Constant.NULL_INTEGER;
             }
-            return new Constant(~(Integer) o, t);
+            return Constant.create(~(Integer) o, t);
         }
 
         return new BitwiseNot(e);

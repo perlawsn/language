@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.util.List;
 
@@ -63,7 +64,8 @@ public final class Selection {
         for (int i = 0; i < upto && i < buf.length(); i++) {
             Object[] cur = buf.get(i);
             // HAVING CLAUSE
-            if (having != null && !(Boolean) having.run(cur, buf)) {
+            if (having != null &&
+                    !LogicValue.toBoolean((LogicValue) having.run(cur, buf))) {
                 continue;
             }
             // SELECTION

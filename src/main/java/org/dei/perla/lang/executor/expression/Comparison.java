@@ -60,7 +60,7 @@ public final class Comparison implements Expression {
             if (o1 == null || o2 == null) {
                 return Constant.NULL_BOOLEAN;
             }
-            return new Constant(compute(op, o1, o2), DataType.BOOLEAN);
+            return Constant.create(compute(op, o1, o2), DataType.BOOLEAN);
         }
 
         return new Comparison(op, e1, e2);
@@ -107,22 +107,30 @@ public final class Comparison implements Expression {
         }
 
         Comparable<Object> c1 = (Comparable<Object>) o1;
+        Boolean res;
         switch (op) {
             case LT:
-                return c1.compareTo(o2) < 0;
+                res = c1.compareTo(o2) < 0;
+                break;
             case LE:
-                return c1.compareTo(o2) <= 0;
+                res = c1.compareTo(o2) <= 0;
+                break;
             case GT:
-                return c1.compareTo(o2) > 0;
+                res =  c1.compareTo(o2) > 0;
+                break;
             case GE:
-                return c1.compareTo(o2) >= 0;
+                res = c1.compareTo(o2) >= 0;
+                break;
             case EQ:
-                return c1.compareTo(o2) == 0;
+                res = c1.compareTo(o2) == 0;
+                break;
             case NE:
-                return c1.compareTo(o2) != 0;
+                res = c1.compareTo(o2) != 0;
+                break;
             default:
                 throw new RuntimeException("unknown comparison operator");
         }
+        return LogicValue.fromBoolean(res);
     }
 
 }

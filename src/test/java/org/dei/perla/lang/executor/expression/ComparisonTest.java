@@ -39,13 +39,13 @@ public class ComparisonTest {
     private static Expression stringExpr;
     private static Expression floatExpr;
 
-    private static final Expression trueExpr = new Constant(true, DataType.BOOLEAN);
-    private static final Expression falseExpr = new Constant(false, DataType.BOOLEAN);
+    private static final Expression trueExpr = Constant.TRUE;
+    private static final Expression falseExpr = Constant.FALSE;
 
     private static final Expression t1 =
-            new Constant(Instant.parse("2015-02-23T15:07:45.000Z"), DataType.TIMESTAMP);
+            Constant.create(Instant.parse("2015-02-23T15:07:45.000Z"), DataType.TIMESTAMP);
     private static final Expression t2 =
-            new Constant(Instant.parse("2015-02-23T15:08:45.000Z"), DataType.TIMESTAMP);
+            Constant.create(Instant.parse("2015-02-23T15:08:45.000Z"), DataType.TIMESTAMP);
 
     @BeforeClass
     public static void setupBuffer() {
@@ -73,48 +73,48 @@ public class ComparisonTest {
 
     @Test
     public void testEQ() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createEQ(intExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createEQ(floatExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
-        c = new Constant("4", DataType.STRING);
+        c = Constant.create("4", DataType.STRING);
         e = Comparison.createEQ(stringExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createEQ(trueExpr, trueExpr).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createEQ(trueExpr, falseExpr).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createEQ(t1, t1).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createEQ(t1, t2).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
     public void testEQNull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createEQ(c, nul);
@@ -139,7 +139,7 @@ public class ComparisonTest {
     @Test
     public void testEQError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createEQ(err, c);
         assertTrue(e.isComplete());
@@ -157,7 +157,7 @@ public class ComparisonTest {
     @Test
     public void testEQRebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createEQ(f, c);
         assertFalse(e.isComplete());
@@ -183,52 +183,52 @@ public class ComparisonTest {
 
     @Test
     public void testNE() {
-        Constant c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createNE(intExpr, c);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createNE(floatExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
-        c = new Constant("4", DataType.STRING);
+        c = Constant.create("4", DataType.STRING);
         e = Comparison.createNE(stringExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createNE(trueExpr, trueExpr).run(null, null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createNE(trueExpr, falseExpr).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createNE(t1, t1).run(null, null);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createNE(t1, t2).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
     }
 
     @Test
     public void testNENull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createNE(c, nul);
@@ -253,7 +253,7 @@ public class ComparisonTest {
     @Test
     public void testNEError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createNE(err, c);
         assertTrue(e.isComplete());
@@ -271,7 +271,7 @@ public class ComparisonTest {
     @Test
     public void testNERebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createNE(f, c);
         assertFalse(e.isComplete());
@@ -297,42 +297,42 @@ public class ComparisonTest {
 
     @Test
     public void testGT() {
-        Constant c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createGT(c, intExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGT(intExpr, c);
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createGT(c, floatExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGT(floatExpr, c);
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGT(t1, t1).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createGT(t1, t2).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createGT(t2, t1).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
     }
 
     @Test
     public void testGTNull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createGT(c, nul);
@@ -357,7 +357,7 @@ public class ComparisonTest {
     @Test
     public void testGTError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createGT(err, c);
         assertTrue(e.isComplete());
@@ -375,7 +375,7 @@ public class ComparisonTest {
     @Test
     public void testGTRebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createGT(f, c);
         assertFalse(e.isComplete());
@@ -401,46 +401,46 @@ public class ComparisonTest {
 
     @Test
     public void testGE() {
-        Constant c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createGE(c, intExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGE(intExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createGE(c, floatExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGE(floatExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGE(t1, t1).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createGE(t1, t2).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createGE(t2, t1).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
     }
 
     @Test
     public void testGENull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createGE(c, nul);
@@ -465,7 +465,7 @@ public class ComparisonTest {
     @Test
     public void testGEError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createGE(err, c);
         assertTrue(e.isComplete());
@@ -483,7 +483,7 @@ public class ComparisonTest {
     @Test
     public void testGERebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createGE(f, c);
         assertFalse(e.isComplete());
@@ -509,46 +509,46 @@ public class ComparisonTest {
 
     @Test
     public void testLT() {
-        Constant c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createLT(c, intExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLT(intExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createLT(c, floatExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLT(floatExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLT(t1, t1).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         res = Comparison.createLT(t1, t2).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createLT(t2, t1).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
     public void testLTNull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createLT(c, nul);
@@ -573,7 +573,7 @@ public class ComparisonTest {
     @Test
     public void testLTError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createLT(err, c);
         assertTrue(e.isComplete());
@@ -591,7 +591,7 @@ public class ComparisonTest {
     @Test
     public void testLTRebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createLT(f, c);
         assertFalse(e.isComplete());
@@ -617,46 +617,46 @@ public class ComparisonTest {
 
     @Test
     public void testLE() {
-        Constant c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression e = Comparison.createLE(c, intExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLE(intExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
-        c = new Constant(4.4f, DataType.FLOAT);
+        c = Constant.create(4.4f, DataType.FLOAT);
         e = Comparison.createLE(c, floatExpr);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(0), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLE(floatExpr, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(view.get(1), view);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLE(t1, t1).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createLE(t1, t2).run(null, null);
-        assertThat(res, equalTo(true));
+        assertThat(res, equalTo(LogicValue.TRUE));
         res = Comparison.createLE(t2, t1).run(null, null);
-        assertThat(res, equalTo(false));
+        assertThat(res, equalTo(LogicValue.FALSE));
     }
 
     @Test
     public void testLENull() {
-        Expression c = new Constant(4, DataType.INTEGER);
+        Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL_INTEGER;
 
         Expression e = Comparison.createLE(c, nul);
@@ -681,7 +681,7 @@ public class ComparisonTest {
     @Test
     public void testLEError() {
         Expression err = new ErrorExpression("test");
-        Expression c = new Constant(85, DataType.INTEGER);
+        Expression c = Constant.create(85, DataType.INTEGER);
 
         Expression e = Comparison.createLE(err, c);
         assertTrue(e.isComplete());
@@ -699,7 +699,7 @@ public class ComparisonTest {
     @Test
     public void testLERebuild() {
         Expression f = new Field("integer");
-        Constant c = new Constant(12, DataType.INTEGER);
+        Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createLE(f, c);
         assertFalse(e.isComplete());
@@ -725,9 +725,9 @@ public class ComparisonTest {
 
     @Test
     public void testBetween() {
-        Constant min = new Constant(-0.5f, DataType.FLOAT);
-        Constant max = new Constant(456f, DataType.FLOAT);
-        Constant middle = new Constant(23f, DataType.FLOAT);
+        Expression min = Constant.create(-0.5f, DataType.FLOAT);
+        Expression max = Constant.create(456f, DataType.FLOAT);
+        Expression middle = Constant.create(23f, DataType.FLOAT);
 
         Expression e = Between.create(middle, min, max);
         assertTrue(e.isComplete());
@@ -762,8 +762,8 @@ public class ComparisonTest {
 
     @Test
     public void testBetweenError() {
-        Constant c1 = new Constant(-0.5f, DataType.FLOAT);
-        Constant c2 = new Constant(456f, DataType.FLOAT);
+        Expression c1 = Constant.create(-0.5f, DataType.FLOAT);
+        Expression c2 = Constant.create(456f, DataType.FLOAT);
         Expression err = new ErrorExpression("test");
 
         Expression e = Between.create(err, c1, c2);
@@ -781,8 +781,8 @@ public class ComparisonTest {
 
     @Test
     public void testBetweenRebuild() {
-        Constant c1 = new Constant(12, DataType.INTEGER);
-        Constant c2 = new Constant(54, DataType.INTEGER);
+        Expression c1 = Constant.create(12, DataType.INTEGER);
+        Expression c2 = Constant.create(54, DataType.INTEGER);
         Field f = new Field("integer");
 
         Expression e = Between.create(f, c1, c2);

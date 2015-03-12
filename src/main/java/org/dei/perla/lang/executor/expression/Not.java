@@ -24,11 +24,11 @@ public final class Not implements Expression {
         }
 
         if (e instanceof Constant) {
-            Boolean b = (Boolean) ((Constant) e).getValue();
-            if (b == null) {
-                return Constant.NULL_BOOLEAN;
+            LogicValue l = (LogicValue) ((Constant) e).getValue();
+            if (l == null) {
+                return Constant.UNKNOWN;
             }
-            return new Constant(!b, DataType.BOOLEAN);
+            return Constant.create(l.not(), DataType.BOOLEAN);
         }
 
         return new Not(e);
@@ -59,11 +59,8 @@ public final class Not implements Expression {
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        Boolean b = (Boolean) e.run(record, buffer);
-        if (b == null) {
-            return null;
-        }
-        return !b;
+        LogicValue l = (LogicValue) e.run(record, buffer);
+        return LogicValue.not(l);
     }
 
 }

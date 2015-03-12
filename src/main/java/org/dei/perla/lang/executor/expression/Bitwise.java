@@ -62,7 +62,7 @@ public final class Bitwise implements Expression {
             if (o1 == null || o2 == null) {
                 return Constant.NULL_INTEGER;
             }
-            return new Constant(compute(op, o1, o2), DataType.INTEGER);
+            return Constant.create(compute(op, o1, o2), DataType.INTEGER);
         }
 
         return new Bitwise(op, e1, e2);

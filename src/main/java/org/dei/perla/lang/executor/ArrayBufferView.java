@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -123,8 +124,8 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         }
 
         for (int i = oldest; i <= newest; i++) {
-            Boolean cond = (Boolean) e.run(data[i], this);
-            if (cond == null || !cond) {
+            LogicValue cond = (LogicValue) e.run(data[i], this);
+            if (!LogicValue.toBoolean(cond)) {
                 continue;
             }
             c.accept(data[i], this);
