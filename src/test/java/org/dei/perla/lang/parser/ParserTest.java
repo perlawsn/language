@@ -891,7 +891,7 @@ public class ParserTest {
         Field f = new Field("test");
 
         p = new Parser(new StringReader("is true"));
-        e = p.Is(Constant.TRUE, false, err);
+        e = p.Is(Constant.TRUE, err);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -899,7 +899,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("is not true"));
-        e = p.Is(Constant.TRUE, false, err);
+        e = p.Is(Constant.TRUE, err);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -907,7 +907,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
 
         p.ReInit(new StringReader("is false"));
-        e = p.Is(f, false, err);
+        e = p.Is(f, err);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -915,18 +915,41 @@ public class ParserTest {
         assertThat(((Is) e).getLogicValue(), equalTo(LogicValue.FALSE));
 
         p.ReInit(new StringReader("is null"));
-        e = p.Is(f, false, err);
+        e = p.Is(f, err);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
         assertTrue(e instanceof IsNull);
 
         p.ReInit(new StringReader("is not null"));
-        e = p.Is(f, false, err);
+        e = p.Is(f, err);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
         assertTrue(e instanceof Not);
+    }
+
+    @Test
+    public void testLike() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+        Expression c = Constant.create("test", DataType.STRING);
+        Field f = new Field("test");
+
+        p = new Parser(new StringReader("like \"%test\""));
+        e = p.Like(c, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        p.ReInit(new StringReader("like \"asdf\""));
+        e = p.Like(f, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Like);
     }
 
 }

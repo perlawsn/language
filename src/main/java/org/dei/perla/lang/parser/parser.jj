@@ -1276,16 +1276,16 @@ Expression BooleanPredicate(boolean aggregate, Errors err) :
 {
     e = Comparison(aggregate, err)
     [
-        e = Is(e, aggregate, err)
+        e = Is(e, err)
         |
-        e = Like(e, aggregate, err)
+        e = Like(e, err)
         |
         e = Between(e, aggregate, err)
     ]
     { return e; }
 }
 
-Expression Is(Expression e, boolean aggregate, Errors err) :
+Expression Is(Expression e, Errors err) :
 {
     boolean invert = false;
     Expression is;
@@ -1319,12 +1319,19 @@ Expression Is(Expression e, boolean aggregate, Errors err) :
     }
 }
 
-Expression Like(Expression e, boolean aggregate, Errors err) :
-{}
+Expression Like(Expression e, Errors err) :
+{
+    String pattern;
+    Expression like;
+}
 {
     <KEYWORD_LIKE>
-    ConstantString()
-    { return null; }
+    pattern = ConstantString()
+    {
+        like = Like.create(e, pattern);
+        addIfError(like, token, err);
+        return like;
+    }
 }
 
 Expression Between(Expression e, boolean aggregate, Errors err) :

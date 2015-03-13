@@ -20,7 +20,7 @@ public final class Not implements Expression {
     public static Expression create(Expression e) {
         if (e.getType() != null && e.getType() != DataType.BOOLEAN) {
             return new ErrorExpression("Incompatible operand type: only " +
-                    "boolean values are allowed");
+                    "boolean values are allowed in operator not");
         }
 
         if (e instanceof Constant) {

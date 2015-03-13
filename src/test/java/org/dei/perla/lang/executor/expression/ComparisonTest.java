@@ -970,4 +970,45 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
     }
 
+    @Test
+    public void testLike() {
+        Expression c;
+        Expression e;
+
+        c = Constant.create("test", DataType.STRING);
+        e = Like.create(c, "_est");
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        c = Constant.create("interest", DataType.STRING);
+        e = Like.create(c, "inte[s-y]est");
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+    }
+
+    @Test
+    public void testNullLike() {
+        Expression e = Like.create(Constant.NULL_STRING, "test");
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
+    public void testNullRebuild() {
+        Expression f = new Field("string");
+
+        Expression e = Like.create(f, "test");
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+    }
+
 }
