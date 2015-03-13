@@ -952,4 +952,103 @@ public class ParserTest {
         assertTrue(e instanceof Like);
     }
 
+    @Test
+    public void testBooleanPredicate() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("name like \"asdf\""));
+        e = p.BooleanPredicate(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Like);
+
+        p = new Parser(new StringReader("room between 0 and 23"));
+        e = p.BooleanPredicate(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Between);
+
+        p = new Parser(new StringReader("temperature is null"));
+        e = p.BooleanPredicate(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof IsNull);
+
+        p = new Parser(new StringReader("flag is unknown"));
+        e = p.BooleanPredicate(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Is);
+    }
+
+    @Test
+    public void testBooleanNegation() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("not flag"));
+        e = p.BooleanNegation(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Not);
+    }
+
+    @Test
+    public void testBooleanFactor() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("true xor flag"));
+        e = p.BooleanFactor(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Bool);
+        assertThat(((Bool) e).getOperation(), equalTo(BoolOperation.XOR));
+    }
+
+    @Test
+    public void testBooleanTerm() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("true and flag"));
+        e = p.BooleanTerm(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Bool);
+        assertThat(((Bool) e).getOperation(), equalTo(BoolOperation.AND));
+    }
+
+    @Test
+    public void testBooleanOR() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("true or flag"));
+        e = p.Expression(false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e instanceof Bool);
+        assertThat(((Bool) e).getOperation(), equalTo(BoolOperation.OR));
+    }
+
+    @Test
+    public void testExpression() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("not (2 << 4 > 0) && false"));
+        e = p.Expression(false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+    }
+
 }

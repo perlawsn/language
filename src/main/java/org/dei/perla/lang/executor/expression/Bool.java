@@ -10,33 +10,34 @@ import java.util.List;
  * @author Guido Rota 10/03/15.
  */
 public final class Bool implements Expression {
-    private final BooleanOperation op;
+
+    private final BoolOperation op;
     private final Expression e1;
     private final Expression e2;
 
-    private Bool(BooleanOperation op, Expression e1, Expression e2) {
+    private Bool(BoolOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
     public static Expression createAND(Expression e1, Expression e2) {
-        return create(BooleanOperation.AND, e1, e2);
+        return create(BoolOperation.AND, e1, e2);
     }
 
     public static Expression createOR(Expression e1, Expression e2) {
-        return create(BooleanOperation.OR, e1, e2);
+        return create(BoolOperation.OR, e1, e2);
     }
 
     public static Expression createXOR(Expression e1, Expression e2) {
-        return create(BooleanOperation.XOR, e1, e2);
+        return create(BoolOperation.XOR, e1, e2);
     }
 
     public static Expression createNOT(Expression e) {
         return Not.create(e);
     }
 
-    public static Expression create(BooleanOperation op,
+    public static Expression create(BoolOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
@@ -54,6 +55,10 @@ public final class Bool implements Expression {
         }
 
         return new Bool(op, e1, e2);
+    }
+
+    public BoolOperation getOperation() {
+        return op;
     }
 
     @Override
@@ -86,7 +91,7 @@ public final class Bool implements Expression {
         return compute(op, o1, o2);
     }
 
-    private static Object compute(BooleanOperation op, Object o1, Object o2) {
+    private static Object compute(BoolOperation op, Object o1, Object o2) {
         LogicValue l1 = (LogicValue) o1;
         LogicValue l2 = (LogicValue) o2;
         if (l1 == null) {
