@@ -28,9 +28,12 @@ PARSER_BEGIN(Parser)
     import java.time.temporal.TemporalUnit;
     import java.time.temporal.ChronoUnit;
     import java.time.Duration;
+    import java.util.List;
+    import java.util.ArrayList;
 
     import org.dei.perla.lang.executor.statement.WindowSize;
     import org.dei.perla.lang.executor.expression.*;
+    import org.dei.perla.lang.executor.statement.*;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -647,11 +650,11 @@ void FieldList() :
 void StreamSelectionStatement(Errors err) :
 {}
 {
-    LowEveryClause(err)
-    LowSelectionStatement(err)
+    EveryClause(err)
+    SelectionStatement(err)
 }
 
-WindowSize LowEveryClause(Errors err) :
+WindowSize EveryClause(Errors err) :
 {
     WindowSize ws;
 }
@@ -661,18 +664,22 @@ WindowSize LowEveryClause(Errors err) :
 	{ return ws; }
 }
 
-void LowSelectionStatement(Errors err) :
-{}
+void SelectionStatement(Errors err) :
+{
+    GroupBy gby = null;
+    Expression having;
+    WindowSize upto;
+}
 {
 	SelectClause(err)
 	[
-		GroupByClause()
+		gby = GroupByClause()
 	]
 	[
-		HavingClause(err)
+		having = HavingClause(err)
 	]
 	[
-		UpToClause(err)
+		upto = UpToClause(err)
 	]
 	[
 		OnEmptySelectionClause()
@@ -722,51 +729,76 @@ void FieldSelection(Errors err) :
 	]
 }
 
-void GroupByClause() :
-{}
+GroupBy GroupByClause() :
+{
+    GroupBy g;
+}
 {
 	<KEYWORD_GROUP>
 	<KEYWORD_BY>
-	FieldGroupingByList()
+	g = FieldGroupingByList()
+	{ return g; }
 }
 
-void FieldGroupingByList() :
-{}
+GroupBy FieldGroupingByList() :
+{
+    GroupByTS gts = null;
+    Field f;
+    List<Field> fs = new ArrayList<Field>();
+}
 {
 	(
-		FieldGroupingBy()
+		f = FieldGroupingBy()
+		{ fs.add(f); }
 		|
-		FieldGroupingByTs()
+		gts = FieldGroupingByTs()
 	)
 	(
 		","
-		FieldGroupingBy()
+		f = FieldGroupingBy()
+		{ fs.add(f); }
 	)*
+	{
+	    if (gts == null) {
+	        return new GroupBy(fs);
+	    }
+	    return new GroupBy(gts.getDuration(), gts.getCount(), fs);
+	}
 }
 
-void FieldGroupingBy() :
-{}
+Field FieldGroupingBy() :
 {
-	Identifier() // FPC attribute
+    String f;
+}
+{
+	f = Identifier() // FPC attribute
+	{ return new Field(f); }
 }
 
-void FieldGroupingByTs() :
-{}
+GroupByTS FieldGroupingByTs() :
+{
+    Duration d;
+    int count;
+}
 {
 	<TYPE_TS>
 	"("
-	Duration()
+	d = Duration()
 	","
-	ConstantInteger()
+	count = ConstantInteger()
 	<KEYWORD_GROUPS>
 	")"
+	{ return new GroupByTS(d, count); }
 }
 
-void HavingClause(Errors err) :
-{}
+Expression HavingClause(Errors err) :
+{
+    Expression e;
+}
 {
 	<KEYWORD_HAVING>
-	Expression(true, err)
+	e = Expression(true, err)
+	{ return e; }
 }
 
 WindowSize UpToClause(Errors err) :
@@ -817,22 +849,31 @@ void SamplingClause(Errors err) :
 	]
 }
 
-void OnEventClause() :
-{}
+List<String> OnEventClause() :
+{
+    List<String> evs;
+}
 {
 	<KEYWORD_ON>
 	<KEYWORD_EVENT>
-	EventList()
+	evs = EventList()
+	{ return evs; }
 }
 
-void EventList() :
-{}
+List<String> EventList() :
 {
-	Identifier() // FPC Event
+    String e;
+    List<String> evs = new ArrayList<String>();
+}
+{
+	e = Identifier() // FPC Event
+	{ evs.add(e); }
 	(
 		","
-		Identifier() // FPC Event
+		e = Identifier() // FPC Event
+		{ evs.add(e); }
 	)*
+	{ return evs; }
 }
 
 void SamplingIfEveryClause(Errors err) :
@@ -869,7 +910,7 @@ void SamplingEveryClause(Errors err) :
 	TimeUnit()
 }
 
-void OnUnsupportedSRClause() :
+UnsupportedSamplingRate OnUnsupportedSRClause() :
 {}
 {
 	<KEYWORD_ON>
@@ -880,11 +921,13 @@ void OnUnsupportedSRClause() :
 		<KEYWORD_DO>
 		<OPERATOR_NOT>
 		<KEYWORD_SAMPLE>
+		{ return UnsupportedSamplingRate.DO_NOT_SAMPLE; }
 	)
 	|
 	(
 		<KEYWORD_SLOW>
 		<KEYWORD_DOWN>
+		{ return UnsupportedSamplingRate.SLOW_DOWN; }
 	)
 }
 
