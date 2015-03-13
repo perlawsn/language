@@ -30,6 +30,8 @@ public class ComparisonTest {
             Attribute.create("string", DataType.STRING);
     private static Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
+    private static Attribute boolAtt =
+            Attribute.create("boolean", DataType.BOOLEAN);
 
     private static BufferView view;
 
@@ -53,7 +55,8 @@ public class ComparisonTest {
                 Attribute.TIMESTAMP,
                 intAtt,
                 stringAtt,
-                floatAtt
+                floatAtt,
+                boolAtt
         };
         atts = Arrays.asList(as);
 
@@ -62,11 +65,11 @@ public class ComparisonTest {
         floatExpr = new Field(floatAtt.getId()).rebuild(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f, true}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f, true}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f, false}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f, true}));
+        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f, false}));
 
         view = b.unmodifiableView();
     }
@@ -800,6 +803,166 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
 
         e = Between.create(c1, c2, f);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+    }
+
+    @Test
+    public void testIs() {
+        Expression e;
+
+        e = Is.create(Constant.TRUE, LogicValue.TRUE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = Is.create(Constant.TRUE, LogicValue.FALSE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.TRUE, LogicValue.UNKNOWN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.FALSE, LogicValue.TRUE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.FALSE, LogicValue.FALSE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = Is.create(Constant.FALSE, LogicValue.UNKNOWN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.UNKNOWN, LogicValue.TRUE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.UNKNOWN, LogicValue.FALSE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = Is.create(Constant.UNKNOWN, LogicValue.UNKNOWN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.TRUE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
+
+        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.FALSE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
+
+        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.UNKNOWN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
+    public void testIsRebuild() {
+        Expression f = new Field("boolean");
+
+        Expression e = Is.create(f, LogicValue.TRUE);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        e = e.rebuild(atts);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+    }
+
+    @Test
+    public void testIsNull() {
+        Expression e;
+
+        e = IsNull.create(Constant.NULL_BOOLEAN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.NULL_INTEGER);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.NULL_FLOAT);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.NULL_TIMESTAMP);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.NULL_STRING);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.NULL_ID);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
+
+        e = IsNull.create(Constant.INTEGER_0);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = IsNull.create(Constant.FALSE);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+
+        e = IsNull.create(Constant.UNKNOWN);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+    }
+
+    @Test
+    public void testIsNullRebuild() {
+        Expression f = new Field("integer");
+
+        Expression e = IsNull.create(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.rebuild(atts);

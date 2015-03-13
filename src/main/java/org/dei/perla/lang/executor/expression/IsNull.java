@@ -7,31 +7,25 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
- * @author Guido Rota 12/03/15.
+ * @author Guido Rota 13/03/15.
  */
-public final class Is implements Expression {
+public final class IsNull implements Expression {
 
     private final Expression e;
-    private final LogicValue l;
 
-    private Is(Expression e, LogicValue l) {
+    private IsNull(Expression e) {
         this.e = e;
-        this.l = l;
     }
 
-    public static Expression create(Expression e, LogicValue l) {
-        DataType t = e.getType();
-        if (t != null && t != DataType.BOOLEAN) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "boolean values are allowed");
-        }
-
+    public static Expression create(Expression e) {
         if (e instanceof Constant) {
-            Object c = compute(((Constant) e).getValue(), l);
-            return Constant.create(c, DataType.BOOLEAN);
+            if (((Constant) e).getValue() == null) {
+                return Constant.TRUE;
+            } else {
+                return Constant.FALSE;
+            }
         }
-
-        return new Is(e, l);
+        return new IsNull(e);
     }
 
     @Override
@@ -54,21 +48,17 @@ public final class Is implements Expression {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts), l);
+        return create(e.rebuild(atts));
     }
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
         Object o = e.run(record, buffer);
-        return compute(o, l);
-    }
-
-    private static Object compute(Object o, LogicValue l) {
         if (o == null) {
-            return LogicValue.UNKNOWN;
+            return Constant.TRUE;
+        } else {
+            return Constant.FALSE;
         }
-
-        return LogicValue.fromBoolean(o.equals(l));
     }
 
 }
