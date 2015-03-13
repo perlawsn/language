@@ -1286,22 +1286,37 @@ Expression BooleanPredicate(boolean aggregate, Errors err) :
 }
 
 Expression Is(Expression e, boolean aggregate, Errors err) :
-{}
+{
+    boolean invert = false;
+    Expression is;
+}
 {
     <KEYWORD_IS>
     [
         <OPERATOR_NOT>
+        { invert = true; }
     ]
     (
         <CONSTANT_BOOLEAN_TRUE>
+        { is = Is.create(e, LogicValue.TRUE); }
         |
         <CONSTANT_BOOLEAN_FALSE>
+        { is = Is.create(e, LogicValue.FALSE); }
         |
         <CONSTANT_BOOLEAN_UNKNOWN>
+        { is = Is.create(e, LogicValue.UNKNOWN); }
         |
         <CONSTANT_NULL>
+        { is = IsNull.create(e); }
     )
-    { return null; }
+    {
+        addIfError(is, token, err);
+        if (invert) {
+            is = Bool.createNOT(is);
+            addIfError(is, token, err);
+        }
+        return is;
+    }
 }
 
 Expression Like(Expression e, boolean aggregate, Errors err) :

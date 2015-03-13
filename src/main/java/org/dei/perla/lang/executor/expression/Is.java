@@ -34,6 +34,10 @@ public final class Is implements Expression {
         return new Is(e, l);
     }
 
+    public LogicValue getLogicValue() {
+        return l;
+    }
+
     @Override
     public DataType getType() {
         return DataType.BOOLEAN;

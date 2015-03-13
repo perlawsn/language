@@ -883,4 +883,50 @@ public class ParserTest {
         assertTrue(e instanceof Between);
     }
 
+    @Test
+    public void testIs() throws Exception {
+        Parser p;
+        Expression e;
+        Errors err = new Errors();
+        Field f = new Field("test");
+
+        p = new Parser(new StringReader("is true"));
+        e = p.Is(Constant.TRUE, false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
+
+        p.ReInit(new StringReader("is not true"));
+        e = p.Is(Constant.TRUE, false, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Constant);
+        assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
+
+        p.ReInit(new StringReader("is false"));
+        e = p.Is(f, false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Is);
+        assertThat(((Is) e).getLogicValue(), equalTo(LogicValue.FALSE));
+
+        p.ReInit(new StringReader("is null"));
+        e = p.Is(f, false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof IsNull);
+
+        p.ReInit(new StringReader("is not null"));
+        e = p.Is(f, false, err);
+        assertFalse(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
+        assertTrue(e instanceof Not);
+    }
+
 }
