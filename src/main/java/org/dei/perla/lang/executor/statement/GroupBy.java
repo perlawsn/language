@@ -38,6 +38,18 @@ public final class GroupBy {
         this.fields = Collections.unmodifiableList(fields);
     }
 
+    protected Duration getDuration() {
+        return d;
+    }
+
+    protected int getCount() {
+        return count;
+    }
+
+    protected List<? extends Expression> getFields() {
+        return fields;
+    }
+
     public GroupBy rebuild(List<Attribute> atts) {
         if (fields == null) {
             return this;
@@ -48,12 +60,12 @@ public final class GroupBy {
         return new GroupBy(d, count, newFields);
     }
 
-    public List<BufferView> createGroups(BufferView buffer) {
+    public List<BufferView> createGroups(BufferView view) {
         List<BufferView> tsGroups = new LinkedList<>();
         if (d != null) {
-            tsGroups.addAll(buffer.groupBy(d, count));
+            tsGroups.addAll(view.groupBy(d, count));
         } else {
-            tsGroups.add(buffer);
+            tsGroups.add(view);
         }
         if (Check.nullOrEmpty(fields)) {
             return tsGroups;

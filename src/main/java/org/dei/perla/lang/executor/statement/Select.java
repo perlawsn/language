@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public final class Select {
 
     public Select(List<Expression> fields, WindowSize upto,
             GroupBy group, Expression having, Object[] def) {
-        this.fields = fields;
+        this.fields = Collections.unmodifiableList(fields);
         if (upto == null) {
             this.upto = DEFAULT_UPTO;
         } else {
@@ -32,6 +33,26 @@ public final class Select {
         this.group = group;
         this.having = having;
         this.def = def;
+    }
+
+    protected List<Expression> getFields() {
+        return fields;
+    }
+
+    protected WindowSize getUpTo() {
+        return upto;
+    }
+
+    protected GroupBy getGroupBy() {
+        return group;
+    }
+
+    protected Expression getHaving() {
+        return having;
+    }
+
+    protected Object[] getDefault() {
+        return def;
     }
 
     public Select rebuidl(List<Attribute> atts) {
