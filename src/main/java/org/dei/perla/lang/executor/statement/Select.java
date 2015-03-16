@@ -1,9 +1,11 @@
 package org.dei.perla.lang.executor.statement;
 
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,15 +15,15 @@ public final class Select {
 
     private static final WindowSize DEFAULT_UPTO = new WindowSize(1);
 
-    private final List<Expression> select;
+    private final List<Expression> fields;
     private final WindowSize upto;
     private final GroupBy group;
     private final Expression having;
     private final Object[] def;
 
-    public Select(List<Expression> select, WindowSize upto,
+    public Select(List<Expression> fields, WindowSize upto,
             GroupBy group, Expression having, Object[] def) {
-        this.select = select;
+        this.fields = fields;
         if (upto == null) {
             this.upto = DEFAULT_UPTO;
         } else {
@@ -30,6 +32,14 @@ public final class Select {
         this.group = group;
         this.having = having;
         this.def = def;
+    }
+
+    public Select rebuidl(List<Attribute> atts) {
+        List<Expression> newFields = new ArrayList<>();
+        fields.forEach(f -> newFields.add(f.rebuild(atts)));
+        GroupBy newGroup = group.rebuild(atts);
+        Expression newHaving = having.rebuild(atts);
+        return new Select(newFields, upto, newGroup, newHaving, def);
     }
 
     public void select(BufferView buffer, SelectHandler handler) {
@@ -69,9 +79,9 @@ public final class Select {
                 continue;
             }
             // SELECTION
-            Object[] out = new Object[select.size()];
-            for (int j = 0; j < select.size(); j++) {
-                out[j] = select.get(j).run(cur, buf);
+            Object[] out = new Object[fields.size()];
+            for (int j = 0; j < fields.size(); j++) {
+                out[j] = fields.get(j).run(cur, buf);
             }
             handler.newRecord(out);
             generated = true;
