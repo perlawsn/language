@@ -52,10 +52,10 @@ public class SelectTest {
         };
         atts = Arrays.asList(as);
 
-        tsExpr = new Field(tsAtt.getId()).rebuild(atts);
-        intExpr = new Field(integerAtt.getId()).rebuild(atts);
-        stringExpr = new Field(stringAtt.getId()).rebuild(atts);
-        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
+        tsExpr = new Field(tsAtt.getId()).bind(atts);
+        intExpr = new Field(integerAtt.getId()).bind(atts);
+        stringExpr = new Field(stringAtt.getId()).bind(atts);
+        floatExpr = new Field(floatAtt.getId()).bind(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{

@@ -7,6 +7,13 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * {@code Arithmetic} is a class representing an arithmetic operation.
+ *
+ * <p>
+ * Except for the modulo operation, whose operands must both be of type
+ * integer, all other arithmetic operations can be performed on float and
+ * integer values.
+ *
  * @author Guido Rota 10/03/15.
  */
 public final class Arithmetic implements Expression {
@@ -16,6 +23,10 @@ public final class Arithmetic implements Expression {
     private final Expression e2;
     private final DataType type;
 
+    /**
+     * Private constructor, new {@code Arithmetic} instances must be created
+     * using the static {@code create*} methods.
+     */
     private Arithmetic(ArithmeticOperation op, Expression e1, Expression e2,
             DataType type) {
         this.op = op;
@@ -24,30 +35,80 @@ public final class Arithmetic implements Expression {
         this.type = type;
     }
 
+    /**
+     * Creates an arithmetic expression that adds two operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression that adds two operands.
+     */
     public static Expression createAddition(Expression e1, Expression e2) {
         return create(ArithmeticOperation.ADDITION, e1, e2);
     }
 
+    /**
+     * Creates an arithmetic expression that subtracts two operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression that subtracts two operands.
+     */
     public static Expression createSubtraction(Expression e1, Expression e2) {
         return create(ArithmeticOperation.SUBTRACTION, e1, e2);
     }
 
+    /**
+     * Creates an arithmetic expression that multiplies two operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression that multiplies two operands.
+     */
     public static Expression createProduct(Expression e1, Expression e2) {
         return create(ArithmeticOperation.PRODUCT, e1, e2);
     }
 
+    /**
+     * Creates an arithmetic expression that divides two operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression that divides two operands.
+     */
     public static Expression createDivision(Expression e1, Expression e2) {
         return create(ArithmeticOperation.DIVISION, e1, e2);
     }
 
+    /**
+     * Creates an arithmetic expression that performs the modulo between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression that performs the modulo between two
+     * operands.
+     */
     public static Expression createModulo(Expression e1, Expression e2) {
         return create(ArithmeticOperation.MODULO, e1, e2);
     }
 
+    /**
+     * Creates an arithmetic expression that inverts the sign of its operand.
+     * @param e operand
+     * @return an arithmetic expression that inverts the sign of its operand.
+     */
     public static Expression createInverse(Expression e) {
         return Inverse.create(e);
     }
 
+    /**
+     * Creates an arithmetic expression of the desired type
+     *
+     * @param op operation type
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an arithmetic expression of the desired type
+     */
     public static Expression create(ArithmeticOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -107,11 +168,11 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
-        return create(op, e1.rebuild(atts), e2.rebuild(atts));
+        return create(op, e1.bind(atts), e2.bind(atts));
     }
 
     @Override

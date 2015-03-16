@@ -47,8 +47,8 @@ public class ArithmeticTest {
         };
         atts = Arrays.asList(as);
 
-        intField = new Field(intAtt.getId()).rebuild(atts);
-        floatField = new Field(floatAtt.getId()).rebuild(atts);
+        intField = new Field(intAtt.getId()).bind(atts);
+        floatField = new Field(floatAtt.getId()).bind(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
@@ -141,7 +141,7 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void additionRebuildTest() {
+    public void additionBindTest() {
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
@@ -149,21 +149,21 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createAddition(c1, f1);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Arithmetic.createAddition(f1, c1);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Arithmetic.createAddition(f1, f2);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -242,24 +242,24 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void subtractionRebuildTest() {
+    public void subtractionBindTest() {
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
         Expression e = Arithmetic.createSubtraction(c1, f1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createSubtraction(f1, c1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createSubtraction(f1, f2);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
     }
 
@@ -337,24 +337,24 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void productRebuildTest() {
+    public void productBindTest() {
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
         Expression e = Arithmetic.createProduct(c1, f1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createProduct(f1, c1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createProduct(f1, f2);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
     }
 
@@ -432,24 +432,24 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void divisionRebuildTest() {
+    public void divisionBindTest() {
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
         Expression e = Arithmetic.createDivision(c1, f1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createDivision(f1, c1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createDivision(f1, f2);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
     }
 
@@ -504,23 +504,23 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void moduloRebuildTest() {
+    public void moduloBindTest() {
         Expression c1 = Constant.create(1, DataType.INTEGER);
         Field f1 = new Field("integer");
 
         Expression e = Arithmetic.createModulo(c1, f1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createModulo(f1, c1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
 
         e = Arithmetic.createModulo(f1, f1);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
     }
 
@@ -541,12 +541,12 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void inverseRebuildTest() {
+    public void inverseBindTest() {
         Expression f = new Field("integer");
 
         Expression e = Arithmetic.createInverse(f);
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
     }
 

@@ -7,6 +7,7 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * A class representing an expression that returns a constant value
  * @author Guido Rota 23/02/15.
  */
 public final class Constant implements Expression {
@@ -44,11 +45,22 @@ public final class Constant implements Expression {
     private final Object value;
     private final DataType type;
 
+    /**
+     * Private constructor, new {@code Constant} instances must be
+     * created using the static {@code create} method.
+     */
     private Constant(Object value, DataType type) {
         this.value = value;
         this.type = type;
     }
 
+    /**
+     * Creates a new {@code Constant} expression.
+     *
+     * @param value value of the constant
+     * @param type data type of the constant
+     * @return new constant expression
+     */
     public static Expression create(Object value, DataType type) {
         if (value == null) {
             switch (type) {
@@ -116,7 +128,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         return this;
     }
 

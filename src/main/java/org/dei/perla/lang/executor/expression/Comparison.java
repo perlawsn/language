@@ -7,6 +7,8 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * A class for performing different types of comparisons between values.
+ *
  * @author Guido Rota 09/03/15.
  */
 public final class Comparison implements Expression {
@@ -15,36 +17,96 @@ public final class Comparison implements Expression {
     private final Expression e2;
     private final ComparisonOperation op;
 
+    /**
+     * Private constructor, new {@code Comparison} instances must be
+     * created using the static {@code create*} methods.
+     */
     private Comparison(ComparisonOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
+    /**
+     * Creates a less-than comparison that returns true if the first operand
+     * is smaller than the second.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new less-than comparison operation
+     */
     public static Expression createLT(Expression e1, Expression e2) {
         return create(ComparisonOperation.LT, e1, e2);
     }
 
+    /**
+     * Creates a less-than-or-equal comparison that returns true if the first
+     * operand is smaller than, or equal to, the second.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new less-than-or-equal comparison operation
+     */
     public static Expression createLE(Expression e1, Expression e2) {
         return create(ComparisonOperation.LE, e1, e2);
     }
 
+    /**
+     * Creates a greater-than comparison that returns true if the first
+     * operand is bigger than the second.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new greater-than comparison operation
+     */
     public static Expression createGT(Expression e1, Expression e2) {
         return create(ComparisonOperation.GT, e1, e2);
     }
 
+    /**
+     * Creates a greater-than-or-equal comparison that returns true if the first
+     * operand is bigger than, or equal to, the second.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new greater-than comparison operation
+     */
     public static Expression createGE(Expression e1, Expression e2) {
         return create(ComparisonOperation.GE, e1, e2);
     }
 
+    /**
+     * Creates an equality comparison that returns true if the first
+     * operand is equal to the second
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new equality comparison operation
+     */
     public static Expression createEQ(Expression e1, Expression e2) {
         return create(ComparisonOperation.EQ, e1, e2);
     }
 
+    /**
+     * Creates an inequality comparison that returns true if the first
+     * operand is not equal to the second
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new inequality comparison operation
+     */
     public static Expression createNE(Expression e1, Expression e2) {
         return create(ComparisonOperation.NE, e1, e2);
     }
 
+    /**
+     * Creates a comparison expression of the desired type
+     *
+     * @param op operation type
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return new comparison expression of the desired type
+     */
     public static Expression create(ComparisonOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -86,11 +148,11 @@ public final class Comparison implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
-        return new Comparison(op, e1.rebuild(atts), e2.rebuild(atts));
+        return new Comparison(op, e1.bind(atts), e2.bind(atts));
     }
 
     @Override

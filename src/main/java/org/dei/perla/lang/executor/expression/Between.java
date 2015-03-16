@@ -7,6 +7,9 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * A comparison expression that tests if a value lies between an inclusive
+ * range.
+ *
  * @author Guido Rota 12/03/15.
  */
 public final class Between implements Expression {
@@ -15,12 +18,25 @@ public final class Between implements Expression {
     private final Expression min;
     private final Expression max;
 
+    /**
+     * Private constructor, new {@code Between} instances must be
+     * created using the static {@code create} method.
+     */
     private Between(Expression e, Expression min, Expression max) {
         this.e = e;
         this.min = min;
         this.max = max;
     }
 
+    /**
+     * Creates a new {@code Between} expression that tests if a value lies
+     * between an inclusive range.
+     *
+     * @param e value to be tested
+     * @param min minimum value allowed
+     * @param max maximum value allowed
+     * @return new {@code Between} expression
+     */
     public static Expression create(Expression e, Expression min,
             Expression max) {
         DataType t = e.getType();
@@ -59,13 +75,13 @@ public final class Between implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
-        Expression eNew = e.rebuild(atts);
-        Expression minNew = min.rebuild(atts);
-        Expression maxNew = max.rebuild(atts);
+        Expression eNew = e.bind(atts);
+        Expression minNew = min.bind(atts);
+        Expression maxNew = max.bind(atts);
         return create(eNew, minNew, maxNew);
     }
 

@@ -7,16 +7,28 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * An {@code Expression} computing the complement of a boolean value
+ *
  * @author Guido Rota 02/03/15.
  */
 public final class Not implements Expression {
 
     private final Expression e;
 
+    /**
+     * Private constructor, new {@code Not} instances must be created
+     * using the static {@code create} method.
+     */
     private Not(Expression e) {
         this.e = e;
     }
 
+    /**
+     * Creates a new expression that inverts the boolean value of its operand
+     *
+     * @param e operand
+     * @return new {@code Not} expression
+     */
     public static Expression create(Expression e) {
         if (e.getType() != null && e.getType() != DataType.BOOLEAN) {
             return new ErrorExpression("Incompatible operand type: only " +
@@ -47,11 +59,11 @@ public final class Not implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts));
+        return create(e.bind(atts));
     }
 
     @Override

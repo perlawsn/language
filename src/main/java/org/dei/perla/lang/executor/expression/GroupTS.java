@@ -7,6 +7,13 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * A special {@code Expression} node that retrieves the GROUP TIMESTAMP of a
+ * buffer portion resulting from a time-based grouping.
+ *
+ * <p>
+ * Newly created {@code GroupTS} objects must be bound to an actual attribute
+ * list before being used.
+ *
  * @author Guido Rota 03/03/15.
  */
 public final class GroupTS implements Expression {
@@ -27,7 +34,7 @@ public final class GroupTS implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
             if (a == Attribute.TIMESTAMP) {
@@ -67,7 +74,7 @@ public final class GroupTS implements Expression {
         }
 
         @Override
-        public Expression rebuild(List<Attribute> atts) {
+        public Expression bind(List<Attribute> atts) {
             return this;
         }
 

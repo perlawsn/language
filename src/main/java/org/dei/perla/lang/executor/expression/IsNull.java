@@ -7,16 +7,28 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * An expression for evaluating if a value is null.
+ *
  * @author Guido Rota 13/03/15.
  */
 public final class IsNull implements Expression {
 
     private final Expression e;
 
+    /**
+     * Private constructor, new {@code Inverse} instances must be
+     * created using the static {@code create} method.
+     */
     private IsNull(Expression e) {
         this.e = e;
     }
 
+    /**
+     * Creates a new expression that evaluates if its operand is null
+     *
+     * @param e operand
+     * @return a new expression that evaluates if its operand is null.
+     */
     public static Expression create(Expression e) {
         if (e instanceof Constant) {
             if (((Constant) e).getValue() == null) {
@@ -44,11 +56,11 @@ public final class IsNull implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts));
+        return create(e.bind(atts));
     }
 
     @Override

@@ -9,14 +9,29 @@ import java.time.Instant;
 import java.util.List;
 
 /**
+ * An {@code Expression} for determining the maximum value in a buffer.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class MaxAggregate extends Aggregate {
 
+    /**
+     * Private constructor, new {@code MaxAggregate} instances must be created
+     * using the static {@code create} method.
+     */
     private MaxAggregate(Expression e, WindowSize ws, Expression filter) {
         super(e, ws, filter);
     }
 
+    /**
+     * Creates a new {@code MaxAggregate} expression node.
+     *
+     * @param e value
+     * @param ws portion of buffer to aggregate
+     * @param filter optional filtering expression to determine which records
+     *               must be aggregated
+     * @return new {@code MaxAggregate} instance
+     */
     public static Expression create(Expression e, WindowSize ws,
             Expression filter) {
         DataType t = e.getType();
@@ -39,15 +54,15 @@ public final class MaxAggregate extends Aggregate {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
 
-        Expression eNew = e.rebuild(atts);
+        Expression eNew = e.bind(atts);
         Expression fNew = null;
         if (filter != null) {
-            fNew = filter.rebuild(atts);
+            fNew = filter.bind(atts);
         }
         return create(eNew, ws, fNew);
     }

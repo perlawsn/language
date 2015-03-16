@@ -1,6 +1,8 @@
 package org.dei.perla.lang.executor.expression;
 
 /**
+ * Available comparison operations.
+ *
  * @author Guido Rota 05/03/15.
  */
 public enum ComparisonOperation {

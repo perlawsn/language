@@ -62,7 +62,7 @@ public class MiscTest {
     public void castFloat() {
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
-        Expression fFloat = new Field(floatAtt.getId()).rebuild(atts);
+        Expression fFloat = new Field(floatAtt.getId()).bind(atts);
         Expression incomplete = new Field("integer");
         Expression error = new ErrorExpression("test");
 
@@ -88,7 +88,7 @@ public class MiscTest {
         cast = CastFloat.create(incomplete);
         assertFalse(cast.isComplete());
         assertFalse(cast.hasErrors());
-        cast = cast.rebuild(atts);
+        cast = cast.bind(atts);
         assertTrue(cast.isComplete());
         assertThat(cast.run(view.get(0), view), equalTo(4f));
 
@@ -288,7 +288,7 @@ public class MiscTest {
         Expression fi = new Field(integerAtt.getId());
         assertFalse(fi.isComplete());
         assertFalse(fi.hasErrors());
-        fi = fi.rebuild(atts);
+        fi = fi.bind(atts);
         assertTrue(fi.isComplete());
         assertThat(fi.getType(), equalTo(DataType.INTEGER));
         assertThat(fi.run(view.get(0), view), equalTo(4));
@@ -297,7 +297,7 @@ public class MiscTest {
         Expression fs = new Field(stringAtt.getId());
         assertFalse(fs.isComplete());
         assertFalse(fs.hasErrors());
-        fs = fs.rebuild(atts);
+        fs = fs.bind(atts);
         assertTrue(fi.isComplete());
         assertThat(fs.getType(), equalTo(DataType.STRING));
         assertThat(fs.run(view.get(0), view), equalTo("4"));
@@ -306,7 +306,7 @@ public class MiscTest {
         Expression fb = new Field(boolAtt.getId());
         assertFalse(fb.isComplete());
         assertFalse(fb.hasErrors());
-        fb = fb.rebuild(atts);
+        fb = fb.bind(atts);
         assertTrue(fb.isComplete());
         assertThat(fb.getType(), equalTo(DataType.BOOLEAN));
         assertThat(fb.run(view.get(0), view), equalTo(LogicValue.TRUE));
@@ -319,7 +319,7 @@ public class MiscTest {
         Expression gts = new GroupTS();
         assertFalse(gts.isComplete());
         assertFalse(gts.hasErrors());
-        gts = gts.rebuild(atts);
+        gts = gts.bind(atts);
         assertTrue(gts.isComplete());
         assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
         assertThat(gts.run(null, view), equalTo(view.get(0)[0]));

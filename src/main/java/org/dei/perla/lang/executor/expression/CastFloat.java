@@ -7,16 +7,29 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * An expression that performs a cast to float. This class only supports
+ * float and integer operands.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class CastFloat implements Expression {
 
     private final Expression e;
 
+    /**
+     * Private constructor, new {@code CastFloat} instances must be
+     * created using the static {@code create} method.
+     */
     private CastFloat(Expression e) {
         this.e = e;
     }
 
+    /**
+     * Creates a new expression that performs an integer to float cast.
+     *
+     * @param e value to be cast to float
+     * @return an expression that casts integer values to float
+     */
     public static Expression create(Expression e) {
         DataType t = e.getType();
         if (t == DataType.FLOAT) {
@@ -54,11 +67,11 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return new CastFloat(e.rebuild(atts));
+        return new CastFloat(e.bind(atts));
     }
 
     @Override

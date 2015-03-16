@@ -50,9 +50,9 @@ public class AggregateTest {
         };
         atts = Arrays.asList(as);
 
-        tsExpr = new Field(Attribute.TIMESTAMP.getId()).rebuild(atts);
-        intExpr = new Field(intAtt.getId()).rebuild(atts);
-        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
+        tsExpr = new Field(Attribute.TIMESTAMP.getId()).bind(atts);
+        intExpr = new Field(intAtt.getId()).bind(atts);
+        floatExpr = new Field(floatAtt.getId()).bind(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f}));
@@ -159,7 +159,7 @@ public class AggregateTest {
     }
 
     @Test
-    public void testSumRebuild() {
+    public void testSumBind() {
         Expression c = Constant.create(12, DataType.INTEGER);
         Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
@@ -168,7 +168,7 @@ public class AggregateTest {
         Expression e = Aggregate.createSum(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -176,21 +176,21 @@ public class AggregateTest {
         e = Aggregate.createSum(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createSum(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createSum(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -283,7 +283,7 @@ public class AggregateTest {
     }
 
     @Test
-    public void testAvgRebuild() {
+    public void testAvgBind() {
         Expression c = Constant.create(12, DataType.INTEGER);
         Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
@@ -292,28 +292,28 @@ public class AggregateTest {
         Expression e = Aggregate.createAvg(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -435,7 +435,7 @@ public class AggregateTest {
     }
 
     @Test
-    public void testMinRebuild() {
+    public void testMinBind() {
         Expression c = Constant.create(12, DataType.INTEGER);
         Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
@@ -444,28 +444,28 @@ public class AggregateTest {
         Expression e = Aggregate.createMin(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -588,7 +588,7 @@ public class AggregateTest {
     }
 
     @Test
-    public void testMaxRebuild() {
+    public void testMaxBind() {
         Expression c = Constant.create(12, DataType.INTEGER);
         Expression cFilt = Constant.TRUE;
         Expression exp = new Field("integer");
@@ -597,28 +597,28 @@ public class AggregateTest {
         Expression e = Aggregate.createMax(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -671,7 +671,7 @@ public class AggregateTest {
     }
 
     @Test
-    public void testCountRebuild() {
+    public void testCountBind() {
         Expression c = Constant.create(12, DataType.INTEGER);
         Expression exp = new Field("integer");
         Expression filter = Comparison.createGT(exp, c);
@@ -679,7 +679,7 @@ public class AggregateTest {
         Expression e = Aggregate.createCount(new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

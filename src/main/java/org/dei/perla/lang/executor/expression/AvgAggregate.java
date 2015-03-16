@@ -8,14 +8,29 @@ import org.dei.perla.lang.executor.statement.WindowSize;
 import java.util.List;
 
 /**
+ * An {@code Expression} for computing averages.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class AvgAggregate extends Aggregate {
 
+    /**
+     * Private constructor, new {@code AvgAggregate} instances must be created
+     * using the static {@code create} method.
+     */
     private AvgAggregate(Expression e, WindowSize ws, Expression filter) {
         super(e, ws, filter, DataType.FLOAT);
     }
 
+    /**
+     * Creates a new {@code AvgAggregate} expression node.
+     *
+     * @param e expression to average
+     * @param ws portion of buffer to aggregate
+     * @param filter optional filtering expression to determine which records
+     *               must be aggregated
+     * @return new {@code AvgAggregate} instance
+     */
     public static Expression create(Expression e, WindowSize ws,
             Expression filter) {
         DataType t = e.getType();
@@ -37,15 +52,15 @@ public final class AvgAggregate extends Aggregate {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
 
-        Expression eNew = e.rebuild(atts);
+        Expression eNew = e.bind(atts);
         Expression fNew = null;
         if (filter != null) {
-            fNew = filter.rebuild(atts);
+            fNew = filter.bind(atts);
         }
         return create(eNew, ws, fNew);
     }

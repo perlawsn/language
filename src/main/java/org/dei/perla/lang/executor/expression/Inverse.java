@@ -7,16 +7,28 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * An arithmetic expression that inverts the sign of its operand.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class Inverse implements Expression {
 
     private final Expression e;
 
+    /**
+     * Private constructor, new {@code Inverse} instances must be
+     * created using the static {@code create} method.
+     */
     private Inverse(Expression e) {
         this.e = e;
     }
 
+    /**
+     * Creates a new arithmetic expression that inverts the sign of its operand
+     *
+     * @param e operand
+     * @return new arithmetic inversion expression
+     */
     public static Expression create(Expression e) {
         DataType t = e.getType();
         if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
@@ -48,11 +60,11 @@ public final class Inverse implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts));
+        return create(e.bind(atts));
     }
 
     @Override

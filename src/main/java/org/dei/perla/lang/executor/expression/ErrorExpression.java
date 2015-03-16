@@ -7,13 +7,20 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * Placeholder {@code Expression} node returned by the various {@code
+ * create} methods in case of error.
+ *
  * @author Guido Rota 09/03/15.
  */
-
 public final class ErrorExpression implements Expression {
 
     private final String error;
 
+    /**
+     * Creates a new {@code ErrorExpression}
+     *
+     * @param error error message
+     */
     public ErrorExpression(String error) {
         this.error = error;
     }
@@ -38,7 +45,7 @@ public final class ErrorExpression implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         return this;
     }
 

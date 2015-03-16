@@ -56,7 +56,7 @@ public final class GroupBy {
         }
 
         List<Expression> newFields = new ArrayList<>();
-        fields.forEach(f -> newFields.add(f.rebuild(atts)));
+        fields.forEach(f -> newFields.add(f.bind(atts)));
         return new GroupBy(d, count, newFields);
     }
 

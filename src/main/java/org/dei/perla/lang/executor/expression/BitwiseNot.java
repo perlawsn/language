@@ -7,16 +7,28 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * Expression for performing the bitwise complement of a single value.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class BitwiseNot implements Expression {
 
     private final Expression e;
 
+    /**
+     * Private constructor, new {@code BitwiseNot} instances must be
+     * created using the static {@code create} method.
+     */
     private BitwiseNot(Expression e) {
         this.e = e;
     }
 
+    /**
+     * Creates a new bitwise complement expression
+     *
+     * @param e value to complement
+     * @return new bitwise complement expression
+     */
     public static Expression create(Expression e) {
         DataType t = e.getType();
         if (t != null && t != DataType.INTEGER) {
@@ -51,11 +63,11 @@ public final class BitwiseNot implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts));
+        return create(e.bind(atts));
     }
 
     @Override

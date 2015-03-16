@@ -7,6 +7,9 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * An {@code Expression} for evaluating if a boolean value corresponds to
+ * a specific logic state (true, false, unknown).
+ *
  * @author Guido Rota 12/03/15.
  */
 public final class Is implements Expression {
@@ -14,11 +17,22 @@ public final class Is implements Expression {
     private final Expression e;
     private final LogicValue l;
 
+    /**
+     * Private constructor, new {@code Is} instances must be
+     * created using the static {@code create} method.
+     */
     private Is(Expression e, LogicValue l) {
         this.e = e;
         this.l = l;
     }
 
+    /**
+     * Creates a new boolean comparison expression.
+     *
+     * @param e operand
+     * @param l logic value
+     * @return an expression for evaluating logic values
+     */
     public static Expression create(Expression e, LogicValue l) {
         DataType t = e.getType();
         if (t != null && t != DataType.BOOLEAN) {
@@ -54,11 +68,11 @@ public final class Is implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts), l);
+        return create(e.bind(atts), l);
     }
 
     @Override

@@ -9,14 +9,29 @@ import java.time.Instant;
 import java.util.List;
 
 /**
+ * An {@code Expression} for determining the minimum value in a buffer.
+ *
  * @author Guido Rota 27/02/15.
  */
 public final class MinAggregate extends Aggregate {
 
+    /**
+     * Private constructor, new {@code MinAggregate} instances must be created
+     * using the static {@code create} method.
+     */
     private MinAggregate(Expression e, WindowSize ws, Expression filter) {
         super(e, ws, filter);
     }
 
+    /**
+     * Creates a new {@code MinAggregate} expression node.
+     *
+     * @param e value
+     * @param ws portion of buffer to aggregate
+     * @param filter optional filtering expression to determine which records
+     *               must be aggregated
+     * @return new {@code MinAggregate} instance
+     */
     public static Expression create(Expression e, WindowSize ws,
             Expression filter) {
         DataType t = e.getType();
@@ -39,15 +54,15 @@ public final class MinAggregate extends Aggregate {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
 
-        Expression eNew = e.rebuild(atts);
+        Expression eNew = e.bind(atts);
         Expression fNew = null;
         if (filter != null) {
-            fNew = filter.rebuild(atts);
+            fNew = filter.bind(atts);
         }
         return create(eNew, ws, fNew);
     }

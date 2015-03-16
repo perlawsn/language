@@ -84,28 +84,28 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseANDRebuildTest() {
+    public void bitwiseANDBindTest() {
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
         Expression e = Bitwise.createAND(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createAND(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createAND(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -166,28 +166,28 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseORRebuildTest() {
+    public void bitwiseORBindTest() {
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
         Expression e = Bitwise.createOR(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createOR(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -248,28 +248,28 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseXORRebuildTest() {
+    public void bitwiseXORBindTest() {
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
         Expression e = Bitwise.createXOR(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createXOR(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createXOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -305,13 +305,13 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseNOTRebuildTest() {
+    public void bitwiseNOTBindTest() {
         Expression f = new Field("integer");
 
         Expression e = Bitwise.createNOT(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -372,28 +372,28 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseLSHRebuildTest() {
+    public void bitwiseLSHBindTest() {
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
         Expression e = Bitwise.createLSH(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createLSH(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createLSH(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -454,28 +454,28 @@ public class BitwiseTest {
     }
 
     @Test
-    public void bitwiseRSHRebuildTest() {
+    public void bitwiseRSHBindTest() {
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
         Expression e = Bitwise.createRSH(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createRSH(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createRSH(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

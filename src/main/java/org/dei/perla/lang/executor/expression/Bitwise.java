@@ -7,6 +7,9 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * {@code Bitwise} is a class representing a bitwise operation among integer
+ * values.
+ *
  * @author Guido Rota 10/03/15.
  */
 public final class Bitwise implements Expression {
@@ -15,35 +18,92 @@ public final class Bitwise implements Expression {
     private final Expression e1;
     private final Expression e2;
 
+    /**
+     * Private constructor, new {@code Bitwise} instances must be
+     * created using the static {@code create*} methods.
+     */
     private Bitwise(BitwiseOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
+    /**
+     * Creates an expression performing a bitwise AND operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a bitwise AND expression between two operands.
+     */
     public static Expression createAND(Expression e1, Expression e2) {
         return create(BitwiseOperation.AND, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a bitwise OR operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a bitwise OR expression between two operands.
+     */
     public static Expression createOR(Expression e1, Expression e2) {
         return create(BitwiseOperation.OR, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a bitwise XOR operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a bitwise XOR expression between two operands.
+     */
     public static Expression createXOR(Expression e1, Expression e2) {
         return create(BitwiseOperation.XOR, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a right shift operation
+     *
+     * @param e1 value to shift
+     * @param e2 shift amount
+     * @return a right shift expression
+     */
     public static Expression createRSH(Expression e1, Expression e2) {
         return create(BitwiseOperation.RSH, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a left shift operation
+     *
+     * @param e1 value to shift
+     * @param e2 shift amount
+     * @return a left shift expression
+     */
     public static Expression createLSH(Expression e1, Expression e2) {
         return create(BitwiseOperation.LSH, e1, e2);
     }
 
+    /**
+     * Creates an expression that complements a value
+     *
+     * @param e1 value to complement
+     * @return a bitwise complement expression
+     */
     public static Expression createNOT(Expression e) {
         return BitwiseNot.create(e);
     }
+
+     /**
+     * Creates a bitwise expression of the desired type
+     *
+     * @param op operation type
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return an bitwise expression of the desired type
+     */
 
     public static Expression create(BitwiseOperation op,
             Expression e1, Expression e2) {
@@ -85,11 +145,11 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
-        return create(op, e1.rebuild(atts), e2.rebuild(atts));
+        return create(op, e1.bind(atts), e2.bind(atts));
     }
 
     @Override

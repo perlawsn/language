@@ -9,6 +9,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * An {@code Expression} implementing a String comparison operation.
+ *
+ * <p>
+ * The like expression supports the use of wildcards:
+ * <ul>
+ *     <li>_ wildcard representing a single character</li>
+ *     <li>% wildcard representing zero or more characters</li>
+ *     <li>[a-m] character range</li>
+ * </ul>
+ * </p>
+ *
  * @author Guido Rota 13/03/15.
  */
 public final class Like implements Expression {
@@ -16,11 +27,23 @@ public final class Like implements Expression {
     private final Expression e;
     private final Pattern p;
 
+    /**
+     * Private constructor, new {@code Like} instances must be
+     * created using the static {@code create} method.
+     */
     private Like(Expression e, Pattern p) {
         this.e = e;
         this.p = p;
     }
 
+    /**
+     * Creates a new expression that indicates if a string operand matches
+     * the given pattern.
+     *
+     * @param e operand
+     * @param pattern pattern to be matched
+     * @return new {@code Like} expression
+     */
     public static Expression create(Expression e, String pattern) {
         pattern = pattern.replace("_", ".");
         pattern = pattern.replace("%", ".*");
@@ -59,11 +82,11 @@ public final class Like implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;
         }
-        return create(e.rebuild(atts), p);
+        return create(e.bind(atts), p);
     }
 
     @Override

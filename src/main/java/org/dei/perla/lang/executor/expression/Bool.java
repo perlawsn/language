@@ -7,6 +7,8 @@ import org.dei.perla.lang.executor.BufferView;
 import java.util.List;
 
 /**
+ * A class for performing various boolean operations
+ *
  * @author Guido Rota 10/03/15.
  */
 public final class Bool implements Expression {
@@ -15,28 +17,70 @@ public final class Bool implements Expression {
     private final Expression e1;
     private final Expression e2;
 
+    /**
+     * Private constructor, new {@code Bool} instances must be created
+     * using the static {@code create*} methods.
+     */
     private Bool(BoolOperation op, Expression e1, Expression e2) {
         this.op = op;
         this.e1 = e1;
         this.e2 = e2;
     }
 
+    /**
+     * Creates an expression performing a boolen AND operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a boolean AND expression between two operands.
+     */
     public static Expression createAND(Expression e1, Expression e2) {
         return create(BoolOperation.AND, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a boolen OR operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a boolean OR expression between two operands.
+     */
     public static Expression createOR(Expression e1, Expression e2) {
         return create(BoolOperation.OR, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a boolen XOR operation between two
+     * operands.
+     *
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a boolean XOR expression between two operands.
+     */
     public static Expression createXOR(Expression e1, Expression e2) {
         return create(BoolOperation.XOR, e1, e2);
     }
 
+    /**
+     * Creates an expression performing a boolean negation of a single operand
+     *
+     * @param e operand to negate
+     * @return a boolean negation
+     */
     public static Expression createNOT(Expression e) {
         return Not.create(e);
     }
 
+    /**
+     * Creates a booelan expression of the desired type
+     *
+     * @param op operation type
+     * @param e1 first operand
+     * @param e2 second operand
+     * @return a boolean expression of the desired type
+     */
     public static Expression create(BoolOperation op,
             Expression e1, Expression e2) {
         DataType t1 = e1.getType();
@@ -77,11 +121,11 @@ public final class Bool implements Expression {
     }
 
     @Override
-    public Expression rebuild(List<Attribute> atts) {
+    public Expression bind(List<Attribute> atts) {
         if (isComplete()) {
             return this;
         }
-        return create(op, e1.rebuild(atts), e2.rebuild(atts));
+        return create(op, e1.bind(atts), e2.bind(atts));
     }
 
     @Override

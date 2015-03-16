@@ -78,13 +78,13 @@ public class BooleanTest {
     }
 
     @Test
-    public void testNOTRebuild() {
+    public void testNOTBind() {
         Expression f = new Field("boolean");
 
         Expression e = Bool.createNOT(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -174,27 +174,27 @@ public class BooleanTest {
     }
 
     @Test
-    public void testANDRebuild() {
+    public void testANDBind() {
         Field f = new Field("boolean");
 
         Expression e = Bool.createAND(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createAND(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createAND(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -284,27 +284,27 @@ public class BooleanTest {
     }
 
     @Test
-    public void testORRebuild() {
+    public void testORBind() {
         Field f = new Field("boolean");
 
         Expression e = Bool.createOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -394,27 +394,27 @@ public class BooleanTest {
     }
 
     @Test
-    public void testXORRebuild() {
+    public void testXORBind() {
         Field f = new Field("boolean");
 
         Expression e = Bool.createXOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createXOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createXOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

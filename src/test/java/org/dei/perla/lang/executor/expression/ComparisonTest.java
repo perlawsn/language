@@ -60,9 +60,9 @@ public class ComparisonTest {
         };
         atts = Arrays.asList(as);
 
-        intExpr = new Field(intAtt.getId()).rebuild(atts);
-        stringExpr = new Field(stringAtt.getId()).rebuild(atts);
-        floatExpr = new Field(floatAtt.getId()).rebuild(atts);
+        intExpr = new Field(intAtt.getId()).bind(atts);
+        stringExpr = new Field(stringAtt.getId()).bind(atts);
+        floatExpr = new Field(floatAtt.getId()).bind(atts);
 
         Buffer b = new ArrayBuffer(0, 512);
         b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f, true}));
@@ -158,28 +158,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testEQRebuild() {
+    public void testEQBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createEQ(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createEQ(c, f);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createEQ(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -272,28 +272,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testNERebuild() {
+    public void testNEBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createNE(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createNE(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createNE(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -376,28 +376,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testGTRebuild() {
+    public void testGTBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createGT(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createGT(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createGT(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -484,28 +484,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testGERebuild() {
+    public void testGEBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createGE(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createGE(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createGE(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -592,28 +592,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testLTRebuild() {
+    public void testLTBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createLT(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createLT(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createLT(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -700,28 +700,28 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testLERebuild() {
+    public void testLEBind() {
         Expression f = new Field("integer");
         Expression c = Constant.create(12, DataType.INTEGER);
 
         Expression e = Comparison.createLE(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createLE(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createLE(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -783,7 +783,7 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testBetweenRebuild() {
+    public void testBetweenBind() {
         Expression c1 = Constant.create(12, DataType.INTEGER);
         Expression c2 = Constant.create(54, DataType.INTEGER);
         Field f = new Field("integer");
@@ -791,21 +791,21 @@ public class ComparisonTest {
         Expression e = Between.create(f, c1, c2);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Between.create(c1, f, c2);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Between.create(c1, c2, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -888,13 +888,13 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testIsRebuild() {
+    public void testIsBind() {
         Expression f = new Field("boolean");
 
         Expression e = Is.create(f, LogicValue.TRUE);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -959,13 +959,13 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testIsNullRebuild() {
+    public void testIsNullBind() {
         Expression f = new Field("integer");
 
         Expression e = IsNull.create(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1000,13 +1000,13 @@ public class ComparisonTest {
     }
 
     @Test
-    public void testNullRebuild() {
+    public void testNullBind() {
         Expression f = new Field("string");
 
         Expression e = Like.create(f, "test");
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.rebuild(atts);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
