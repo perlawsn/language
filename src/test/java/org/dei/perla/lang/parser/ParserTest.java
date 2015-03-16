@@ -1051,4 +1051,38 @@ public class ParserTest {
         assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
     }
 
+    @Test
+    public void testTerminateAfter() throws Exception {
+        Parser p;
+        WindowSize ws;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("terminate after 23 days"));
+        ws = p.TerminateAfterClause(err);
+        assertTrue(err.isEmpty());
+        assertThat(ws.getDuration(), equalTo(Duration.ofDays(23)));
+        assertThat(ws.getSamples(), equalTo(-1));
+
+        p.ReInit(new StringReader("terminate after 45 selections"));
+        ws = p.TerminateAfterClause(err);
+        assertTrue(err.isEmpty());
+        assertThat(ws.getSamples(), equalTo(45));
+        assertThat(ws.getDuration(), nullValue());
+    }
+
+    @Test
+    public void testOnUnsupportedSR() throws Exception {
+        Parser p;
+        UnsupportedSamplingRate usr;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("on unsupported sample rate slow down"));
+        usr = p.OnUnsupportedSRClause();
+        assertThat(usr, equalTo(UnsupportedSamplingRate.SLOW_DOWN));
+
+        p.ReInit(new StringReader("on unsupported sample rate do not sample"));
+        usr = p.OnUnsupportedSRClause();
+        assertThat(usr, equalTo(UnsupportedSamplingRate.DO_NOT_SAMPLE));
+    }
+
 }

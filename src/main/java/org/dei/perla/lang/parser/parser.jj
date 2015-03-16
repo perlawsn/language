@@ -219,8 +219,6 @@ TOKEN :
     |
 	< KEYWORD_DO:          "DO"          >
     |
-//	< KEYWORD_NOT:         "NOT"         >
-//  |
 	< KEYWORD_SLOW:        "SLOW"        >
     |
 	< KEYWORD_DOWN:        "DOWN"        >
@@ -947,56 +945,63 @@ UnsupportedSamplingRate OnUnsupportedSRClause() :
 		<OPERATOR_NOT>
 		<KEYWORD_SAMPLE>
 		{ return UnsupportedSamplingRate.DO_NOT_SAMPLE; }
-	)
-	|
-	(
+        |
 		<KEYWORD_SLOW>
 		<KEYWORD_DOWN>
 		{ return UnsupportedSamplingRate.SLOW_DOWN; }
 	)
 }
 
-void RefreshClause() :
-{}
+Refresh RefreshClause() :
+{
+    List<String> es;
+    Duration d;
+}
 {
 	<KEYWORD_REFRESH>
 	(
-		(
-			OnEventClause()
-		)
+        es = OnEventClause()
+        { return new Refresh(es); }
 		|
-		(
-			<KEYWORD_EVERY>
-			Duration()
-		)
+        <KEYWORD_EVERY>
+        d = Duration()
+        { return new Refresh(d); }
 		|
-		(
-			<KEYWORD_NEVER>
-		)
+        <KEYWORD_NEVER>
+        { return null; }
 	)
 }
 
-void ExecuteIfClause(Errors err) :
-{}
+ExecuteIf ExecuteIfClause(Errors err) :
+{
+    Expression cond;
+    Refresh r = null;
+}
 {
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
-	Expression(false, err) // No aggregations allowed
+	cond = Expression(false, err) // No aggregations allowed
 	[
-		RefreshClause()
+		r = RefreshClause()
 	]
+	{ return new ExecuteIf(cond, r); }
 }
 
-void TerminateAfterClause(Errors err) :
-{}
+WindowSize TerminateAfterClause(Errors err) :
+{
+    Duration d;
+    int count;
+}
 {
 	<KEYWORD_TERMINATE>
 	<KEYWORD_AFTER>
 	(
 		LOOKAHEAD(2)
-		Duration()
+		d = Duration()
+		{ return new WindowSize(d); }
 		|
-		SelectionsNumber(err)
+		count = SelectionsNumber(err)
+		{ return new WindowSize(count); }
 	)
 }
 
