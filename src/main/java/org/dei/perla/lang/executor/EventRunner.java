@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
-import org.dei.perla.lang.executor.statement.Query;
+import org.dei.perla.lang.executor.statement.Selection;
 
 /**
  * @author Guido Rota 04/03/15.
@@ -12,7 +12,7 @@ public class EventRunner extends Runner {
 
     private int recvd;
 
-    public EventRunner(Fpc fpc, Query query, int samples, QueryHandler qh) {
+    public EventRunner(Fpc fpc, Selection query, int samples, QueryHandler qh) {
         super(fpc, query, qh);
         this.samples = samples;
         recvd = 0;

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Guido Rota 03/03/15.
  */
-public class SelectionTest {
+public class SelectTest {
 
     private static Attribute tsAtt = Attribute.TIMESTAMP;
     private static Attribute integerAtt =
@@ -80,7 +80,7 @@ public class SelectionTest {
         sel.add(stringExpr);
         sel.add(floatExpr);
 
-        Selection dm = new Selection(sel, null, null, null, null);
+        Select dm = new Select(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -106,7 +106,7 @@ public class SelectionTest {
         sel.add(floatExpr);
         sel.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
 
-        Selection dm = new Selection(sel, null, null, null, null);
+        Select dm = new Select(sel, null, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -134,7 +134,7 @@ public class SelectionTest {
         sel.add(floatExpr);
 
         WindowSize upto = new WindowSize(3);
-        Selection dm = new Selection(sel, upto, null, null, null);
+        Select dm = new Select(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -162,7 +162,7 @@ public class SelectionTest {
         sel.add(floatExpr);
 
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
-        Selection dm = new Selection(sel, upto, null, null, null);
+        Select dm = new Select(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -191,7 +191,7 @@ public class SelectionTest {
         sel.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
 
         WindowSize upto = new WindowSize(3);
-        Selection dm = new Selection(sel, upto, null, null, null);
+        Select dm = new Select(sel, upto, null, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -224,7 +224,7 @@ public class SelectionTest {
                 Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
-        Selection dm = new Selection(sel, upto, null, having, null);
+        Select dm = new Select(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -264,7 +264,7 @@ public class SelectionTest {
                 Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
-        Selection dm = new Selection(sel, upto, null, having, null);
+        Select dm = new Select(sel, upto, null, having, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -309,7 +309,7 @@ public class SelectionTest {
         def[1] = 5;
 
         WindowSize upto = new WindowSize(3);
-        Selection dm = new Selection(sel, upto, null, having, def);
+        Select dm = new Select(sel, upto, null, having, def);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();
@@ -330,7 +330,7 @@ public class SelectionTest {
         sel.add(intExpr);
 
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
-        Selection dm = new Selection(sel, null, group, null, null);
+        Select dm = new Select(sel, null, group, null, null);
         SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
         dm.select(view, qh);
         List<Object[]> records = qh.getRecords();

@@ -124,26 +124,13 @@ TOKEN :
 {
 	< KEYWORD_SELECT:    "SELECT"   >
     |
-	< KEYWORD_DISTINCT:  "DISTINCT" >
-    |
-	< KEYWORD_ALL:       "ALL"      >
-    |
 	// Virtual record field created by the GROUP BY clause
 	<KEYWORD_GROUPTS:    "GROUP_TS" >
 }
 
 /*
- * UNION CLAUSE
+ * WHERE CLAUSE
  */
-TOKEN :
-{
-	< KEYWORD_UNION:     "UNION" >
-//  |
-//	< KEYWORD_ALL:       "ALL"   >
-}
-
-/*
- * WHERE CLAUSE  */
 TOKEN :
 {
 	< KEYWORD_WHERE:     "WHERE" >
@@ -260,7 +247,9 @@ TOKEN :
     |
 	< KEYWORD_IF:        "IF"      >
     |
-	< KEYWORD_EXISTS :   "EXISTS" >
+	< KEYWORD_EXISTS:    "EXISTS"  >
+	|
+	< KEYWORD_ALL:       "ALL"     >
 }
 
 /*
@@ -528,28 +517,39 @@ TOKEN :
  * PRODUCTIONS
  */
 
-void StatementSequence(Errors err) :
-{}
+List<Statement> StatementSequence(Errors err) :
 {
-	Statement(err)
+    List<Statement> sl = new ArrayList<Statement>();
+    Statement s;
+}
+{
+	s = Statement(err)
+	{ sl.add(s); }
 	(
 		";"
-		Statement(err)
+		s = Statement(err)
+		{ sl.add(s); }
 	)*
 	<EOF>
+	{ return sl; }
 }
 
-void Statement(Errors err):
-{}
+Statement Statement(Errors err):
 {
-    SetParametersStament(err)
+    Statement s;
+}
+{
+    (
+    s = SetParametersStament(err)
     |
-    CreationStatement(err)
+    s = CreationStatement(err)
     |
-    InsertionStatement(err)
+    s = InsertionStatement(err)
+    )
+    { return s; }
 }
 
-void SetParametersStament(Errors err):
+Statement SetParametersStament(Errors err):
 {}
 {
     <KEYWORD_SET>
@@ -576,6 +576,7 @@ void SetParametersStament(Errors err):
 			ConstantString()
 		)
 	)*
+	{ return null; }
 }
 
 void SetParameterList(Errors err):
@@ -586,7 +587,7 @@ void SetParameterList(Errors err):
 	Expression(false, err)
 }
 
-void CreationStatement(Errors err) :
+Statement CreationStatement(Errors err) :
 {}
 {
 	<KEYWORD_CREATE>
@@ -595,8 +596,9 @@ void CreationStatement(Errors err) :
 	FieldDefinitionList(err)
 	[
 	    <KEYWORD_AS>
-	    StreamSelectionStatement(err)
+	    SelectionStatement(err)
 	]
+	{ return null; }
 }
 
 void FieldDefinitionList(Errors err) :
@@ -622,8 +624,10 @@ void FieldDefinition(Errors err) :
 	]
 }
 
-void InsertionStatement(Errors err) :
-{}
+Statement InsertionStatement(Errors err) :
+{
+    Selection sel;
+}
 {
 	<KEYWORD_INSERT>
 	<KEYWORD_INTO>
@@ -632,26 +636,76 @@ void InsertionStatement(Errors err) :
 	[
 	    FieldList()
 	]
-	StreamSelectionStatement(err)
+	sel = SelectionStatement(err)
+	{ return null; }
 }
 
-void FieldList() :
-{}
+List<String> FieldList() :
+{
+    List<String> sl = new ArrayList<String>();
+    String s;
+}
 {
 	"("
-	Identifier() // DataStructureField
+	s = Identifier() // DataStructureField
+	{ sl.add(s); }
 	(
 		","
-		Identifier() // DataStructureField
+		s = Identifier() // DataStructureField
+		{ sl.add(s); }
 	)*
 	")"
+	{ return sl; }
 }
 
-void StreamSelectionStatement(Errors err) :
-{}
+Selection SelectionStatement(Errors err) :
 {
-    EveryClause(err)
-    SelectionStatement(err)
+    WindowSize every;
+    List<FieldSelection> fsl;
+    GroupBy gby = null;
+    Expression having = null;
+    WindowSize upto = WindowSize.ONE;
+    OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
+
+    Select sel;
+}
+{
+    every = EveryClause(err)
+    <KEYWORD_SELECT>
+    fsl = FieldSelectionList(err)
+	[
+		gby = GroupByClause()
+	]
+	[
+		having = HavingClause(err)
+	]
+	[
+		upto = UpToClause(err)
+	]
+	[
+		oes = OnEmptySelectionClause()
+	]
+	{
+	    List<Expression> fields = new ArrayList<Expression>();
+	    Object[] def = new Object[fsl.size()];
+	    int i = 0;
+	    for (FieldSelection fs : fsl) {
+	        fields.add(fs.getField());
+	        def[i++] = fs.getDefault();
+	    }
+	    if (oes == OnEmptySelection.INSERT_NOTHING) {
+	        def = null;
+	    }
+	    sel = new Select(fields, upto, gby, having, def);
+	}
+	SamplingClause(err)
+	[
+		ExecuteIfClause(err)
+	]
+	[
+		TerminateAfterClause(err)
+	]
+	{ return null; }
 }
 
 WindowSize EveryClause(Errors err) :
@@ -664,69 +718,38 @@ WindowSize EveryClause(Errors err) :
 	{ return ws; }
 }
 
-void SelectionStatement(Errors err) :
+List<FieldSelection> FieldSelectionList(Errors err) :
 {
-    GroupBy gby = null;
-    Expression having;
-    WindowSize upto;
+    List<FieldSelection> fsl = new ArrayList<FieldSelection>();
+    FieldSelection fs;
 }
 {
-	SelectClause(err)
-	[
-		gby = GroupByClause()
-	]
-	[
-		having = HavingClause(err)
-	]
-	[
-		upto = UpToClause(err)
-	]
-	[
-		OnEmptySelectionClause()
-	]
-	SamplingClause(err)
-	[
-		ExecuteIfClause(err)
-	]
-	[
-		TerminateAfterClause(err)
-	]
-}
-
-void SelectClause(Errors err) :
-{}
-{
-	<KEYWORD_SELECT>
-	[
-		<KEYWORD_DISTINCT>
-		|
-		<KEYWORD_ALL>
-	]
-	FieldSelectionList(err)
-}
-
-void FieldSelectionList(Errors err) :
-{}
-{
-	FieldSelection(err)
+	fs = FieldSelection(err)
+	{ fsl.add(fs); }
 	(
 		","
-		FieldSelection(err)
+		fs = FieldSelection(err)
+		{ fsl.add(fs); }
 	)*
+	{ return fsl; }
 }
 
-void FieldSelection(Errors err) :
-{}
+FieldSelection FieldSelection(Errors err) :
 {
-	Expression(true, err)
+    Expression field;
+    Object def = null;
+}
+{
+	field = Expression(true, err)
 	[
 		<KEYWORD_DEFAULT>
 		(
-            Expression(false, err)
+            def = Expression(false, err)
             |
             <CONSTANT_NULL>
 		)
 	]
+	{ return new FieldSelection(field, def); }
 }
 
 GroupBy GroupByClause() :
@@ -812,7 +835,7 @@ WindowSize UpToClause(Errors err) :
 	{ return ws; }
 }
 
-void OnEmptySelectionClause() :
+OnEmptySelection OnEmptySelectionClause() :
 {}
 {
 	<KEYWORD_ON>
@@ -821,8 +844,10 @@ void OnEmptySelectionClause() :
 	<KEYWORD_INSERT>
 	(
 		<KEYWORD_NOTHING>
+		{ return OnEmptySelection.INSERT_NOTHING; }
 		|
 	 	<KEYWORD_DEFAULT>
+	 	{ return OnEmptySelection.INSERT_DEFAULT; }
 	)
 }
 

@@ -7,6 +7,8 @@ import java.time.Duration;
  */
 public final class WindowSize {
 
+    public static final WindowSize ONE = new WindowSize(1);
+
     private final int samples;
     private final Duration d;
 

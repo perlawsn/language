@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.Query;
+import org.dei.perla.lang.executor.statement.Selection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class SynchronizerQueryHandler implements QueryHandler {
     }
 
     @Override
-    public void newRecord(Query q, Object[] r) {
+    public void newRecord(Selection q, Object[] r) {
         lk.lock();
         try {
             if (upto != 0) {
@@ -38,7 +38,7 @@ public class SynchronizerQueryHandler implements QueryHandler {
     }
 
     @Override
-    public void error(Query q, Throwable cause) {
+    public void error(Selection q, Throwable cause) {
         lk.lock();
         try {
             error = cause;

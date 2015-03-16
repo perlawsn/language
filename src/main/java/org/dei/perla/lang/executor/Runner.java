@@ -5,7 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
-import org.dei.perla.lang.executor.statement.Query;
+import org.dei.perla.lang.executor.statement.Selection;
 import org.dei.perla.lang.executor.statement.SelectHandler;
 
 import java.util.List;
@@ -28,14 +28,14 @@ public abstract class Runner {
     private final Buffer buf;
 
     private final Fpc fpc;
-    private final Query query;
+    private final Selection query;
     private final QueryHandler qh;
 
     private Task sampTask;
     private final SelectHandler selHandler = new RunnerSelectHandler();
     private final TaskHandler sampHandler = new SamplingTaskHandler();
 
-    public Runner(Fpc fpc, Query query, QueryHandler qh) {
+    public Runner(Fpc fpc, Selection query, QueryHandler qh) {
         this.fpc = fpc;
         this.query = query;
         this.qh = qh;
