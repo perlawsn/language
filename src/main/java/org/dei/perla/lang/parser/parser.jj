@@ -51,6 +51,13 @@ PARSER_BEGIN(Parser)
 	        addError(((ErrorExpression) e).getError(), t, err);
 	    }
 
+	    private static void addIfError(ClauseWrapper<?> cw, Token t, Errors err) {
+	        if (!cw.hasError()) {
+	            return;
+	        }
+	        addError(cw.getError(), t, err);
+	    }
+
 	}
 
 PARSER_END(Parser)
@@ -934,7 +941,8 @@ Every SamplingEveryClause(Errors err) :
 	tu = TimeUnit()
     {
         cw = Every.create(e, tu);
-        return null;
+        addIfError(cw, token, err);
+        return cw.getClause();
     }
 }
 

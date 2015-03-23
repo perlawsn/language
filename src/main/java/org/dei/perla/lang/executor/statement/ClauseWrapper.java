@@ -10,16 +10,26 @@ public final class ClauseWrapper<T extends Clause> {
     private final T clause;
     private final String error;
 
+    public ClauseWrapper(T clause) {
+        this.clause = clause;
+        error = null;
+    }
+
     public ClauseWrapper(T clause, String error) {
         this.clause = clause;
         this.error = error;
     }
 
-    public T getClause(Consumer<String> onError) {
-        if (error != null) {
-            onError.accept(error);
-        }
+    public T getClause() {
         return clause;
+    }
+
+    public boolean hasError() {
+        return error != null;
+    }
+
+    public String getError() {
+        return error;
     }
 
 }

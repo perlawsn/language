@@ -98,6 +98,45 @@ public class MiscTest {
     }
 
     @Test
+    public void castInteger() {
+        Expression cInt = Constant.create(1, DataType.INTEGER);
+        Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
+        Expression fFloat = new Field(floatAtt.getId()).bind(atts);
+        Expression incomplete = new Field("integer");
+        Expression error = new ErrorExpression("test");
+
+        Expression cast = CastInteger.create(cInt);
+        assertTrue(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.run(view.get(0), view), equalTo(1));
+
+        cast = CastInteger.create(cFloat);
+        assertTrue(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.run(view.get(0), view), equalTo(1));
+
+        cast = CastInteger.create(fFloat);
+        assertTrue(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.run(view.get(0), view), equalTo(4));
+        assertThat(cast.run(view.get(1), view), equalTo(3));
+
+        cast = CastInteger.create(incomplete);
+        assertFalse(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        cast = cast.bind(atts);
+        assertTrue(cast.isComplete());
+        assertThat(cast.run(view.get(0), view), equalTo(4));
+
+        cast = CastInteger.create(error);
+        assertTrue(cast.isComplete());
+        assertTrue(cast.hasErrors());
+    }
+
+    @Test
     public void constantTest() {
         Expression c1 = Constant.create(1, DataType.INTEGER);
         assertTrue(c1.isComplete());

@@ -30,6 +30,9 @@ public final class Every implements Clause {
             err = "Incompatible data type, period must be a numeric value";
         }
 
+        if (t == DataType.FLOAT) {
+        }
+
         return null;
     }
 
