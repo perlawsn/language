@@ -906,41 +906,51 @@ List<String> EventList() :
 	{ return evs; }
 }
 
-void SamplingIfEveryClause(Errors err) :
+List<Every> SamplingIfEveryClause(Errors err) :
 {
-    Expression cond;
+    List<Every> es = new ArrayList<Every>();
+
     Every every;
+    Expression cond;
+    Expression value;
+    TemporalUnit unit;
 }
 {
 	(
 		(
 		    <KEYWORD_IF>
 		    cond = Expression(false, err)
-			every = SamplingEveryClause(err)
+		    <KEYWORD_EVERY>
+		    every = SamplingEveryClause(cond, err)
+		    { es.add(every); }
 		)+
 		(
 			<KEYWORD_ELSE>
-			SamplingEveryClause(err)
+			<KEYWORD_EVERY>
+			every = SamplingEveryClause(Constant.TRUE, err)
+			{ es.add(every); }
 		)
 	)
 	|
 	(
-		SamplingEveryClause(err)
+	    <KEYWORD_EVERY>
+	    every = SamplingEveryClause(Constant.TRUE, err)
+	    { es.add(every); }
 	)
+	{ return es; }
 }
 
-Every SamplingEveryClause(Errors err) :
+Every SamplingEveryClause(Expression cond, Errors err) :
 {
     ClauseWrapper<Every> cw;
-    Expression e;
-    TemporalUnit tu;
+    Expression value;
+    TemporalUnit unit;
 }
 {
-	<KEYWORD_EVERY>
-	e = Expression(false, err) // No aggregations allowed
-	tu = TimeUnit()
+    value = Expression(false, err)
+    unit = TimeUnit()
     {
-        cw = Every.create(e, tu);
+        cw = Every.create(cond, value, unit);
         addIfError(cw, token, err);
         return cw.getClause();
     }

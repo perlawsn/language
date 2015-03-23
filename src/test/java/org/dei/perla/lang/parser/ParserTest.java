@@ -3,6 +3,8 @@ package org.dei.perla.lang.parser;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
+import org.dei.perla.lang.executor.statement.Every;
+import org.dei.perla.lang.executor.statement.Period;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.junit.Test;
 
@@ -1083,6 +1085,23 @@ public class ParserTest {
         p.ReInit(new StringReader("on unsupported sample rate do not sample"));
         usr = p.OnUnsupportedSRClause();
         assertThat(usr, equalTo(UnsupportedSamplingRate.DO_NOT_SAMPLE));
+    }
+
+    @Test
+    public void testSamplingEveryClause() throws Exception {
+        Parser p;
+        Every e;
+        Period period;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("5 seconds"));
+        e = p.SamplingEveryClause(Constant.TRUE, err);
+        assertTrue(e.isComplete());
+        assertFalse(e.hasErrors());
+        assertTrue(e.isComplete());
+        period = e.run(null);
+        assertThat(period.getValue(), equalTo(5));
+        assertThat(period.getUnit(), equalTo(ChronoUnit.SECONDS));
     }
 
 }
