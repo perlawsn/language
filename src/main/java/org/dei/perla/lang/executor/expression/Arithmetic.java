@@ -116,8 +116,8 @@ public final class Arithmetic implements Expression {
 
         if (op == ArithmeticOperation.MODULO && t1 != null && t2 != null &&
                 t1 != DataType.INTEGER && t2 != DataType.INTEGER) {
-            return new ErrorExpression("Modulo operation is only allowed on " +
-                    "integer values");
+            return new ErrorExpression("Incompatible operand type, modulo " +
+                    "operation is only allowed on integer values");
         }
         if (t1 != null && t1 != DataType.INTEGER && t1 != DataType.FLOAT ||
                 t2 != null && t2 != DataType.INTEGER && t2 != DataType.FLOAT) {

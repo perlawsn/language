@@ -38,13 +38,13 @@ PARSER_BEGIN(Parser)
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
 
-	public class Parser {
+	public final class Parser {
 
-	    private static final void addError(String msg, Token t, Errors err) {
+	    private static void addError(String msg, Token t, Errors err) {
 	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
 	    }
 
-	    private static final void addIfError(Expression e, Token t, Errors err) {
+	    private static void addIfError(Expression e, Token t, Errors err) {
 	        if (!(e instanceof ErrorExpression)) {
 	            return;
 	        }
@@ -900,12 +900,16 @@ List<String> EventList() :
 }
 
 void SamplingIfEveryClause(Errors err) :
-{}
+{
+    Expression cond;
+    Every every;
+}
 {
 	(
 		(
-			SamplingIfClause(err)
-			SamplingEveryClause(err)
+		    <KEYWORD_IF>
+		    cond = Expression(false, err)
+			every = SamplingEveryClause(err)
 		)+
 		(
 			<KEYWORD_ELSE>
@@ -918,19 +922,20 @@ void SamplingIfEveryClause(Errors err) :
 	)
 }
 
-void SamplingIfClause(Errors err) :
-{}
+Every SamplingEveryClause(Errors err) :
 {
-	<KEYWORD_IF>
-	Expression(false, err) // No aggregations allowed
+    ClauseWrapper<Every> cw;
+    Expression e;
+    TemporalUnit tu;
 }
-
-void SamplingEveryClause(Errors err) :
-{}
 {
 	<KEYWORD_EVERY>
-	Expression(false, err) // No aggregations allowed
-	TimeUnit()
+	e = Expression(false, err) // No aggregations allowed
+	tu = TimeUnit()
+    {
+        cw = Every.create(e, tu);
+        return null;
+    }
 }
 
 UnsupportedSamplingRate OnUnsupportedSRClause() :
