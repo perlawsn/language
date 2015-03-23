@@ -5,7 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.IfEvery;
-import org.dei.perla.lang.executor.statement.Period;
+import org.dei.perla.core.fpc.Period;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.junit.Test;
 
@@ -1105,9 +1105,11 @@ public class ParserTest {
 
         p = new Parser(new StringReader("on unsupported sample rate slow down"));
         usr = p.OnUnsupportedSRClause();
+        assertTrue(err.isEmpty());
         assertThat(usr, equalTo(UnsupportedSamplingRate.SLOW_DOWN));
 
         p.ReInit(new StringReader("on unsupported sample rate do not sample"));
+        assertTrue(err.isEmpty());
         usr = p.OnUnsupportedSRClause();
         assertThat(usr, equalTo(UnsupportedSamplingRate.DO_NOT_SAMPLE));
     }

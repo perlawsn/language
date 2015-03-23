@@ -168,6 +168,7 @@ public final class Comparison implements Expression {
             return null;
         }
 
+        @SuppressWarnings("unchecked")
         Comparable<Object> c1 = (Comparable<Object>) o1;
         Boolean res;
         switch (op) {

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Guido Rota 04/03/15.
  */
-public final class GroupBy {
+public final class GroupBy implements Clause {
 
     private final Duration d;
     private final int count;
@@ -50,8 +50,28 @@ public final class GroupBy {
         return fields;
     }
 
-    public GroupBy rebuild(List<Attribute> atts) {
+    @Override
+    public boolean hasErrors() {
+        return false;
+    }
+
+    @Override
+    public boolean isComplete() {
         if (fields == null) {
+            return true;
+        }
+
+        for (Expression e : fields) {
+            if (!e.isComplete()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public GroupBy bind(List<Attribute> atts) {
+        if (isComplete()) {
             return this;
         }
 

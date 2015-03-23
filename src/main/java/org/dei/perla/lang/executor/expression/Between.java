@@ -94,6 +94,7 @@ public final class Between implements Expression {
         return compute(o, omin, omax);
     }
 
+    @SuppressWarnings("unchecked")
     private static Object compute(Object o, Object omin, Object omax) {
         if (o == null || omin == null || omax == null) {
             return LogicValue.UNKNOWN;

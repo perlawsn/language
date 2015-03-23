@@ -8,14 +8,11 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -81,7 +78,7 @@ public class GroupByTest {
             assertFalse(e.isComplete());
         }
 
-        GroupBy ng = g.rebuild(atts);
+        GroupBy ng = g.bind(atts);
         assertThat(ng.getDuration(), equalTo(g.getDuration()));
         assertThat(ng.getCount(), equalTo(g.getCount()));
         assertThat(g.getFields().size(), equalTo(ng.getFields().size()));

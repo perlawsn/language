@@ -58,7 +58,7 @@ public final class Select {
     public Select rebuidl(List<Attribute> atts) {
         List<Expression> newFields = new ArrayList<>();
         fields.forEach(f -> newFields.add(f.bind(atts)));
-        GroupBy newGroup = group.rebuild(atts);
+        GroupBy newGroup = group.bind(atts);
         Expression newHaving = having.bind(atts);
         return new Select(newFields, upto, newGroup, newHaving, def);
     }

@@ -1,7 +1,5 @@
 package org.dei.perla.lang.executor.statement;
 
-import java.util.function.Consumer;
-
 /**
  * @author Guido Rota 23/03/15.
  */
