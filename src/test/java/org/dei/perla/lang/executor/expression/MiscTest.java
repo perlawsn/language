@@ -63,7 +63,7 @@ public class MiscTest {
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
         Expression fFloat = new Field(floatAtt.getId()).bind(atts);
-        Expression incomplete = new Field("integer");
+        Expression incomplete = new Field("float");
         Expression error = new ErrorExpression("test");
 
         Expression cast = CastFloat.create(cInt);
@@ -90,7 +90,7 @@ public class MiscTest {
         assertFalse(cast.hasErrors());
         cast = cast.bind(atts);
         assertTrue(cast.isComplete());
-        assertThat(cast.run(view.get(0), view), equalTo(4f));
+        assertThat(cast.run(view.get(0), view), equalTo(4.4f));
 
         cast = CastFloat.create(error);
         assertTrue(cast.isComplete());

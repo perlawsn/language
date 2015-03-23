@@ -71,7 +71,7 @@ public final class CastFloat implements Expression {
         if (e.isComplete()) {
             return this;
         }
-        return new CastFloat(e.bind(atts));
+        return CastFloat.create(e.bind(atts));
     }
 
     @Override
