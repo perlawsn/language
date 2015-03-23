@@ -925,7 +925,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 		    <KEYWORD_IF>
 		    cond = Expression(false, err)
 		    <KEYWORD_EVERY>
-		    every = SamplingEveryClause(cond, err)
+		    every = SamplingEveryClause(err)
 		    {
 		        if (ife == null) {
 		            cw = IfEvery.create(cond, every.getValue(),
@@ -944,18 +944,19 @@ IfEvery SamplingIfEveryClause(Errors err) :
 		(
 			<KEYWORD_ELSE>
 			<KEYWORD_EVERY>
-			every = SamplingEveryClause(Constant.TRUE, err)
+			every = SamplingEveryClause(err)
 			{
 			    cw = IfEvery.create(prev, Constant.TRUE, every.getValue(),
 			        every.getUnit());
 			    addIfError(cw, token, err);
 			}
 		)
+		{ return ife; }
 	)
 	|
 	(
 	    <KEYWORD_EVERY>
-	    every = SamplingEveryClause(Constant.TRUE, err)
+	    every = SamplingEveryClause(err)
 	    {
 	        cw = IfEvery.create(Constant.TRUE, every.getValue(),
 	            every.getUnit());
@@ -966,7 +967,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 	{ return ife; }
 }
 
-Every SamplingEveryClause(Expression cond, Errors err) :
+Every SamplingEveryClause(Errors err) :
 {
     Expression value;
     TemporalUnit unit;

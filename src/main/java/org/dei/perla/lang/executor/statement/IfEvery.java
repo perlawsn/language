@@ -64,7 +64,7 @@ public final class IfEvery implements Clause {
     }
 
     private void setNext(IfEvery next) {
-        if (next != null) {
+        if (this.next != null) {
             throw new IllegalStateException("next IF-EVERY node has already " +
                     "been set");
         }
@@ -73,11 +73,17 @@ public final class IfEvery implements Clause {
 
     @Override
     public boolean hasErrors() {
+        if (next != null && next.hasErrors()) {
+            return true;
+        }
         return value.hasErrors() || cond.hasErrors() || err;
     }
 
     @Override
     public boolean isComplete() {
+        if (next != null && !next.isComplete()) {
+            return false;
+        }
         return cond.isComplete() && value.isComplete();
     }
 
@@ -90,8 +96,13 @@ public final class IfEvery implements Clause {
         if (isComplete()) {
             return this;
         }
+
         ClauseWrapper<IfEvery> cw = IfEvery.create(cond.bind(atts), value.bind(atts), unit);
-        return cw.getClause();
+        IfEvery ife = cw.getClause();
+        if (next != null) {
+            ife.next = next.bind(atts);
+        }
+        return ife;
     }
 
     public Period run(Object[] record) {

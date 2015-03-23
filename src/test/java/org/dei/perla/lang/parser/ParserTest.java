@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.IfEvery;
@@ -12,6 +13,8 @@ import java.io.StringReader;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -21,6 +24,28 @@ import static org.junit.Assert.*;
  * @author Guido Rota 04/03/15.
  */
 public class ParserTest {
+
+    private static final Attribute powerAtt =
+            Attribute.create("power", DataType.INTEGER);
+
+    private static final List<Attribute> atts;
+    static {
+        atts = new ArrayList<>();
+        atts.add(powerAtt);
+    }
+
+    private static final Object[][] records;
+    static {
+        records = new Object[4][];
+        records[0] = new Object[1];
+        records[0][0] = 94;
+        records[1] = new Object[1];
+        records[1][0] = 75;
+        records[2] = new Object[1];
+        records[2][0] =  50;
+        records[3] = new Object[1];
+        records[3][0] = 30;
+    }
 
     @Test
     public void testSign() throws Exception {
@@ -1086,23 +1111,80 @@ public class ParserTest {
         usr = p.OnUnsupportedSRClause();
         assertThat(usr, equalTo(UnsupportedSamplingRate.DO_NOT_SAMPLE));
     }
-/*
+
     @Test
-    public void testSamplingEveryClause() throws Exception {
+    public void testEveryClause() throws Exception {
         Parser p;
-        IfEvery e;
-        Period period;
+        Every e;
+        Expression c;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("5 seconds"));
-        e = p.SamplingEveryClause(Constant.TRUE, err);
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.isComplete());
-        period = e.getValue(null);
-        assertThat(period.getValue(), equalTo(5));
-        assertThat(period.getUnit(), equalTo(ChronoUnit.SECONDS));
+        e = p.SamplingEveryClause(err);
+        c = e.getValue();
+        assertTrue(c instanceof Constant);
+        assertThat(((Constant) c).getValue(), equalTo(5));
+        assertThat(e.getUnit(), equalTo(ChronoUnit.SECONDS));
+
+        p.ReInit(new StringReader("25 days"));
+        e = p.SamplingEveryClause(err);
+        c = e.getValue();
+        assertTrue(c instanceof Constant);
+        assertThat(((Constant) c).getValue(), equalTo(25));
+        assertThat(e.getUnit(), equalTo(ChronoUnit.DAYS));
     }
-*/
+
+    @Test
+    public void testIfEveryClause() throws Exception {
+        Parser p;
+        IfEvery ife;
+        Period pe;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("every 5 seconds"));
+        ife = p.SamplingIfEveryClause(err);
+        assertTrue(err.isEmpty());
+        assertFalse(ife.hasErrors());
+        assertTrue(ife.isComplete());
+        pe = ife.run(null);
+        assertThat(pe.getValue(), equalTo(5));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
+
+        p.ReInit(new StringReader(
+                "if false every 10 seconds else every 2 days"));
+        ife = p.SamplingIfEveryClause(err);
+        assertTrue(err.isEmpty());
+        assertFalse(ife.hasErrors());
+        assertTrue(ife.isComplete());
+        pe = ife.run(null);
+        assertThat(pe.getValue(), equalTo(2));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.DAYS));
+
+        p.ReInit(new StringReader(
+                "if power > 80 every 10 seconds " +
+                "if power > 60 every 40 seconds " +
+                "if power > 40 every 2 minutes " +
+                "else every 1 hours"
+        ));
+        ife = p.SamplingIfEveryClause(err);
+        assertTrue(err.isEmpty());
+        assertFalse(ife.hasErrors());
+        assertFalse(ife.isComplete());
+        ife = ife.bind(atts);
+        assertFalse(ife.hasErrors());
+        assertTrue(ife.isComplete());
+        pe = ife.run(records[0]);
+        assertThat(pe.getValue(), equalTo(10));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
+        pe = ife.run(records[1]);
+        assertThat(pe.getValue(), equalTo(40));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
+        pe = ife.run(records[2]);
+        assertThat(pe.getValue(), equalTo(2));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.MINUTES));
+        pe = ife.run(records[3]);
+        assertThat(pe.getValue(), equalTo(1));
+        assertThat(pe.getUnit(), equalTo(ChronoUnit.HOURS));
+    }
 
 }
