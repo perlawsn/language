@@ -105,4 +105,8 @@ public enum LogicValue {
         }
     }
 
+    public final Boolean toBoolean() {
+        return LogicValue.toBoolean(this);
+    }
+
 }

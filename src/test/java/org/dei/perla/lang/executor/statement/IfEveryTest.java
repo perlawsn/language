@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -47,32 +46,30 @@ public class IfEveryTest {
 
     @Test
     public void testEvery() {
-        Every e;
+        IfEvery e;
         Period p;
-        ClauseWrapper<Every> cw;
+        ClauseWrapper<IfEvery> cw;
         Expression cInt = Constant.create(5, DataType.INTEGER);
         Expression cFloat = Constant.create(3.4f, DataType.FLOAT);
         Expression cString = Constant.create("test", DataType.STRING);
 
-        cw = Every.create(Constant.TRUE, cInt, ChronoUnit.DAYS);
+        cw = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         p = e.run(null);
-        assertThat(p.getUnit(), equalTo(ChronoUnit.DAYS));
         assertThat(p.getValue(), equalTo(5));
 
-        cw = Every.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
+        cw = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         p = e.run(null);
-        assertThat(p.getUnit(), equalTo(ChronoUnit.DAYS));
         assertThat(p.getValue(), equalTo(3));
 
-        cw = Every.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
+        cw = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
         assertTrue(cw.hasError());
         e = cw.getClause();
         assertTrue(e.hasErrors());
@@ -80,10 +77,10 @@ public class IfEveryTest {
 
     @Test
     public void testEveryBind() {
-        ClauseWrapper<Every> cw;
-        Every e;
+        ClauseWrapper<IfEvery> cw;
+        IfEvery e;
 
-        cw = Every.create(Constant.TRUE, fInt, ChronoUnit.SECONDS);
+        cw = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
@@ -92,7 +89,7 @@ public class IfEveryTest {
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
 
-        cw = Every.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
+        cw = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
@@ -101,7 +98,7 @@ public class IfEveryTest {
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
 
-        cw = Every.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
+        cw = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());

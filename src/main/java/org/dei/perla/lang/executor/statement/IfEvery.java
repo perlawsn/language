@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.CastInteger;
 import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.time.temporal.TemporalUnit;
 import java.util.List;
@@ -11,14 +12,16 @@ import java.util.List;
 /**
  * @author Guido Rota 23/03/15.
  */
-public final class Every implements Clause {
+public final class IfEvery implements Clause {
 
     private final Expression cond;
     private final Expression value;
     private final TemporalUnit unit;
-    private boolean err;
+    private final boolean err;
 
-    private Every(Expression cond, Expression value, TemporalUnit unit,
+    private IfEvery next = null;
+
+    private IfEvery(Expression cond, Expression value, TemporalUnit unit,
             boolean err) {
         this.cond = cond;
         this.value = value;
@@ -26,8 +29,17 @@ public final class Every implements Clause {
         this.err = err;
     }
 
-    public static ClauseWrapper<Every> create(Expression cond, Expression value,
-            TemporalUnit tu) {
+    public static ClauseWrapper<IfEvery> create(IfEvery previous,
+            Expression cond, Expression value, TemporalUnit unit) {
+        ClauseWrapper<IfEvery> cw = create(cond, value, unit);
+        if (previous != null) {
+            previous.setNext(cw.getClause());
+        }
+        return cw;
+    }
+
+    public static ClauseWrapper<IfEvery> create(Expression cond,
+            Expression value, TemporalUnit unit) {
         boolean err = false;
         String emsg = null;
 
@@ -48,7 +60,15 @@ public final class Every implements Clause {
             value = CastInteger.create(value);
         }
 
-        return new ClauseWrapper<>(new Every(cond, value, tu, err), emsg);
+        return new ClauseWrapper<>(new IfEvery(cond, value, unit, err), emsg);
+    }
+
+    private void setNext(IfEvery next) {
+        if (next != null) {
+            throw new IllegalStateException("next IF-EVERY node has already " +
+                    "been set");
+        }
+        this.next = next;
     }
 
     @Override
@@ -62,7 +82,7 @@ public final class Every implements Clause {
     }
 
     @Override
-    public Every bind(List<Attribute> atts) {
+    public IfEvery bind(List<Attribute> atts) {
         if (hasErrors()) {
             throw new IllegalStateException(
                     "Cannot bind, every clause contains errors");
@@ -70,14 +90,17 @@ public final class Every implements Clause {
         if (isComplete()) {
             return this;
         }
-        ClauseWrapper<Every> cw = Every.create(
-                cond.bind(atts), value.bind(atts), unit);
+        ClauseWrapper<IfEvery> cw = IfEvery.create(cond.bind(atts), value.bind(atts), unit);
         return cw.getClause();
     }
 
     public Period run(Object[] record) {
-        int res = (int) value.run(record, null);
-        return new Period(res, unit);
+        LogicValue c = (LogicValue) cond.run(record, null);
+        if (!c.toBoolean()) {
+            return next.run(record);
+        }
+        int v = (int) value.run(record, null);
+        return new Period(v, unit);
     }
 
 }

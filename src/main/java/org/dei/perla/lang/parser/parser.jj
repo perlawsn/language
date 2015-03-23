@@ -906,14 +906,18 @@ List<String> EventList() :
 	{ return evs; }
 }
 
-List<Every> SamplingIfEveryClause(Errors err) :
+IfEvery SamplingIfEveryClause(Errors err) :
 {
-    List<Every> es = new ArrayList<Every>();
+    IfEvery ife = null;
+    IfEvery prev = null;
 
+    ClauseWrapper<IfEvery> cw;
     Every every;
     Expression cond;
     Expression value;
     TemporalUnit unit;
+
+    Token t;
 }
 {
 	(
@@ -922,27 +926,48 @@ List<Every> SamplingIfEveryClause(Errors err) :
 		    cond = Expression(false, err)
 		    <KEYWORD_EVERY>
 		    every = SamplingEveryClause(cond, err)
-		    { es.add(every); }
+		    {
+		        if (ife == null) {
+		            cw = IfEvery.create(cond, every.getValue(),
+		                every.getUnit());
+		            addIfError(cw, token, err);
+		            ife = cw.getClause();
+		            prev = ife;
+		        } else {
+                    cw = IfEvery.create(prev, cond, every.getValue(),
+                        every.getUnit());
+                    addIfError(cw, token, err);
+                    prev = cw.getClause();
+		        }
+		    }
 		)+
 		(
 			<KEYWORD_ELSE>
 			<KEYWORD_EVERY>
 			every = SamplingEveryClause(Constant.TRUE, err)
-			{ es.add(every); }
+			{
+			    cw = IfEvery.create(prev, Constant.TRUE, every.getValue(),
+			        every.getUnit());
+			    addIfError(cw, token, err);
+			}
 		)
 	)
 	|
 	(
 	    <KEYWORD_EVERY>
 	    every = SamplingEveryClause(Constant.TRUE, err)
-	    { es.add(every); }
+	    {
+	        cw = IfEvery.create(Constant.TRUE, every.getValue(),
+	            every.getUnit());
+	        addIfError(cw, token, err);
+	        ife = cw.getClause();
+	    }
 	)
-	{ return es; }
+	{ return ife; }
 }
 
 Every SamplingEveryClause(Expression cond, Errors err) :
 {
-    ClauseWrapper<Every> cw;
     Expression value;
     TemporalUnit unit;
 }
@@ -950,9 +975,7 @@ Every SamplingEveryClause(Expression cond, Errors err) :
     value = Expression(false, err)
     unit = TimeUnit()
     {
-        cw = Every.create(cond, value, unit);
-        addIfError(cw, token, err);
-        return cw.getClause();
+        return new Every(value, unit);
     }
 }
 
