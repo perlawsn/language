@@ -25,6 +25,7 @@ public final class Sampler {
 
         this.sampling = sampling;
         this.fpc = fpc;
+
     }
 
 }

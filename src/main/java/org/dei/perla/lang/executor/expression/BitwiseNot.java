@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Expression for performing the bitwise complement of a single value.
@@ -63,8 +64,8 @@ public final class BitwiseNot implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return e.getAttributes();
+    public Set<String> getFields() {
+        return e.getFields();
     }
 
     @Override

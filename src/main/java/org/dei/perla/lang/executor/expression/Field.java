@@ -4,9 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * An {@link Expression} for accessing the value of a specific Fpc
@@ -21,6 +19,7 @@ import java.util.List;
 public final class Field implements Expression {
 
     private final String id;
+    private final Set<String> fields;
 
     /**
      * Creates a new Field for accessing the value of a data attribute
@@ -30,6 +29,9 @@ public final class Field implements Expression {
      */
     public Field(String id) {
         this.id = id;
+        Set<String> fs = new TreeSet<>();
+        fs.add(id);
+        fields = Collections.unmodifiableSet(fs);
     }
 
     public String getId() {
@@ -52,8 +54,8 @@ public final class Field implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return Collections.emptyList();
+    public Set<String> getFields() {
+        return fields;
     }
 
     @Override
@@ -65,9 +67,9 @@ public final class Field implements Expression {
                 continue;
             }
             if (a.getType() == DataType.BOOLEAN) {
-                return new ConcreteBooleanField(i, a);
+                return new ConcreteBooleanField(i, fields);
             } else {
-                return new ConcreteField(i, a);
+                return new ConcreteField(i, a.getType(), fields);
             }
         }
         return this;
@@ -80,15 +82,14 @@ public final class Field implements Expression {
 
     private static class ConcreteField implements Expression {
 
-        private final DataType type;
         protected final int idx;
-        protected final List<Attribute> atts;
+        protected final DataType type;
+        protected final Set<String> fields;
 
-        private ConcreteField(int idx, Attribute a) {
+        private ConcreteField(int idx, DataType type, Set<String> fields) {
             this.idx = idx;
-            this.type = a.getType();
-            atts = Collections.unmodifiableList(
-                    Arrays.asList(new Attribute[]{a}));
+            this.type = type;
+            this.fields = fields;
         }
 
         @Override
@@ -107,8 +108,8 @@ public final class Field implements Expression {
         }
 
         @Override
-        public List<Attribute> getAttributes() {
-            return atts;
+        public Set<String> getFields() {
+            return fields;
         }
 
         @Override
@@ -131,13 +132,8 @@ public final class Field implements Expression {
      */
     private static final class ConcreteBooleanField extends ConcreteField {
 
-        private ConcreteBooleanField(int idx, Attribute a) {
-            super(idx, a);
-        }
-
-        @Override
-        public DataType getType() {
-            return DataType.BOOLEAN;
+        private ConcreteBooleanField(int idx, Set<String> fields) {
+            super(idx, DataType.BOOLEAN, fields);
         }
 
         @Override

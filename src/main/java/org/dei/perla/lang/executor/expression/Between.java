@@ -4,8 +4,9 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A comparison expression that tests if a value lies between an inclusive
@@ -76,12 +77,12 @@ public final class Between implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        List<Attribute> atts = new LinkedList<>();
-        atts.addAll(e.getAttributes());
-        atts.addAll(min.getAttributes());
-        atts.addAll(max.getAttributes());
-        return atts;
+    public Set<String> getFields() {
+        Set<String> fields = new TreeSet<>();
+        fields.addAll(e.getFields());
+        fields.addAll(min.getFields());
+        fields.addAll(max.getFields());
+        return fields;
     }
 
     @Override

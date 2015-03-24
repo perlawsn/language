@@ -6,10 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Guido Rota 04/03/15.
@@ -18,24 +15,24 @@ public final class GroupBy implements Clause {
 
     private final Duration d;
     private final int count;
-    private final List<? extends Expression> fields;
+    private final List<? extends Expression> groups;
 
     public GroupBy(Duration d, int count) {
         this.d = d;
         this.count = count;
-        fields = null;
+        groups = null;
     }
 
-    public GroupBy(List<? extends Expression> fields) {
-        this.fields = Collections.unmodifiableList(fields);
+    public GroupBy(List<? extends Expression> groups) {
+        this.groups = Collections.unmodifiableList(groups);
         d = null;
         count = -1;
     }
 
-    public GroupBy(Duration d, int count, List<? extends Expression> fields) {
+    public GroupBy(Duration d, int count, List<? extends Expression> groups) {
         this.d = d;
         this.count = count;
-        this.fields = Collections.unmodifiableList(fields);
+        this.groups = Collections.unmodifiableList(groups);
     }
 
     protected Duration getDuration() {
@@ -46,8 +43,8 @@ public final class GroupBy implements Clause {
         return count;
     }
 
-    protected List<? extends Expression> getFields() {
-        return fields;
+    protected List<? extends Expression> getGroups() {
+        return groups;
     }
 
     @Override
@@ -57,16 +54,26 @@ public final class GroupBy implements Clause {
 
     @Override
     public boolean isComplete() {
-        if (fields == null) {
+        if (groups == null) {
             return true;
         }
 
-        for (Expression e : fields) {
+        for (Expression e : groups) {
             if (!e.isComplete()) {
                 return false;
             }
         }
         return true;
+    }
+
+    @Override
+    public Set<String> getFields() {
+        if (groups == null) {
+            return Collections.emptySet();
+        }
+        Set<String> fields = new TreeSet<>();
+        groups.forEach(e -> fields.addAll(e.getFields()));
+        return fields;
     }
 
     @Override
@@ -76,7 +83,7 @@ public final class GroupBy implements Clause {
         }
 
         List<Expression> newFields = new ArrayList<>();
-        fields.forEach(f -> newFields.add(f.bind(atts)));
+        groups.forEach(f -> newFields.add(f.bind(atts)));
         return new GroupBy(d, count, newFields);
     }
 
@@ -87,7 +94,7 @@ public final class GroupBy implements Clause {
         } else {
             tsGroups.add(view);
         }
-        if (Check.nullOrEmpty(fields)) {
+        if (Check.nullOrEmpty(groups)) {
             return tsGroups;
         }
 
@@ -95,7 +102,7 @@ public final class GroupBy implements Clause {
         // in the query.
         List<BufferView> bufs = new LinkedList<>();
         for (BufferView tgb : tsGroups) {
-            bufs.addAll(tgb.groupBy(fields));
+            bufs.addAll(tgb.groupBy(groups));
         }
         return bufs;
     }

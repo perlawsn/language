@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * An expression that performs a cast to float. This class only supports
@@ -67,8 +68,8 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return e.getAttributes();
+    public Set<String> getFields() {
+        return e.getFields();
     }
 
     @Override

@@ -4,8 +4,9 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * {@code Bitwise} is a class representing a bitwise operation among integer
@@ -146,11 +147,11 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        List<Attribute> atts = new LinkedList<>();
-        atts.addAll(e1.getAttributes());
-        atts.addAll(e2.getAttributes());
-        return atts;
+    public Set<String> getFields() {
+        Set<String> fields = new TreeSet<>();
+        fields.addAll(e1.getFields());
+        fields.addAll(e2.getFields());
+        return fields;
     }
 
     @Override

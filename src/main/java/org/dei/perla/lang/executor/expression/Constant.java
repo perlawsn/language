@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A class representing an expression that returns a constant value
@@ -129,8 +130,8 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return Collections.emptyList();
+    public Set<String> getFields() {
+        return Collections.emptySet();
     }
 
     @Override

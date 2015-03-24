@@ -30,6 +30,8 @@ PARSER_BEGIN(Parser)
     import java.time.Duration;
     import java.util.List;
     import java.util.ArrayList;
+    import java.util.Set;
+    import java.util.TreeSet;
 
     import org.dei.perla.lang.executor.statement.WindowSize;
     import org.dei.perla.lang.executor.expression.*;
@@ -880,30 +882,23 @@ void SamplingClause(Errors err) :
 	]
 }
 
-List<String> OnEventClause() :
+Set<String> OnEventClause() :
 {
-    List<String> evs;
+    Set<String> evs = new TreeSet<String>();
+    String e;
 }
 {
 	<KEYWORD_ON>
 	<KEYWORD_EVENT>
-	evs = EventList()
-	{ return evs; }
-}
-
-List<String> EventList() :
-{
-    String e;
-    List<String> evs = new ArrayList<String>();
-}
-{
-	e = Identifier() // FPC Event
-	{ evs.add(e); }
 	(
-		","
-		e = Identifier() // FPC Event
-		{ evs.add(e); }
-	)*
+	    e = Identifier() //FPC Event
+	    { evs.add(e); }
+	    (
+	        ","
+	        e = Identifier() // FPC Event
+	        { evs.add(e); }
+	    )
+    )
 	{ return evs; }
 }
 
@@ -1002,7 +997,7 @@ UnsupportedSamplingRate OnUnsupportedSRClause() :
 
 Refresh RefreshClause() :
 {
-    List<String> es;
+    Set<String> es;
     Duration d;
 }
 {

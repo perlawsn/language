@@ -1,11 +1,12 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -40,6 +41,18 @@ public final class Sampling implements Clause {
         return new ClauseWrapper<>(s, emsg);
     }
 
+    public IfEvery getIfEvery() {
+        return ifevery;
+    }
+
+    public Refresh getRefresh() {
+        return refresh;
+    }
+
+    public Expression getWhere() {
+        return where;
+    }
+
     @Override
     public boolean hasErrors() {
         if (where != null && where.hasErrors()) {
@@ -56,6 +69,19 @@ public final class Sampling implements Clause {
             return false;
         }
         return ifevery.isComplete();
+    }
+
+    @Override
+    public Set<String> getFields() {
+        Set<String> fields = new TreeSet<>();
+        fields.addAll(ifevery.getFields());
+        if (refresh != null) {
+            fields.addAll(refresh.getFields());
+        }
+        if (where != null) {
+            fields.addAll(where.getFields());
+        }
+        return fields;
     }
 
     @Override

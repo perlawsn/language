@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * An {@code Expression} computing the complement of a boolean value
@@ -59,8 +60,8 @@ public final class Not implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return e.getAttributes();
+    public Set<String> getFields() {
+        return e.getFields();
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * An expression for evaluating if a value is null.
@@ -56,8 +57,8 @@ public final class IsNull implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return e.getAttributes();
+    public Set<String> getFields() {
+        return e.getFields();
     }
 
     @Override

@@ -52,14 +52,14 @@ public class GroupByTest {
         g = new GroupBy(SEC_10, 5);
         assertThat(g.getDuration(), equalTo(SEC_10));
         assertThat(g.getCount(), equalTo(5));
-        assertThat(g.getFields(), nullValue());
+        assertThat(g.getGroups(), nullValue());
 
         g = new GroupBy(fields);
         assertThat(g.getDuration(), nullValue());
         assertThat(g.getCount(), equalTo(-1));
         assertThat(g.getFields().size(), equalTo(fields.size()));
         for (int i = 0; i < fields.size(); i++) {
-            assertThat(g.getFields().get(i), equalTo(fields.get(i)));
+            assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }
 
         g = new GroupBy(MIN_10, 12, fields);
@@ -67,14 +67,14 @@ public class GroupByTest {
         assertThat(g.getCount(), equalTo(12));
         assertThat(g.getFields().size(), equalTo(fields.size()));
         for (int i = 0; i < fields.size(); i++) {
-            assertThat(g.getFields().get(i), equalTo(fields.get(i)));
+            assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }
     }
 
     @Test
     public void rebuild() {
         GroupBy g = new GroupBy(SEC_10, 54, fields);
-        for (Expression e : g.getFields()) {
+        for (Expression e : g.getGroups()) {
             assertFalse(e.isComplete());
         }
 
@@ -83,7 +83,7 @@ public class GroupByTest {
         assertThat(ng.getCount(), equalTo(g.getCount()));
         assertThat(g.getFields().size(), equalTo(ng.getFields().size()));
         for (int i = 0; i < ng.getFields().size(); i++) {
-            assertTrue(ng.getFields().get(i).isComplete());
+            assertTrue(ng.getGroups().get(i).isComplete());
         }
     }
 

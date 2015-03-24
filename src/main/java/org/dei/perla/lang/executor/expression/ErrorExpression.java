@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Placeholder {@code Expression} node returned by the various {@code
@@ -46,8 +47,8 @@ public final class ErrorExpression implements Expression {
     }
 
     @Override
-    public List<Attribute> getAttributes() {
-        return Collections.emptyList();
+    public Set<String> getFields() {
+        return Collections.emptySet();
     }
 
     @Override

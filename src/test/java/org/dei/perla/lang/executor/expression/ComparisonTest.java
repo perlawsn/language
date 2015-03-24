@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -165,22 +166,20 @@ public class ComparisonTest {
         Expression e = Comparison.createEQ(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
         e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertThat(as.get(0), equalTo(intAtt));
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Comparison.createEQ(c, f);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        assertTrue(e.getAttributes().isEmpty());
         e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertThat(as.get(0), equalTo(intAtt));
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 

@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -12,7 +13,7 @@ import java.util.List;
 public final class Refresh implements Clause {
 
     private final Duration d;
-    private final List<String> names;
+    private final Set<String> names;
     private final List<Attribute> events = null;
 
     public Refresh(Duration d) {
@@ -20,8 +21,8 @@ public final class Refresh implements Clause {
         names = null;
     }
 
-    public Refresh(List<String> events) {
-        this.names = Collections.unmodifiableList(events);
+    public Refresh(Set<String> events) {
+        this.names = Collections.unmodifiableSet(events);
         d = null;
     }
 
@@ -33,6 +34,14 @@ public final class Refresh implements Clause {
     @Override
     public boolean isComplete() {
         return d != null || events != null;
+    }
+
+    @Override
+    public Set<String> getFields() {
+        if (names == null) {
+            return Collections.emptySet();
+        }
+        return names;
     }
 
     @Override
