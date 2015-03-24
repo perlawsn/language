@@ -5,7 +5,6 @@ import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -35,13 +34,11 @@ public final class ExecuteIf implements Clause {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        fields.addAll(cond.getFields());
+    public void getFields(Set<String> fields) {
+        cond.getFields(fields);
         if (refresh != null) {
-            fields.addAll(refresh.getFields());
+            refresh.getFields(fields);
         }
-        return fields;
     }
 
     @Override

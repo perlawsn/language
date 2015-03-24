@@ -68,8 +68,8 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        return e.getFields();
+    public void getFields(Set<String> fields) {
+        e.getFields(fields);
     }
 
     @Override

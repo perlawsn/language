@@ -4,6 +4,7 @@ import org.dei.perla.core.record.Attribute;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Guido Rota 23/03/15.
@@ -14,7 +15,13 @@ public interface Clause {
 
     public boolean isComplete();
 
-    public Set<String> getFields();
+    public default Set<String> getFields() {
+        Set<String> fields = new TreeSet<>();
+        getFields(fields);
+        return fields;
+    }
+
+    public void getFields(Set<String> fields);
 
     public Clause bind(List<Attribute> atts);
 

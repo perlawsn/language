@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * General template for the implementation of an aggregation {@link Expression}.
@@ -128,15 +127,13 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
+    public void getFields(Set<String> fields) {
         if (e != null) {
-            fields.addAll(e.getFields());
+            e.getFields(fields);
         }
         if (filter != null) {
-            fields.addAll(filter.getFields());
+            e.getFields(fields);
         }
-        return fields;
     }
 
     @Override

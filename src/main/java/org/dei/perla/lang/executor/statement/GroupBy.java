@@ -67,13 +67,11 @@ public final class GroupBy implements Clause {
     }
 
     @Override
-    public Set<String> getFields() {
+    public void getFields(Set<String> fields) {
         if (groups == null) {
-            return Collections.emptySet();
+            return;
         }
-        Set<String> fields = new TreeSet<>();
-        groups.forEach(e -> fields.addAll(e.getFields()));
-        return fields;
+        groups.forEach(e -> e.getFields(fields));
     }
 
     @Override

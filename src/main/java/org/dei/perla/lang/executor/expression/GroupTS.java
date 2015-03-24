@@ -4,7 +4,9 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A special {@code Expression} node that retrieves the GROUP TIMESTAMP of a
@@ -17,13 +19,6 @@ import java.util.*;
  * @author Guido Rota 03/03/15.
  */
 public final class GroupTS implements Expression {
-
-    private static final Set<String> fields;
-    static {
-        Set<String> fs = new TreeSet<>();
-        fs.add("timestamp");
-        fields = Collections.unmodifiableSet(fs);
-    }
 
     @Override
     public DataType getType() {
@@ -41,8 +36,8 @@ public final class GroupTS implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        return fields;
+    public void getFields(Set<String> fields) {
+        fields.add(Attribute.TIMESTAMP.getId());
     }
 
     @Override
@@ -89,8 +84,8 @@ public final class GroupTS implements Expression {
         }
 
         @Override
-        public Set<String> getFields() {
-            return fields;
+        public void getFields(Set<String> fields) {
+            fields.add(Attribute.TIMESTAMP.getId());
         }
 
         @Override

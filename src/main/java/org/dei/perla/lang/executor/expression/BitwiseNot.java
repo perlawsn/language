@@ -64,8 +64,8 @@ public final class BitwiseNot implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        return e.getFields();
+    public void getFields(Set<String> fields) {
+        e.getFields(fields);
     }
 
     @Override

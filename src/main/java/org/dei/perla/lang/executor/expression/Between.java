@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A comparison expression that tests if a value lies between an inclusive
@@ -77,12 +76,10 @@ public final class Between implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        fields.addAll(e.getFields());
-        fields.addAll(min.getFields());
-        fields.addAll(max.getFields());
-        return fields;
+    public void getFields(Set<String> fields) {
+        e.getFields(fields);
+        min.getFields(fields);
+        max.getFields(fields);
     }
 
     @Override

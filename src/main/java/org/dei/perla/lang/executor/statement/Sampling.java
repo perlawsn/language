@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -72,16 +71,14 @@ public final class Sampling implements Clause {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        fields.addAll(ifevery.getFields());
+    public void getFields(Set<String> fields) {
+        ifevery.getFields(fields);
         if (refresh != null) {
-            fields.addAll(refresh.getFields());
+            refresh.getFields(fields);
         }
         if (where != null) {
-            fields.addAll(where.getFields());
+            where.getFields(fields);
         }
-        return fields;
     }
 
     @Override

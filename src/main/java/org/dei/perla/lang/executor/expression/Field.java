@@ -19,7 +19,6 @@ import java.util.*;
 public final class Field implements Expression {
 
     private final String id;
-    private final Set<String> fields;
 
     /**
      * Creates a new Field for accessing the value of a data attribute
@@ -29,9 +28,6 @@ public final class Field implements Expression {
      */
     public Field(String id) {
         this.id = id;
-        Set<String> fs = new TreeSet<>();
-        fs.add(id);
-        fields = Collections.unmodifiableSet(fs);
     }
 
     public String getId() {
@@ -54,8 +50,8 @@ public final class Field implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        return fields;
+    public void getFields(Set<String> fields) {
+        fields.add(id);
     }
 
     @Override
@@ -67,9 +63,9 @@ public final class Field implements Expression {
                 continue;
             }
             if (a.getType() == DataType.BOOLEAN) {
-                return new ConcreteBooleanField(i, fields);
+                return new ConcreteBooleanField(i, id);
             } else {
-                return new ConcreteField(i, a.getType(), fields);
+                return new ConcreteField(i, a.getType(), id);
             }
         }
         return this;
@@ -83,13 +79,13 @@ public final class Field implements Expression {
     private static class ConcreteField implements Expression {
 
         protected final int idx;
-        protected final DataType type;
-        protected final Set<String> fields;
+        private final DataType type;
+        private final String id;
 
-        private ConcreteField(int idx, DataType type, Set<String> fields) {
+        private ConcreteField(int idx, DataType type, String id) {
             this.idx = idx;
             this.type = type;
-            this.fields = fields;
+            this.id = id;
         }
 
         @Override
@@ -108,8 +104,8 @@ public final class Field implements Expression {
         }
 
         @Override
-        public Set<String> getFields() {
-            return fields;
+        public void getFields(Set<String> fields) {
+            fields.add(id);
         }
 
         @Override
@@ -132,8 +128,8 @@ public final class Field implements Expression {
      */
     private static final class ConcreteBooleanField extends ConcreteField {
 
-        private ConcreteBooleanField(int idx, Set<String> fields) {
-            super(idx, DataType.BOOLEAN, fields);
+        private ConcreteBooleanField(int idx, String id) {
+            super(idx, DataType.BOOLEAN, id);
         }
 
         @Override

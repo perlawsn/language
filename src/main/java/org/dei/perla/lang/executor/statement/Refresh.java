@@ -37,11 +37,11 @@ public final class Refresh implements Clause {
     }
 
     @Override
-    public Set<String> getFields() {
+    public void getFields(Set<String> fields) {
         if (names == null) {
-            return Collections.emptySet();
+            return;
         }
-        return names;
+        fields.addAll(names);
     }
 
     @Override

@@ -130,8 +130,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        return Collections.emptySet();
+    public void getFields(Set<String> fields) {
     }
 
     @Override

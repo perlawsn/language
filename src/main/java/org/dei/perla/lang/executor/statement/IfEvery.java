@@ -10,7 +10,6 @@ import org.dei.perla.lang.executor.expression.LogicValue;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Guido Rota 23/03/15.
@@ -91,14 +90,12 @@ public final class IfEvery implements Clause {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        fields.addAll(cond.getFields());
-        fields.addAll(value.getFields());
+    public void getFields(Set<String> fields) {
+        cond.getFields(fields);
+        value.getFields(fields);
         if (next != null) {
-            fields.addAll(next.getFields());
+            next.getFields(fields);
         }
-        return fields;
     }
 
     @Override

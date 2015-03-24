@@ -4,10 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A class for performing different types of comparisons between values.
@@ -151,11 +149,9 @@ public final class Comparison implements Expression {
     }
 
     @Override
-    public Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        fields.addAll(e1.getFields());
-        fields.addAll(e2.getFields());
-        return fields;
+    public void getFields(Set<String> fields) {
+        e1.getFields(fields);
+        e2.getFields(fields);
     }
 
     @Override
