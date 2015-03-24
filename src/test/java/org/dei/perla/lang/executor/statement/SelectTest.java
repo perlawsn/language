@@ -81,9 +81,7 @@ public class SelectTest {
         sel.add(floatExpr);
 
         Select dm = new Select(sel, null, null, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(1));
         Object[] r = records.get(0);
@@ -107,9 +105,7 @@ public class SelectTest {
         sel.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
 
         Select dm = new Select(sel, null, null, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(1));
         Object[] r = records.get(0);
@@ -135,9 +131,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select dm = new Select(sel, upto, null, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(3));
         for (int i = 0; i < records.size(); i++) {
@@ -163,9 +157,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Select dm = new Select(sel, upto, null, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(2));
         for (int i = 0; i < records.size(); i++) {
@@ -192,9 +184,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select dm = new Select(sel, upto, null, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(3));
         for (int i = 0; i < records.size(); i++) {
@@ -225,9 +215,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select dm = new Select(sel, upto, null, having, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(2));
         Object[] r = records.get(0);
@@ -265,9 +253,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select dm = new Select(sel, upto, null, having, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(2);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(2));
         Object[] r = records.get(0);
@@ -310,9 +296,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select dm = new Select(sel, upto, null, having, def);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(1);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(1));
         Object[] r = records.get(0);
@@ -331,9 +315,7 @@ public class SelectTest {
 
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
         Select dm = new Select(sel, null, group, null, null);
-        SynchronizerSelectHandler qh = new SynchronizerSelectHandler(3);
-        dm.select(view, qh);
-        List<Object[]> records = qh.getRecords();
+        List<Object[]> records = dm.select(view);
 
         assertThat(records.size(), equalTo(3));
     }

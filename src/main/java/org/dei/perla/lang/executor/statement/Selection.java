@@ -18,8 +18,8 @@ public final class Selection implements Statement {
         this.every = every;
     }
 
-    public void select(BufferView buffer, SelectHandler handler) {
-        select.select(buffer, handler);
+    public List<Object[]> select(BufferView buffer) {
+        return select.select(buffer);
     }
 
     public List<Attribute> selectedAttributes() {

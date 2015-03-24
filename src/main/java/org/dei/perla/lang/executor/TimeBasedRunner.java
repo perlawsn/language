@@ -6,15 +6,11 @@ import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.statement.Selection;
-import org.dei.perla.lang.executor.statement.SelectHandler;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 04/03/15.
@@ -32,7 +28,6 @@ public final class TimeBasedRunner {
     private final QueryHandler qh;
 
     private Task sampTask;
-    private final SelectHandler selHandler = new RunnerSelectHandler();
     private final TaskHandler sampHandler = new SamplingTaskHandler();
 
     private int samples;
@@ -67,21 +62,11 @@ public final class TimeBasedRunner {
         }
         pool.submit(() -> {
             BufferView view = buf.unmodifiableView();
-            query.select(view, selHandler);
+            query.select(view);
             view.release();
             // TODO: delete old records from buffer
             inSelect.set(false);
         });
-    }
-
-    private final class RunnerSelectHandler implements SelectHandler {
-
-        @Override
-        public void newRecord(Object[] r) {
-            qh.newRecord(query, r);
-            // TODO: manage query termination
-        }
-
     }
 
     private final class SamplingTaskHandler implements TaskHandler {

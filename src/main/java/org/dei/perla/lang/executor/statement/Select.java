@@ -63,7 +63,9 @@ public final class Select {
         return new Select(newFields, upto, newGroup, newHaving, def);
     }
 
-    public void select(BufferView buffer, SelectHandler handler) {
+    public List<Object[]> select(BufferView buffer) {
+        List<Object[]> rs = new ArrayList<>();
+
         // UPTO CLAUSE
         int ut;
         if (upto.getDuration() != null) {
@@ -72,26 +74,26 @@ public final class Select {
             ut = upto.getSamples();
         }
 
-        boolean generated = false;
         if (group == null) {
-            generated = selectBuffer(ut, buffer, handler);
+            selectBuffer(ut, buffer, rs);
         } else {
             // GROUP BY CLAUSE
             List<BufferView> bufs = group.createGroups(buffer);
             for (BufferView b : bufs) {
-                generated |= selectBuffer(ut, b, handler);
+                selectBuffer(ut, b, rs);
                 b.release();
             }
         }
 
-        if (def != null && !generated) {
+        if (def != null && rs.isEmpty()) {
             // ON EMPTY SELECTION INSERT DEFAULT
-            handler.newRecord(def);
+            rs.add(def);
         }
+
+        return rs;
     }
 
-    private boolean selectBuffer(int upto, BufferView buf, SelectHandler handler) {
-        boolean generated = false;
+    private void selectBuffer(int upto, BufferView buf, List<Object[]> rs) {
         for (int i = 0; i < upto && i < buf.length(); i++) {
             Object[] cur = buf.get(i);
             // HAVING CLAUSE
@@ -104,10 +106,8 @@ public final class Select {
             for (int j = 0; j < fields.size(); j++) {
                 out[j] = fields.get(j).run(cur, buf);
             }
-            handler.newRecord(out);
-            generated = true;
+            rs.add(out);
         }
-        return generated;
     }
 
 }
