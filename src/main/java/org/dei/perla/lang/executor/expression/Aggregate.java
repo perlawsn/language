@@ -132,7 +132,7 @@ public abstract class Aggregate implements Expression {
             e.getFields(fields);
         }
         if (filter != null) {
-            e.getFields(fields);
+            filter.getFields(fields);
         }
     }
 

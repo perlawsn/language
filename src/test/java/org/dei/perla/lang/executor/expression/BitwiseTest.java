@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
@@ -92,6 +93,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -99,6 +103,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -106,6 +113,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -174,6 +184,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -181,6 +194,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -188,6 +204,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -256,6 +275,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -263,6 +285,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -270,6 +295,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -312,6 +340,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -380,6 +411,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -387,6 +421,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -394,6 +431,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -462,6 +502,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -469,6 +512,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -476,6 +522,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

@@ -187,6 +187,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -287,6 +290,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -294,6 +300,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -301,6 +310,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -391,6 +403,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -398,6 +413,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -405,6 +423,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -499,6 +520,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -506,6 +530,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -513,6 +540,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -607,6 +637,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -614,6 +647,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -621,6 +657,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -715,6 +754,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -722,6 +764,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -729,6 +774,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -799,6 +847,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -806,6 +857,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -813,6 +867,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -902,6 +959,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("boolean"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -973,6 +1033,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("integer"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1014,6 +1077,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
+        Set<String> fields = e.getFields();
+        assertThat(fields.size(), equalTo(1));
+        assertTrue(fields.contains("string"));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
