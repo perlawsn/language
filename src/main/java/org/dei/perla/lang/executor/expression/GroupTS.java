@@ -4,6 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +36,11 @@ public final class GroupTS implements Expression {
     }
 
     @Override
+    public List<Attribute> getAttributes() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Expression bind(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
@@ -51,6 +58,9 @@ public final class GroupTS implements Expression {
     }
 
     private static final class ConcreteGroupTS implements Expression {
+
+        private static final List<Attribute> atts =
+                Arrays.asList(new Attribute[]{Attribute.TIMESTAMP});
 
         private final int tsIdx;
 
@@ -71,6 +81,11 @@ public final class GroupTS implements Expression {
         @Override
         public boolean hasErrors() {
             return false;
+        }
+
+        @Override
+        public List<Attribute> getAttributes() {
+            return atts;
         }
 
         @Override

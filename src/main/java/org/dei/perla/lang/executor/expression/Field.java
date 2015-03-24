@@ -4,6 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,6 +52,11 @@ public final class Field implements Expression {
     }
 
     @Override
+    public List<Attribute> getAttributes() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Expression bind(List<Attribute> atts) {
         int i = 0;
         for (Attribute a : atts) {
@@ -58,9 +65,9 @@ public final class Field implements Expression {
                 continue;
             }
             if (a.getType() == DataType.BOOLEAN) {
-                return new ConcreteBooleanField(i);
+                return new ConcreteBooleanField(i, a);
             } else {
-                return new ConcreteField(i, a.getType());
+                return new ConcreteField(i, a);
             }
         }
         return this;
@@ -71,14 +78,17 @@ public final class Field implements Expression {
         return null;
     }
 
-    private static final class ConcreteField implements Expression {
+    private static class ConcreteField implements Expression {
 
         private final DataType type;
-        private final int idx;
+        protected final int idx;
+        protected final List<Attribute> atts;
 
-        private ConcreteField(int idx, DataType type) {
+        private ConcreteField(int idx, Attribute a) {
             this.idx = idx;
-            this.type = type;
+            this.type = a.getType();
+            atts = Collections.unmodifiableList(
+                    Arrays.asList(new Attribute[]{a}));
         }
 
         @Override
@@ -94,6 +104,11 @@ public final class Field implements Expression {
         @Override
         public boolean hasErrors() {
             return false;
+        }
+
+        @Override
+        public List<Attribute> getAttributes() {
+            return atts;
         }
 
         @Override
@@ -114,32 +129,15 @@ public final class Field implements Expression {
      * the {@link Fpc} object into a {@link LogicValue}, which can then be
      * used in PerLa query expressions.
      */
-    private static final class ConcreteBooleanField implements Expression {
+    private static final class ConcreteBooleanField extends ConcreteField {
 
-        private final int idx;
-
-        private ConcreteBooleanField(int idx) {
-            this.idx = idx;
+        private ConcreteBooleanField(int idx, Attribute a) {
+            super(idx, a);
         }
 
         @Override
         public DataType getType() {
             return DataType.BOOLEAN;
-        }
-
-        @Override
-        public boolean isComplete() {
-            return true;
-        }
-
-        @Override
-        public boolean hasErrors() {
-            return false;
-        }
-
-        @Override
-        public Expression bind(List<Attribute> atts) {
-            return this;
         }
 
         @Override

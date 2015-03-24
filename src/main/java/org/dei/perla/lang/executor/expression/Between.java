@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -72,6 +73,15 @@ public final class Between implements Expression {
     @Override
     public boolean hasErrors() {
         return e.hasErrors() || min.hasErrors() || max.hasErrors();
+    }
+
+    @Override
+    public List<Attribute> getAttributes() {
+        List<Attribute> atts = new LinkedList<>();
+        atts.addAll(e.getAttributes());
+        atts.addAll(min.getAttributes());
+        atts.addAll(max.getAttributes());
+        return atts;
     }
 
     @Override

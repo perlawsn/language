@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -125,6 +126,11 @@ public final class Constant implements Expression {
     @Override
     public boolean hasErrors() {
         return false;
+    }
+
+    @Override
+    public List<Attribute> getAttributes() {
+        return Collections.emptyList();
     }
 
     @Override

@@ -67,6 +67,11 @@ public final class CastFloat implements Expression {
     }
 
     @Override
+    public List<Attribute> getAttributes() {
+        return e.getAttributes();
+    }
+
+    @Override
     public Expression bind(List<Attribute> atts) {
         if (e.isComplete()) {
             return this;

@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,6 +43,11 @@ public final class ErrorExpression implements Expression {
     @Override
     public boolean hasErrors() {
         return true;
+    }
+
+    @Override
+    public List<Attribute> getAttributes() {
+        return Collections.emptyList();
     }
 
     @Override

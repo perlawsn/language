@@ -1,10 +1,13 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * General template for the implementation of an aggregation {@link Expression}.
@@ -123,6 +126,18 @@ public abstract class Aggregate implements Expression {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public List<Attribute> getAttributes() {
+        List<Attribute> atts = new LinkedList<>();
+        if (e != null) {
+            atts.addAll(e.getAttributes());
+        }
+        if (filter != null) {
+            atts.addAll(filter.getAttributes());
+        }
+        return atts;
     }
 
     @Override
