@@ -5,7 +5,7 @@ import java.time.Duration;
 /**
  * @author Guido Rota 13/03/15.
  */
-public class GroupByTS {
+public final class GroupByTS {
 
     private final Duration d;
     private final int count;

@@ -5,7 +5,7 @@ import org.dei.perla.lang.executor.expression.Expression;
 /**
  * @author Guido Rota 16/03/15.
  */
-public class FieldSelection {
+public final class FieldSelection {
 
     private final Expression field;
     private final Object def;

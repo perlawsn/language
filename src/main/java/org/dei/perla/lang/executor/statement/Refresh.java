@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.record.Attribute;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public final class Refresh implements Clause {
     }
 
     public Refresh(List<String> events) {
-        this.names = events;
+        this.names = Collections.unmodifiableList(events);
         d = null;
     }
 

@@ -7,7 +7,7 @@ import java.time.temporal.TemporalUnit;
 /**
  * @author Guido Rota 23/03/15.
  */
-public class Every {
+public final class Every {
 
     private final Expression value;
     private final TemporalUnit unit;
