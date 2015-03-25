@@ -4,9 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A special {@code Expression} node that retrieves the GROUP TIMESTAMP of a
@@ -18,7 +17,9 @@ import java.util.Set;
  *
  * @author Guido Rota 03/03/15.
  */
-public final class GroupTS implements Expression {
+public class GroupTS implements Expression {
+
+    private static final String id = Attribute.TIMESTAMP.getId();
 
     @Override
     public DataType getType() {
@@ -36,13 +37,16 @@ public final class GroupTS implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-        fields.add(Attribute.TIMESTAMP.getId());
-    }
+    public void getAttributes(List<Attribute> atts) { }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
-        int i = 0;
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+        int i = Expression.indexOf(id, bound);
+        if (i != -1) {
+            return new ConcreteGroupTS(i);
+        }
+
+        i = 0;
         for (Attribute a : atts) {
             if (a == Attribute.TIMESTAMP) {
                 return new ConcreteGroupTS(i);
@@ -57,10 +61,7 @@ public final class GroupTS implements Expression {
         return null;
     }
 
-    private static final class ConcreteGroupTS implements Expression {
-
-        private static final List<Attribute> atts =
-                Arrays.asList(new Attribute[]{Attribute.TIMESTAMP});
+    private static final class ConcreteGroupTS extends GroupTS {
 
         private final int tsIdx;
 
@@ -84,13 +85,8 @@ public final class GroupTS implements Expression {
         }
 
         @Override
-        public void getFields(Set<String> fields) {
-            fields.add(Attribute.TIMESTAMP.getId());
-        }
-
-        @Override
-        public Expression bind(List<Attribute> atts) {
-            return this;
+        public void getAttributes(List<Attribute> atts) {
+            atts.add(tsIdx, Attribute.TIMESTAMP);
         }
 
         @Override

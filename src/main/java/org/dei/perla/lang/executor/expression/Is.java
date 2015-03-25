@@ -4,8 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * An {@code Expression} for evaluating if a boolean value corresponds to
@@ -69,16 +69,14 @@ public final class Is implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-        e.getFields(fields);
+    public void getAttributes(List<Attribute> atts) {
+        e.getAttributes(atts);
     }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
-        if (e.isComplete()) {
-            return this;
-        }
-        return create(e.bind(atts), l);
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+        Expression be = e.bind(atts, bound);
+        return create(be, l);
     }
 
     @Override

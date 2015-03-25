@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -26,11 +25,16 @@ public class BooleanTest {
 
     private static List<Attribute> atts;
 
+    private static Attribute intAtt =
+            Attribute.create("integer", DataType.INTEGER);
+    private static Attribute boolAtt =
+            Attribute.create("boolean", DataType.BOOLEAN);
+
     @BeforeClass
     public static void setup() {
         atts = new ArrayList<>();
-        atts.add(Attribute.create("integer", DataType.INTEGER));
-        atts.add(Attribute.create("boolean", DataType.BOOLEAN));
+        atts.add(intAtt);
+        atts.add(boolAtt);
     }
 
     @Test
@@ -83,9 +87,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -182,9 +186,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -192,9 +196,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -202,9 +206,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -301,9 +305,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -311,9 +315,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -321,9 +325,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -420,9 +424,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -430,9 +434,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -440,9 +444,9 @@ public class BooleanTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

@@ -5,7 +5,6 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -68,17 +67,6 @@ public final class Sampling implements Clause {
             return false;
         }
         return ifevery.isComplete();
-    }
-
-    @Override
-    public void getFields(Set<String> fields) {
-        ifevery.getFields(fields);
-        if (refresh != null) {
-            refresh.getFields(fields);
-        }
-        if (where != null) {
-            where.getFields(fields);
-        }
     }
 
     @Override

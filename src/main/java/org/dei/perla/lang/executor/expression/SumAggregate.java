@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,17 +53,13 @@ public final class SumAggregate extends Aggregate {
     }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
-        if (isComplete()) {
-            return this;
-        }
-
-        Expression eNew = e.bind(atts);
-        Expression fNew = null;
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+        Expression be = e.bind(atts, bound);
+        Expression bf = null;
         if (filter != null) {
-            fNew = filter.bind(atts);
+            bf = filter.bind(atts, bound);
         }
-        return create(eNew, ws, fNew);
+        return create(be, ws, bf);
     }
 
     @Override

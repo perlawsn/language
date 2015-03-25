@@ -12,7 +12,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -57,7 +58,6 @@ public class GroupByTest {
         g = new GroupBy(fields);
         assertThat(g.getDuration(), nullValue());
         assertThat(g.getCount(), equalTo(-1));
-        assertThat(g.getFields().size(), equalTo(fields.size()));
         for (int i = 0; i < fields.size(); i++) {
             assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }
@@ -65,14 +65,13 @@ public class GroupByTest {
         g = new GroupBy(MIN_10, 12, fields);
         assertThat(g.getDuration(), equalTo(MIN_10));
         assertThat(g.getCount(), equalTo(12));
-        assertThat(g.getFields().size(), equalTo(fields.size()));
         for (int i = 0; i < fields.size(); i++) {
             assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }
     }
 
     @Test
-    public void rebuild() {
+    public void bind() {
         GroupBy g = new GroupBy(SEC_10, 54, fields);
         for (Expression e : g.getGroups()) {
             assertFalse(e.isComplete());
@@ -81,10 +80,6 @@ public class GroupByTest {
         GroupBy ng = g.bind(atts);
         assertThat(ng.getDuration(), equalTo(g.getDuration()));
         assertThat(ng.getCount(), equalTo(g.getCount()));
-        assertThat(g.getFields().size(), equalTo(ng.getFields().size()));
-        for (int i = 0; i < ng.getFields().size(); i++) {
-            assertTrue(ng.getGroups().get(i).isComplete());
-        }
     }
 
 }

@@ -12,13 +12,10 @@ import org.junit.Test;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 02/03/15.
@@ -151,9 +148,9 @@ public class ArithmeticTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -161,9 +158,9 @@ public class ArithmeticTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -171,10 +168,10 @@ public class ArithmeticTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(2));
-        assertTrue(fields.contains("integer"));
-        assertTrue(fields.contains("float"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(2));
+        assertTrue(atts.contains(intAtt));
+        assertTrue(atts.contains(floatAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -261,26 +258,26 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createSubtraction(c1, f1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createSubtraction(f1, c1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createSubtraction(f1, f2);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(2));
-        assertTrue(fields.contains("integer"));
-        assertTrue(fields.contains("float"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(2));
+        assertTrue(atts.contains(intAtt));
+        assertTrue(atts.contains(floatAtt));
         assertTrue(e.isComplete());
     }
 
@@ -366,26 +363,26 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createProduct(c1, f1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createProduct(f1, c1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createProduct(f1, f2);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(2));
-        assertTrue(fields.contains("integer"));
-        assertTrue(fields.contains("float"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(2));
+        assertTrue(atts.contains(intAtt));
+        assertTrue(atts.contains(floatAtt));
         assertTrue(e.isComplete());
     }
 
@@ -471,26 +468,26 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createDivision(c1, f1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createDivision(f1, c1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createDivision(f1, f2);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(2));
-        assertTrue(fields.contains("integer"));
-        assertTrue(fields.contains("float"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(2));
+        assertTrue(atts.contains(intAtt));
+        assertTrue(atts.contains(floatAtt));
         assertTrue(e.isComplete());
     }
 
@@ -552,25 +549,25 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createModulo(c1, f1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createModulo(f1, c1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
 
         e = Arithmetic.createModulo(f1, f1);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
     }
 
@@ -597,9 +594,9 @@ public class ArithmeticTest {
         Expression e = Arithmetic.createInverse(f);
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
     }
 

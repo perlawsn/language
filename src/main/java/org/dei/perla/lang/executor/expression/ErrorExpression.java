@@ -4,8 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Placeholder {@code Expression} node returned by the various {@code
@@ -46,11 +46,10 @@ public final class ErrorExpression implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-    }
+    public void getAttributes(List<Attribute> atts) { }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         return this;
     }
 

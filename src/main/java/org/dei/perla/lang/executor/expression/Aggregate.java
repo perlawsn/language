@@ -1,11 +1,12 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 
 /**
  * General template for the implementation of an aggregation {@link Expression}.
@@ -127,12 +128,12 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
+    public void getAttributes(List<Attribute> atts) {
         if (e != null) {
-            e.getFields(fields);
+            e.getAttributes(atts);
         }
         if (filter != null) {
-            filter.getFields(fields);
+            filter.getAttributes(atts);
         }
     }
 

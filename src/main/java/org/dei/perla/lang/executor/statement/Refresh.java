@@ -37,14 +37,6 @@ public final class Refresh implements Clause {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-        if (names == null) {
-            return;
-        }
-        fields.addAll(names);
-    }
-
-    @Override
     public Refresh bind(List<Attribute> events) {
         throw new RuntimeException("unimplemented");
     }

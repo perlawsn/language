@@ -9,7 +9,6 @@ import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.time.temporal.TemporalUnit;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Guido Rota 23/03/15.
@@ -87,15 +86,6 @@ public final class IfEvery implements Clause {
             return false;
         }
         return cond.isComplete() && value.isComplete();
-    }
-
-    @Override
-    public void getFields(Set<String> fields) {
-        cond.getFields(fields);
-        value.getFields(fields);
-        if (next != null) {
-            next.getFields(fields);
-        }
     }
 
     @Override

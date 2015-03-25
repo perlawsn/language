@@ -4,7 +4,6 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -31,14 +30,6 @@ public final class ExecuteIf implements Clause {
     @Override
     public boolean isComplete() {
         return cond.isComplete() && refresh.isComplete();
-    }
-
-    @Override
-    public void getFields(Set<String> fields) {
-        cond.getFields(fields);
-        if (refresh != null) {
-            refresh.getFields(fields);
-        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.record.Attribute;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -14,14 +15,6 @@ public interface Clause {
     public boolean hasErrors();
 
     public boolean isComplete();
-
-    public default Set<String> getFields() {
-        Set<String> fields = new TreeSet<>();
-        getFields(fields);
-        return fields;
-    }
-
-    public void getFields(Set<String> fields);
 
     public Clause bind(List<Attribute> atts);
 

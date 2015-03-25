@@ -4,8 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@code Arithmetic} is a class representing an arithmetic operation.
@@ -169,17 +169,16 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-        e1.getFields(fields);
-        e2.getFields(fields);
+    public void getAttributes(List<Attribute> atts) {
+        e1.getAttributes(atts);
+        e2.getAttributes(atts);
     }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
-        if (isComplete()) {
-            return this;
-        }
-        return create(op, e1.bind(atts), e2.bind(atts));
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+        Expression be1 = e1.bind(atts, bound);
+        Expression be2 = e2.bind(atts, bound);
+        return create(op, be1, be2);
     }
 
     @Override

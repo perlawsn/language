@@ -4,9 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A class representing an expression that returns a constant value
@@ -130,11 +129,10 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-    }
+    public void getAttributes(List<Attribute> atts) { }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         return this;
     }
 

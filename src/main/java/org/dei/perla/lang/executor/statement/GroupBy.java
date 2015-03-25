@@ -6,7 +6,10 @@ import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Guido Rota 04/03/15.
@@ -64,14 +67,6 @@ public final class GroupBy implements Clause {
             }
         }
         return true;
-    }
-
-    @Override
-    public void getFields(Set<String> fields) {
-        if (groups == null) {
-            return;
-        }
-        groups.forEach(e -> e.getFields(fields));
     }
 
     @Override

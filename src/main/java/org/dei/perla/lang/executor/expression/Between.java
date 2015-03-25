@@ -4,8 +4,8 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A comparison expression that tests if a value lies between an inclusive
@@ -76,21 +76,18 @@ public final class Between implements Expression {
     }
 
     @Override
-    public void getFields(Set<String> fields) {
-        e.getFields(fields);
-        min.getFields(fields);
-        max.getFields(fields);
+    public void getAttributes(List<Attribute> atts) {
+        e.getAttributes(atts);
+        min.getAttributes(atts);
+        max.getAttributes(atts);
     }
 
     @Override
-    public Expression bind(List<Attribute> atts) {
-        if (isComplete()) {
-            return this;
-        }
-        Expression eNew = e.bind(atts);
-        Expression minNew = min.bind(atts);
-        Expression maxNew = max.bind(atts);
-        return create(eNew, minNew, maxNew);
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+        Expression be = e.bind(atts, bound);
+        Expression bmin = min.bind(atts, bound);
+        Expression bmax = max.bind(atts, bound);
+        return create(be, bmin, bmax);
     }
 
     @Override

@@ -12,13 +12,10 @@ import org.junit.Test;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 23/02/15.
@@ -167,9 +164,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -177,9 +174,9 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -187,9 +184,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -290,9 +287,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -300,9 +297,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -310,9 +307,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -403,9 +400,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -413,9 +410,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -423,9 +420,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -520,9 +517,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -530,9 +527,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -540,9 +537,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -637,9 +634,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -647,9 +644,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -657,9 +654,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -754,9 +751,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -764,9 +761,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -774,9 +771,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -847,9 +844,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -857,9 +854,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -867,9 +864,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -959,9 +956,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("boolean"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1033,9 +1030,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("integer"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1077,9 +1074,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        Set<String> fields = e.getFields();
-        assertThat(fields.size(), equalTo(1));
-        assertTrue(fields.contains("string"));
+        List<Attribute> atts = e.getAttributes();
+        assertThat(atts.size(), equalTo(1));
+        assertTrue(atts.contains(stringAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
