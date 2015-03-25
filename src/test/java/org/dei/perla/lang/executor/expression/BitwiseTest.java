@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -17,18 +18,17 @@ import static org.junit.Assert.*;
  */
 public class BitwiseTest {
 
-    private static List<Attribute> atts;
-
     private static final Attribute intAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static final Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
 
-    @BeforeClass
-    public static void setup() {
-        atts = new ArrayList<>();
-        atts.add(intAtt);
-        atts.add(floatAtt);
+    private static final List<Attribute> atts;
+    static {
+        atts = Arrays.asList(new Attribute[] {
+                intAtt,
+                floatAtt
+        });
     }
 
     @Test
@@ -95,9 +95,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -105,9 +105,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -115,9 +115,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -186,9 +186,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -196,9 +196,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -206,9 +206,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -277,9 +277,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -287,9 +287,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -297,9 +297,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -342,9 +342,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -413,9 +413,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -423,9 +423,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -433,9 +433,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -504,9 +504,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -514,9 +514,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -524,9 +524,9 @@ public class BitwiseTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
