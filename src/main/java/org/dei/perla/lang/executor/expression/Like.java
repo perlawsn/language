@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,7 +84,7 @@ public final class Like implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e.getAttributes(atts);
     }
 

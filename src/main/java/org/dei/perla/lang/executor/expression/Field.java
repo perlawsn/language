@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An {@link Expression} for accessing the value of a specific Fpc
@@ -51,7 +52,7 @@ public class Field implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) { }
+    public void getAttributes(Map<Integer, Attribute> atts) { }
 
     @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
@@ -111,8 +112,8 @@ public class Field implements Expression {
         }
 
         @Override
-        public void getAttributes(List<Attribute> atts) {
-            atts.add(idx, att);
+        public void getAttributes(Map<Integer, Attribute> atts) {
+            atts.put(idx, att);
         }
 
         @Override
@@ -139,7 +140,7 @@ public class Field implements Expression {
             Object o = record[idx];
 
             if (o == null) {
-                return null;
+                return Constant.NULL_BOOLEAN;
             } else if ((Boolean) o) {
                 return LogicValue.TRUE;
             } else {

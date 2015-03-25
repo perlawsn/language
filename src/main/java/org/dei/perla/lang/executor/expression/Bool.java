@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class for performing various boolean operations
@@ -122,7 +123,7 @@ public final class Bool implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e1.getAttributes(atts);
         e2.getAttributes(atts);
     }

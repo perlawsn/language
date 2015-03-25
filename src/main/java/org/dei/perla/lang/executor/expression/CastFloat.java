@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An expression that performs a cast to float. This class only supports
@@ -68,7 +69,7 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e.getAttributes(atts);
     }
 

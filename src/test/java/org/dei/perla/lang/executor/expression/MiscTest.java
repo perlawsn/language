@@ -6,7 +6,6 @@ import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -22,7 +21,7 @@ import static org.junit.Assert.*;
  */
 public class MiscTest {
 
-    private static Attribute integerAtt =
+    private static Attribute intAtt =
             Attribute.create("integer", DataType.INTEGER);
     private static Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
@@ -31,33 +30,21 @@ public class MiscTest {
     private static Attribute boolAtt =
             Attribute.create("boolean", DataType.BOOLEAN);
 
-    private static List<Attribute> atts;
-
-    private static BufferView view;
-
-    @BeforeClass
-    public static void setupBuffer() {
-        Attribute[] as = new Attribute[] {
+    private static final List<Attribute> atts;
+    static {
+        atts = Arrays.asList(new Attribute[]{
                 Attribute.TIMESTAMP,
-                integerAtt,
+                intAtt,
                 stringAtt,
                 floatAtt,
                 boolAtt
-        };
-        atts = Arrays.asList(as);
-
-        Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f, true}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f, false}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f, false}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f, null}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f, true}));
-
-        view = b.unmodifiableView();
+        });
     }
 
     @Test
     public void castFloat() {
+        Object[] record;
+
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
         Expression fFloat = new Field(floatAtt.getId()).bind(atts);
@@ -69,34 +56,37 @@ public class MiscTest {
         assertFalse(cast.hasErrors());
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.run(view.get(0), view), equalTo(1f));
+        assertThat(cast.run(null, null), equalTo(1f));
 
         cast = CastFloat.create(cFloat);
         assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.run(view.get(0), view), equalTo(1.2f));
+        assertThat(cast.run(null, null), equalTo(1.2f));
 
         cast = CastFloat.create(fFloat);
         assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
-        List<Attribute> atts = cast.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(floatAtt));
+        List<Attribute> as = cast.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(floatAtt));
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        assertThat(cast.run(view.get(0), view), equalTo(4.4f));
-        assertThat(cast.run(view.get(1), view), equalTo(3.3f));
+        record = new Object[]{4.4f};
+        assertThat(cast.run(record, null), equalTo(4.4f));
+        record = new Object[]{3.3f};
+        assertThat(cast.run(record, null), equalTo(3.3f));
 
         cast = CastFloat.create(incomplete);
         assertFalse(cast.isComplete());
         assertFalse(cast.hasErrors());
         cast = cast.bind(atts);
         assertTrue(cast.isComplete());
-        atts = cast.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(floatAtt));
-        assertThat(cast.run(view.get(0), view), equalTo(4.4f));
+        as = cast.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(floatAtt));
+        record = new Object[]{4.4f};
+        assertThat(cast.run(record, null), equalTo(4.4f));
 
         cast = CastFloat.create(error);
         assertTrue(cast.isComplete());
@@ -110,40 +100,44 @@ public class MiscTest {
         Expression fFloat = new Field(floatAtt.getId()).bind(atts);
         Expression incomplete = new Field("integer");
         Expression error = new ErrorExpression("test");
+        Object[] record;
 
         Expression cast = CastInteger.create(cInt);
         assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.run(view.get(0), view), equalTo(1));
+        assertThat(cast.run(null, null), equalTo(1));
 
         cast = CastInteger.create(cFloat);
         assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.run(view.get(0), view), equalTo(1));
+        assertThat(cast.run(null, null), equalTo(1));
 
         cast = CastInteger.create(fFloat);
         assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
-        List<Attribute> atts = cast.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(floatAtt));
+        List<Attribute> as = cast.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(floatAtt));
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        assertThat(cast.run(view.get(0), view), equalTo(4));
-        assertThat(cast.run(view.get(1), view), equalTo(3));
+        record = new Object[]{4.4f};
+        assertThat(cast.run(record, null), equalTo(4));
+        record = new Object[]{3.3f};
+        assertThat(cast.run(record, null), equalTo(3));
 
         cast = CastInteger.create(incomplete);
         assertFalse(cast.isComplete());
         assertFalse(cast.hasErrors());
         cast = cast.bind(atts);
         assertTrue(cast.isComplete());
-        atts = cast.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains("integer"));
-        assertThat(cast.run(view.get(0), view), equalTo(4));
+        as = cast.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
+        record = new Object[]{4};
+        assertThat(cast.run(record, null), equalTo(4));
 
         cast = CastInteger.create(error);
         assertTrue(cast.isComplete());
@@ -157,14 +151,14 @@ public class MiscTest {
         assertFalse(c1.hasErrors());
         assertTrue(c1.getAttributes().isEmpty());
         assertThat(c1.getType(), equalTo(DataType.INTEGER));
-        assertThat(c1.run(view.get(0), view), equalTo(1));
+        assertThat(c1.run(null, null), equalTo(1));
 
         Expression c2 = Constant.create("test", DataType.STRING);
         assertTrue(c2.isComplete());
         assertFalse(c2.hasErrors());
         assertTrue(c2.getAttributes().isEmpty());
         assertThat(c2.getType(), equalTo(DataType.STRING));
-        assertThat(c2.run(view.get(0), view), equalTo("test"));
+        assertThat(c2.run(null, null), equalTo("test"));
 
         Constant u = Constant.UNKNOWN;
         assertTrue(u.isComplete());
@@ -365,42 +359,51 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        Expression fi = new Field(integerAtt.getId());
+        Object[] record;
+
+        Expression fi = new Field(intAtt.getId());
         assertFalse(fi.isComplete());
         assertFalse(fi.hasErrors());
         fi = fi.bind(atts);
         assertTrue(fi.isComplete());
-        List<Attribute> atts = fi.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains("integer"));
+        List<Attribute> as = fi.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertThat(fi.getType(), equalTo(DataType.INTEGER));
-        assertThat(fi.run(view.get(0), view), equalTo(4));
-        assertThat(fi.run(view.get(1), view), equalTo(3));
+        record = new Object[]{4};
+        assertThat(fi.run(record, null), equalTo(4));
+        record = new Object[]{3};
+        assertThat(fi.run(record, null), equalTo(3));
 
         Expression fs = new Field(stringAtt.getId());
         assertFalse(fs.isComplete());
         assertFalse(fs.hasErrors());
         fs = fs.bind(atts);
         assertTrue(fi.isComplete());
-        atts = fs.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(stringAtt));
+        as = fs.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(stringAtt));
         assertThat(fs.getType(), equalTo(DataType.STRING));
-        assertThat(fs.run(view.get(0), view), equalTo("4"));
-        assertThat(fs.run(view.get(1), view), equalTo("3"));
+        record = new Object[]{"4"};
+        assertThat(fs.run(record, null), equalTo("4"));
+        record = new Object[]{"3"};
+        assertThat(fs.run(record, null), equalTo("3"));
 
         Expression fb = new Field(boolAtt.getId());
         assertFalse(fb.isComplete());
         assertFalse(fb.hasErrors());
         fb = fb.bind(atts);
         assertTrue(fb.isComplete());
-        atts = fb.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(boolAtt));
+        as = fb.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(boolAtt));
         assertThat(fb.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(fb.run(view.get(0), view), equalTo(LogicValue.TRUE));
-        assertThat(fb.run(view.get(1), view), nullValue());
-        assertThat(fb.run(view.get(2), view), equalTo(LogicValue.FALSE));
+        record = new Object[]{true};
+        assertThat(fb.run(record, null), equalTo(LogicValue.TRUE));
+        record = new Object[]{null};
+        assertThat(fb.run(record, null), equalTo(Constant.NULL_BOOLEAN));
+        record = new Object[]{false};
+        assertThat(fb.run(record, null), equalTo(LogicValue.FALSE));
     }
 
     @Test
@@ -409,6 +412,17 @@ public class MiscTest {
         assertFalse(gts.isComplete());
         assertFalse(gts.hasErrors());
         gts = gts.bind(atts);
+
+        List<Attribute> as = Arrays.asList(new Attribute[]{
+                Attribute.TIMESTAMP,
+                intAtt
+        });
+
+        Buffer b = new ArrayBuffer(0, 1);
+        b.add(new Record(as, new Object[]{Instant.now(), 1}));
+        b.add(new Record(as, new Object[]{Instant.now(), 2}));
+        BufferView view = b.unmodifiableView();
+
         List<Attribute> atts = gts.getAttributes();
         assertThat(atts.size(), equalTo(1));
         assertTrue(atts.contains(Attribute.TIMESTAMP));

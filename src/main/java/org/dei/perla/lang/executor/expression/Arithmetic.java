@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@code Arithmetic} is a class representing an arithmetic operation.
@@ -169,7 +170,7 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e1.getAttributes(atts);
         e2.getAttributes(atts);
     }

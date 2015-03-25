@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@code Bitwise} is a class representing a bitwise operation among integer
@@ -146,7 +147,7 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e1.getAttributes(atts);
         e2.getAttributes(atts);
     }

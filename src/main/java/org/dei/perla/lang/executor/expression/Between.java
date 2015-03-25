@@ -6,6 +6,7 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A comparison expression that tests if a value lies between an inclusive
@@ -76,7 +77,7 @@ public final class Between implements Expression {
     }
 
     @Override
-    public void getAttributes(List<Attribute> atts) {
+    public void getAttributes(Map<Integer, Attribute> atts) {
         e.getAttributes(atts);
         min.getAttributes(atts);
         max.getAttributes(atts);
