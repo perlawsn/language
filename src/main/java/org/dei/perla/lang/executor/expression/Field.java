@@ -60,10 +60,9 @@ public class Field implements Expression {
             return create(i, bound.get(i));
         }
 
-        i = 0;
         for (Attribute a : atts) {
             if (a.getId().equals(id)) {
-                return create(i, a);
+                return create(bound.size(), a);
             }
         }
 

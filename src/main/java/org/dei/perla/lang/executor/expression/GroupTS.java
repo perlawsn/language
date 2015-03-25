@@ -46,12 +46,10 @@ public class GroupTS implements Expression {
             return new ConcreteGroupTS(i);
         }
 
-        i = 0;
         for (Attribute a : atts) {
             if (a == Attribute.TIMESTAMP) {
-                return new ConcreteGroupTS(i);
+                return new ConcreteGroupTS(bound.size());
             }
-            i++;
         }
         return this;
     }
