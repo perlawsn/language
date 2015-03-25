@@ -127,7 +127,7 @@ public final class Arithmetic implements Expression {
                     "integer operands are allowed in " + op + " operations");
         }
 
-        if (t1 != t2) {
+        if (t1 != t2 && t1 != null && t2 != null) {
             if (t1 == DataType.INTEGER) {
                 e1 = CastFloat.create(e1);
                 t1 = DataType.FLOAT;

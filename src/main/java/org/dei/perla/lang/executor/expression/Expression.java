@@ -89,7 +89,8 @@ public interface Expression {
 
         List<Attribute> out = new ArrayList<>(atts.size());
         for (int i = 0; i < atts.size(); i++) {
-            if (!atts.containsKey(i)) {
+            Attribute a = atts.get(i);
+            if (a == null) {
                 throw new RuntimeException("Non-contiguous attributes");
             }
             out.add(atts.get(i));

@@ -63,7 +63,8 @@ public class Field implements Expression {
 
         for (Attribute a : atts) {
             if (a.getId().equals(id)) {
-                return create(bound.size(), a);
+                bound.add(a);
+                return create(bound.size() - 1, a);
             }
         }
 
