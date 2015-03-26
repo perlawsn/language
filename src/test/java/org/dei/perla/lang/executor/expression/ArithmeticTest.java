@@ -230,6 +230,21 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void subtractionIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createSubtraction(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createSubtraction(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void subtractionErrorTest() {
         Expression err = new ErrorExpression("test");
         Expression c = Constant.create(85, DataType.INTEGER);

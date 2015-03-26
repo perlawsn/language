@@ -31,13 +31,16 @@ public class ComparisonTest {
     private static Attribute boolAtt =
             Attribute.create("boolean", DataType.BOOLEAN);
 
-    private static BufferView view;
-
-    private static List<Attribute> atts;
-
-    private static Expression intExpr;
-    private static Expression stringExpr;
-    private static Expression floatExpr;
+    private static final List<Attribute> atts;
+    static {
+        atts = Arrays.asList(new Attribute[]{
+                Attribute.TIMESTAMP,
+                intAtt,
+                stringAtt,
+                floatAtt,
+                boolAtt
+        });
+    }
 
     private static final Expression trueExpr = Constant.TRUE;
     private static final Expression falseExpr = Constant.FALSE;
@@ -47,59 +50,43 @@ public class ComparisonTest {
     private static final Expression t2 =
             Constant.create(Instant.parse("2015-02-23T15:08:45.000Z"), DataType.TIMESTAMP);
 
-    @BeforeClass
-    public static void setupBuffer() {
-        Attribute[] as = new Attribute[]{
-                Attribute.TIMESTAMP,
-                intAtt,
-                stringAtt,
-                floatAtt,
-                boolAtt
-        };
-        atts = Arrays.asList(as);
-
-        intExpr = new Field(intAtt.getId()).bind(atts);
-        stringExpr = new Field(stringAtt.getId()).bind(atts);
-        floatExpr = new Field(floatAtt.getId()).bind(atts);
-
-        Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{Instant.now(), 0, "0", 0.0f, true}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1, "1", 1.1f, true}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2, "2", 2.2f, false}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 3, "3", 3.3f, true}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 4, "4", 4.4f, false}));
-
-        view = b.unmodifiableView();
-    }
-
     @Test
     public void testEQ() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createEQ(intExpr, c);
+        Expression e = Comparison.createEQ(new Field("integer"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createEQ(floatExpr, c);
+        e = Comparison.createEQ(new Field("float"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create("4", DataType.STRING);
-        e = Comparison.createEQ(stringExpr, c);
+        e = Comparison.createEQ(new Field("string"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{"4"};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{"3"};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createEQ(trueExpr, trueExpr).run(null, null);
@@ -164,9 +151,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -174,9 +161,9 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -184,9 +171,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -194,31 +181,40 @@ public class ComparisonTest {
     @Test
     public void testNE() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createNE(intExpr, c);
+        Expression e = Comparison.createNE(new Field("integer"), c);
+        e = e.bind(atts);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createNE(floatExpr, c);
+        e = Comparison.createNE(new Field("float"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create("4", DataType.STRING);
-        e = Comparison.createNE(stringExpr, c);
+        e = Comparison.createNE(new Field("string"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{"4"};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{"3"};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createNE(trueExpr, trueExpr).run(null, null);
@@ -287,9 +283,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -297,9 +293,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -307,9 +303,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -317,28 +313,36 @@ public class ComparisonTest {
     @Test
     public void testGT() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createGT(c, intExpr);
+        Expression e = Comparison.createGT(c, new Field("integer"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        e = Comparison.createGT(intExpr, c);
-        res = e.run(view.get(1), view);
+        e = Comparison.createGT(new Field("integer"), c);
+        e = e.bind(atts);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createGT(c, floatExpr);
+        e = Comparison.createGT(c, new Field("float"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        e = Comparison.createGT(floatExpr, c);
-        res = e.run(view.get(1), view);
+        e = Comparison.createGT(new Field("float"), c);
+        e = e.bind(atts);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGT(t1, t1).run(null, null);
@@ -400,9 +404,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -410,9 +414,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -420,9 +424,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -430,32 +434,40 @@ public class ComparisonTest {
     @Test
     public void testGE() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createGE(c, intExpr);
+        Expression e = Comparison.createGE(c, new Field("integer"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        e = Comparison.createGE(intExpr, c);
+        e = Comparison.createGE(new Field("integer"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createGE(c, floatExpr);
+        e = Comparison.createGE(c, new Field("float"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        e = Comparison.createGE(floatExpr, c);
+        e = Comparison.createGE(new Field("float"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGE(t1, t1).run(null, null);
@@ -517,9 +529,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -527,9 +539,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -537,9 +549,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -547,32 +559,40 @@ public class ComparisonTest {
     @Test
     public void testLT() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createLT(c, intExpr);
+        Expression e = Comparison.createLT(c, new Field("integer"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        e = Comparison.createLT(intExpr, c);
+        e = Comparison.createLT(new Field("integer"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createLT(c, floatExpr);
+        e = Comparison.createLT(c, new Field("float"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        e = Comparison.createLT(floatExpr, c);
+        e = Comparison.createLT(new Field("float"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLT(t1, t1).run(null, null);
@@ -634,9 +654,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -644,9 +664,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -654,9 +674,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -664,32 +684,40 @@ public class ComparisonTest {
     @Test
     public void testLE() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression e = Comparison.createLE(c, intExpr);
+        Expression e = Comparison.createLE(c, new Field("integer"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object res = e.run(view.get(0), view);
+        Object[] record = new Object[]{4};
+        Object res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        e = Comparison.createLE(intExpr, c);
+        e = Comparison.createLE(new Field("integer"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
-        e = Comparison.createLE(c, floatExpr);
+        e = Comparison.createLE(c, new Field("float"));
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(0), view);
+        record = new Object[]{4.4f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        res = e.run(view.get(1), view);
+        record = new Object[]{3.3f};
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        e = Comparison.createLE(floatExpr, c);
+        e = Comparison.createLE(new Field("float"), c);
+        e = e.bind(atts);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(view.get(1), view);
+        res = e.run(record, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLE(t1, t1).run(null, null);
@@ -751,9 +779,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -761,9 +789,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -771,9 +799,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -844,9 +872,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -854,9 +882,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
@@ -864,9 +892,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -956,9 +984,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(boolAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1030,9 +1058,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(intAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -1074,9 +1102,9 @@ public class ComparisonTest {
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         e = e.bind(atts);
-        List<Attribute> atts = e.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(stringAtt));
+        List<Attribute> as = e.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(stringAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
