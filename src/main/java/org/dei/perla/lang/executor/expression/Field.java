@@ -141,7 +141,7 @@ public class Field implements Expression {
             Object o = record[idx];
 
             if (o == null) {
-                return Constant.NULL;
+                return null;
             } else if ((Boolean) o) {
                 return LogicValue.TRUE;
             } else {

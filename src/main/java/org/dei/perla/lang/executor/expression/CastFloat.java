@@ -81,7 +81,12 @@ public final class CastFloat implements Expression {
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        return ((Integer) e.run(record, buffer)).floatValue();
+        Object o = e.run(record, buffer);
+        if (o == null) {
+            return null;
+        }
+
+        return ((Integer) o).floatValue();
     }
 
 }

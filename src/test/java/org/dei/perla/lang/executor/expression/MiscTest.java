@@ -47,9 +47,6 @@ public class MiscTest {
 
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
-        Expression fFloat = new Field(floatAtt.getId()).bind(atts);
-        Expression incomplete = new Field("float");
-        Expression error = new ErrorExpression("test");
 
         Expression cast = CastFloat.create(cInt);
         assertTrue(cast.isComplete());
@@ -64,33 +61,44 @@ public class MiscTest {
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.FLOAT));
         assertThat(cast.run(null, null), equalTo(1.2f));
+    }
 
-        cast = CastFloat.create(fFloat);
-        assertTrue(cast.isComplete());
-        assertFalse(cast.hasErrors());
-        List<Attribute> as = cast.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(floatAtt));
-        assertThat(cast.getType(), equalTo(DataType.FLOAT));
-        record = new Object[]{4.4f};
-        assertThat(cast.run(record, null), equalTo(4.4f));
-        record = new Object[]{3.3f};
-        assertThat(cast.run(record, null), equalTo(3.3f));
-
-        cast = CastFloat.create(incomplete);
+    @Test
+    public void castFloatBind() {
+        Expression cast = CastFloat.create(new Field("float"));
         assertFalse(cast.isComplete());
         assertFalse(cast.hasErrors());
         cast = cast.bind(atts);
         assertTrue(cast.isComplete());
-        as = cast.getAttributes();
+        List<Attribute> as = cast.getAttributes();
         assertThat(as.size(), equalTo(1));
         assertTrue(as.contains(floatAtt));
-        record = new Object[]{4.4f};
+        Object[] record = new Object[]{4.4f};
         assertThat(cast.run(record, null), equalTo(4.4f));
+    }
 
-        cast = CastFloat.create(error);
+    @Test
+    public void castFloatError() {
+        Expression err = new ErrorExpression("test");
+        Expression cast = CastFloat.create(err);
         assertTrue(cast.isComplete());
         assertTrue(cast.hasErrors());
+    }
+
+    @Test
+    public void castFloatNull() {
+        Expression cast = CastFloat.create(Constant.NULL);
+        assertTrue(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), nullValue());
+        assertThat(cast.run(null, null), equalTo(null));
+        assertThat(cast, equalTo(Constant.NULL));
+
+        cast = CastFloat.create(new Field("incomplete"));
+        assertFalse(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), equalTo(DataType.FLOAT));
+        assertThat(cast.run(null, null), equalTo(null));
     }
 
     @Test
