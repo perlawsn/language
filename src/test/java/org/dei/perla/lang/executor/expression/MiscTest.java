@@ -170,95 +170,60 @@ public class MiscTest {
 
     @Test
     public void constantNullTest() {
-        Expression e = Constant.NULL_INTEGER;
+        Expression e = Constant.NULL;
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
 
         e = Constant.create(null, DataType.INTEGER);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_INTEGER));
-
-        e = Constant.NULL_FLOAT;
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.FLOAT));
-        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL));
 
         e = Constant.create(null, DataType.FLOAT);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.FLOAT));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_FLOAT));
-
-        e = Constant.NULL_STRING;
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.STRING));
-        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL));
 
         e = Constant.create(null, DataType.STRING);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.STRING));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_STRING));
-
-        e = Constant.NULL_BOOLEAN;
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL));
 
         e = Constant.create(null, DataType.BOOLEAN);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_BOOLEAN));
-
-        e = Constant.NULL_TIMESTAMP;
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
-        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL));
 
         e = Constant.create(null, DataType.TIMESTAMP);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_TIMESTAMP));
-
-        e = Constant.NULL_ID;
-        assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
-        assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.ID));
-        assertThat(((Constant) e).getValue(), nullValue());
+        assertThat(e, equalTo(Constant.NULL));
 
         e = Constant.create(null, DataType.ID);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e.getAttributes().isEmpty());
-        assertThat(e.getType(), equalTo(DataType.ID));
+        assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
-        assertThat(e, equalTo(Constant.NULL_ID));
+        assertThat(e, equalTo(Constant.NULL));
     }
 
     @Test
@@ -401,7 +366,7 @@ public class MiscTest {
         record = new Object[]{true};
         assertThat(fb.run(record, null), equalTo(LogicValue.TRUE));
         record = new Object[]{null};
-        assertThat(fb.run(record, null), equalTo(Constant.NULL_BOOLEAN));
+        assertThat(fb.run(record, null), equalTo(Constant.NULL));
         record = new Object[]{false};
         assertThat(fb.run(record, null), equalTo(LogicValue.FALSE));
     }

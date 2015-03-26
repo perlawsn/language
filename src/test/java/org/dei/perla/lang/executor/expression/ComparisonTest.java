@@ -103,7 +103,7 @@ public class ComparisonTest {
     @Test
     public void testEQNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createEQ(c, nul);
         assertTrue(e.isComplete());
@@ -235,7 +235,7 @@ public class ComparisonTest {
     @Test
     public void testNENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createNE(c, nul);
         assertTrue(e.isComplete());
@@ -356,7 +356,7 @@ public class ComparisonTest {
     @Test
     public void testGTNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createGT(c, nul);
         assertTrue(e.isComplete());
@@ -481,7 +481,7 @@ public class ComparisonTest {
     @Test
     public void testGENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createGE(c, nul);
         assertTrue(e.isComplete());
@@ -606,7 +606,7 @@ public class ComparisonTest {
     @Test
     public void testLTNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createLT(c, nul);
         assertTrue(e.isComplete());
@@ -731,7 +731,7 @@ public class ComparisonTest {
     @Test
     public void testLENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Comparison.createLE(c, nul);
         assertTrue(e.isComplete());
@@ -957,19 +957,19 @@ public class ComparisonTest {
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.TRUE);
+        e = Is.create(Constant.NULL, LogicValue.TRUE);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
 
-        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.FALSE);
+        e = Is.create(Constant.NULL, LogicValue.FALSE);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
 
-        e = Is.create(Constant.NULL_BOOLEAN, LogicValue.UNKNOWN);
+        e = Is.create(Constant.NULL, LogicValue.UNKNOWN);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -995,37 +995,37 @@ public class ComparisonTest {
     public void testIsNull() {
         Expression e;
 
-        e = IsNull.create(Constant.NULL_BOOLEAN);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = IsNull.create(Constant.NULL_INTEGER);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = IsNull.create(Constant.NULL_FLOAT);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = IsNull.create(Constant.NULL_TIMESTAMP);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = IsNull.create(Constant.NULL_STRING);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 
-        e = IsNull.create(Constant.NULL_ID);
+        e = IsNull.create(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -1087,7 +1087,7 @@ public class ComparisonTest {
 
     @Test
     public void testNullLike() {
-        Expression e = Like.create(Constant.NULL_STRING, "test");
+        Expression e = Like.create(Constant.NULL, "test");
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));

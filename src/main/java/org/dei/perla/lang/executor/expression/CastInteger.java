@@ -45,7 +45,7 @@ public final class CastInteger implements Expression {
         if (e instanceof Constant) {
             Float value = (Float) ((Constant) e).getValue();
             if (value == null) {
-                return Constant.NULL_INTEGER;
+                return Constant.NULL;
             }
             return Constant.create(value.intValue(), DataType.INTEGER);
         }

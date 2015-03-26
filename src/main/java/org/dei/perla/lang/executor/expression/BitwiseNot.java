@@ -41,7 +41,7 @@ public final class BitwiseNot implements Expression {
         if (e instanceof Constant) {
             Object o = ((Constant) e).getValue();
             if (o == null) {
-                return Constant.NULL_INTEGER;
+                return Constant.NULL;
             }
             return Constant.create(~(Integer) o, t);
         }

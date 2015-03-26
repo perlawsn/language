@@ -91,7 +91,7 @@ public class ArithmeticTest {
     @Test
     public void additionNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Arithmetic.createAddition(c, nul);
         assertTrue(e.isComplete());
@@ -211,7 +211,7 @@ public class ArithmeticTest {
     @Test
     public void subtractionNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Arithmetic.createSubtraction(c, nul);
         assertTrue(e.isComplete());
@@ -337,7 +337,7 @@ public class ArithmeticTest {
     @Test
     public void productNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Arithmetic.createProduct(c, nul);
         assertTrue(e.isComplete());
@@ -448,7 +448,7 @@ public class ArithmeticTest {
     @Test
     public void divisionNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Arithmetic.createDivision(c, nul);
         assertTrue(e.isComplete());
@@ -533,7 +533,7 @@ public class ArithmeticTest {
     @Test
     public void moduloNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Arithmetic.createModulo(c, nul);
         assertTrue(e.isComplete());
@@ -631,7 +631,7 @@ public class ArithmeticTest {
 
     @Test
     public void inverseNullTest() {
-        Expression e = Arithmetic.createInverse(Constant.NULL_INTEGER);
+        Expression e = Arithmetic.createInverse(Constant.NULL);
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());

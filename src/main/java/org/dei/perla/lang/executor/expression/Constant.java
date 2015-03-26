@@ -14,19 +14,9 @@ import java.util.Map;
  */
 public final class Constant implements Expression {
 
-    // CONSTANT NULL VALUES
-    public static final Constant NULL_INTEGER =
-            new Constant(null, DataType.INTEGER);
-    public static final Constant NULL_FLOAT =
-            new Constant(null, DataType.FLOAT);
-    public static final Constant NULL_STRING =
-            new Constant(null, DataType.STRING);
-    public static final Constant NULL_BOOLEAN =
-            new Constant(null, DataType.BOOLEAN);
-    public static final Constant NULL_TIMESTAMP =
-            new Constant(null, DataType.TIMESTAMP);
-    public static final Constant NULL_ID =
-            new Constant(null, DataType.ID);
+    // CONSTANT NULL
+    public static final Constant NULL =
+            new Constant(null, null);
 
     // CONSTANT LOGIC VALUES
     public static final Constant TRUE =
@@ -65,22 +55,7 @@ public final class Constant implements Expression {
      */
     public static Expression create(Object value, DataType type) {
         if (value == null) {
-            switch (type) {
-                case INTEGER:
-                    return NULL_INTEGER;
-                case FLOAT:
-                    return NULL_FLOAT;
-                case STRING:
-                    return NULL_STRING;
-                case BOOLEAN:
-                    return NULL_BOOLEAN;
-                case TIMESTAMP:
-                    return NULL_TIMESTAMP;
-                case ID:
-                    return NULL_ID;
-                default:
-                    throw new RuntimeException("unknown data type " + type);
-            }
+            return NULL;
         }
 
         if (type == DataType.BOOLEAN) {

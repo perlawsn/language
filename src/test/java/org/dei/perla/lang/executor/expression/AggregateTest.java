@@ -150,8 +150,8 @@ public class AggregateTest {
 
     @Test
     public void testSumNull() {
-        Expression nuli = Constant.NULL_INTEGER;
-        Expression nulb = Constant.NULL_BOOLEAN;
+        Expression nuli = Constant.NULL;
+        Expression nulb = Constant.NULL;
 
         Expression e = Aggregate.createSum(nuli, new WindowSize(3), null);
         assertTrue(e.isComplete());
@@ -298,8 +298,8 @@ public class AggregateTest {
 
     @Test
     public void testAvgNull() {
-        Expression nulf = Constant.NULL_FLOAT;
-        Expression nulb = Constant.NULL_BOOLEAN;
+        Expression nulf = Constant.NULL;
+        Expression nulb = Constant.NULL;
 
         Expression e = Aggregate.createAvg(nulf, new WindowSize(3), null);
         assertTrue(e.isComplete());
@@ -469,8 +469,8 @@ public class AggregateTest {
 
     @Test
     public void testMinNull() {
-        Expression nuli = Constant.NULL_INTEGER;
-        Expression nulb = Constant.NULL_BOOLEAN;
+        Expression nuli = Constant.NULL;
+        Expression nulb = Constant.NULL;
 
         Expression e = Aggregate.createMin(nuli, new WindowSize(3), null);
         assertTrue(e.isComplete());
@@ -634,8 +634,8 @@ public class AggregateTest {
 
     @Test
     public void testMaxNull() {
-        Expression nulf = Constant.NULL_FLOAT;
-        Expression nulb = Constant.NULL_BOOLEAN;
+        Expression nulf = Constant.NULL;
+        Expression nulb = Constant.NULL;
 
         Expression e = Aggregate.createMax(nulf, new WindowSize(3), null);
         assertTrue(e.isComplete());
@@ -746,7 +746,7 @@ public class AggregateTest {
 
     @Test
     public void testCountNull() {
-        Expression nulb = Constant.NULL_BOOLEAN;
+        Expression nulb = Constant.NULL;
 
         Expression e = Aggregate.createCount(new WindowSize(3), nulb);
         assertTrue(e.isComplete());

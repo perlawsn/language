@@ -122,7 +122,7 @@ public final class Comparison implements Expression {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
             if (o1 == null || o2 == null) {
-                return Constant.NULL_BOOLEAN;
+                return Constant.NULL;
             }
             return Constant.create(compute(op, o1, o2), DataType.BOOLEAN);
         }

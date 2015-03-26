@@ -63,7 +63,7 @@ public class BooleanTest {
 
     @Test
     public void testNOTUnknown() {
-        Expression e = Bool.createNOT(Constant.NULL_BOOLEAN);
+        Expression e = Bool.createNOT(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
@@ -127,7 +127,7 @@ public class BooleanTest {
 
     @Test
     public void testANDUnknown() {
-        Expression nul = Constant.NULL_BOOLEAN;
+        Expression nul = Constant.NULL;
 
         Expression e = Bool.createAND(trueExpr, nul);
         assertTrue(e.isComplete());
@@ -246,7 +246,7 @@ public class BooleanTest {
 
     @Test
     public void testORUnknown() {
-        Expression nul = Constant.NULL_BOOLEAN;
+        Expression nul = Constant.NULL;
 
         Expression e = Bool.createOR(trueExpr, nul);
         assertTrue(e.isComplete());
@@ -365,7 +365,7 @@ public class BooleanTest {
 
     @Test
     public void testXORUnknown() {
-        Expression nul = Constant.NULL_BOOLEAN;
+        Expression nul = Constant.NULL;
 
         Expression e = Bool.createXOR(trueExpr, nul);
         assertTrue(e.isComplete());

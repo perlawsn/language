@@ -47,7 +47,7 @@ public class BitwiseTest {
     @Test
     public void bitwiseANDNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Bitwise.createAND(c, nul);
         assertTrue(e.isComplete());
@@ -138,7 +138,7 @@ public class BitwiseTest {
     @Test
     public void bitwiseORNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Bitwise.createOR(c, nul);
         assertTrue(e.isComplete());
@@ -229,7 +229,7 @@ public class BitwiseTest {
     @Test
     public void bitwiseXORNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Bitwise.createXOR(c, nul);
         assertTrue(e.isComplete());
@@ -318,7 +318,7 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseNOTNullTest() {
-        Expression e = Bitwise.createNOT(Constant.NULL_INTEGER);
+        Expression e = Bitwise.createNOT(Constant.NULL);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
@@ -365,7 +365,7 @@ public class BitwiseTest {
     @Test
     public void bitwiseLSHNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Bitwise.createLSH(c, nul);
         assertTrue(e.isComplete());
@@ -456,7 +456,7 @@ public class BitwiseTest {
     @Test
     public void bitwiseRSHNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
-        Expression nul = Constant.NULL_INTEGER;
+        Expression nul = Constant.NULL;
 
         Expression e = Bitwise.createRSH(c, nul);
         assertTrue(e.isComplete());
