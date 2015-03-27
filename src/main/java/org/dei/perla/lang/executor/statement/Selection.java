@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,12 +19,22 @@ public final class Selection implements Statement {
         this.every = every;
     }
 
-    public List<Object[]> select(BufferView buffer) {
-        return select.select(buffer);
+    @Override
+    public boolean hasErrors() {
+        throw new RuntimeException("unimplemented");
     }
 
-    public List<Attribute> selectedAttributes() {
+    @Override
+    public boolean isComplete() {
         throw new RuntimeException("unimplemented");
+    }
+
+    public Selection bind(Collection<Attribute> atts, List<Attribute> bound) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    public List<Object[]> select(BufferView buffer) {
+        return select.select(buffer);
     }
 
 }

@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A special {@code Expression} node that retrieves the GROUP TIMESTAMP of a
@@ -44,13 +43,13 @@ public class GroupTS implements Expression {
             return new ConcreteGroupTS(i);
         }
 
-        for (Attribute a : atts) {
-            if (a == Attribute.TIMESTAMP) {
-                bound.add(a);
-                return new ConcreteGroupTS(bound.size() - 1);
-            }
+        Attribute a = Expression.getById(id, atts);
+        if (a == null) {
+            return this;
         }
-        return this;
+
+        bound.add(a);
+        return new ConcreteGroupTS(bound.size() - 1);
     }
 
     @Override

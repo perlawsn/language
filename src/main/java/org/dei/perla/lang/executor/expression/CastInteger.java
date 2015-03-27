@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An expression that performs a cast to integer. This class only supports

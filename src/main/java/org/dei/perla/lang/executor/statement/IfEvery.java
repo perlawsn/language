@@ -90,14 +90,6 @@ public final class IfEvery implements Clause {
     }
 
     public IfEvery bind(Collection<Attribute> atts, List<Attribute> bound) {
-        if (hasErrors()) {
-            throw new IllegalStateException(
-                    "Cannot bind, every clause contains errors");
-        }
-        if (isComplete()) {
-            return this;
-        }
-
         Expression bcond = cond.bind(atts, bound);
         Expression bvalue = value.bind(atts, bound);
 

@@ -37,9 +37,7 @@ public final class TimeBasedRunner {
         this.query = query;
         this.qh = qh;
 
-        int tsIdx = timestampIndex(query.selectedAttributes());
-        // TODO: estimate buffer length
-        buf = new ArrayBuffer(tsIdx, 512);
+        buf = null;
     }
 
     // Retrieves the index of the timestamp column

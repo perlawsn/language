@@ -6,7 +6,6 @@ import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An {@link Expression} for accessing the value of a specific Fpc
@@ -58,14 +57,13 @@ public class Field implements Expression {
             return create(i, bound.get(i));
         }
 
-        for (Attribute a : atts) {
-            if (a.getId().equals(id)) {
-                bound.add(a);
-                return create(bound.size() - 1, a);
-            }
+        Attribute a = Expression.getById(id, atts);
+        if (a == null) {
+            return this;
         }
 
-        return this;
+        bound.add(a);
+        return create(bound.size() - 1, a);
     }
 
     private Expression create(int idx, Attribute att) {
@@ -85,13 +83,11 @@ public class Field implements Expression {
 
         protected final int idx;
         private final DataType type;
-        private final Attribute att;
 
         private ConcreteField(int idx, Attribute att) {
             super(att.getId());
             this.idx = idx;
             this.type = att.getType();
-            this.att = att;
         }
 
         @Override

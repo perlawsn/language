@@ -1,12 +1,10 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
-import java.util.Map;
 
 /**
  * General template for the implementation of an aggregation {@link Expression}.

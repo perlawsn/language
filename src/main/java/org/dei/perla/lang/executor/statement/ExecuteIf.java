@@ -34,9 +34,12 @@ public final class ExecuteIf implements Clause {
     }
 
     public ExecuteIf bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression newCond = cond.bind(atts, bound);
-        Refresh newRef = refresh.bind(atts, bound);
-        return new ExecuteIf(newCond, newRef);
+        Expression bcond = cond.bind(atts, bound);
+        Refresh brefresh = null;
+        if (refresh != null) {
+            brefresh = refresh.bind(atts, bound);
+        }
+        return new ExecuteIf(bcond, brefresh);
     }
 
     public Refresh getRefresh() {
