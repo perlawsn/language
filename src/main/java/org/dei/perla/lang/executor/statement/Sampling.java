@@ -4,6 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -69,25 +70,21 @@ public final class Sampling implements Clause {
         return ifevery.isComplete();
     }
 
-    @Override
-    public Clause bind(List<Attribute> atts) {
-        if (isComplete()) {
-            return this;
-        }
+    public Clause bind(Collection<Attribute> atts, List<Attribute> bound) {
+        IfEvery bifevery = ifevery.bind(atts, bound);
 
-        IfEvery nife = ifevery.bind(atts);
-
-        Refresh nref = null;
+        Refresh brefresh = null;
         if (refresh != null) {
-            nref = refresh.bind(atts);
+            brefresh = refresh.bind(atts, bound);
         }
 
-        Expression nwhere = null;
+        Expression bwhere = null;
         if (where != null) {
-            nwhere = where.bind(atts);
+            bwhere = where.bind(atts, bound);
         }
 
-        ClauseWrapper<Sampling> cw = Sampling.create(nife, nref, nwhere);
+        ClauseWrapper<Sampling> cw =
+                Sampling.create(bifevery, brefresh, bwhere);
         return cw.getClause();
     }
 

@@ -6,13 +6,14 @@ import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Guido Rota 02/03/15.
  */
-public final class Select {
+public final class Select implements Clause {
 
     private static final WindowSize DEFAULT_UPTO = new WindowSize(1);
 
@@ -55,12 +56,26 @@ public final class Select {
         return def;
     }
 
-    public Select bind(List<Attribute> atts) {
-        List<Expression> newFields = new ArrayList<>();
-        fields.forEach(f -> newFields.add(f.bind(atts)));
-        GroupBy newGroup = group.bind(atts);
-        Expression newHaving = having.bind(atts);
-        return new Select(newFields, upto, newGroup, newHaving, def);
+    @Override
+    public boolean hasErrors() {
+        return false;
+    }
+
+    @Override
+    public boolean isComplete() {
+        return false;
+    }
+
+    public Select bind(Collection<Attribute> atts, List<Attribute> bound) {
+        List<Expression> bfields = new ArrayList<>();
+        fields.forEach(f -> bfields.add(f.bind(atts, bound)));
+
+        GroupBy bgroup = null;
+        if (group != null) {
+            bgroup = group.bind(atts, bound);
+        }
+        Expression bhaving = having.bind(atts, bound);
+        return new Select(bfields, upto, bgroup, bhaving, def);
     }
 
     public List<Object[]> select(BufferView buffer) {

@@ -77,7 +77,7 @@ public class GroupByTest {
             assertFalse(e.isComplete());
         }
 
-        GroupBy ng = g.bind(atts);
+        GroupBy ng = g.bind(atts, new ArrayList<>());
         assertThat(ng.getDuration(), equalTo(g.getDuration()));
         assertThat(ng.getCount(), equalTo(g.getCount()));
     }

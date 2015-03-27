@@ -96,7 +96,7 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
 
@@ -105,7 +105,7 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
 
@@ -114,7 +114,7 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
 
@@ -123,7 +123,7 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.hasErrors());
         assertTrue(e.isComplete());
     }
@@ -158,7 +158,7 @@ public class IfEveryTest {
 
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
-        ife = ife.bind(atts);
+        ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
 

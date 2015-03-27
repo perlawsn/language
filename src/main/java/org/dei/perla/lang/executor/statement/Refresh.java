@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.record.Attribute;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +37,7 @@ public final class Refresh implements Clause {
         return d != null || events != null;
     }
 
-    @Override
-    public Refresh bind(List<Attribute> events) {
+    public Refresh bind(Collection<Attribute> atts, List<Attribute> bound) {
         throw new RuntimeException("unimplemented");
     }
 

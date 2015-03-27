@@ -8,6 +8,7 @@ import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.time.temporal.TemporalUnit;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -88,8 +89,7 @@ public final class IfEvery implements Clause {
         return cond.isComplete() && value.isComplete();
     }
 
-    @Override
-    public IfEvery bind(List<Attribute> atts) {
+    public IfEvery bind(Collection<Attribute> atts, List<Attribute> bound) {
         if (hasErrors()) {
             throw new IllegalStateException(
                     "Cannot bind, every clause contains errors");
@@ -101,7 +101,7 @@ public final class IfEvery implements Clause {
         ClauseWrapper<IfEvery> cw = IfEvery.create(cond.bind(atts), value.bind(atts), unit);
         IfEvery ife = cw.getClause();
         if (next != null) {
-            ife.next = next.bind(atts);
+            ife.next = next.bind(atts, bound);
         }
         return ife;
     }

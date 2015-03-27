@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,14 +33,9 @@ public final class ExecuteIf implements Clause {
         return cond.isComplete() && refresh.isComplete();
     }
 
-    @Override
-    public ExecuteIf bind(List<Attribute> atts) {
-        if (isComplete()) {
-            return this;
-        }
-
-        Expression newCond = cond.bind(atts);
-        Refresh newRef = refresh.bind(atts);
+    public ExecuteIf bind(Collection<Attribute> atts, List<Attribute> bound) {
+        Expression newCond = cond.bind(atts, bound);
+        Refresh newRef = refresh.bind(atts, bound);
         return new ExecuteIf(newCond, newRef);
     }
 

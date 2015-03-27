@@ -1,11 +1,11 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Period;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.IfEvery;
-import org.dei.perla.core.fpc.Period;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.junit.Test;
 
@@ -1172,7 +1172,7 @@ public class ParserTest {
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
-        ife = ife.bind(atts);
+        ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
         pe = ife.run(records[0]);
