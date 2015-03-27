@@ -113,6 +113,21 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void additionIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createAddition(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createAddition(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void additionErrorTest() {
         Expression err = new ErrorExpression("test");
         Expression c = Constant.create(85, DataType.INTEGER);
@@ -335,6 +350,21 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void productIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createProduct(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createProduct(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void productNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -446,6 +476,21 @@ public class ArithmeticTest {
     }
 
     @Test
+    public void divisionIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createDivision(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createDivision(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void divisionNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -528,6 +573,21 @@ public class ArithmeticTest {
         assertThat(e.run(record, null), equalTo(1 % 4));
         record = new Object[]{3};
         assertThat(e.run(record, null), equalTo(1 % 3));
+    }
+
+    @Test
+    public void moduloIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Arithmetic.createModulo(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Arithmetic.createModulo(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
     @Test
@@ -627,6 +687,14 @@ public class ArithmeticTest {
         assertThat(atts.size(), equalTo(1));
         assertTrue(atts.contains(intAtt));
         assertTrue(e.isComplete());
+    }
+
+    @Test
+    public void inverseIncompleteTest() {
+        Expression e = Arithmetic.createInverse(new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
     @Test

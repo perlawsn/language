@@ -187,6 +187,10 @@ public final class Arithmetic implements Expression {
         Object o1 = e1.run(record, buffer);
         Object o2 = e2.run(record, buffer);
 
+        if (type == null) {
+            return null;
+        }
+
         switch (type) {
             case INTEGER:
                 return computeInteger(op, o1, o2);

@@ -2,14 +2,13 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -77,6 +76,14 @@ public class BooleanTest {
         Expression e = Bool.createNOT(err);
         assertTrue(e.isComplete());
         assertTrue(e.hasErrors());
+    }
+
+    @Test
+    public void testNOTIncomplete() {
+        Expression e = Bool.createNOT(new Field("boolean"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -156,6 +163,21 @@ public class BooleanTest {
         e = Bool.createAND(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
+    public void testANDIncomplete() {
+        Expression c = Constant.create(LogicValue.TRUE, DataType.BOOLEAN);
+
+        Expression e = Bool.createAND(c, new Field("boolean"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Bool.createAND(new Field("boolean"), c);
+        assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
@@ -280,6 +302,33 @@ public class BooleanTest {
     }
 
     @Test
+    public void testORIncomplete() {
+        Expression c = Constant.create(LogicValue.FALSE, DataType.BOOLEAN);
+
+        Expression e = Bool.createOR(c, new Field("boolean"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Bool.createOR(new Field("boolean"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        c = Constant.create(LogicValue.TRUE, DataType.BOOLEAN);
+
+        e = Bool.createOR(c, new Field("boolean"));
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.TRUE));
+
+        e = Bool.createOR(new Field("boolean"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.TRUE));
+    }
+
+    @Test
     public void testORError() {
         Expression err = new ErrorExpression("test");
         Expression c = Constant.create(85, DataType.INTEGER);
@@ -394,6 +443,21 @@ public class BooleanTest {
         e = Bool.createXOR(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
+    public void testXORIncomplete() {
+        Expression c = Constant.create(LogicValue.TRUE, DataType.BOOLEAN);
+
+        Expression e = Bool.createXOR(c, new Field("boolean"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Bool.createXOR(new Field("boolean"), c);
+        assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, equalTo(LogicValue.UNKNOWN));
     }

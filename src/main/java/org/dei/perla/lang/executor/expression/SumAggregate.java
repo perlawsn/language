@@ -64,6 +64,10 @@ public final class SumAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
+        if (type == null) {
+            return 0;
+        }
+
         switch (type) {
             case INTEGER:
                 IntAccumulator si = new IntAccumulator(0);

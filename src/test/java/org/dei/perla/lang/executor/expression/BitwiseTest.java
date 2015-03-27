@@ -45,6 +45,21 @@ public class BitwiseTest {
     }
 
     @Test
+    public void bitwiseANDIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Bitwise.createAND(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Bitwise.createAND(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void bitwiseANDNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -133,6 +148,21 @@ public class BitwiseTest {
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(51452 | 93849));
+    }
+
+    @Test
+    public void bitwiseORIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Bitwise.createOR(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Bitwise.createOR(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
     @Test
@@ -227,6 +257,21 @@ public class BitwiseTest {
     }
 
     @Test
+    public void bitwiseXORIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Bitwise.createXOR(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Bitwise.createXOR(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void bitwiseXORNullTest() {
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -317,6 +362,14 @@ public class BitwiseTest {
     }
 
     @Test
+    public void bitwiseNOTIncompleteTest() {
+        Expression e = Bitwise.createNOT(new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+    }
+
+    @Test
     public void bitwiseNOTNullTest() {
         Expression e = Bitwise.createNOT(Constant.NULL);
         assertTrue(e.isComplete());
@@ -360,6 +413,21 @@ public class BitwiseTest {
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(7382 << 8));
+    }
+
+    @Test
+    public void bitwiseLSHIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Bitwise.createLSH(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Bitwise.createLSH(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
     @Test
@@ -451,6 +519,21 @@ public class BitwiseTest {
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(7382 >> 8));
+    }
+
+    @Test
+    public void bitwiseRSHIncompleteTest() {
+        Expression c = Constant.create(43, DataType.INTEGER);
+
+        Expression e = Bitwise.createRSH(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, nullValue());
+
+        e = Bitwise.createRSH(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, nullValue());
     }
 
     @Test

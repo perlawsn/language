@@ -66,6 +66,10 @@ public final class MaxAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
+        if (type == null) {
+            return null;
+        }
+
         BooleanAccumulator found = new BooleanAccumulator(false);
         switch (type) {
             case INTEGER:

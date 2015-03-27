@@ -81,7 +81,11 @@ public final class CastInteger implements Expression {
 
     @Override
     public Object run(Object[] record, BufferView buffer) {
-        return ((Float) e.run(record, buffer)).intValue();
+        Object o = e.run(record, buffer);
+        if (o == null) {
+            return null;
+        }
+        return ((Float) o).intValue();
     }
 
 }

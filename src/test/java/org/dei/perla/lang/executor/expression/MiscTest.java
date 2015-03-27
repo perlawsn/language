@@ -106,7 +106,6 @@ public class MiscTest {
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
         Expression fFloat = new Field(floatAtt.getId()).bind(atts);
-        Expression incomplete = new Field("integer");
         Expression error = new ErrorExpression("test");
         Object[] record;
 
@@ -123,33 +122,46 @@ public class MiscTest {
         assertTrue(cast.getAttributes().isEmpty());
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
         assertThat(cast.run(null, null), equalTo(1));
+    }
 
-        cast = CastInteger.create(fFloat);
-        assertTrue(cast.isComplete());
-        assertFalse(cast.hasErrors());
-        List<Attribute> as = cast.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(floatAtt));
-        assertThat(cast.getType(), equalTo(DataType.INTEGER));
-        record = new Object[]{4.4f};
-        assertThat(cast.run(record, null), equalTo(4));
-        record = new Object[]{3.3f};
-        assertThat(cast.run(record, null), equalTo(3));
-
-        cast = CastInteger.create(incomplete);
+    @Test
+    public void castIntegerBind() {
+        Expression cast = CastInteger.create(new Field("integer"));
         assertFalse(cast.isComplete());
+        cast = cast.bind(atts);
+        assertTrue(cast.isComplete());
         assertFalse(cast.hasErrors());
         cast = cast.bind(atts);
         assertTrue(cast.isComplete());
-        as = cast.getAttributes();
+        List<Attribute> as = cast.getAttributes();
         assertThat(as.size(), equalTo(1));
         assertTrue(as.contains(intAtt));
-        record = new Object[]{4};
+        Object[] record = new Object[]{4};
         assertThat(cast.run(record, null), equalTo(4));
+    }
 
-        cast = CastInteger.create(error);
+    @Test
+    public void castIntegerError() {
+        Expression err = new ErrorExpression("test");
+        Expression cast = CastInteger.create(err);
         assertTrue(cast.isComplete());
         assertTrue(cast.hasErrors());
+    }
+
+    @Test
+    public void castIntegerNull() {
+        Expression cast = CastInteger.create(Constant.NULL);
+        assertTrue(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), nullValue());
+        assertThat(cast.run(null, null), equalTo(null));
+        assertThat(cast, equalTo(Constant.NULL));
+
+        cast = CastInteger.create(new Field("incomplete"));
+        assertFalse(cast.isComplete());
+        assertFalse(cast.hasErrors());
+        assertThat(cast.getType(), equalTo(DataType.INTEGER));
+        assertThat(cast.run(null, null), equalTo(null));
     }
 
     @Test
@@ -374,31 +386,37 @@ public class MiscTest {
         record = new Object[]{true};
         assertThat(fb.run(record, null), equalTo(LogicValue.TRUE));
         record = new Object[]{null};
-        assertThat(fb.run(record, null), equalTo(Constant.NULL));
+        assertThat(fb.run(record, null), nullValue());
         record = new Object[]{false};
         assertThat(fb.run(record, null), equalTo(LogicValue.FALSE));
+
+        Expression incomplete = new Field("incomplete");
+        assertFalse(incomplete.isComplete());
+        assertFalse(incomplete.hasErrors());
+        assertThat(incomplete.run(null, null), nullValue());
     }
 
     @Test
     public void groupTSTest() {
-        Expression gts = new GroupTS();
-        assertFalse(gts.isComplete());
-        assertFalse(gts.hasErrors());
-        gts = gts.bind(atts);
-
-        List<Attribute> as = Arrays.asList(new Attribute[]{
+        List<Attribute> ra = Arrays.asList(new Attribute[]{
                 Attribute.TIMESTAMP,
                 intAtt
         });
-
         Buffer b = new ArrayBuffer(0, 1);
-        b.add(new Record(as, new Object[]{Instant.now(), 1}));
-        b.add(new Record(as, new Object[]{Instant.now(), 2}));
+        b.add(new Record(ra, new Object[]{Instant.now(), 1}));
+        b.add(new Record(ra, new Object[]{Instant.now(), 2}));
         BufferView view = b.unmodifiableView();
 
-        List<Attribute> atts = gts.getAttributes();
-        assertThat(atts.size(), equalTo(1));
-        assertTrue(atts.contains(Attribute.TIMESTAMP));
+        Expression gts = new GroupTS();
+        assertFalse(gts.isComplete());
+        assertFalse(gts.hasErrors());
+        assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
+        assertThat(gts.run(null, null), nullValue());
+
+        gts = gts.bind(atts);
+        List<Attribute> as = gts.getAttributes();
+        assertThat(as.size(), equalTo(1));
+        assertTrue(as.contains(Attribute.TIMESTAMP));
         assertTrue(gts.isComplete());
         assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
         assertThat(gts.run(null, view), equalTo(view.get(0)[0]));

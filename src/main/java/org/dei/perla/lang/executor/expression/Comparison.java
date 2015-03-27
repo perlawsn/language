@@ -122,7 +122,7 @@ public final class Comparison implements Expression {
             Object o1 = ((Constant) e1).getValue();
             Object o2 = ((Constant) e2).getValue();
             if (o1 == null || o2 == null) {
-                return Constant.NULL;
+                return Constant.UNKNOWN;
             }
             return Constant.create(compute(op, o1, o2), DataType.BOOLEAN);
         }
@@ -172,7 +172,7 @@ public final class Comparison implements Expression {
 
     private static Object compute(ComparisonOperation op, Object o1, Object o2) {
         if (o1 == null || o2 == null) {
-            return null;
+            return LogicValue.UNKNOWN;
         }
 
         @SuppressWarnings("unchecked")

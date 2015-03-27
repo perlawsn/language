@@ -94,7 +94,7 @@ public final class Between implements Expression {
     @Override
     public Object run(Object[] record, BufferView buffer) {
         Object o = e.run(record, buffer);
-        Object omin = e.run(record, buffer);
+        Object omin = min.run(record, buffer);
         Object omax = max.run(record, buffer);
 
         return compute(o, omin, omax);

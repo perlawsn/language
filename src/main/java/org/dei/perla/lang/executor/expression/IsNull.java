@@ -72,9 +72,9 @@ public final class IsNull implements Expression {
     public Object run(Object[] record, BufferView buffer) {
         Object o = e.run(record, buffer);
         if (o == null) {
-            return Constant.TRUE;
+            return LogicValue.TRUE;
         } else {
-            return Constant.FALSE;
+            return LogicValue.FALSE;
         }
     }
 

@@ -64,6 +64,10 @@ public final class AvgAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
+        if (e.getType() == null) {
+            return 0;
+        }
+
         IntAccumulator count = new IntAccumulator(0);
         switch (e.getType()) {
             case INTEGER:

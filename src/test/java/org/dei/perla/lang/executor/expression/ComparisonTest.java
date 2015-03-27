@@ -2,11 +2,6 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
-import org.dei.perla.lang.executor.ArrayBuffer;
-import org.dei.perla.lang.executor.Buffer;
-import org.dei.perla.lang.executor.BufferView;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -14,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -101,6 +95,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testEQIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createEQ(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createEQ(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testEQNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -109,19 +118,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createEQ(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createEQ(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -233,6 +242,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testNEIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createNE(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createNE(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testNENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -241,19 +265,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createNE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createNE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -354,6 +378,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testGTIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createGT(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createGT(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testGTNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -362,19 +401,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createGT(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createGT(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -479,6 +518,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testGEIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createGE(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createGE(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testGENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -487,19 +541,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createGE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createGE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -604,6 +658,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testLTIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createLT(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createLT(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testLTNull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -612,19 +681,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createLT(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createLT(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -729,6 +798,21 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testLEIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Comparison.createLE(c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Comparison.createLE(new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testLENull() {
         Expression c = Constant.create(4, DataType.INTEGER);
         Expression nul = Constant.NULL;
@@ -737,19 +821,19 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         Object res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createLE(nul, c);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
 
         e = Comparison.createLE(nul, nul);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, null);
-        assertThat(res, nullValue());
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -841,6 +925,26 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+    }
+
+    @Test
+    public void testBetweenIncomplete() {
+        Expression c = Constant.create(4, DataType.INTEGER);
+
+        Expression e = Between.create(c, c, new Field("integer"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Between.create(c, new Field("integer"), c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+
+        e = Between.create(new Field("integer"), c, c);
+        assertFalse(e.isComplete());
+        res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -977,6 +1081,14 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testIsIncomplete() {
+        Expression e = Is.create(new Field("boolean"), LogicValue.FALSE);
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
     public void testIsBind() {
         Expression f = new Field("boolean");
 
@@ -1051,6 +1163,14 @@ public class ComparisonTest {
     }
 
     @Test
+    public void testIsNullIncomplete() {
+        Expression e = IsNull.create(new Field("boolean"));
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.TRUE));
+    }
+
+    @Test
     public void testIsNullBind() {
         Expression f = new Field("integer");
 
@@ -1083,6 +1203,14 @@ public class ComparisonTest {
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
+    }
+
+    @Test
+    public void testLikeIncomplete() {
+        Expression e = Like.create(new Field("string"), "test");
+        assertFalse(e.isComplete());
+        Object res = e.run(null, null);
+        assertThat(res, equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
