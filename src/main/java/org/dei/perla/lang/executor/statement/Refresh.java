@@ -33,6 +33,14 @@ public final class Refresh implements Clause {
         this.events = events;
     }
 
+    public Duration getDuration() {
+        return d;
+    }
+
+    public List<Attribute> getEvents() {
+        return events;
+    }
+
     @Override
     public boolean hasErrors() {
         return false;
@@ -72,14 +80,6 @@ public final class Refresh implements Clause {
         }
 
         return new Refresh(names, events);
-    }
-
-    public Duration getDuration() {
-        return d;
-    }
-
-    public List<Attribute> getEvents() {
-        return events;
     }
 
 }
