@@ -170,12 +170,6 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) {
-        e1.getAttributes(atts);
-        e2.getAttributes(atts);
-    }
-
-    @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         Expression be1 = e1.bind(atts, bound);
         Expression be2 = e2.bind(atts, bound);

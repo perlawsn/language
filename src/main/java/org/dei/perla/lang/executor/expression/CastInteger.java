@@ -69,11 +69,6 @@ public final class CastInteger implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) {
-        e.getAttributes(atts);
-    }
-
-    @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         Expression be = e.bind(atts, bound);
         return CastInteger.create(be);

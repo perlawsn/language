@@ -74,7 +74,12 @@ public final class Select implements Clause {
         if (group != null) {
             bgroup = group.bind(atts, bound);
         }
-        Expression bhaving = having.bind(atts, bound);
+
+        Expression bhaving = null;
+        if (having != null) {
+            bhaving = having.bind(atts, bound);
+        }
+
         return new Select(bfields, upto, bgroup, bhaving, def);
     }
 

@@ -7,7 +7,6 @@ import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.*;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -48,54 +47,22 @@ public class SelectTest {
     private static final Expression stringExpr = new Field(stringAtt.getId());
     private static final Expression floatExpr = new Field(floatAtt.getId());
 
-    private static BufferView createView(List<Attribute> atts) {
-        Object[][] values = new Object[5][];
-        values[0] = new Object[]{
-                Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f};
-        values[1] = new Object[]{
-                Instant.parse("2015-02-23T15:07:18.000Z"), 2, "2", 2.2f};
-        values[2] = new Object[]{
-                Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f};
-        values[3] = new Object[]{
-                Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f};
-        values[4] = new Object[]{
-                Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f};
+    private static final BufferView view;
+    static {
+        Buffer b = new ArrayBuffer(0, 512);
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:15.000Z"), 1, "1", 1.1f}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:18.000Z"), 2, "2", 2.2f}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f}));
+        b.add(new Record(atts, new Object[]{
+                Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f}));
 
-        int tsIdx = atts.indexOf(Attribute.TIMESTAMP);
-        if (tsIdx == -1) {
-            atts.add(Attribute.TIMESTAMP);
-            tsIdx = atts.size() - 1;
-        }
-
-        Buffer b = new ArrayBuffer(tsIdx, 512);
-        for (int i = 0; i < 5; i++) {
-            Object[] row = new Object[atts.size()];
-            int j = 0;
-            for (Attribute a : atts) {
-                switch (a.getType()) {
-                    case TIMESTAMP:
-                        row[j] = values[i][1];
-                        break;
-                    case INTEGER:
-                        row[j] = values[i][2];
-                        break;
-                    case STRING:
-                        row[j] = values[i][3];
-                        break;
-                    case FLOAT:
-                        row[j] = values[i][3];
-                        break;
-                    default:
-                        throw new RuntimeException(
-                                "test does not support type " + a.getType());
-                }
-            }
-            b.add(new Record(atts, row));
-        }
-
-        return b.unmodifiableView();
+        view = b.unmodifiableView();
     }
-
     @Test
     public void plainSelect() throws InterruptedException {
         List<Expression> fields = new ArrayList<>();
@@ -105,9 +72,7 @@ public class SelectTest {
         fields.add(floatExpr);
 
         Select sel = new Select(fields, null, null, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(1));
@@ -132,9 +97,7 @@ public class SelectTest {
         fields.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
 
         Select sel = new Select(fields, null, null, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(1));
@@ -161,9 +124,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(3));
@@ -190,9 +151,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Select sel = new Select(fields, upto, null, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(2));
@@ -220,9 +179,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(3));
@@ -254,9 +211,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(2));
@@ -295,9 +250,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(2));
@@ -341,8 +294,7 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, def);
-        List<Attribute> bound = new ArrayList<>();
-        BufferView view = createView(bound);
+        sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(1));
@@ -362,9 +314,7 @@ public class SelectTest {
 
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
         Select sel = new Select(fields, null, group, null, null);
-        List<Attribute> bound = new ArrayList<>();
-        sel = sel.bind(atts, bound);
-        BufferView view = createView(bound);
+        sel = sel.bind(atts, atts);
         List<Object[]> records = sel.select(view);
 
         assertThat(records.size(), equalTo(3));

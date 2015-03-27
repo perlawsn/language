@@ -128,16 +128,6 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) {
-        if (e != null) {
-            e.getAttributes(atts);
-        }
-        if (filter != null) {
-            filter.getAttributes(atts);
-        }
-    }
-
-    @Override
     public final Object run(Object[] record, BufferView view) {
         Object res;
 

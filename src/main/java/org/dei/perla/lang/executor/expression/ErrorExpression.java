@@ -47,9 +47,6 @@ public final class ErrorExpression implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) { }
-
-    @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         return this;
     }

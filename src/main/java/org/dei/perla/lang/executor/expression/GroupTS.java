@@ -38,9 +38,6 @@ public class GroupTS implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) { }
-
-    @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         int i = Expression.indexOf(id, bound);
         if (i != -1) {
@@ -82,11 +79,6 @@ public class GroupTS implements Expression {
         @Override
         public boolean hasErrors() {
             return false;
-        }
-
-        @Override
-        public void getAttributes(Map<Integer, Attribute> atts) {
-            atts.put(tsIdx, Attribute.TIMESTAMP);
         }
 
         @Override

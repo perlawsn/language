@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -109,30 +108,31 @@ public class BitwiseTest {
         Expression e = Bitwise.createAND(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createAND(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createAND(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -215,30 +215,30 @@ public class BitwiseTest {
         Expression e = Bitwise.createOR(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createOR(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -321,30 +321,30 @@ public class BitwiseTest {
         Expression e = Bitwise.createXOR(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createXOR(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createXOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -394,10 +394,10 @@ public class BitwiseTest {
         Expression e = Bitwise.createNOT(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -480,30 +480,30 @@ public class BitwiseTest {
         Expression e = Bitwise.createLSH(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createLSH(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createLSH(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -586,30 +586,30 @@ public class BitwiseTest {
         Expression e = Bitwise.createRSH(f, c);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createRSH(c, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bitwise.createRSH(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

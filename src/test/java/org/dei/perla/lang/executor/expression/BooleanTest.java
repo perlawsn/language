@@ -4,11 +4,11 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -93,10 +93,10 @@ public class BooleanTest {
         Expression e = Bool.createNOT(f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -207,30 +207,30 @@ public class BooleanTest {
         Expression e = Bool.createAND(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createAND(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createAND(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -353,30 +353,30 @@ public class BooleanTest {
         Expression e = Bool.createOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -487,30 +487,30 @@ public class BooleanTest {
         Expression e = Bool.createXOR(trueExpr, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createXOR(f, trueExpr);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Bool.createXOR(f, f);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(boolAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(boolAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

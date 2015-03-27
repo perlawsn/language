@@ -67,9 +67,12 @@ public final class GroupBy implements Clause {
     }
 
     public GroupBy bind(Collection<Attribute> atts, List<Attribute> bound) {
-        List<Expression> newFields = new ArrayList<>();
-        groups.forEach(f -> newFields.add(f.bind(atts, bound)));
-        return new GroupBy(d, count, newFields);
+        if (groups == null) {
+            return new GroupBy(d, count);
+        }
+        List<Expression> bgroups = new ArrayList<>();
+        groups.forEach(f -> bgroups.add(f.bind(atts, bound)));
+        return new GroupBy(d, count, bgroups);
     }
 
     public List<BufferView> createGroups(BufferView view) {

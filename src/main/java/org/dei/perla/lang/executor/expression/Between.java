@@ -77,13 +77,6 @@ public final class Between implements Expression {
     }
 
     @Override
-    public void getAttributes(Map<Integer, Attribute> atts) {
-        e.getAttributes(atts);
-        min.getAttributes(atts);
-        max.getAttributes(atts);
-    }
-
-    @Override
     public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
         Expression be = e.bind(atts, bound);
         Expression bmin = min.bind(atts, bound);

@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,13 +54,6 @@ public class AggregateTest {
 
     @BeforeClass
     public static void setupBuffer() {
-        Attribute[] as = new Attribute[] {
-                Attribute.TIMESTAMP,
-                intAtt,
-                stringAtt,
-                floatAtt
-        };
-
         Buffer b = new ArrayBuffer(1, 512);
         b.add(new Record(atts, new Object[]{0, Instant.now()}));
         b.add(new Record(atts, new Object[]{1, Instant.now()}));
@@ -88,7 +82,7 @@ public class AggregateTest {
     @Test
     public void testIntegerSum() {
         Expression e = Aggregate.createSum(intExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -97,7 +91,7 @@ public class AggregateTest {
         assertThat(res, equalTo(10));
 
         e = Aggregate.createSum (intExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -108,7 +102,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(intExpr,
                 Constant.create(3, DataType.INTEGER));
         e = Aggregate.createSum(intExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -120,7 +114,7 @@ public class AggregateTest {
     public void testFloatSum() {
         Expression e = Aggregate.createSum(floatExpr,
                 new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -129,7 +123,7 @@ public class AggregateTest {
         assertThat(res, equalTo(11f));
 
         e = Aggregate.createSum(floatExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -140,7 +134,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(floatExpr,
                 Constant.create(2.2f, DataType.FLOAT));
         e = Aggregate.createSum(floatExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -201,10 +195,10 @@ public class AggregateTest {
         Expression e = Aggregate.createSum(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -212,30 +206,30 @@ public class AggregateTest {
         e = Aggregate.createSum(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createSum(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createSum(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -243,7 +237,7 @@ public class AggregateTest {
     @Test
     public void testIntegerAvg() {
         Expression e = Aggregate.createAvg(intExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -252,7 +246,7 @@ public class AggregateTest {
         assertThat(res, equalTo(2f));
 
         e = Aggregate.createAvg(intExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -263,7 +257,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(intExpr,
                 Constant.create(2, DataType.INTEGER));
         e = (AvgAggregate) Aggregate.createAvg(intExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -274,7 +268,7 @@ public class AggregateTest {
     @Test
     public void testFloatAvg() {
         Expression e = Aggregate.createAvg(floatExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -283,7 +277,7 @@ public class AggregateTest {
         assertThat(res, equalTo(11f / 5));
 
         e = (AvgAggregate) Aggregate.createAvg(floatExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         res = e.run(null, floatView);
         assertTrue(res instanceof Float);
         assertThat(res, equalTo(3.3f));
@@ -291,7 +285,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(floatExpr,
                 Constant.create(2.2f, DataType.FLOAT));
         e = Aggregate.createAvg(floatExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         res = e.run(null, floatView);
         assertThat(res, equalTo(7.7f / 2));
     }
@@ -349,40 +343,40 @@ public class AggregateTest {
         Expression e = Aggregate.createAvg(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createAvg(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -390,7 +384,7 @@ public class AggregateTest {
     @Test
     public void testIntegerMin() {
         Expression e = Aggregate.createMin(intExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -399,7 +393,7 @@ public class AggregateTest {
         assertThat(res, equalTo(0));
 
         e = Aggregate.createMin(intExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -410,7 +404,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(intExpr,
                 Constant.create(3, DataType.INTEGER));
         e = Aggregate.createMin(intExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -421,7 +415,7 @@ public class AggregateTest {
     @Test
     public void testFloatMin() {
         Expression e = Aggregate.createMin(floatExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -430,7 +424,7 @@ public class AggregateTest {
         assertThat(res, equalTo(0f));
 
         e = Aggregate.createMin(floatExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, floatView);
@@ -440,7 +434,7 @@ public class AggregateTest {
         Expression filter = Comparison.createGT(floatExpr,
                 Constant.create(2.2f, DataType.FLOAT));
         e = Aggregate.createMin(floatExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, floatView);
@@ -450,7 +444,7 @@ public class AggregateTest {
     @Test
     public void testInstantMin() {
         Expression e = Aggregate.createMin(tsExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -459,7 +453,7 @@ public class AggregateTest {
         assertThat(res, equalTo(tsView.get(4)[0]));
 
         e = Aggregate.createMin(tsExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, tsView);
@@ -514,40 +508,40 @@ public class AggregateTest {
         Expression e = Aggregate.createMin(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMin(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -555,7 +549,7 @@ public class AggregateTest {
     @Test
     public void testIntegerMax() {
         Expression e = Aggregate.createMax(intExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -564,7 +558,7 @@ public class AggregateTest {
         assertThat(res, equalTo(4));
 
         e = Aggregate.createMax(intExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -575,7 +569,7 @@ public class AggregateTest {
         Expression filter = Comparison.createLT(intExpr,
                 Constant.create(3, DataType.INTEGER));
         e = Aggregate.createMax(intExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -586,7 +580,7 @@ public class AggregateTest {
     @Test
     public void testFloatMax() {
         Expression e = Aggregate.createMax(floatExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -595,7 +589,7 @@ public class AggregateTest {
         assertThat(res, equalTo(4.4f));
 
         e = Aggregate.createMax(floatExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, floatView);
@@ -605,7 +599,7 @@ public class AggregateTest {
         Expression filter = Comparison.createLT(floatExpr,
                 Constant.create(4.4f, DataType.FLOAT));
         e = Aggregate.createMax(floatExpr, new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, floatView);
@@ -615,7 +609,7 @@ public class AggregateTest {
     @Test
     public void testInstantMax() {
         Expression e = Aggregate.createMax(tsExpr, new WindowSize(5), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.TIMESTAMP));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
@@ -624,7 +618,7 @@ public class AggregateTest {
         assertThat(res, equalTo(tsView.get(0)[0]));
 
         e = Aggregate.createMax(tsExpr, new WindowSize(3), null);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, tsView);
@@ -679,40 +673,40 @@ public class AggregateTest {
         Expression e = Aggregate.createMax(exp, new WindowSize(3), null);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(exp, new WindowSize(3), cFilt);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(exp, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
 
         e = Aggregate.createMax(e, new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        bound.clear();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }
@@ -737,7 +731,7 @@ public class AggregateTest {
         Expression filter = Comparison.createLT(intExpr,
                 Constant.create(3, DataType.INTEGER));
         e = Aggregate.createCount(new WindowSize(5), filter);
-        e = e.bind(atts);
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         res = e.run(null, intView);
@@ -774,10 +768,10 @@ public class AggregateTest {
         Expression e = Aggregate.createCount(new WindowSize(3), filter);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
-        e = e.bind(atts);
-        List<Attribute> as = e.getAttributes();
-        assertThat(as.size(), equalTo(1));
-        assertTrue(as.contains(intAtt));
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
     }

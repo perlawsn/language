@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -527,8 +528,11 @@ public class ArrayBufferTest {
 
         count.value = 0;
         sub = v.subView(11);
+        List<Attribute> bound = new ArrayList<>();
+        bound.add(Attribute.TIMESTAMP);
+        bound.add(Attribute.create("integer", DataType.INTEGER));
         Expression where = Comparison.createGT(new Field("integer"),
-                Constant.create(5, DataType.INTEGER)).bind(atts);
+                Constant.create(5, DataType.INTEGER)).bind(atts, bound);
         sub.forEach((r, view) -> count.value++, where);
         assertThat(count.value, equalTo(5));
         sub.release();

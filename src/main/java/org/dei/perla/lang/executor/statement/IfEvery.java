@@ -98,7 +98,10 @@ public final class IfEvery implements Clause {
             return this;
         }
 
-        ClauseWrapper<IfEvery> cw = IfEvery.create(cond.bind(atts), value.bind(atts), unit);
+        Expression bcond = cond.bind(atts, bound);
+        Expression bvalue = value.bind(atts, bound);
+
+        ClauseWrapper<IfEvery> cw = IfEvery.create(bcond, bvalue, unit);
         IfEvery ife = cw.getClause();
         if (next != null) {
             ife.next = next.bind(atts, bound);
