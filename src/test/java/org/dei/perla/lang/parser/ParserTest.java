@@ -1,7 +1,6 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.fpc.Period;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
@@ -1140,7 +1139,7 @@ public class ParserTest {
     public void testIfEveryClause() throws Exception {
         Parser p;
         IfEvery ife;
-        Period pe;
+        Duration d;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("every 5 seconds"));
@@ -1148,9 +1147,8 @@ public class ParserTest {
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
-        pe = ife.run(null);
-        assertThat(pe.getValue(), equalTo(5));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
+        d = ife.run(null);
+        assertThat(d, equalTo(Duration.ofSeconds(5)));
 
         p.ReInit(new StringReader(
                 "if false every 10 seconds else every 2 days"));
@@ -1158,9 +1156,8 @@ public class ParserTest {
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
-        pe = ife.run(null);
-        assertThat(pe.getValue(), equalTo(2));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.DAYS));
+        d = ife.run(null);
+        assertThat(d, equalTo(Duration.ofDays(2)));
 
         p.ReInit(new StringReader(
                 "if power > 80 every 10 seconds " +
@@ -1175,18 +1172,14 @@ public class ParserTest {
         ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
-        pe = ife.run(records[0]);
-        assertThat(pe.getValue(), equalTo(10));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
-        pe = ife.run(records[1]);
-        assertThat(pe.getValue(), equalTo(40));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.SECONDS));
-        pe = ife.run(records[2]);
-        assertThat(pe.getValue(), equalTo(2));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.MINUTES));
-        pe = ife.run(records[3]);
-        assertThat(pe.getValue(), equalTo(1));
-        assertThat(pe.getUnit(), equalTo(ChronoUnit.HOURS));
+        d = ife.run(records[0]);
+        assertThat(d, equalTo(Duration.ofSeconds(10)));
+        d = ife.run(records[1]);
+        assertThat(d, equalTo(Duration.ofSeconds(40)));
+        d = ife.run(records[2]);
+        assertThat(d, equalTo(Duration.ofMinutes(2)));
+        d = ife.run(records[3]);
+        assertThat(d, equalTo(Duration.ofHours(1)));
     }
 
 }

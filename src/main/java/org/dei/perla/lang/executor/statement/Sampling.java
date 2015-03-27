@@ -70,7 +70,7 @@ public final class Sampling implements Clause {
         return ifevery.isComplete();
     }
 
-    public Clause bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public Sampling bind(Collection<Attribute> atts, List<Attribute> bound) {
         IfEvery bifevery = ifevery.bind(atts, bound);
 
         Refresh brefresh = null;

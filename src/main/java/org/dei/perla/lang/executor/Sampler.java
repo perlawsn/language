@@ -23,9 +23,8 @@ public final class Sampler {
         Conditions.checkIllegalArgument(sampling.hasErrors(),
                 "Sampling clause contains errors.");
 
-        this.sampling = sampling;
         this.fpc = fpc;
-
+        this.sampling = sampling;
     }
 
 }

@@ -1,12 +1,12 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.fpc.Period;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.CastInteger;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
 
+import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.List;
@@ -101,13 +101,13 @@ public final class IfEvery implements Clause {
         return ife;
     }
 
-    public Period run(Object[] record) {
+    public Duration run(Object[] record) {
         LogicValue c = (LogicValue) cond.run(record, null);
         if (!c.toBoolean()) {
             return next.run(record);
         }
         int v = (int) value.run(record, null);
-        return new Period(v, unit);
+        return Duration.of(v, unit);
     }
 
 }

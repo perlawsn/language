@@ -1,7 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.fpc.Period;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
@@ -9,14 +8,13 @@ import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.Field;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 23/03/15.
@@ -58,7 +56,7 @@ public class IfEveryTest {
     @Test
     public void testSingle() {
         IfEvery e;
-        Period p;
+        Duration d;
         ClauseWrapper<IfEvery> cw;
         Expression cInt = Constant.create(5, DataType.INTEGER);
         Expression cFloat = Constant.create(3.4f, DataType.FLOAT);
@@ -69,16 +67,16 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
-        p = e.run(null);
-        assertThat(p.getValue(), equalTo(5));
+        d = e.run(null);
+        assertThat(d, equalTo(Duration.ofDays(5)));
 
         cw = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
-        p = e.run(null);
-        assertThat(p.getValue(), equalTo(3));
+        d = e.run(null);
+        assertThat(d, equalTo(Duration.ofDays(3)));
 
         cw = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
         assertTrue(cw.hasError());
@@ -130,7 +128,7 @@ public class IfEveryTest {
 
     @Test
     public void testMultiple() {
-        Period p;
+        Duration d;
         IfEvery ife;
         IfEvery last;
         ClauseWrapper<IfEvery> cw;
@@ -162,14 +160,14 @@ public class IfEveryTest {
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
 
-        p = ife.run(records[0]);
-        assertThat(p.getValue(), equalTo(0));
-        p = ife.run(records[1]);
-        assertThat(p.getValue(), equalTo(1));
-        p = ife.run(records[2]);
-        assertThat(p.getValue(), equalTo(2));
-        p = ife.run(records[3]);
-        assertThat(p.getValue(), equalTo(3));
+        d = ife.run(records[0]);
+        assertThat(d, equalTo(Duration.ofSeconds(0)));
+        d = ife.run(records[1]);
+        assertThat(d, equalTo(Duration.ofSeconds(1)));
+        d = ife.run(records[2]);
+        assertThat(d, equalTo(Duration.ofSeconds(2)));
+        d = ife.run(records[3]);
+        assertThat(d, equalTo(Duration.ofSeconds(3)));
     }
 
 }
