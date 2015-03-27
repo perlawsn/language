@@ -395,8 +395,6 @@ TOKEN :
 	< FUNCTION_MIN:       "MIN"       >
     |
 	< FUNCTION_SUM:       "SUM"       >
-//  |
-//	< FUNCTION_TIMESTAMP: "TIMESTAMP" >
 }
 
 /*
