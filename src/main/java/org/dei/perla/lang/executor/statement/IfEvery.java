@@ -14,55 +14,45 @@ import java.util.List;
 /**
  * @author Guido Rota 23/03/15.
  */
-public final class IfEvery implements Clause {
+public class IfEvery implements Clause {
 
     private final Expression cond;
     private final Expression value;
     private final TemporalUnit unit;
-    private final boolean err;
 
     private IfEvery next = null;
 
-    private IfEvery(Expression cond, Expression value, TemporalUnit unit,
-            boolean err) {
+    private IfEvery(Expression cond, Expression value, TemporalUnit unit) {
         this.cond = cond;
         this.value = value;
         this.unit = unit;
-        this.err = err;
     }
 
-    public static ClauseWrapper<IfEvery> create(IfEvery previous,
-            Expression cond, Expression value, TemporalUnit unit) {
-        ClauseWrapper<IfEvery> cw = create(cond, value, unit);
-        if (previous != null) {
-            previous.setNext(cw.getClause());
-        }
-        return cw;
-    }
-
-    public static ClauseWrapper<IfEvery> create(Expression cond,
+    public static IfEvery create(IfEvery previous, Expression cond,
             Expression value, TemporalUnit unit) {
-        boolean err = false;
-        String emsg = null;
+        IfEvery ife = IfEvery.create(cond, value, unit);
+        previous.setNext(ife);
+        return ife;
+    }
 
+    public static IfEvery create(Expression cond, Expression value,
+            TemporalUnit unit) {
         DataType t = cond.getType();
         if (t != null && t != DataType.BOOLEAN) {
-            err = true;
-            emsg = "Incompatible data type, if-every condition must by of " +
-                    "type boolean";
+            return new ErrorIfEvery("Incompatible data type, if-every " +
+                    "condition must by of type boolean");
         }
         t = value.getType();
         if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
-            err = true;
-            emsg = "Incompatible data type, if-every sampling period must be " +
-                    "a numeric value";
+            return new ErrorIfEvery("Incompatible data type, if-every " +
+                    "sampling period must be a numeric value");
         }
 
         if (t == DataType.FLOAT) {
             value = CastInteger.create(value);
         }
 
-        return new ClauseWrapper<>(new IfEvery(cond, value, unit, err), emsg);
+        return new IfEvery(cond, value, unit);
     }
 
     private void setNext(IfEvery next) {
@@ -78,7 +68,7 @@ public final class IfEvery implements Clause {
         if (next != null && next.hasErrors()) {
             return true;
         }
-        return value.hasErrors() || cond.hasErrors() || err;
+        return value.hasErrors() || cond.hasErrors();
     }
 
     @Override
@@ -93,8 +83,7 @@ public final class IfEvery implements Clause {
         Expression bcond = cond.bind(atts, bound);
         Expression bvalue = value.bind(atts, bound);
 
-        ClauseWrapper<IfEvery> cw = IfEvery.create(bcond, bvalue, unit);
-        IfEvery ife = cw.getClause();
+        IfEvery ife = IfEvery.create(bcond, bvalue, unit);
         if (next != null) {
             ife.next = next.bind(atts, bound);
         }
@@ -108,6 +97,44 @@ public final class IfEvery implements Clause {
         }
         int v = (int) value.run(record, null);
         return Duration.of(v, unit);
+    }
+
+    /**
+     * @author Guido Rota 30/03/2015
+     */
+    public static class ErrorIfEvery extends IfEvery {
+
+        private final String message;
+
+        private ErrorIfEvery(String message) {
+            super(null, null, null);
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        @Override
+        public boolean hasErrors() {
+            return true;
+        }
+
+        @Override
+        public boolean isComplete() {
+            return true;
+        }
+
+        @Override
+        public IfEvery bind(Collection<Attribute> atts, List<Attribute> bound) {
+            return this;
+        }
+
+        public Duration run(Object[] record) {
+            throw new RuntimeException(
+                    "Cannot run, IF-EVERY instance has an error");
+        }
+
     }
 
 }

@@ -29,8 +29,8 @@ public final class Refresh implements Clause {
 
     private Refresh(Set<String> names, List<Attribute> events) {
         d = null;
-        this.names = names;
-        this.events = events;
+        this.names = Collections.unmodifiableSet(names);
+        this.events = Collections.unmodifiableList(events);
     }
 
     public Duration getDuration() {
@@ -73,7 +73,6 @@ public final class Refresh implements Clause {
             return this;
         }
 
-        events = Collections.unmodifiableList(events);
         return new Refresh(names, events);
     }
 

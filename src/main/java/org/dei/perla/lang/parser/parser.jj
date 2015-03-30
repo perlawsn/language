@@ -36,6 +36,7 @@ PARSER_BEGIN(Parser)
     import org.dei.perla.lang.executor.statement.WindowSize;
     import org.dei.perla.lang.executor.expression.*;
     import org.dei.perla.lang.executor.statement.*;
+    import org.dei.perla.lang.executor.statement.IfEvery.ErrorIfEvery;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -53,11 +54,11 @@ PARSER_BEGIN(Parser)
 	        addError(((ErrorExpression) e).getError(), t, err);
 	    }
 
-	    private static void addIfError(ClauseWrapper<?> cw, Token t, Errors err) {
-	        if (!cw.hasError()) {
-	            return;
-	        }
-	        addError(cw.getError(), t, err);
+	    private static void addIfError(IfEvery ife, Token t, Errors err) {
+	    	if (!(ife instanceof ErrorIfEvery)) {
+	    		return;
+	    	}
+	    	addError(((ErrorIfEvery) ife).getMessage(), t, err);
 	    }
 
 	}
@@ -671,6 +672,8 @@ Selection SelectionStatement(Errors err) :
     Expression having = null;
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
+    Sampling sampling;
+    Expression where = null;
 
     Select sel;
 }
@@ -703,12 +706,12 @@ Selection SelectionStatement(Errors err) :
 	    }
 	    sel = new Select(fields, upto, gby, having, def);
 	}
-	SamplingClause(err)
+	sampling = SamplingClause(err)
 	[
 		// This optional where clause filters the sampled values before adding
 		// them to the local buffer
 	    <KEYWORD_WHERE>
-	    Expression(false, err) // No aggregates allowed
+	    where = Expression(false, err) // No aggregates allowed
 	]
 	[
 		ExecuteIfClause(err)
@@ -914,7 +917,6 @@ IfEvery IfEveryClause(Errors err) :
     IfEvery ife = null;
     IfEvery prev = null;
 
-    ClauseWrapper<IfEvery> cw;
     Every every;
     Expression cond;
     Expression value;
@@ -931,16 +933,13 @@ IfEvery IfEveryClause(Errors err) :
 		    every = EveryDuration(err)
 		    {
 		        if (ife == null) {
-		            cw = IfEvery.create(cond, every.getValue(),
+		            ife = IfEvery.create(cond, every.getValue(),
 		                every.getUnit());
-		            addIfError(cw, token, err);
-		            ife = cw.getClause();
+		            addIfError(ife, token, err);
 		            prev = ife;
 		        } else {
-                    cw = IfEvery.create(prev, cond, every.getValue(),
+                    prev = IfEvery.create(prev, cond, every.getValue(),
                         every.getUnit());
-                    addIfError(cw, token, err);
-                    prev = cw.getClause();
 		        }
 		    }
 		)+
@@ -949,9 +948,9 @@ IfEvery IfEveryClause(Errors err) :
 			<KEYWORD_EVERY>
 			every = EveryDuration(err)
 			{
-			    cw = IfEvery.create(prev, Constant.TRUE, every.getValue(),
+			    prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
 			        every.getUnit());
-			    addIfError(cw, token, err);
+			    addIfError(prev, token, err);
 			}
 		)
 		{ return ife; }
@@ -961,10 +960,9 @@ IfEvery IfEveryClause(Errors err) :
 	    <KEYWORD_EVERY>
 	    every = EveryDuration(err)
 	    {
-	        cw = IfEvery.create(Constant.TRUE, every.getValue(),
+	        ife = IfEvery.create(Constant.TRUE, every.getValue(),
 	            every.getUnit());
-	        addIfError(cw, token, err);
-	        ife = cw.getClause();
+	        addIfError(ife, token, err);
 	    }
 	)
 	{ return ife; }

@@ -46,7 +46,7 @@ public class SamplingTest {
     public void testSamplingIfEvery() {
         IfEvery ife = IfEvery.create(Constant.TRUE,
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS).getClause();
+                ChronoUnit.SECONDS);
         Refresh refresh = new Refresh(Duration.ofMinutes(10));
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
@@ -63,7 +63,7 @@ public class SamplingTest {
     public void testSamplingIfEveryBind() {
         IfEvery ife = IfEvery.create(new Field("boolean"),
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS).getClause();
+                ChronoUnit.SECONDS);
         Refresh refresh = new Refresh(names);
 
         SamplingIfEvery s = new SamplingIfEvery(ife,

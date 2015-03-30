@@ -14,13 +14,12 @@ public class SamplingEvent implements Sampling {
     private final List<Attribute> events;
 
     public SamplingEvent(Set<String> events) {
-        this.names = events;
-        this.events = Collections.emptyList();
+        this(events, Collections.emptyList());
     }
 
     private SamplingEvent(Set<String> names, List<Attribute> events) {
-        this.names = names;
-        this.events = events;
+        this.names = Collections.unmodifiableSet(names);
+        this.events = Collections.unmodifiableList(events);
     }
 
     public List<Attribute> getEvents() {

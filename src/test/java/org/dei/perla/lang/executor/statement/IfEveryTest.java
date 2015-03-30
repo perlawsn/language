@@ -57,41 +57,31 @@ public class IfEveryTest {
     public void testSingle() {
         IfEvery e;
         Duration d;
-        ClauseWrapper<IfEvery> cw;
         Expression cInt = Constant.create(5, DataType.INTEGER);
         Expression cFloat = Constant.create(3.4f, DataType.FLOAT);
         Expression cString = Constant.create("test", DataType.STRING);
 
-        cw = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(5)));
 
-        cw = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(3)));
 
-        cw = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
-        assertTrue(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
         assertTrue(e.hasErrors());
     }
 
     @Test
     public void testBind() {
-        ClauseWrapper<IfEvery> cw;
         IfEvery e;
 
-        cw = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
@@ -101,9 +91,7 @@ public class IfEveryTest {
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
 
-        cw = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
@@ -113,9 +101,7 @@ public class IfEveryTest {
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(floatAtt));
 
-        cw = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
@@ -126,9 +112,7 @@ public class IfEveryTest {
         assertTrue(bound.contains(floatAtt));
         assertTrue(bound.contains(boolAtt));
 
-        cw = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        e = cw.getClause();
+        e = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
@@ -144,7 +128,6 @@ public class IfEveryTest {
         Duration d;
         IfEvery ife;
         IfEvery last;
-        ClauseWrapper<IfEvery> cw;
         Expression cond;
         Expression field = new Field("integer");
         Expression c0 = Constant.create(0, DataType.INTEGER);
@@ -152,20 +135,12 @@ public class IfEveryTest {
         Expression c2 = Constant.create(2, DataType.INTEGER);
 
         cond = Comparison.createEQ(field, c0);
-        cw = IfEvery.create(cond, field, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        ife = last = cw.getClause();
+        ife = last = IfEvery.create(cond, field, ChronoUnit.SECONDS);
         cond = Comparison.createEQ(field, c1);
-        cw = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        last = cw.getClause();
+        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
         cond = Comparison.createEQ(field, c2);
-        cw = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        last = cw.getClause();
-        cw = IfEvery.create(last, Constant.TRUE, field, ChronoUnit.SECONDS);
-        assertFalse(cw.hasError());
-        last = cw.getClause();
+        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
+        last = IfEvery.create(last, Constant.TRUE, field, ChronoUnit.SECONDS);
 
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
