@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.IfEvery;
+import org.dei.perla.lang.executor.statement.UnsupportedSamplingRate;
 import org.dei.perla.lang.executor.statement.WindowSize;
 import org.junit.Test;
 

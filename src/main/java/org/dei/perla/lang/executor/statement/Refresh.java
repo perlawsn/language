@@ -18,12 +18,12 @@ public final class Refresh implements Clause {
     public Refresh(Duration d) {
         this.d = d;
         names = null;
-        events = null;
+        events = Collections.emptyList();
     }
 
     public Refresh(Set<String> events) {
         this.names = Collections.unmodifiableSet(events);
-        this.events = null;
+        this.events = Collections.emptyList();
         d = null;
     }
 
@@ -55,16 +55,16 @@ public final class Refresh implements Clause {
         }
     }
 
-    public Refresh bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public Refresh bind(Collection<Attribute> atts) {
         if (names == null) {
             return this;
         }
 
         List<Attribute> events = new ArrayList<>();
         for (String e : names) {
-            int i = Expression.indexOf(e, bound);
+            int i = Expression.indexOf(e, events);
             if (i > 0) {
-                events.add(bound.get(i));
+                events.add(events.get(i));
             }
 
             Attribute a = Expression.getById(e, atts);
@@ -72,7 +72,6 @@ public final class Refresh implements Clause {
                 continue;
             }
             events.add(a);
-            bound.add(a);
         }
 
         if (events.size() == 0) {

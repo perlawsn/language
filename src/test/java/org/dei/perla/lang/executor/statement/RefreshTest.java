@@ -26,7 +26,7 @@ public class RefreshTest {
         assertTrue(r.isComplete());
         assertFalse(r.hasErrors());
         assertThat(r.getDuration(), equalTo(d));
-        assertThat(r.getEvents(), nullValue());
+        assertThat(r.getEvents().size(), equalTo(0));
     }
 
     @Test
@@ -46,10 +46,12 @@ public class RefreshTest {
         Refresh r = new Refresh(names);
         assertFalse(r.isComplete());
         assertFalse(r.hasErrors());
-        List<Attribute> bound = new ArrayList<>();
-        r = r.bind(atts, bound);
+        List<Attribute> bound = r.getEvents();
+        assertThat(bound.size(), equalTo(0));
+        r = r.bind(atts);
         assertTrue(r.isComplete());
         assertFalse(r.hasErrors());
+        bound = r.getEvents();
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(lb));
         assertTrue(bound.contains(al));

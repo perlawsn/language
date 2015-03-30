@@ -1,4 +1,4 @@
-package org.dei.perla.lang.parser;
+package org.dei.perla.lang.executor.statement;
 
 /**
  * @author Guido Rota 13/03/15.

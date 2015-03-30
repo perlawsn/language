@@ -37,7 +37,7 @@ public final class ExecuteIf implements Clause {
         Expression bcond = cond.bind(atts, bound);
         Refresh brefresh = null;
         if (refresh != null) {
-            brefresh = refresh.bind(atts, bound);
+            brefresh = refresh.bind(atts);
         }
         return new ExecuteIf(bcond, brefresh);
     }

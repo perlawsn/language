@@ -705,6 +705,12 @@ Selection SelectionStatement(Errors err) :
 	}
 	SamplingClause(err)
 	[
+		// This optional where clause filters the sampled values before adding
+		// them to the local buffer
+	    <KEYWORD_WHERE>
+	    Expression(false, err) // No aggregates allowed
+	]
+	[
 		ExecuteIfClause(err)
 	]
 	[
@@ -856,27 +862,29 @@ OnEmptySelection OnEmptySelectionClause() :
 	)
 }
 
-void SamplingClause(Errors err) :
-{}
+Sampling SamplingClause(Errors err) :
+{
+	IfEvery ife;
+	UnsupportedSamplingRate usr = UnsupportedSamplingRate.DO_NOT_SAMPLE;
+	Refresh refresh = null;
+}
 {
 	<KEYWORD_SAMPLING>
 	(
 		OnEventClause()
+		{ return null; }
 		|
 		(
-			SamplingIfEveryClause(err)
+			ife = SamplingIfEveryClause(err)
 			[
-				OnUnsupportedSRClause()
+				usr = OnUnsupportedSRClause()
 			]
 			[
-				RefreshClause()
+				refresh = RefreshClause()
 			]
+			{ return new SamplingIfEvery(ife, usr, refresh); }
 		)
 	)
-	[
-	    <KEYWORD_WHERE>
-	    Expression(false, err) // No aggregates allowed
-	]
 }
 
 Set<String> OnEventClause() :

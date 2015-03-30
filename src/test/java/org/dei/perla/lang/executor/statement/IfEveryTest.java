@@ -94,36 +94,49 @@ public class IfEveryTest {
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts, new ArrayList<>());
+        List<Attribute> bound = new ArrayList<>();
+        e = e.bind(atts, bound);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(intAtt));
 
         cw = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts, new ArrayList<>());
+        bound.clear();
+        e = e.bind(atts, bound);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(floatAtt));
 
         cw = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts, new ArrayList<>());
+        bound.clear();
+        e = e.bind(atts, bound);
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
+        assertThat(bound.size(), equalTo(2));
+        assertTrue(bound.contains(floatAtt));
+        assertTrue(bound.contains(boolAtt));
 
         cw = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
         assertFalse(cw.hasError());
         e = cw.getClause();
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
-        e = e.bind(atts, new ArrayList<>());
+        bound.clear();
+        e = e.bind(atts, bound);
         assertTrue(e.hasErrors());
         assertTrue(e.isComplete());
+        assertThat(bound.size(), equalTo(1));
+        assertTrue(bound.contains(stringAtt));
     }
 
     @Test
