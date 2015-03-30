@@ -1,12 +1,9 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
-import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -14,18 +11,22 @@ import java.util.List;
 public final class SamplingIfEvery implements Sampling {
 
     private final IfEvery ifevery;
-    private final UnsupportedSamplingRate usr;
+    private final RatePolicy ratePolicy;
     private final Refresh refresh;
 
-    public SamplingIfEvery(IfEvery ifevery, UnsupportedSamplingRate usr,
+    public SamplingIfEvery(IfEvery ifevery, RatePolicy ratePolicy,
             Refresh refresh) {
         this.ifevery = ifevery;
-        this.usr = usr;
+        this.ratePolicy = ratePolicy;
         this.refresh = refresh;
     }
 
     public IfEvery getIfEvery() {
         return ifevery;
+    }
+
+    public RatePolicy getRatePolicy() {
+        return ratePolicy;
     }
 
     public Refresh getRefresh() {
@@ -45,16 +46,15 @@ public final class SamplingIfEvery implements Sampling {
         return ifevery.isComplete();
     }
 
-    public SamplingIfEvery bind(Collection<Attribute> atts, List<Attribute> bound) {
-        List<Attribute> sampBound = new ArrayList<>();
-        IfEvery bifevery = ifevery.bind(atts, sampBound);
+    public SamplingIfEvery bind(Collection<Attribute> atts) {
+        IfEvery bifevery = ifevery.bind(atts, new ArrayList<>());
 
         Refresh brefresh = null;
         if (refresh != null) {
             brefresh = refresh.bind(atts);
         }
 
-        return new SamplingIfEvery(bifevery, usr, brefresh);
+        return new SamplingIfEvery(bifevery, ratePolicy, brefresh);
     }
 
 }

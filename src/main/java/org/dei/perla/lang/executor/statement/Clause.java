@@ -1,9 +1,5 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.record.Attribute;
-
-import java.util.*;
-
 /**
  * @author Guido Rota 23/03/15.
  */

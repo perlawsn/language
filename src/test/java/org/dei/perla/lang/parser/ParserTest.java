@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -25,11 +26,18 @@ public class ParserTest {
 
     private static final Attribute powerAtt =
             Attribute.create("power", DataType.INTEGER);
+    private static final Attribute alertAtt =
+            Attribute.create("alert", DataType.BOOLEAN);
+    private static final Attribute lowPowerAtt =
+            Attribute.create("low_power", DataType.BOOLEAN);
 
     private static final List<Attribute> atts;
     static {
-        atts = new ArrayList<>();
-        atts.add(powerAtt);
+        atts = Arrays.asList(new Attribute[]{
+                powerAtt,
+                alertAtt,
+                lowPowerAtt
+        });
     }
 
     private static final Object[][] records;
@@ -1098,18 +1106,18 @@ public class ParserTest {
     @Test
     public void testOnUnsupportedSR() throws Exception {
         Parser p;
-        UnsupportedSamplingRate usr;
+        RatePolicy usr;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("on unsupported sample rate slow down"));
         usr = p.OnUnsupportedSRClause();
         assertTrue(err.isEmpty());
-        assertThat(usr, equalTo(UnsupportedSamplingRate.SLOW_DOWN));
+        assertThat(usr, equalTo(RatePolicy.SLOW_DOWN));
 
         p.ReInit(new StringReader("on unsupported sample rate do not sample"));
         assertTrue(err.isEmpty());
         usr = p.OnUnsupportedSRClause();
-        assertThat(usr, equalTo(UnsupportedSamplingRate.DO_NOT_SAMPLE));
+        assertThat(usr, equalTo(RatePolicy.DO_NOT_SAMPLE));
     }
 
     @Test
@@ -1222,6 +1230,26 @@ public class ParserTest {
         assertThat(d, equalTo(Duration.ofMinutes(2)));
         d = ife.run(records[3]);
         assertThat(d, equalTo(Duration.ofHours(1)));
+    }
+
+    @Test
+    public void testSamplingEvent() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "sampling on event alert, low_power"));
+        Sampling s = p.SamplingClause(err);
+        assertTrue(err.isEmpty());
+        assertFalse(s.isComplete());
+        assertFalse(s.hasErrors());
+        assertTrue(s instanceof SamplingEvent);
+        s = s.bind(atts);
+        assertTrue(s.isComplete());
+        assertFalse(s.hasErrors());
+        List<Attribute> bound = ((SamplingEvent) s).getEvents();
+        assertThat(bound.size(), equalTo(2));
+        assertTrue(bound.contains(lowPowerAtt));
+        assertTrue(bound.contains(alertAtt));
     }
 
 }

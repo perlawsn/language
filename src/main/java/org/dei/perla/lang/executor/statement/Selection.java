@@ -35,7 +35,7 @@ public final class Selection implements Statement {
     public Selection bind(Collection<Attribute> atts) {
         List<Attribute> bound = new ArrayList<>();
         Select bselect = select.bind(atts, bound);
-        Sampling bsampling = sampling.bind(atts, bound);
+        Sampling bsampling = sampling.bind(atts);
         return new Selection(bselect, every, bsampling);
     }
 

@@ -3,38 +3,24 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
-import java.time.Duration;
 import java.util.*;
 
 /**
- * @author Guido Rota 16/03/15.
+ * @author Guido Rota 30/03/15.
  */
-public final class Refresh implements Clause {
+public class SamplingEvent implements Sampling {
 
-    private final Duration d;
     private final Set<String> names;
     private final List<Attribute> events;
 
-    public Refresh(Duration d) {
-        this.d = d;
-        names = null;
-        events = Collections.emptyList();
-    }
-
-    public Refresh(Set<String> events) {
-        this.names = Collections.unmodifiableSet(events);
+    public SamplingEvent(Set<String> events) {
+        this.names = events;
         this.events = Collections.emptyList();
-        d = null;
     }
 
-    private Refresh(Set<String> names, List<Attribute> events) {
-        d = null;
+    private SamplingEvent(Set<String> names, List<Attribute> events) {
         this.names = names;
         this.events = events;
-    }
-
-    public Duration getDuration() {
-        return d;
     }
 
     public List<Attribute> getEvents() {
@@ -48,18 +34,11 @@ public final class Refresh implements Clause {
 
     @Override
     public boolean isComplete() {
-        if (names == null) {
-            return d != null;
-        } else {
-            return events != null && names.size() == events.size();
-        }
+        return !events.isEmpty();
     }
 
-    public Refresh bind(Collection<Attribute> atts) {
-        if (names == null) {
-            return this;
-        }
-
+    @Override
+    public SamplingEvent bind(Collection<Attribute> atts) {
         List<Attribute> events = new ArrayList<>();
         for (String e : names) {
             Attribute a = Expression.getById(e, atts);
@@ -74,7 +53,7 @@ public final class Refresh implements Clause {
         }
 
         events = Collections.unmodifiableList(events);
-        return new Refresh(names, events);
+        return new SamplingEvent(names, events);
     }
 
 }

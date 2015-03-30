@@ -864,25 +864,27 @@ OnEmptySelection OnEmptySelectionClause() :
 
 Sampling SamplingClause(Errors err) :
 {
+	Set<String> events;
+
 	IfEvery ife;
-	UnsupportedSamplingRate usr = UnsupportedSamplingRate.DO_NOT_SAMPLE;
+	RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
 	Refresh refresh = null;
 }
 {
 	<KEYWORD_SAMPLING>
 	(
-		OnEventClause()
-		{ return null; }
+		events = OnEventClause()
+		{ return new SamplingEvent(events); }
 		|
 		(
 			ife = IfEveryClause(err)
 			[
-				usr = OnUnsupportedSRClause()
+				policy = OnUnsupportedSRClause()
 			]
 			[
 				refresh = RefreshClause()
 			]
-			{ return new SamplingIfEvery(ife, usr, refresh); }
+			{ return new SamplingIfEvery(ife, policy, refresh); }
 		)
 	)
 }
@@ -981,7 +983,7 @@ Every EveryDuration(Errors err) :
     }
 }
 
-UnsupportedSamplingRate OnUnsupportedSRClause() :
+RatePolicy OnUnsupportedSRClause() :
 {}
 {
 	<KEYWORD_ON>
@@ -992,11 +994,11 @@ UnsupportedSamplingRate OnUnsupportedSRClause() :
 		<KEYWORD_DO>
 		<OPERATOR_NOT>
 		<KEYWORD_SAMPLE>
-		{ return UnsupportedSamplingRate.DO_NOT_SAMPLE; }
+		{ return RatePolicy.DO_NOT_SAMPLE; }
         |
 		<KEYWORD_SLOW>
 		<KEYWORD_DOWN>
-		{ return UnsupportedSamplingRate.SLOW_DOWN; }
+		{ return RatePolicy.SLOW_DOWN; }
 	)
 }
 
