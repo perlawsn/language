@@ -875,7 +875,7 @@ Sampling SamplingClause(Errors err) :
 		{ return null; }
 		|
 		(
-			ife = SamplingIfEveryClause(err)
+			ife = IfEveryClause(err)
 			[
 				usr = OnUnsupportedSRClause()
 			]
@@ -907,7 +907,7 @@ Set<String> OnEventClause() :
 	{ return evs; }
 }
 
-IfEvery SamplingIfEveryClause(Errors err) :
+IfEvery IfEveryClause(Errors err) :
 {
     IfEvery ife = null;
     IfEvery prev = null;
@@ -926,7 +926,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 		    <KEYWORD_IF>
 		    cond = Expression(false, err)
 		    <KEYWORD_EVERY>
-		    every = SamplingEveryClause(err)
+		    every = EveryDuration(err)
 		    {
 		        if (ife == null) {
 		            cw = IfEvery.create(cond, every.getValue(),
@@ -945,7 +945,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 		(
 			<KEYWORD_ELSE>
 			<KEYWORD_EVERY>
-			every = SamplingEveryClause(err)
+			every = EveryDuration(err)
 			{
 			    cw = IfEvery.create(prev, Constant.TRUE, every.getValue(),
 			        every.getUnit());
@@ -957,7 +957,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 	|
 	(
 	    <KEYWORD_EVERY>
-	    every = SamplingEveryClause(err)
+	    every = EveryDuration(err)
 	    {
 	        cw = IfEvery.create(Constant.TRUE, every.getValue(),
 	            every.getUnit());
@@ -968,7 +968,7 @@ IfEvery SamplingIfEveryClause(Errors err) :
 	{ return ife; }
 }
 
-Every SamplingEveryClause(Errors err) :
+Every EveryDuration(Errors err) :
 {
     Expression value;
     TemporalUnit unit;

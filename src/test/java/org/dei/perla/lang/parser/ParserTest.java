@@ -4,9 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
-import org.dei.perla.lang.executor.statement.IfEvery;
-import org.dei.perla.lang.executor.statement.UnsupportedSamplingRate;
-import org.dei.perla.lang.executor.statement.WindowSize;
+import org.dei.perla.lang.executor.statement.*;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -1115,21 +1113,21 @@ public class ParserTest {
     }
 
     @Test
-    public void testEveryClause() throws Exception {
+    public void testEveryDuration() throws Exception {
         Parser p;
         Every e;
         Expression c;
         Errors err = new Errors();
 
         p = new Parser(new StringReader("5 seconds"));
-        e = p.SamplingEveryClause(err);
+        e = p.EveryDuration(err);
         c = e.getValue();
         assertTrue(c instanceof Constant);
         assertThat(((Constant) c).getValue(), equalTo(5));
         assertThat(e.getUnit(), equalTo(ChronoUnit.SECONDS));
 
         p.ReInit(new StringReader("25 days"));
-        e = p.SamplingEveryClause(err);
+        e = p.EveryDuration(err);
         c = e.getValue();
         assertTrue(c instanceof Constant);
         assertThat(((Constant) c).getValue(), equalTo(25));
@@ -1144,7 +1142,7 @@ public class ParserTest {
         Errors err = new Errors();
 
         p = new Parser(new StringReader("every 5 seconds"));
-        ife = p.SamplingIfEveryClause(err);
+        ife = p.IfEveryClause(err);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
@@ -1153,7 +1151,7 @@ public class ParserTest {
 
         p.ReInit(new StringReader(
                 "if false every 10 seconds else every 2 days"));
-        ife = p.SamplingIfEveryClause(err);
+        ife = p.IfEveryClause(err);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
@@ -1166,10 +1164,53 @@ public class ParserTest {
                 "if power > 40 every 2 minutes " +
                 "else every 1 hours"
         ));
-        ife = p.SamplingIfEveryClause(err);
+        ife = p.IfEveryClause(err);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
+        ife = ife.bind(atts, new ArrayList<>());
+        assertFalse(ife.hasErrors());
+        assertTrue(ife.isComplete());
+        d = ife.run(records[0]);
+        assertThat(d, equalTo(Duration.ofSeconds(10)));
+        d = ife.run(records[1]);
+        assertThat(d, equalTo(Duration.ofSeconds(40)));
+        d = ife.run(records[2]);
+        assertThat(d, equalTo(Duration.ofMinutes(2)));
+        d = ife.run(records[3]);
+        assertThat(d, equalTo(Duration.ofHours(1)));
+    }
+
+    @Test
+    public void testSamplingIfEvery() throws Exception {
+        Parser p;
+        Sampling s;
+        IfEvery ife;
+        Duration d;
+        Errors err = new Errors();
+
+        p = new Parser(new StringReader("sampling every 5 seconds"));
+        s = p.SamplingClause(err);
+        assertTrue(err.isEmpty());
+        assertTrue(s.isComplete());
+        assertTrue(s instanceof SamplingIfEvery);
+        assertFalse(s.hasErrors());
+        ife = ((SamplingIfEvery) s).getIfEvery();
+        d = ife.run(null);
+        assertThat(d, equalTo(Duration.ofSeconds(5)));
+
+        p.ReInit(new StringReader("sampling " +
+                "if power > 80 every 10 seconds " +
+                "if power > 60 every 40 seconds " +
+                "if power > 40 every 2 minutes " +
+                "else every 1 hours"
+        ));
+        s = p.SamplingClause(err);
+        assertTrue(err.isEmpty());
+        assertFalse(s.isComplete());
+        assertFalse(s.hasErrors());
+        assertTrue(s instanceof SamplingIfEvery);
+        ife = ((SamplingIfEvery) s).getIfEvery();
         ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
