@@ -76,6 +76,8 @@ public class SamplingTest {
         s = s.bind(atts);
         assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
+        assertThat(s.getIfEveryAttributes().size(), equalTo(1));
+        assertTrue(s.getIfEveryAttributes().contains(boolAtt));
         assertThat(s.getRatePolicy(),
                 equalTo(RatePolicy.SLOW_DOWN));
     }

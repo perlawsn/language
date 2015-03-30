@@ -1219,8 +1219,8 @@ public class ParserTest {
         assertFalse(s.isComplete());
         assertFalse(s.hasErrors());
         assertTrue(s instanceof SamplingIfEvery);
+        s = s.bind(atts);
         ife = ((SamplingIfEvery) s).getIfEvery();
-        ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
         d = ife.run(records[0]);

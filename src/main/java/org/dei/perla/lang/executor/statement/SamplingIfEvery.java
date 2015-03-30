@@ -4,6 +4,8 @@ import org.dei.perla.core.record.Attribute;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -11,18 +13,32 @@ import java.util.Collection;
 public final class SamplingIfEvery implements Sampling {
 
     private final IfEvery ifevery;
+    private final List<Attribute> atts;
     private final RatePolicy ratePolicy;
     private final Refresh refresh;
 
     public SamplingIfEvery(IfEvery ifevery, RatePolicy ratePolicy,
             Refresh refresh) {
         this.ifevery = ifevery;
+        this.atts = Collections.emptyList();
+        this.ratePolicy = ratePolicy;
+        this.refresh = refresh;
+    }
+
+    private SamplingIfEvery(IfEvery ifevery, List<Attribute> atts,
+            RatePolicy ratePolicy, Refresh refresh) {
+        this.ifevery = ifevery;
+        this.atts = Collections.unmodifiableList(atts);
         this.ratePolicy = ratePolicy;
         this.refresh = refresh;
     }
 
     public IfEvery getIfEvery() {
         return ifevery;
+    }
+
+    public List<Attribute> getIfEveryAttributes() {
+        return atts;
     }
 
     public RatePolicy getRatePolicy() {
@@ -47,14 +63,15 @@ public final class SamplingIfEvery implements Sampling {
     }
 
     public SamplingIfEvery bind(Collection<Attribute> atts) {
-        IfEvery bifevery = ifevery.bind(atts, new ArrayList<>());
+        List<Attribute> bound = new ArrayList<>();
+        IfEvery bifevery = ifevery.bind(atts, bound);
 
         Refresh brefresh = null;
         if (refresh != null) {
             brefresh = refresh.bind(atts);
         }
 
-        return new SamplingIfEvery(bifevery, ratePolicy, brefresh);
+        return new SamplingIfEvery(bifevery, bound, ratePolicy, brefresh);
     }
 
 }

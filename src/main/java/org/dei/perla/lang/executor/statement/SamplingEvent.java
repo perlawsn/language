@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * @author Guido Rota 30/03/15.
  */
-public class SamplingEvent implements Sampling {
+public final class SamplingEvent implements Sampling {
 
     private final Set<String> names;
     private final List<Attribute> events;
