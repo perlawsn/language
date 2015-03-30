@@ -11,6 +11,7 @@ import java.util.*;
  */
 public final class Refresh implements Clause {
 
+    private final RefreshType type;
     private final Duration d;
     private final Set<String> names;
     private final List<Attribute> events;
@@ -18,27 +19,42 @@ public final class Refresh implements Clause {
     public Refresh(Duration d) {
         this.d = d;
         names = null;
-        events = Collections.emptyList();
+        events = null;
+        type = RefreshType.TIME;
     }
 
     public Refresh(Set<String> events) {
         this.names = Collections.unmodifiableSet(events);
         this.events = Collections.emptyList();
         d = null;
+        type = RefreshType.EVENT;
     }
 
     private Refresh(Set<String> names, List<Attribute> events) {
         d = null;
         this.names = Collections.unmodifiableSet(names);
         this.events = Collections.unmodifiableList(events);
+        type = RefreshType.EVENT;
     }
 
     public Duration getDuration() {
+        if (type != RefreshType.TIME) {
+            throw new RuntimeException(
+                    "Cannot access duration in event-based Refresh object");
+        }
         return d;
     }
 
     public List<Attribute> getEvents() {
+        if (type != RefreshType.EVENT) {
+            throw new RuntimeException(
+                    "Cannot access events in time-based Refresh object");
+        }
         return events;
+    }
+
+    public RefreshType getRefreshType() {
+        return type;
     }
 
     @Override
@@ -74,6 +90,14 @@ public final class Refresh implements Clause {
         }
 
         return new Refresh(names, events);
+    }
+
+    /**
+     * @author Guido Rota 30/03/2015
+     */
+    public static enum RefreshType {
+        EVENT,
+        TIME
     }
 
 }

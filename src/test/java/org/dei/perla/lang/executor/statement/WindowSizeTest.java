@@ -1,5 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
+import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -14,21 +15,22 @@ public class WindowSizeTest {
 
     @Test
     public void testCreation() {
-        WindowSize wss = new WindowSize(1);
-        assertThat(wss.getSamples(), equalTo(1));
-        assertThat(wss.getDuration(), nullValue());
+        WindowSize ws;
+        ws = new WindowSize(1);
+        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
+        assertThat(ws.getSamples(), equalTo(1));
 
-        wss = new WindowSize(543);
-        assertThat(wss.getSamples(), equalTo(543));
-        assertThat(wss.getDuration(), nullValue());
+        ws = new WindowSize(543);
+        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
+        assertThat(ws.getSamples(), equalTo(543));
 
-        WindowSize wsd = new WindowSize(Duration.ofSeconds(12));
-        assertThat(wsd.getDuration(), equalTo(Duration.ofSeconds(12)));
-        assertThat(wsd.getSamples(), equalTo(-1));
+        ws = new WindowSize(Duration.ofSeconds(12));
+        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
+        assertThat(ws.getDuration(), equalTo(Duration.ofSeconds(12)));
 
-        wsd = new WindowSize(Duration.ofDays(23));
-        assertThat(wsd.getDuration(), equalTo(Duration.ofDays(23)));
-        assertThat(wsd.getSamples(), equalTo(-1));
+        ws = new WindowSize(Duration.ofDays(23));
+        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
+        assertThat(ws.getDuration(), equalTo(Duration.ofDays(23)));
     }
 
     @Test

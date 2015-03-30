@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -24,8 +25,8 @@ public class RefreshTest {
         Refresh r = new Refresh(d);
         assertTrue(r.isComplete());
         assertFalse(r.hasErrors());
+        assertThat(r.getRefreshType(), equalTo(RefreshType.TIME));
         assertThat(r.getDuration(), equalTo(d));
-        assertThat(r.getEvents().size(), equalTo(0));
     }
 
     @Test

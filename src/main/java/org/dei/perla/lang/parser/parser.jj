@@ -33,7 +33,6 @@ PARSER_BEGIN(Parser)
     import java.util.Set;
     import java.util.TreeSet;
 
-    import org.dei.perla.lang.executor.statement.WindowSize;
     import org.dei.perla.lang.executor.expression.*;
     import org.dei.perla.lang.executor.statement.*;
     import org.dei.perla.lang.executor.statement.IfEvery.ErrorIfEvery;

@@ -129,16 +129,19 @@ public abstract class Aggregate implements Expression {
     public final Object run(Object[] record, BufferView view) {
         Object res;
 
-        if (ws.getSamples() > 0) {
-            view = view.subView(ws.getSamples());
-            res = compute(view);
-            view.release();
-        } else if (ws.getDuration() != null) {
-            view = view.subView(ws.getDuration());
-            res = compute(view);
-            view.release();
-        } else {
-            throw new RuntimeException("invalid window size");
+        switch (ws.getWindowType()) {
+            case SAMPLE:
+                view = view.subView(ws.getSamples());
+                res = compute(view);
+                view.release();
+                break;
+            case TIME:
+                view = view.subView(ws.getDuration());
+                res = compute(view);
+                view.release();
+                break;
+            default:
+                throw new RuntimeException("invalid window size");
         }
 
         return res;

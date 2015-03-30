@@ -4,6 +4,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
+import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public final class Select implements Clause {
 
         // UPTO CLAUSE
         int ut;
-        if (upto.getDuration() != null) {
+        if (upto.getWindowType() == WindowType.TIME) {
             ut = buffer.recordsIn(upto.getDuration());
         } else {
             ut = upto.getSamples();

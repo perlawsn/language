@@ -9,24 +9,39 @@ public final class WindowSize {
 
     public static final WindowSize ONE = new WindowSize(1);
 
+    private final WindowType type;
     private final int samples;
     private final Duration d;
 
     public WindowSize(int samples) {
         this.samples = samples;
         d = null;
+        type = WindowType.SAMPLE;
     }
 
     public WindowSize(Duration d) {
         this.d = d;
         samples = -1;
+        type = WindowType.TIME;
+    }
+
+    public WindowType getWindowType() {
+        return type;
     }
 
     public int getSamples() {
+        if (type != WindowType.SAMPLE) {
+            throw new RuntimeException(
+                    "Cannot access samples in time-based WindowSize object");
+        }
         return samples;
     }
 
     public Duration getDuration() {
+        if (type != WindowType.TIME) {
+            throw new RuntimeException(
+                    "Cannot access samples in sample WindowSize object");
+        }
         return d;
     }
 
@@ -50,6 +65,16 @@ public final class WindowSize {
         } else {
             return other.d != null && d.equals(other.d);
         }
+    }
+
+    /**
+     * @author Guido Rota 30/03/2014
+     */
+    public static enum WindowType {
+
+        TIME,
+        SAMPLE
+
     }
 
 }

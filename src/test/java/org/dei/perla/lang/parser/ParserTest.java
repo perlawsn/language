@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.*;
+import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -1093,14 +1094,14 @@ public class ParserTest {
         p = new Parser(new StringReader("terminate after 23 days"));
         ws = p.TerminateAfterClause(err);
         assertTrue(err.isEmpty());
+        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofDays(23)));
-        assertThat(ws.getSamples(), equalTo(-1));
 
         p.ReInit(new StringReader("terminate after 45 selections"));
         ws = p.TerminateAfterClause(err);
         assertTrue(err.isEmpty());
+        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(45));
-        assertThat(ws.getDuration(), nullValue());
     }
 
     @Test
