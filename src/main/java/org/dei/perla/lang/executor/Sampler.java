@@ -34,7 +34,7 @@ public final class Sampler {
     private final TaskHandler ifeHandler;
 
     private final AtomicInteger status = new AtomicInteger(INITIALIZING);
-    private Duration rate = Duration.ofSeconds(0);
+    private volatile Duration rate = Duration.ofSeconds(0);
 
     private volatile Task ifeTask = null;
     private Task samplingTask;
@@ -54,7 +54,12 @@ public final class Sampler {
 
         sampHandler = new SamplingHandler();
         ifeHandler = new IfEveryHandler();
-        fpc.get(sampling.getIfEveryAttributes(), ifeHandler);
+
+        ifeTask = fpc.get(sampling.getIfEveryAttributes(), ifeHandler);
+        if (ifeTask == null) {
+            // TODO: improve this
+            throw new RuntimeException("cannot sample");
+        }
     }
 
     /**
