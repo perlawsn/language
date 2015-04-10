@@ -9,11 +9,11 @@ import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.statement.IfEvery;
 import org.dei.perla.lang.executor.statement.Refresh;
 import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
+import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -33,6 +33,7 @@ public final class Sampler {
     private final SamplingIfEvery sampling;
     private final List<Attribute> atts;
     private final Fpc fpc;
+    private final QueryHandler<Sampling, Object[]> handler;
     private final Refresh refresh;
     private final IfEvery ife;
 
@@ -48,8 +49,9 @@ public final class Sampler {
     private Task sampTask = null;
     private Task evtTask = null;
 
-    protected Sampler(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc)
-            throws IllegalArgumentException, QueryExecutionException {
+    protected Sampler(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
+            QueryHandler<Sampling, Object[]> handler)
+            throws IllegalArgumentException, QueryException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
         Conditions.checkIllegalArgument(sampling.hasErrors(),
@@ -58,12 +60,13 @@ public final class Sampler {
         this.sampling = sampling;
         this.atts = atts;
         this.fpc = fpc;
+        this.handler = handler;
         this.refresh = sampling.getRefresh();
         this.ife = sampling.getIfEvery();
 
         ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (ifeTask == null) {
-            throw new QueryExecutionException(IFE_SAMPLING_ERROR);
+            throw new QueryException(IFE_SAMPLING_ERROR);
         }
     }
 
@@ -116,7 +119,8 @@ public final class Sampler {
                 ifeTask = fpc.async(sampling.getIfEveryAttributes(), true,
                         ifeHandler);
                 if (ifeTask == null) {
-                    // TODO: escalate error
+                    Exception e = new QueryException(IFE_SAMPLING_ERROR);
+                    handler.error(sampling, e);
                 }
             } finally {
                 lk.unlock();
@@ -160,7 +164,9 @@ public final class Sampler {
                 return;
             }
 
-            // TODO: escalate error
+            Exception e = new QueryException("Error while retrieving IF EVERY" +
+                    " attributes required to update sampling frequency", cause);
+            handler.error(sampling, e);
         }
 
     }
@@ -183,8 +189,11 @@ public final class Sampler {
                 if (status == NEW_RATE) {
                     sampTask = fpc.get(atts, false, rate, sampHandler);
                     status = SAMPLING;
+
                 } else if (status == SAMPLING) {
-                    // TODO: Propagate error
+                    Exception e = new QueryException("IF EVERY sampling has " +
+                            "stopped prematurely");
+                    handler.error(sampling, e);
                 }
             } finally {
                 lk.unlock();
@@ -197,7 +206,7 @@ public final class Sampler {
                 return;
             }
 
-            // TODO: send the record to the local buffer
+            handler.data(sampling, record.values());
         }
 
         @Override
@@ -206,7 +215,9 @@ public final class Sampler {
                 return;
             }
 
-            // TODO: Escalate error
+            Exception e = new QueryException("IF EVERY sampling generated an " +
+                    "error", cause);
+            handler.error(sampling, e);
         }
 
     }
@@ -223,7 +234,10 @@ public final class Sampler {
             lk.lock();
             try {
                 if (status != STOPPED) {
-                    // TODO: propagate error
+                    Exception e = new QueryException("Event-based REFRESH " +
+                            "clause in IF EVERY sampling has stopped " +
+                            "prematurely");
+                    handler.error(sampling, e);
                 }
             } finally {
                 lk.unlock();
@@ -237,7 +251,8 @@ public final class Sampler {
                 // Single shot sampling when the refresh event is triggered
                 ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
                 if (ifeTask == null) {
-                    // TODO: Escalate error
+                    Exception e = new QueryException(IFE_SAMPLING_ERROR);
+                    handler.error(sampling, e);
                 }
             } finally {
                 lk.unlock();
@@ -246,7 +261,9 @@ public final class Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            // TODO: escalate error
+            Exception e = new QueryException("Event-based REFRESH clause in " +
+                    "IF EVERY sampling generated an error", cause);
+            handler.error(sampling, e);
         }
 
     }

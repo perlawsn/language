@@ -7,11 +7,7 @@ import java.util.Collection;
 /**
  * @author Guido Rota 16/03/15.
  */
-public interface Statement {
-
-    public boolean hasErrors();
-
-    public boolean isComplete();
+public interface Statement extends Clause {
 
     public Statement bind(Collection<Attribute> atts);
 

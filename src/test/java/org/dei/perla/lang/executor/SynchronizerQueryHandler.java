@@ -11,7 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 03/03/15.
  */
-public class SynchronizerQueryHandler implements QueryHandler {
+public class SynchronizerQueryHandler
+        implements QueryHandler<Selection, Object[]> {
 
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
@@ -24,7 +25,7 @@ public class SynchronizerQueryHandler implements QueryHandler {
     }
 
     @Override
-    public void newRecord(Selection q, Object[] r) {
+    public void data(Selection q, Object[] r) {
         lk.lock();
         try {
             if (upto != 0) {

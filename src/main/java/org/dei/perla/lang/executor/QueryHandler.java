@@ -1,14 +1,14 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.Selection;
+import org.dei.perla.lang.executor.statement.Clause;
 
 /**
- * @author Guido Rota 03/03/15.
+ * @author Guido Rota 10/04/15.
  */
-public interface QueryHandler {
+public interface QueryHandler<E extends Clause, T> {
 
-    public void newRecord(Selection q, Object[] r);
+    public void error(E source, Throwable error);
 
-    public void error(Selection q, Throwable cause);
+    public void data(E source, T value);
 
 }
