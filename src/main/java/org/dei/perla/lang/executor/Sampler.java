@@ -14,14 +14,19 @@ import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 24/03/15.
  */
 public final class Sampler {
 
+    private static final String IFE_SAMPLING_ERROR = "Initialization of IF " +
+            "EVERY sampling failed, FPC cannot sample the required attributes";
+
     private static final int INITIALIZING = 0;
-    private static final int SETTING_RATE = 1;
+    private static final int NEW_RATE = 1;
     private static final int SAMPLING = 2;
     private static final int STOPPED = 3;
 
@@ -35,15 +40,16 @@ public final class Sampler {
     private final TaskHandler ifeHandler = new IfEveryHandler();
     private final TaskHandler evtHandler = new EventHandler();
 
-    private final AtomicInteger status = new AtomicInteger(INITIALIZING);
-    private volatile Duration rate = Duration.ofSeconds(0);
+    private final Lock lk = new ReentrantLock();
+    private volatile int status = INITIALIZING;
+    private Duration rate = Duration.ofSeconds(0);
 
-    private volatile Task ifeTask = null;
-    private Task sampTask;
-    private Task evtTask;
+    private Task ifeTask = null;
+    private Task sampTask = null;
+    private Task evtTask = null;
 
     protected Sampler(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc)
-            throws IllegalArgumentException {
+            throws IllegalArgumentException, QueryExecutionException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
         Conditions.checkIllegalArgument(sampling.hasErrors(),
@@ -57,115 +63,190 @@ public final class Sampler {
 
         ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (ifeTask == null) {
-            // TODO: improve this
-            throw new RuntimeException("cannot sample");
+            throw new QueryExecutionException(IFE_SAMPLING_ERROR);
+        }
+    }
+
+    public boolean isRunning() {
+        return status != STOPPED;
+    }
+
+    public void stop() {
+        if (status == STOPPED) {
+            return;
+        }
+
+        lk.lock();
+        try {
+            status = STOPPED;
+            if (ifeTask != null) {
+                ifeTask.stop();
+            }
+            if (sampTask != null) {
+                sampTask.stop();
+            }
+            if (evtTask != null) {
+                evtTask.stop();
+            }
+        } finally {
+            lk.unlock();
         }
     }
 
     /**
+     * TaskHandler employed to sample the attributes required by the IF EVERY
+     * clause
+     *
      * @author Guido Rota 30/03/2015
      */
     private class IfEveryHandler implements TaskHandler {
 
         @Override
         public void complete(Task task) {
-            if (refresh == null || status.intValue() == STOPPED ||
-                    refresh.getRefreshType() == RefreshType.EVENT) {
+            if (status == STOPPED) {
                 return;
             }
 
-            ifeTask = fpc.async(sampling.getIfEveryAttributes(), true, ifeHandler);
-            if (ifeTask == null) {
-                // TODO: escalate error
-            }
-        }
-
-        @Override
-        public void newRecord(Task task, Record record) {
-            // TODO: more states are probably needed
-            if (status.compareAndSet(SAMPLING, SETTING_RATE)) {
-                Duration d = ife.run(record.values());
-                if (d == rate) {
-                    status.set(SAMPLING);
+            lk.lock();
+            try {
+                if (refresh == null ||
+                        refresh.getRefreshType() == RefreshType.EVENT) {
                     return;
                 }
-
-                rate = d;
-                sampTask.stop();
-                // The new sampling rate will be set in the SamplingHandler
-
-            } else if (status.compareAndSet(INITIALIZING, SETTING_RATE)) {
-                Duration d= ife.run(record.values());
-                rate = d;
-                sampTask = fpc.get(atts, false, rate, sampHandler);
-                status.set(SAMPLING);
-            }
-        }
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            // TODO: escalate error
-        }
-
-    }
-
-    /**
-     * @author Guido Rota 09/04/2015
-     */
-    private class EventHandler implements TaskHandler {
-
-        @Override
-        public void complete(Task task) {
-            if (status.intValue() != STOPPED) {
-                // TODO: propagate error
+                ifeTask = fpc.async(sampling.getIfEveryAttributes(), true,
+                        ifeHandler);
+                if (ifeTask == null) {
+                    // TODO: escalate error
+                }
+            } finally {
+                lk.unlock();
             }
         }
 
         @Override
         public void newRecord(Task task, Record record) {
-            // Single shot sampling when the refresh event is triggered
-            ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
-            if (ifeTask == null) {
-                // TODO: Escalate error
+            if (status == STOPPED) {
+                return;
+            }
+
+            lk.lock();
+            try {
+                if (status == SAMPLING) {
+                    Duration d = ife.run(record.values());
+                    if (d == rate) {
+                        // Set the status back to sampling if the new sampling rate
+                        // is the same as the old one
+                        return;
+                    }
+                    status = NEW_RATE;
+                    rate = d;
+                    sampTask.stop();
+                    // The new sampling rate will be set in the SamplingHandler
+
+                } else if (status == INITIALIZING) {
+                    Duration d = ife.run(record.values());
+                    rate = d;
+                    sampTask = fpc.get(atts, false, rate, sampHandler);
+                    status = SAMPLING;
+                }
+            } finally {
+                lk.unlock();
             }
         }
 
         @Override
         public void error(Task task, Throwable cause) {
+            if (status == STOPPED) {
+                return;
+            }
+
             // TODO: escalate error
         }
 
     }
 
     /**
+     * TaskHandler employed to sample the SELECT attributes
+     *
      * @author Guido Rota 30/03/2015
      */
     private class SamplingHandler implements TaskHandler {
 
         @Override
         public void complete(Task task) {
-            if (status.compareAndSet(SETTING_RATE, SAMPLING)) {
-                sampTask = fpc.get(atts, false, rate, sampHandler);
-                status.set(SAMPLING);
+            if (status == STOPPED) {
                 return;
             }
 
-            if (status.intValue() == SAMPLING) {
-                // TODO: propagate an error?
-                return;
-            } else if (status.intValue() == STOPPED) {
-                return;
+            lk.lock();
+            try {
+                if (status == NEW_RATE) {
+                    sampTask = fpc.get(atts, false, rate, sampHandler);
+                    status = SAMPLING;
+                } else if (status == SAMPLING) {
+                    // TODO: Propagate error
+                }
+            } finally {
+                lk.unlock();
             }
         }
 
         @Override
         public void newRecord(Task task, Record record) {
+            if (status == STOPPED) {
+                return;
+            }
+
             // TODO: send the record to the local buffer
         }
 
         @Override
         public void error(Task task, Throwable cause) {
+            if (status == STOPPED) {
+                return;
+            }
+
             // TODO: Escalate error
+        }
+
+    }
+
+    /**
+     * TaskHandler employed to sample the REFRESH ON events
+     *
+     * @author Guido Rota 09/04/2015
+     */
+    private class EventHandler implements TaskHandler {
+
+        @Override
+        public void complete(Task task) {
+            lk.lock();
+            try {
+                if (status != STOPPED) {
+                    // TODO: propagate error
+                }
+            } finally {
+                lk.unlock();
+            }
+        }
+
+        @Override
+        public void newRecord(Task task, Record record) {
+            lk.lock();
+            try {
+                // Single shot sampling when the refresh event is triggered
+                ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+                if (ifeTask == null) {
+                    // TODO: Escalate error
+                }
+            } finally {
+                lk.unlock();
+            }
+        }
+
+        @Override
+        public void error(Task task, Throwable cause) {
+            // TODO: escalate error
         }
 
     }

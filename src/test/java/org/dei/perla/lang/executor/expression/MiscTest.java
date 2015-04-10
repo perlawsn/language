@@ -44,8 +44,6 @@ public class MiscTest {
 
     @Test
     public void castFloat() {
-        Object[] record;
-
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
 
@@ -109,9 +107,6 @@ public class MiscTest {
     public void castInteger() {
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
-        Expression fFloat = new Field(floatAtt.getId());
-        Expression error = new ErrorExpression("test");
-        Object[] record;
 
         Expression e = CastInteger.create(cInt);
         assertTrue(e.isComplete());
