@@ -1,14 +1,15 @@
 package org.dei.perla.lang.simfpc;
 
+import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.record.Record;
+import org.dei.perla.lang.simfpc.SimTask.GetSimTask;
+import org.dei.perla.lang.simfpc.SimTask.PeriodicSimTask;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -17,6 +18,30 @@ import java.util.function.Consumer;
 public class SimFpc implements Fpc {
 
     private final List<FpcAction> actions = new ArrayList<>();
+    private final Object[] values;
+
+    protected static final List<Attribute> ATTRIBUTES;
+    static {
+        ATTRIBUTES = Arrays.asList(new Attribute[]{
+                Attribute.create("temperature", DataType.INTEGER),
+                Attribute.create("power", DataType.INTEGER)
+        });
+    }
+
+    public SimFpc() {
+        values = new Object[ATTRIBUTES.size()];
+        values[0] = 23;
+        values[1] = 100;
+    }
+
+    public synchronized void setValues(Object[] newValues) {
+        if (values.length != newValues.length) {
+            throw new IllegalArgumentException("value array length mismatch");
+        }
+        for (int i = 0; i < values.length; i++) {
+            values[i] = newValues[i];
+        }
+    }
 
     public synchronized List<FpcAction> getActions() {
         return new ArrayList<>(actions);
@@ -24,6 +49,10 @@ public class SimFpc implements Fpc {
 
     public synchronized void addAction(FpcAction action) {
         actions.add(action);
+    }
+
+    protected synchronized Object[] newSample() {
+        return Arrays.copyOf(values, values.length);
     }
 
     @Override
@@ -38,7 +67,7 @@ public class SimFpc implements Fpc {
 
     @Override
     public Collection<Attribute> getAttributes() {
-        return null;
+        return ATTRIBUTES;
     }
 
     @Override
@@ -49,22 +78,20 @@ public class SimFpc implements Fpc {
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, TaskHandler handler) {
-        return null;
+        return new GetSimTask(atts, handler, this);
     }
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, long periodMs, TaskHandler handler) {
-        return null;
+        return new PeriodicSimTask(atts, periodMs, handler, this);
     }
 
     @Override
     public Task async(List<Attribute> atts, boolean strict, TaskHandler handler) {
-        return null;
+        throw new RuntimeException("unimplemented");
     }
 
     @Override
-    public void stop(Consumer<Fpc> handler) {
-
-    }
+    public void stop(Consumer<Fpc> handler) { }
 
 }

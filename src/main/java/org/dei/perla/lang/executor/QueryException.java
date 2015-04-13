@@ -5,6 +5,8 @@ package org.dei.perla.lang.executor;
  */
 public class QueryException extends Exception {
 
+    private static final long serialVersionUID = -3374902279548108393L;
+
     public QueryException() {
         super();
     }

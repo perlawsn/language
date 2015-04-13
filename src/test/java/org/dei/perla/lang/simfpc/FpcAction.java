@@ -23,4 +23,13 @@ public class FpcAction {
         return fields.get(name);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder bld = new StringBuilder();
+        for (Map.Entry<String, Object> e : fields.entrySet()) {
+            bld.append(e.getKey() + ": " + e.getValue() + " - ");
+        }
+        return bld.toString();
+    }
+
 }

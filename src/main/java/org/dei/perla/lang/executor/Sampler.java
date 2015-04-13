@@ -54,7 +54,7 @@ public final class Sampler {
             throws IllegalArgumentException, QueryException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
-        Conditions.checkIllegalArgument(sampling.hasErrors(),
+        Conditions.checkIllegalArgument(!sampling.hasErrors(),
                 "Sampling clause contains errors.");
 
         this.sampling = sampling;

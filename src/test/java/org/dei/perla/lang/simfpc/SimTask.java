@@ -1,12 +1,12 @@
 package org.dei.perla.lang.simfpc;
 
-import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.record.Record;
+import org.dei.perla.core.record.SamplePipeline;
+import org.dei.perla.core.record.SamplePipeline.PipelineBuilder;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,6 +15,7 @@ import java.util.List;
 public abstract class SimTask implements Task {
 
     public static final String ACTION = "action";
+    public static final String START = "start";
     public static final String NEW_SAMPLE = "new sample";
     public static final String COMPLETED = "completed";
     public static final String ERROR = "error";
@@ -24,36 +25,35 @@ public abstract class SimTask implements Task {
     public static final String PERIODIC_SAMPLING = "get periodic";
     public static final String EVENT_SAMPLING = "event";
 
+    public static final String PERIOD = "period";
     public static final String RECORD = "record";
 
-    protected static final List<Attribute> ATTRIBUTES;
-    static {
-        ATTRIBUTES = Arrays.asList(new Attribute[] {
-           Attribute.create("integer", DataType.INTEGER)
-        });
-    }
+    protected final SamplePipeline pipeline;
+    protected final SimFpc fpc;
+    protected final TaskHandler handler;
 
-    private final SimFpc fpc;
-    private final TaskHandler handler;
-
-    protected SimTask(TaskHandler handler, SimFpc fpc) {
+    protected SimTask(List<Attribute> atts, TaskHandler handler, SimFpc fpc) {
         this.fpc = fpc;
         this.handler = handler;
+
+        PipelineBuilder pb = SamplePipeline.newBuilder(SimFpc.ATTRIBUTES);
+        pb.reorder(atts);
+        pipeline = pb.create();
     }
 
     @Override
     public List<Attribute> getAttributes() {
-        return ATTRIBUTES;
+        return SimFpc.ATTRIBUTES;
     }
 
-    private void logComplete(String samplingType) {
+    protected void logComplete(String samplingType) {
         FpcAction a = new FpcAction();
         a.addField(SAMPLING_TYPE, samplingType);
         a.addField(ACTION, COMPLETED);
         fpc.addAction(a);
     }
 
-    private void logSample(String samplingType, Record record) {
+    protected synchronized void logSample(String samplingType, Record record) {
         FpcAction a = new FpcAction();
         a.addField(SAMPLING_TYPE, samplingType);
         a.addField(ACTION, NEW_SAMPLE);
@@ -61,18 +61,19 @@ public abstract class SimTask implements Task {
         fpc.addAction(a);
     }
 
-    private Record newSample() {
-        Object[] values = new Object[] {};
-        return new Record(ATTRIBUTES, values);
-    }
 
     /**
      * @author Guido Rota 13/04/15
      */
-    public class GetSimTask extends SimTask {
+    public static class GetSimTask extends SimTask {
 
-        protected GetSimTask(TaskHandler handler, SimFpc fpc) {
-            super(handler, fpc);
+        protected GetSimTask(List<Attribute> atts, TaskHandler handler,
+                SimFpc fpc) {
+            super(atts, handler, fpc);
+            Record r = pipeline.run(fpc.newSample());
+            logSample(GET_SAMPLING, r);
+            handler.newRecord(this, r);
+            handler.complete(this);
         }
 
         @Override
@@ -81,32 +82,36 @@ public abstract class SimTask implements Task {
         }
 
         @Override
-        public void stop() {
-
-        }
+        public void stop() { }
 
     }
 
     /**
      * @author Guido Rota 13/04/15
      */
-    public class PeriodicSimTask extends SimTask {
+    public static class PeriodicSimTask extends SimTask {
 
         private volatile boolean running = true;
         private final long periodMs;
         private final Thread generator;
 
-        protected PeriodicSimTask(long periodMs, TaskHandler handler,
-                SimFpc fpc) {
-            super(handler, fpc);
+        protected PeriodicSimTask(List<Attribute> atts, long periodMs,
+                TaskHandler handler, SimFpc fpc) {
+            super(atts, handler, fpc);
+            FpcAction a = new FpcAction();
+            a.addField(SAMPLING_TYPE, PERIODIC_SAMPLING);
+            a.addField(ACTION, START);
+            a.addField(PERIOD, periodMs);
+            fpc.addAction(a);
             this.periodMs = periodMs;
             generator = new Thread(this::generateValues);
+            generator.start();
         }
 
         private void generateValues() {
             try {
                 while (true) {
-                    Record r = newSample();
+                    Record r = pipeline.run(fpc.newSample());
                     logSample(PERIODIC_SAMPLING, r);
                     handler.newRecord(this, r);
                     Thread.sleep(periodMs);
