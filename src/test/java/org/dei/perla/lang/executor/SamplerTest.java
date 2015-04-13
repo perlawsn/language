@@ -1,21 +1,18 @@
 package org.dei.perla.lang.executor;
 
+import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 import org.dei.perla.lang.parser.Parser;
-import org.dei.perla.lang.simfpc.FpcAction;
-import org.dei.perla.lang.simfpc.SimFpc;
-import org.dei.perla.lang.simfpc.SimTask;
 import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -23,8 +20,22 @@ import static org.junit.Assert.assertTrue;
  */
 public class SamplerTest {
 
+    private static final Attribute power =
+            Attribute.create("power", DataType.INTEGER);
+    private static final Attribute temperature =
+            Attribute.create("temperature", DataType.INTEGER);
+
+    private static final Map<Attribute, Object> values;
+    static {
+        Map<Attribute, Object> vs = new HashMap<>();
+        vs.put(power, 100);
+        vs.put(temperature, 12);
+        values = Collections.unmodifiableMap(vs);
+    }
+
     @Test
     public void testSimpleIfEvery() throws Exception {
+        Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
@@ -34,99 +45,51 @@ public class SamplerTest {
 
         SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
         assertTrue(err.isEmpty());
-        samp = samp.bind(SimFpc.ATTRIBUTES);
-        assertFalse(samp.hasErrors());
-        assertTrue(samp.isComplete());
 
         // Test with power == 100
-        SimFpc fpc = new SimFpc();
+        SimulatorFpc fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes());
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>(1);
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 handler);
-
-        handler.await();
-        List<FpcAction> as = fpc.getActions();
-
-        FpcAction a = as.get(0);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.GET_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.NEW_SAMPLE));
-
-        a = as.get(1);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.PERIODIC_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.START));
-        assertThat(a.getField(SimTask.PERIOD),
-                equalTo(100l));
-
+        fpc.awaitPeriod(100);
 
         // Test with power == 65
-        fpc = new SimFpc();
-        fpc.setValues(new Object[]{12, 65});
+        vs.put(power, 65);
+        fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes());
         handler = new LatchingQueryHandler<>(1);
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 handler);
-
-        handler.await();
-        as = fpc.getActions();
-
-        a = as.get(0);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.GET_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.NEW_SAMPLE));
-
-        a = as.get(1);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.PERIODIC_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.START));
-        assertThat(a.getField(SimTask.PERIOD),
-                equalTo(200l));
-
+        fpc.awaitPeriod(200);
 
         // Test with power == 10
-        fpc = new SimFpc();
-        fpc.setValues(new Object[]{12, 10});
+        vs.put(power, 10);
+        fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes());
         handler = new LatchingQueryHandler<>(1);
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 handler);
-
-        handler.await();
-        as = fpc.getActions();
-
-        a = as.get(0);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.GET_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.NEW_SAMPLE));
-
-        a = as.get(1);
-        assertThat(a.getField(SimTask.SAMPLING_TYPE),
-                equalTo(SimTask.PERIODIC_SAMPLING));
-        assertThat(a.getField(SimTask.ACTION),
-                equalTo(SimTask.START));
-        assertThat(a.getField(SimTask.PERIOD),
-                equalTo(1000l));
+        fpc.awaitPeriod(1000);
     }
 
     @Test
     public void testRefreshIfEvery() throws Exception {
+        Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
                 "if power > 60 every 200 milliseconds " +
                 "if power > 20 every 400 milliseconds " +
-                "else every 1 seconds"));
+                "else every 1 seconds " +
+                "refresh every 1 seconds"));
 
         SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
         assertTrue(err.isEmpty());
-        samp = samp.bind(SimFpc.ATTRIBUTES);
-        assertFalse(samp.hasErrors());
-        assertTrue(samp.isComplete());
+
+        SimulatorFpc fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes());
     }
 
 }
