@@ -5,11 +5,13 @@ import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
 import org.dei.perla.lang.simfpc.SimTask.GetSimTask;
 import org.dei.perla.lang.simfpc.SimTask.PeriodicSimTask;
 
 import java.util.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -17,10 +19,14 @@ import java.util.function.Consumer;
  */
 public class SimFpc implements Fpc {
 
+    private final Lock lk = new ReentrantLock();
+    private final Condition cond = lk.newCondition();
+    private final Set<Long> periods = new HashSet<>();
+
     private final List<FpcAction> actions = new ArrayList<>();
     private final Object[] values;
 
-    protected static final List<Attribute> ATTRIBUTES;
+    public static final List<Attribute> ATTRIBUTES;
     static {
         ATTRIBUTES = Arrays.asList(new Attribute[]{
                 Attribute.create("temperature", DataType.INTEGER),
@@ -34,25 +40,56 @@ public class SimFpc implements Fpc {
         values[1] = 100;
     }
 
-    public synchronized void setValues(Object[] newValues) {
-        if (values.length != newValues.length) {
-            throw new IllegalArgumentException("value array length mismatch");
+    public void setValues(Object[] newValues) {
+        lk.lock();
+        try {
+            if (values.length != newValues.length) {
+                throw new IllegalArgumentException("value array length mismatch");
+            }
+            for (int i = 0; i < values.length; i++) {
+                values[i] = newValues[i];
+            }
+        } finally {
+            lk.unlock();
         }
-        for (int i = 0; i < values.length; i++) {
-            values[i] = newValues[i];
+    }
+
+    public List<FpcAction> getActions() {
+        lk.lock();
+        try {
+            return new ArrayList<>(actions);
+        } finally {
+            lk.unlock();
         }
     }
 
-    public synchronized List<FpcAction> getActions() {
-        return new ArrayList<>(actions);
+    public void addAction(FpcAction action) {
+        lk.lock();
+        try {
+            actions.add(action);
+        } finally {
+            lk.unlock();
+        }
     }
 
-    public synchronized void addAction(FpcAction action) {
-        actions.add(action);
+    protected Object[] newSample() {
+        lk.lock();
+        try {
+            return Arrays.copyOf(values, values.length);
+        } finally {
+            lk.unlock();
+        }
     }
 
-    protected synchronized Object[] newSample() {
-        return Arrays.copyOf(values, values.length);
+    protected void awaitPeriod(long period) throws InterruptedException {
+        lk.lock();
+        try {
+            while (!periods.contains(period)) {
+                cond.await();
+            }
+        } finally {
+            lk.unlock();
+        }
     }
 
     @Override
@@ -83,7 +120,14 @@ public class SimFpc implements Fpc {
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, long periodMs, TaskHandler handler) {
-        return new PeriodicSimTask(atts, periodMs, handler, this);
+        lk.lock();
+        try {
+            periods.add(periodMs);
+            cond.signalAll();
+            return new PeriodicSimTask(atts, periodMs, handler, this);
+        } finally {
+            lk.unlock();
+        }
     }
 
     @Override

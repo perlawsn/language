@@ -34,13 +34,12 @@ public class SamplerTest {
 
         SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
         assertTrue(err.isEmpty());
-
-        SimFpc fpc = new SimFpc();
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(SimFpc.ATTRIBUTES);
         assertFalse(samp.hasErrors());
         assertTrue(samp.isComplete());
 
         // Test with power == 100
+        SimFpc fpc = new SimFpc();
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>(1);
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
@@ -112,6 +111,22 @@ public class SamplerTest {
                 equalTo(SimTask.START));
         assertThat(a.getField(SimTask.PERIOD),
                 equalTo(1000l));
+    }
+
+    @Test
+    public void testRefreshIfEvery() throws Exception {
+        Errors err = new Errors();
+        Parser p = new Parser(new StringReader("sampling " +
+                "if power > 80 every 100 milliseconds " +
+                "if power > 60 every 200 milliseconds " +
+                "if power > 20 every 400 milliseconds " +
+                "else every 1 seconds"));
+
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
+        assertTrue(err.isEmpty());
+        samp = samp.bind(SimFpc.ATTRIBUTES);
+        assertFalse(samp.hasErrors());
+        assertTrue(samp.isComplete());
     }
 
 }
