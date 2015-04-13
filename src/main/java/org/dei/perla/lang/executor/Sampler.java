@@ -116,8 +116,8 @@ public final class Sampler {
                         refresh.getRefreshType() == RefreshType.EVENT) {
                     return;
                 }
-                ifeTask = fpc.async(sampling.getIfEveryAttributes(), true,
-                        ifeHandler);
+                ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
+                        refresh.getDuration(), ifeHandler);
                 if (ifeTask == null) {
                     Exception e = new QueryException(IFE_SAMPLING_ERROR);
                     handler.error(sampling, e);

@@ -21,7 +21,10 @@ public class SimulatorFpc implements Fpc {
 
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
-    private final Set<Long> periods = new HashSet<>();
+
+    private final Map<Long, Integer> periods = new HashMap<>();
+    private int periodicCount = 0;
+    private int asyncCount = 0;
 
     private final Object[] values;
     private final List<Attribute> atts;
@@ -34,6 +37,25 @@ public class SimulatorFpc implements Fpc {
             atts.add(e.getKey());
             this.values[i++] = e.getValue();
         }
+    }
+
+    private void addPeriod(long period) {
+        Integer count = periods.get(period);
+        if (count == null) {
+            count = 1;
+        } else {
+            count++;
+        }
+        periods.put(period, count);
+    }
+
+    private void removePeriod(long period) {
+        Integer count = periods.get(period);
+        if (count == null || count == 0) {
+            throw new IllegalStateException(
+                    "cannot remove non-existing period");
+        }
+        periods.put(period, count - 1);
     }
 
     public void setValues(Map<Attribute, Object> newValues) {
@@ -60,10 +82,14 @@ public class SimulatorFpc implements Fpc {
         }
     }
 
+    /**
+     * Awaits until a sampling operation with the specified period is run on
+     * this FPC.
+     */
     public void awaitPeriod(long period) throws InterruptedException {
         lk.lock();
         try {
-            while (!periods.contains(period)) {
+            while (!periods.containsKey(period)) {
                 cond.await();
             }
         } finally {
@@ -71,8 +97,41 @@ public class SimulatorFpc implements Fpc {
         }
     }
 
+    /**
+     * Returns true if the FPC is currently running a periodic sampling
+     * operation whose period is equal to the value passed as parameter.
+     */
     public boolean hasPeriod(long period) {
-        return periods.contains(period);
+        lk.lock();
+        try {
+            return periods.containsKey(period);
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
+     * Returns the number of periodic sampling tasks being run in this FPC
+     */
+    public int countPeriodic() {
+        lk.lock();
+        try {
+            return periodicCount;
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
+     * Returns the number of async sampling tasks being run in this FPC
+     */
+    public int countAsync() {
+        lk.lock();
+        try {
+            return asyncCount;
+        } finally {
+            lk.unlock();
+        }
     }
 
     @Override
@@ -105,7 +164,8 @@ public class SimulatorFpc implements Fpc {
     public Task get(List<Attribute> atts, boolean strict, long periodMs, TaskHandler handler) {
         lk.lock();
         try {
-            periods.add(periodMs);
+            addPeriod(periodMs);
+            periodicCount++;
             cond.signalAll();
             return new PeriodicSimTask(atts, periodMs, handler, this);
         } finally {
@@ -212,7 +272,8 @@ public class SimulatorFpc implements Fpc {
             try {
                 running = false;
                 generator.interrupt();
-                periods.remove(periodMs);
+                periodicCount--;
+                removePeriod(periodMs);
             } finally {
                 lk.unlock();
             }

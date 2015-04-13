@@ -3,7 +3,6 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 import org.dei.perla.lang.parser.Parser;
 import org.junit.Test;
@@ -13,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,29 +50,28 @@ public class SamplerTest {
         // Test with power == 100
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        LatchingQueryHandler<Sampling, Object[]> handler = new
-                LatchingQueryHandler<>(1);
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
-                handler);
+                new NoopQueryHandler<>());
         fpc.awaitPeriod(100);
+        assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Test with power == 65
         vs.put(power, 65);
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        handler = new LatchingQueryHandler<>(1);
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
-                handler);
+                new NoopQueryHandler<>());
         fpc.awaitPeriod(200);
+        assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Test with power == 10
         vs.put(power, 10);
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        handler = new LatchingQueryHandler<>(1);
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
-                handler);
+                new NoopQueryHandler<>());
         fpc.awaitPeriod(1000);
+        assertThat(fpc.countPeriodic(), equalTo(1));
     }
 
     @Test
@@ -90,6 +90,12 @@ public class SamplerTest {
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
+        Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
+                new NoopQueryHandler<>());
+        fpc.awaitPeriod(100);
+        assertTrue(fpc.hasPeriod(1000));
+        assertTrue(fpc.hasPeriod(100));
+        assertThat(fpc.countPeriodic(), equalTo(2));
     }
 
 }
