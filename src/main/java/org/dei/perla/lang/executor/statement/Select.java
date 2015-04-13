@@ -89,7 +89,7 @@ public final class Select implements Clause {
 
         // UPTO CLAUSE
         int ut;
-        if (upto.getWindowType() == WindowType.TIME) {
+        if (upto.getType() == WindowType.TIME) {
             ut = buffer.recordsIn(upto.getDuration());
         } else {
             ut = upto.getSamples();

@@ -906,7 +906,7 @@ Set<String> OnEventClause() :
 	        ","
 	        e = Identifier() // FPC Event
 	        { evs.add(e); }
-	    )
+	    )*
     )
 	{ return evs; }
 }

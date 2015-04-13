@@ -53,7 +53,7 @@ public final class Refresh implements Clause {
         return events;
     }
 
-    public RefreshType getRefreshType() {
+    public RefreshType getType() {
         return type;
     }
 

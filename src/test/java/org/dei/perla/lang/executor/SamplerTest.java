@@ -25,12 +25,15 @@ public class SamplerTest {
             Attribute.create("power", DataType.INTEGER);
     private static final Attribute temperature =
             Attribute.create("temperature", DataType.INTEGER);
+    private static final Attribute fire =
+            Attribute.create("fire", DataType.BOOLEAN);
 
     private static final Map<Attribute, Object> values;
     static {
         Map<Attribute, Object> vs = new HashMap<>();
         vs.put(power, 100);
         vs.put(temperature, 12);
+        vs.put(fire, false);
         values = Collections.unmodifiableMap(vs);
     }
 
@@ -75,7 +78,7 @@ public class SamplerTest {
     }
 
     @Test
-    public void testRefreshIfEvery() throws Exception {
+    public void testTimeRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
         Parser p = new Parser(new StringReader("sampling " +
@@ -96,6 +99,35 @@ public class SamplerTest {
         assertTrue(fpc.hasPeriod(1000));
         assertTrue(fpc.hasPeriod(100));
         assertThat(fpc.countPeriodic(), equalTo(2));
+
+        // Change power level, check if sampling rate lowers
+        vs.put(power, 70);
+        fpc.setValues(vs);
+        fpc.awaitPeriod(200);
+        assertTrue(fpc.hasPeriod(1000));
+        assertTrue(fpc.hasPeriod(200));
+        assertThat(fpc.countPeriodic(), equalTo(2));
+
+        // Change power level, check if sampling rate lowers
+        vs.put(power, 10);
+        fpc.setValues(vs);
+        fpc.awaitPeriod(200);
+        assertTrue(fpc.hasPeriod(1000));
+        assertThat(fpc.countPeriodic(), equalTo(2));
+    }
+
+    @Test
+    public void testEventRefreshIfEvery() throws Exception {
+        Map<Attribute, Object> vs = new HashMap<>(values);
+        Errors err = new Errors();
+        Parser p = new Parser(new StringReader("sampling " +
+                "if temperature > 40 every 100 milliseconds " +
+                "if temperature > 30 every 500 milliseconds " +
+                "else every 1 seconds " +
+                "refresh on event fire"));
+
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
+        assertTrue(err.isEmpty());
     }
 
 }

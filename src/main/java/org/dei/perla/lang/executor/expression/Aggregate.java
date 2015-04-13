@@ -129,7 +129,7 @@ public abstract class Aggregate implements Expression {
     public final Object run(Object[] record, BufferView view) {
         Object res;
 
-        switch (ws.getWindowType()) {
+        switch (ws.getType()) {
             case SAMPLE:
                 view = view.subView(ws.getSamples());
                 res = compute(view);

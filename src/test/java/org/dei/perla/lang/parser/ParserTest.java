@@ -5,6 +5,7 @@ import org.dei.perla.core.record.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.*;
+import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
 import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 import org.junit.Test;
 
@@ -16,8 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -1094,13 +1094,13 @@ public class ParserTest {
         p = new Parser(new StringReader("terminate after 23 days"));
         ws = p.TerminateAfterClause(err);
         assertTrue(err.isEmpty());
-        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
+        assertThat(ws.getType(), equalTo(WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofDays(23)));
 
         p.ReInit(new StringReader("terminate after 45 selections"));
         ws = p.TerminateAfterClause(err);
         assertTrue(err.isEmpty());
-        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
+        assertThat(ws.getType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(45));
     }
 
@@ -1141,6 +1141,42 @@ public class ParserTest {
         assertTrue(c instanceof Constant);
         assertThat(((Constant) c).getValue(), equalTo(25));
         assertThat(e.getUnit(), equalTo(ChronoUnit.DAYS));
+    }
+
+    @Test
+    public void testRefresh() throws Exception {
+        Parser p;
+        Refresh r;
+        List<Attribute> events;
+
+        p = new Parser(new StringReader("refresh every 10 seconds"));
+        r = p.RefreshClause();
+        assertThat(r, notNullValue());
+        assertThat(r.getType(), equalTo(RefreshType.TIME));
+        assertThat(r.getDuration(), equalTo(Duration.ofSeconds(10)));
+
+        p.ReInit(new StringReader("refresh never"));
+        r = p.RefreshClause();
+        assertThat(r, nullValue());
+
+        p.ReInit(new StringReader("refresh on event alert"));
+        r = p.RefreshClause();
+        assertThat(r, notNullValue());
+        assertThat(r.getType(), equalTo(RefreshType.EVENT));
+        r = r.bind(atts);
+        events = r.getEvents();
+        assertThat(events.size(), equalTo(1));
+        assertTrue(events.contains(alertAtt));
+
+        p.ReInit(new StringReader("refresh on event alert, low_power"));
+        r = p.RefreshClause();
+        assertThat(r, notNullValue());
+        assertThat(r.getType(), equalTo(RefreshType.EVENT));
+        r = r.bind(atts);
+        events = r.getEvents();
+        assertThat(events.size(), equalTo(2));
+        assertTrue(events.contains(alertAtt));
+        assertTrue(events.contains(lowPowerAtt));
     }
 
     @Test

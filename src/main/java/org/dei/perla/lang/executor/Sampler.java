@@ -113,7 +113,7 @@ public final class Sampler {
             lk.lock();
             try {
                 if (refresh == null ||
-                        refresh.getRefreshType() == RefreshType.EVENT) {
+                        refresh.getType() == RefreshType.EVENT) {
                     return;
                 }
                 ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,

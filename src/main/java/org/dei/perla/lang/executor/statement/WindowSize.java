@@ -25,7 +25,7 @@ public final class WindowSize {
         type = WindowType.TIME;
     }
 
-    public WindowType getWindowType() {
+    public WindowType getType() {
         return type;
     }
 

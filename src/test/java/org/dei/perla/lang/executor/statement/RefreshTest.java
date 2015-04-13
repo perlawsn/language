@@ -25,7 +25,7 @@ public class RefreshTest {
         Refresh r = new Refresh(d);
         assertTrue(r.isComplete());
         assertFalse(r.hasErrors());
-        assertThat(r.getRefreshType(), equalTo(RefreshType.TIME));
+        assertThat(r.getType(), equalTo(RefreshType.TIME));
         assertThat(r.getDuration(), equalTo(d));
     }
 

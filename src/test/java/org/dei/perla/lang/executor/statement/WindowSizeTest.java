@@ -17,19 +17,19 @@ public class WindowSizeTest {
     public void testCreation() {
         WindowSize ws;
         ws = new WindowSize(1);
-        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
+        assertThat(ws.getType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(1));
 
         ws = new WindowSize(543);
-        assertThat(ws.getWindowType(), equalTo(WindowType.SAMPLE));
+        assertThat(ws.getType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(543));
 
         ws = new WindowSize(Duration.ofSeconds(12));
-        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
+        assertThat(ws.getType(), equalTo(WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofSeconds(12)));
 
         ws = new WindowSize(Duration.ofDays(23));
-        assertThat(ws.getWindowType(), equalTo(WindowType.TIME));
+        assertThat(ws.getType(), equalTo(WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofDays(23)));
     }
 
