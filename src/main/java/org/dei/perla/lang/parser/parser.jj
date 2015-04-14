@@ -250,13 +250,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_EXECUTE:   "EXECUTE" >
+	< KEYWORD_EXECUTE:        "EXECUTE" >
     |
-	< KEYWORD_IF:        "IF"      >
+	< KEYWORD_IF:             "IF"      >
     |
-	< KEYWORD_EXISTS:    "EXISTS"  >
+	< KEYWORD_EXISTS:         "EXISTS"  >
 	|
-	< KEYWORD_ALL:       "ALL"     >
+	< KEYWORD_ALL:            "ALL"     >
+	|
+	< KEYWORD_TYPE_SEPARATOR: ":"       >
 }
 
 /*
@@ -589,7 +591,7 @@ void SetParameterList(Errors err):
 {
 	Identifier()
 	"="
-	Expression(false, err)
+	Expression(ExpressionType.SIMPLE, err)
 }
 
 Statement CreationStatement(Errors err) :
@@ -625,7 +627,7 @@ void FieldDefinition(Errors err) :
 	FieldType()
 	[
 		<KEYWORD_DEFAULT>
-		Expression(false, err)
+		Expression(ExpressionType.SIMPLE, err)
 	]
 }
 
@@ -673,6 +675,7 @@ Selection SelectionStatement(Errors err) :
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     Sampling sampling;
     Expression where = null;
+    WindowSize terminate = null;
 
     Select sel;
 }
@@ -710,13 +713,13 @@ Selection SelectionStatement(Errors err) :
 		// This optional where clause filters the sampled values before adding
 		// them to the local buffer
 	    <KEYWORD_WHERE>
-	    where = Expression(false, err) // No aggregates allowed
+	    where = Expression(ExpressionType.SIMPLE, err) // No aggregates allowed
 	]
 	[
 		ExecuteIfClause(err)
 	]
 	[
-		TerminateAfterClause(err)
+		terminate = TerminateAfterClause(err)
 	]
 	{ return null; }
 }
@@ -753,11 +756,11 @@ FieldSelection FieldSelection(Errors err) :
     Object def = null;
 }
 {
-	field = Expression(true, err)
+	field = Expression(ExpressionType.AGGREGATE, err)
 	[
 		<KEYWORD_DEFAULT>
 		(
-            def = Expression(false, err)
+            def = Expression(ExpressionType.SIMPLE, err)
             |
             <CONSTANT_NULL>
 		)
@@ -833,7 +836,7 @@ Expression HavingClause(Errors err) :
 }
 {
 	<KEYWORD_HAVING>
-	e = Expression(true, err)
+	e = Expression(ExpressionType.AGGREGATE, err)
 	{ return e; }
 }
 
@@ -927,7 +930,7 @@ IfEvery IfEveryClause(Errors err) :
 	(
 		(
 		    <KEYWORD_IF>
-		    cond = Expression(false, err)
+		    cond = Expression(ExpressionType.SIMPLE, err)
 		    <KEYWORD_EVERY>
 		    every = EveryDuration(err)
 		    {
@@ -973,7 +976,7 @@ Every EveryDuration(Errors err) :
     TemporalUnit unit;
 }
 {
-    value = Expression(false, err)
+    value = Expression(ExpressionType.SIMPLE, err)
     unit = TimeUnit()
     {
         return new Every(value, unit);
@@ -1027,7 +1030,8 @@ ExecuteIf ExecuteIfClause(Errors err) :
 {
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
-	cond = Expression(false, err) // No aggregations allowed
+	// Allow IF EXISTS expression node, forbid aggregations
+	cond = Expression(ExpressionType.EXECUTE_IF, err)
 	[
 		r = RefreshClause()
 	]
@@ -1315,16 +1319,16 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-Expression Expression(boolean aggregate, Errors err) :
+Expression Expression(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanTerm(aggregate, err)
+	e1 = BooleanTerm(type, err)
 	(
 		<OPERATOR_OR>
-		e2 = BooleanTerm(aggregate, err)
+		e2 = BooleanTerm(type, err)
 		{
 		    e1 = Bool.createOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1333,16 +1337,16 @@ Expression Expression(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanTerm(boolean aggregate, Errors err) :
+Expression BooleanTerm(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanFactor(aggregate, err)
+	e1 = BooleanFactor(type, err)
 	(
 		<OPERATOR_AND>
-		e2 = BooleanFactor(aggregate, err)
+		e2 = BooleanFactor(type, err)
 		{
 		    e1 = Bool.createAND(e1, e2);
 		    addIfError(e1, token, err);
@@ -1351,16 +1355,16 @@ Expression BooleanTerm(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanFactor(boolean aggregate, Errors err) :
+Expression BooleanFactor(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanNegation(aggregate, err)
+	e1 = BooleanNegation(type, err)
 	(
 		<OPERATOR_XOR>
-		e2 = BooleanNegation(aggregate, err)
+		e2 = BooleanNegation(type, err)
 		{
 		    e1 = Bool.createXOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1369,7 +1373,7 @@ Expression BooleanFactor(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanNegation(boolean aggregate, Errors err) :
+Expression BooleanNegation(ExpressionType type, Errors err) :
 {
     Expression e;
     boolean invert = false;
@@ -1379,7 +1383,7 @@ Expression BooleanNegation(boolean aggregate, Errors err) :
 		<OPERATOR_NOT>
 		{ invert = true; }
 	)*
-	e = BooleanPredicate(aggregate, err)
+	e = BooleanPredicate(type, err)
 	{
 	    if (invert) {
 	        return Bool.createNOT(e);
@@ -1389,18 +1393,18 @@ Expression BooleanNegation(boolean aggregate, Errors err) :
 	}
 }
 
-Expression BooleanPredicate(boolean aggregate, Errors err) :
+Expression BooleanPredicate(ExpressionType type, Errors err) :
 {
     Expression e;
 }
 {
-    e = Comparison(aggregate, err)
+    e = Comparison(type, err)
     [
         e = Is(e, err)
         |
         e = Like(e, err)
         |
-        e = Between(e, aggregate, err)
+        e = Between(e, type, err)
     ]
     { return e; }
 }
@@ -1454,7 +1458,7 @@ Expression Like(Expression e, Errors err) :
     }
 }
 
-Expression Between(Expression e, boolean aggregate, Errors err) :
+Expression Between(Expression e, ExpressionType type, Errors err) :
 {
     Expression b;
     Expression min;
@@ -1462,9 +1466,9 @@ Expression Between(Expression e, boolean aggregate, Errors err) :
 }
 {
     <KEYWORD_BETWEEN>
-    min = BitwiseExpression(aggregate, err)
+    min = BitwiseExpression(type, err)
     <OPERATOR_AND>
-    max = BitwiseExpression(aggregate, err)
+    max = BitwiseExpression(type, err)
     {
         b = Between.create(e, min, max);
         addIfError(b, token, err);
@@ -1472,17 +1476,17 @@ Expression Between(Expression e, boolean aggregate, Errors err) :
     }
 }
 
-Expression Comparison(boolean aggregate, Errors err) :
+Expression Comparison(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
     ComparisonOperation op;
 }
 {
-    e1 = BitwiseExpression(aggregate, err)
+    e1 = BitwiseExpression(type, err)
     [
         op = ComparisonOperation()
-        e2 = BitwiseExpression(aggregate, err)
+        e2 = BitwiseExpression(type, err)
         {
             e1 = Comparison.create(op, e1, e2);
             addIfError(e1, token, err);
@@ -1491,16 +1495,16 @@ Expression Comparison(boolean aggregate, Errors err) :
     { return e1; }
 }
 
-Expression BitwiseExpression(boolean aggregate, Errors err) :
+Expression BitwiseExpression(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseTerm(aggregate, err)
+	e1 = BitwiseTerm(type, err)
 	(
 		<OPERATOR_BITWISE_OR>
-		e2 = BitwiseTerm(aggregate, err)
+		e2 = BitwiseTerm(type, err)
 		{
 		    e1 = Bitwise.createOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1509,16 +1513,16 @@ Expression BitwiseExpression(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseTerm(boolean aggregate, Errors err) :
+Expression BitwiseTerm(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseFactor(aggregate, err)
+	e1 = BitwiseFactor(type, err)
 	(
 		<OPERATOR_BITWISE_AND>
-		e2 = BitwiseFactor(aggregate, err)
+		e2 = BitwiseFactor(type, err)
 		{
 		    e1 = Bitwise.createAND(e1, e2);
 		    addIfError(e1, token, err);
@@ -1527,16 +1531,16 @@ Expression BitwiseTerm(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseFactor(boolean aggregate, Errors err) :
+Expression BitwiseFactor(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseShift(aggregate, err)
+	e1 = BitwiseShift(type, err)
 	(
 		<OPERATOR_BITWISE_XOR>
-		e2 = BitwiseShift(aggregate, err)
+		e2 = BitwiseShift(type, err)
 		{
 		    e1 = Bitwise.createXOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1545,14 +1549,14 @@ Expression BitwiseFactor(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseShift(boolean aggregate, Errors err) :
+Expression BitwiseShift(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
     BitwiseOperation op;
 }
 {
-	e1 = BitwiseNegation(aggregate, err)
+	e1 = BitwiseNegation(type, err)
 	[
 		(
 			<OPERATOR_BITWISE_LSH>
@@ -1561,7 +1565,7 @@ Expression BitwiseShift(boolean aggregate, Errors err) :
 			<OPERATOR_BITWISE_RSH>
 			{ op = BitwiseOperation.RSH; }
 		)
-		e2 = BitwiseNegation(aggregate, err)
+		e2 = BitwiseNegation(type, err)
 		{
 		    e1 = Bitwise.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1570,7 +1574,7 @@ Expression BitwiseShift(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseNegation(boolean aggregate, Errors err) :
+Expression BitwiseNegation(ExpressionType type, Errors err) :
 {
     Expression e;
     boolean not = false;
@@ -1580,7 +1584,7 @@ Expression BitwiseNegation(boolean aggregate, Errors err) :
 		<OPERATOR_BITWISE_NOT>
 		{ not = true; }
 	)*
-	e = ArithmeticExpression(aggregate, err)
+	e = ArithmeticExpression(type, err)
 	{
 	    if (not) {
 	        e = Bitwise.createNOT(e);
@@ -1590,14 +1594,14 @@ Expression BitwiseNegation(boolean aggregate, Errors err) :
 	}
 }
 
-Expression ArithmeticExpression(boolean aggregate, Errors err) :
+Expression ArithmeticExpression(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-	e1 = ArithmeticTerm(aggregate, err)
+	e1 = ArithmeticTerm(type, err)
 	(
 		(
 			<OPERATOR_PLUS>
@@ -1606,7 +1610,7 @@ Expression ArithmeticExpression(boolean aggregate, Errors err) :
 			<OPERATOR_MINUS>
 			{ op = ArithmeticOperation.SUBTRACTION; }
 		)
-		e2 = ArithmeticTerm(aggregate, err)
+		e2 = ArithmeticTerm(type, err)
 		{
 		    e1 = Arithmetic.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1615,14 +1619,14 @@ Expression ArithmeticExpression(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression ArithmeticTerm(boolean aggregate, Errors err) :
+Expression ArithmeticTerm(ExpressionType type, Errors err) :
 {
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-	e1 = ArithmeticFactor(aggregate, err)
+	e1 = ArithmeticFactor(type, err)
 	(
 		(
 			<OPERATOR_MULTIPLY>
@@ -1634,7 +1638,7 @@ Expression ArithmeticTerm(boolean aggregate, Errors err) :
 			<OPERATOR_MODULO>
 			{ op = ArithmeticOperation.MODULO; }
 		)
-		e2 = ArithmeticFactor(aggregate, err)
+		e2 = ArithmeticFactor(type, err)
 		{
 		    e1 = Arithmetic.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1643,7 +1647,7 @@ Expression ArithmeticTerm(boolean aggregate, Errors err) :
 	{ return e1; }
 }
 
-Expression ArithmeticFactor(boolean aggregate, Errors err) :
+Expression ArithmeticFactor(ExpressionType type, Errors err) :
 {
     Expression e;
     Sign s = Sign.PLUS;
@@ -1652,7 +1656,7 @@ Expression ArithmeticFactor(boolean aggregate, Errors err) :
 	[
 		s = Sign()
 	]
-	e = PrimaryExpression(aggregate, err)
+	e = PrimaryExpression(type, err)
 	{
 	    if (s == Sign.MINUS) {
 	        e = Arithmetic.createInverse(e);
@@ -1662,7 +1666,7 @@ Expression ArithmeticFactor(boolean aggregate, Errors err) :
 	}
 }
 
-Expression PrimaryExpression(boolean aggregate, Errors err) :
+Expression PrimaryExpression(ExpressionType type, Errors err) :
 {
     String s;
     Expression e;
@@ -1676,13 +1680,18 @@ Expression PrimaryExpression(boolean aggregate, Errors err) :
 	|
 	e = ExistsAttribute()
 	{
+		if (type != ExpressionType.EXECUTE_IF) {
+			String msg = "IF EXIST not allowed";
+			addError(msg, token, err);
+			return new ErrorExpression(msg);
+		}
 	    addIfError(e, token, err);
 	    return e;
 	}
 	|
 	(
 	"("
-        e = Expression(aggregate, err)
+        e = Expression(type, err)
         {
             addIfError(e, token, err);
             return e;
@@ -1692,18 +1701,20 @@ Expression PrimaryExpression(boolean aggregate, Errors err) :
 	|
     <KEYWORD_GROUPTS>
     {
-        if (!aggregate) {
-            addError("aggregation not allowed", token, err);
-            return new ErrorExpression("aggregation not allowed");
+        if (type != ExpressionType.AGGREGATE) {
+        	String msg = "aggregation not allowed";
+            addError(msg, token, err);
+            return new ErrorExpression(msg);
         }
         return new GroupTS();
     }
     |
     e = Aggregate(err)
     {
-        if (!aggregate) {
-            addError("aggregation not allowed", token, err);
-            return new ErrorExpression("aggregation not allowed");
+        if (type != ExpressionType.AGGREGATE) {
+        	String msg = "aggregation not allowed";
+            addError(msg, token, err);
+            return new ErrorExpression(msg);
         }
         return e;
     }
@@ -1747,7 +1758,7 @@ Expression Aggregate(Errors err) :
         ws = WindowSize(err)
         [
             ","
-            filter = Expression(false, err)
+            filter = Expression(ExpressionType.SIMPLE, err)
         ]
         ")"
         )
@@ -1756,12 +1767,12 @@ Expression Aggregate(Errors err) :
         op = AggregateOperation()
         { t = token; }
         "("
-        exp = Expression(false, err)
+        exp = Expression(ExpressionType.SIMPLE, err)
         ","
         ws = WindowSize(err)
         [
             ","
-            filter = Expression(false, err)
+            filter = Expression(ExpressionType.SIMPLE, err)
         ]
         ")"
         )
