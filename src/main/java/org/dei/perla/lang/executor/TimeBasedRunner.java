@@ -3,8 +3,8 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.statement.Selection;
 
 import java.util.List;
@@ -62,7 +62,7 @@ public final class TimeBasedRunner {
             BufferView view = buf.unmodifiableView();
             query.select(view);
             view.release();
-            // TODO: delete old records from buffer
+            // TODO: delete old samples from buffer
             inSelect.set(false);
         });
     }
@@ -76,8 +76,8 @@ public final class TimeBasedRunner {
         }
 
         @Override
-        public void newRecord(Task task, Record record) {
-            buf.add(record);
+        public void data(Task task, Sample sample) {
+            buf.add(sample);
         }
 
         @Override

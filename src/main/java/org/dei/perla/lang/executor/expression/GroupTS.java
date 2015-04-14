@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -53,7 +53,7 @@ public class GroupTS implements Expression {
     }
 
     @Override
-    public Object run(Object[] record, BufferView buffer) {
+    public Object run(Object[] sample, BufferView buffer) {
         return null;
     }
 
@@ -81,7 +81,7 @@ public class GroupTS implements Expression {
         }
 
         @Override
-        public Object run(Object[] record, BufferView buffer) {
+        public Object run(Object[] sample, BufferView buffer) {
             return buffer.get(0)[tsIdx];
         }
 

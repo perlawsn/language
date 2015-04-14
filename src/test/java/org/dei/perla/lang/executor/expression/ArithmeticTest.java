@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -48,10 +48,10 @@ public class ArithmeticTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        Object[] record = new Object[]{4};
-        assertThat(e.run(record, null), equalTo(1 + 4));
-        record = new Object[]{3};
-        assertThat(e.run(record, null), equalTo(1 + 3));
+        Object[] sample = new Object[]{4};
+        assertThat(e.run(sample, null), equalTo(1 + 4));
+        sample = new Object[]{3};
+        assertThat(e.run(sample, null), equalTo(1 + 3));
     }
 
     @Test
@@ -63,10 +63,10 @@ public class ArithmeticTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        Object[] record = new Object[]{4.4f};
-        assertThat(e.run(record, null), equalTo(4.4f + 1.5f));
-        record = new Object[]{3.3f};
-        assertThat(e.run(record, null), equalTo(3.3f + 1.5f));
+        Object[] sample = new Object[]{4.4f};
+        assertThat(e.run(sample, null), equalTo(4.4f + 1.5f));
+        sample = new Object[]{3.3f};
+        assertThat(e.run(sample, null), equalTo(3.3f + 1.5f));
     }
 
     @Test
@@ -186,10 +186,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        Object[] record = new Object[]{4};
-        assertThat(e.run(record, null), equalTo(1 - 4));
-        record = new Object[]{3};
-        assertThat(e.run(record, null), equalTo(1 - 3));
+        Object[] sample = new Object[]{4};
+        assertThat(e.run(sample, null), equalTo(1 - 4));
+        sample = new Object[]{3};
+        assertThat(e.run(sample, null), equalTo(1 - 3));
     }
 
     @Test
@@ -200,10 +200,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        Object[] record = new Object[]{4.4f};
-        assertThat(e.run(record, null), equalTo(1.5f - 4.4f));
-        record = new Object[]{3.3f};
-        assertThat(e.run(record, null), equalTo(1.5f - 3.3f));
+        Object[] sample = new Object[]{4.4f};
+        assertThat(e.run(sample, null), equalTo(1.5f - 4.4f));
+        sample = new Object[]{3.3f};
+        assertThat(e.run(sample, null), equalTo(1.5f - 3.3f));
     }
 
     @Test
@@ -312,10 +312,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        Object[] record = new Object[]{4};
-        assertThat(e.run(record, null), equalTo(1 * 4));
-        record = new Object[]{3};
-        assertThat(e.run(record, null), equalTo(1 * 3));
+        Object[] sample = new Object[]{4};
+        assertThat(e.run(sample, null), equalTo(1 * 4));
+        sample = new Object[]{3};
+        assertThat(e.run(sample, null), equalTo(1 * 3));
     }
 
     @Test
@@ -326,10 +326,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        Object[] record = new Object[]{4.4f};
-        assertThat(e.run(record, null), equalTo(1.5f * 4.4f));
-        record = new Object[]{3.3f};
-        assertThat(e.run(record, null), equalTo(1.5f * 3.3f));
+        Object[] sample = new Object[]{4.4f};
+        assertThat(e.run(sample, null), equalTo(1.5f * 4.4f));
+        sample = new Object[]{3.3f};
+        assertThat(e.run(sample, null), equalTo(1.5f * 3.3f));
     }
 
     @Test
@@ -438,10 +438,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        Object[] record = new Object[]{4};
-        assertThat(e.run(record, null), equalTo(1 / 4));
-        record = new Object[]{3};
-        assertThat(e.run(record, null), equalTo(1 / 3));
+        Object[] sample = new Object[]{4};
+        assertThat(e.run(sample, null), equalTo(1 / 4));
+        sample = new Object[]{3};
+        assertThat(e.run(sample, null), equalTo(1 / 3));
     }
 
     @Test
@@ -452,10 +452,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        Object[] record = new Object[]{4.4f};
-        assertThat(e.run(record, null), equalTo(1.5f / 4.4f));
-        record = new Object[]{3.3f};
-        assertThat(e.run(record, null), equalTo(1.5f / 3.3f));
+        Object[] sample = new Object[]{4.4f};
+        assertThat(e.run(sample, null), equalTo(1.5f / 4.4f));
+        sample = new Object[]{3.3f};
+        assertThat(e.run(sample, null), equalTo(1.5f / 3.3f));
     }
 
     @Test
@@ -564,10 +564,10 @@ public class ArithmeticTest {
 
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        Object[] record = new Object[]{4};
-        assertThat(e.run(record, null), equalTo(1 % 4));
-        record = new Object[]{3};
-        assertThat(e.run(record, null), equalTo(1 % 3));
+        Object[] sample = new Object[]{4};
+        assertThat(e.run(sample, null), equalTo(1 % 4));
+        sample = new Object[]{3};
+        assertThat(e.run(sample, null), equalTo(1 % 3));
     }
 
     @Test
@@ -665,10 +665,10 @@ public class ArithmeticTest {
         e = Arithmetic.createInverse(floatField);
         e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        Object[] record = new Object[]{5.4f};
-        assertThat(e.run(record, null), equalTo(-(Float) record[0]));
-        record = new Object[]{3.2f};
-        assertThat(e.run(record, null), equalTo(-(Float) record[0]));
+        Object[] sample = new Object[]{5.4f};
+        assertThat(e.run(sample, null), equalTo(-(Float) sample[0]));
+        sample = new Object[]{3.2f};
+        assertThat(e.run(sample, null), equalTo(-(Float) sample[0]));
     }
 
     @Test

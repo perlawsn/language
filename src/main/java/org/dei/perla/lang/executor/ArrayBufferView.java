@@ -50,14 +50,14 @@ public final class ArrayBufferView extends ArrayBufferReleaser
 
     /**
      * {@code getTimestampIndex} returns the index of the column which
-     * contains the record timestamp.
+     * contains the sample timestamp.
      */
     protected int getTimestampIndex() {
         return tsIdx;
     }
 
     /**
-     * {@code timestamp} returns the timestamp associated with the ith record
+     * {@code timestamp} returns the timestamp associated with the ith sample
      * in the buffer.
      */
     private Instant timestamp(int i) {
@@ -133,7 +133,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     }
 
     @Override
-    public int recordsIn(Duration d) {
+    public int samplesIn(Duration d) {
         lock.lock();
         try {
             return count(d);
@@ -143,7 +143,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
     }
 
     /**
-     * {@code count} counts the number of records whose timestamp is greater
+     * {@code count} counts the number of samples whose timestamp is greater
      * or equal than (newest - d).
      */
     private int count(Duration d) {
@@ -204,7 +204,7 @@ public final class ArrayBufferView extends ArrayBufferReleaser
         try {
             List<BufferView> bfs = new LinkedList<>();
 
-            // The first timestamped-grouped buffer always contains all records
+            // The first timestamped-grouped buffer always contains all samples
             ArrayBufferView v = new ArrayBufferView(this, oldest, newest);
             bfs.add(v);
             views.add(v);

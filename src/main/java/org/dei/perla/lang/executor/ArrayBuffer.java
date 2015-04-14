@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Sample;
 
 import java.time.Instant;
 import java.util.concurrent.locks.Lock;
@@ -43,7 +43,7 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
     }
 
     @Override
-    public void add(Record r) {
+    public void add(Sample r) {
         idxLk.lock();
         try {
             if (len == cap) {
@@ -60,7 +60,7 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
         Object[][] newData = new Object[cap * 2][];
 
         // Copies the old data using a different thread, so that the calling
-        // thread can continue with adding new records to the head of the array.
+        // thread can continue with adding new samples to the head of the array.
         new Thread(() -> {
             dataLk.lock();
             try {

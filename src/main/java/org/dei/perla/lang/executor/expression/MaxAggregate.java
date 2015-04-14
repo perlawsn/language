@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
@@ -29,7 +29,7 @@ public final class MaxAggregate extends Aggregate {
      *
      * @param e value
      * @param ws portion of buffer to aggregate
-     * @param filter optional filtering expression to determine which records
+     * @param filter optional filtering expression to determine which samples
      *               must be aggregated
      * @return new {@code MaxAggregate} instance
      */

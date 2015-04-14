@@ -3,10 +3,10 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
-import org.dei.perla.core.record.SamplePipeline;
-import org.dei.perla.core.record.SamplePipeline.PipelineBuilder;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.sample.SamplePipeline;
+import org.dei.perla.core.sample.SamplePipeline.PipelineBuilder;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -263,8 +263,8 @@ public class SimulatorFpc implements Fpc {
 
         protected GetSimTask(List<Attribute> atts, TaskHandler handler) {
             super(atts, handler);
-            Record r = pipeline.run(newSample());
-            handler.newRecord(this, r);
+            Sample r = pipeline.run(newSample());
+            handler.data(this, r);
             handler.complete(this);
         }
 
@@ -301,8 +301,8 @@ public class SimulatorFpc implements Fpc {
         private void generateValues() {
             try {
                 while (true) {
-                    Record r = pipeline.run(newSample());
-                    handler.newRecord(this, r);
+                    Sample r = pipeline.run(newSample());
+                    handler.data(this, r);
                     Thread.sleep(periodMs);
                 }
             } catch(InterruptedException e) {
@@ -346,8 +346,8 @@ public class SimulatorFpc implements Fpc {
         }
 
         protected void trigger() {
-            Record r = pipeline.run(newSample());
-            handler.newRecord(this, r);
+            Sample r = pipeline.run(newSample());
+            handler.data(this, r);
         }
 
         @Override

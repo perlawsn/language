@@ -1,8 +1,8 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
@@ -47,11 +47,11 @@ public class ArrayBufferTest {
         Buffer b = new ArrayBuffer(0, 512);
 
         assertThat(b.length(), equalTo(0));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
         assertThat(b.length(), equalTo(1));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 1}));
         assertThat(b.length(), equalTo(2));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 2}));
         assertThat(b.length(), equalTo(3));
 
         BufferView v = b.unmodifiableView();
@@ -77,9 +77,9 @@ public class ArrayBufferTest {
     public void bufferGrowth() {
         Buffer b = new ArrayBuffer(0, 2);
 
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 1}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 2}));
 
         BufferView v = b.unmodifiableView();
         assertThat(v.length(), equalTo(3));
@@ -93,11 +93,11 @@ public class ArrayBufferTest {
     public void outOfOrderInsertionTest() throws InterruptedException {
         Buffer b = new ArrayBuffer(0, 512);
 
-        Record r0 = new Record(atts, new Object[]{
+        Sample r0 = new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:46.000Z"), 0});
-        Record r1 = new Record(atts, new Object[]{
+        Sample r1 = new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:47.000Z"), 1});
-        Record r2 = new Record(atts, new Object[]{
+        Sample r2 = new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:48.000Z"), 2});
 
         b.add(r1);
@@ -121,11 +121,11 @@ public class ArrayBufferTest {
     public void multipleViews() {
         Buffer b = new ArrayBuffer(0, 521);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:46.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:47.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:48.000Z"), 3}));
         assertThat(b.length(), equalTo(3));
 
@@ -133,7 +133,7 @@ public class ArrayBufferTest {
         assertThat(v0, notNullValue());
         assertThat(v0.length(), equalTo(3));
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:44.000Z"), 0}));
         assertThat(b.length(), equalTo(4));
         assertThat(v0.length(), equalTo(3));
@@ -157,9 +157,9 @@ public class ArrayBufferTest {
     public void multipleViewsWithoutRelease() {
         Buffer b = new ArrayBuffer(0, 521);
 
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
 
         BufferView v0 = b.unmodifiableView();
         assertThat(v0, notNullValue());
@@ -171,11 +171,11 @@ public class ArrayBufferTest {
     public void grandchildView() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 1}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 2}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 3}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 4}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 1}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 2}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 3}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 4}));
 
         BufferView v0 = b.unmodifiableView();
         assertThat(v0.length(), equalTo(5));
@@ -207,11 +207,11 @@ public class ArrayBufferTest {
     public void wrongReleaseOrder() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
-        b.add(new Record(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
+        b.add(new Sample(atts, new Object[]{Instant.now(), 0}));
 
         BufferView v0 = b.unmodifiableView();
         BufferView v1 = v0.subView(4);
@@ -221,84 +221,84 @@ public class ArrayBufferTest {
     }
 
     @Test
-    public void recordsIn() {
+    public void samplesIn() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:32.000Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();
 
-        int i = v.recordsIn(Duration.ofSeconds(0));
+        int i = v.samplesIn(Duration.ofSeconds(0));
         assertThat(i, equalTo(1));
 
-        i = v.recordsIn(Duration.ofSeconds(9));
+        i = v.samplesIn(Duration.ofSeconds(9));
         assertThat(i, equalTo(2));
-        i = v.recordsIn(Duration.ofSeconds(10));
+        i = v.samplesIn(Duration.ofSeconds(10));
         assertThat(i, equalTo(2));
 
-        i = v.recordsIn(Duration.ofSeconds(14));
+        i = v.samplesIn(Duration.ofSeconds(14));
         assertThat(i, equalTo(3));
-        i = v.recordsIn(Duration.ofSeconds(15));
+        i = v.samplesIn(Duration.ofSeconds(15));
         assertThat(i, equalTo(3));
 
-        i = v.recordsIn(Duration.ofSeconds(20));
+        i = v.samplesIn(Duration.ofSeconds(20));
         assertThat(i, equalTo(4));
-        i = v.recordsIn(Duration.ofSeconds(21));
+        i = v.samplesIn(Duration.ofSeconds(21));
         assertThat(i, equalTo(4));
 
-        i = v.recordsIn(Duration.ofSeconds(27));
+        i = v.samplesIn(Duration.ofSeconds(27));
         assertThat(i, equalTo(5));
-        i = v.recordsIn(Duration.ofSeconds(28));
+        i = v.samplesIn(Duration.ofSeconds(28));
         assertThat(i, equalTo(5));
 
-        i = v.recordsIn(Duration.ofSeconds(29));
+        i = v.samplesIn(Duration.ofSeconds(29));
         assertThat(i, equalTo(6));
-        i = v.recordsIn(Duration.ofSeconds(30));
+        i = v.samplesIn(Duration.ofSeconds(30));
         assertThat(i, equalTo(6));
 
-        i = v.recordsIn(Duration.ofSeconds(33));
+        i = v.samplesIn(Duration.ofSeconds(33));
         assertThat(i, equalTo(7));
-        i = v.recordsIn(Duration.ofSeconds(34));
+        i = v.samplesIn(Duration.ofSeconds(34));
         assertThat(i, equalTo(7));
 
-        i = v.recordsIn(Duration.ofSeconds(39));
+        i = v.samplesIn(Duration.ofSeconds(39));
         assertThat(i, equalTo(8));
-        i = v.recordsIn(Duration.ofSeconds(40));
+        i = v.samplesIn(Duration.ofSeconds(40));
         assertThat(i, equalTo(8));
 
-        i = v.recordsIn(Duration.ofSeconds(46));
+        i = v.samplesIn(Duration.ofSeconds(46));
         assertThat(i, equalTo(9));
 
-        i = v.recordsIn(Duration.ofSeconds(47));
+        i = v.samplesIn(Duration.ofSeconds(47));
         assertThat(i, equalTo(10));
 
-        i = v.recordsIn(Duration.ofSeconds(49));
+        i = v.samplesIn(Duration.ofSeconds(49));
         assertThat(i, equalTo(11));
-        i = v.recordsIn(Duration.ofSeconds(50));
+        i = v.samplesIn(Duration.ofSeconds(50));
         assertThat(i, equalTo(11));
 
-        i = v.recordsIn(Duration.ofDays(1));
+        i = v.samplesIn(Duration.ofDays(1));
         assertThat(i, equalTo(11));
     }
 
@@ -306,27 +306,27 @@ public class ArrayBufferTest {
     public void durationView() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:32.000Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();
@@ -356,27 +356,27 @@ public class ArrayBufferTest {
     public void groupByTimestamp1() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.500Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();
@@ -401,27 +401,27 @@ public class ArrayBufferTest {
     public void groupByTimestamp2() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.000Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();
@@ -446,27 +446,27 @@ public class ArrayBufferTest {
     public void groupByTimestamp3() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.000Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:40.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();
@@ -487,27 +487,27 @@ public class ArrayBufferTest {
     public void forEach() {
         Buffer b = new ArrayBuffer(0, 512);
 
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:10.000Z"), 0}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:12.000Z"), 1}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:13.000Z"), 2}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:20.000Z"), 3}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:26.000Z"), 4}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:30.000Z"), 5}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:32.000Z"), 6}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:39.000Z"), 7}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:45.000Z"), 8}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:50.000Z"), 9}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:59.000Z"), 10}));
 
         BufferView v = b.unmodifiableView();

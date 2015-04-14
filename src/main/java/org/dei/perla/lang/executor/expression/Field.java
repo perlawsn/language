@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -75,7 +75,7 @@ public class Field implements Expression {
     }
 
     @Override
-    public Object run(Object[] record, BufferView buffer) {
+    public Object run(Object[] sample, BufferView buffer) {
         return null;
     }
 
@@ -106,8 +106,8 @@ public class Field implements Expression {
         }
 
         @Override
-        public Object run(Object[] record, BufferView buffer) {
-            return record[idx];
+        public Object run(Object[] sample, BufferView buffer) {
+            return sample[idx];
         }
 
     }
@@ -125,8 +125,8 @@ public class Field implements Expression {
         }
 
         @Override
-        public Object run(Object[] record, BufferView buffer) {
-            Object o = record[idx];
+        public Object run(Object[] sample, BufferView buffer) {
+            Object o = sample[idx];
 
             if (o == null) {
                 return null;

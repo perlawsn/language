@@ -1,8 +1,8 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
@@ -55,27 +55,27 @@ public class AggregateTest {
     @BeforeClass
     public static void setupBuffer() {
         Buffer b = new ArrayBuffer(1, 512);
-        b.add(new Record(atts, new Object[]{0, Instant.now()}));
-        b.add(new Record(atts, new Object[]{1, Instant.now()}));
-        b.add(new Record(atts, new Object[]{2, Instant.now()}));
-        b.add(new Record(atts, new Object[]{3, Instant.now()}));
-        b.add(new Record(atts, new Object[]{4, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{0, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{1, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{2, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{3, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{4, Instant.now()}));
         intView = b.unmodifiableView();
 
         b = new ArrayBuffer(1, 512);
-        b.add(new Record(atts, new Object[]{0.0f, Instant.now()}));
-        b.add(new Record(atts, new Object[]{1.1f, Instant.now()}));
-        b.add(new Record(atts, new Object[]{2.2f, Instant.now()}));
-        b.add(new Record(atts, new Object[]{3.3f, Instant.now()}));
-        b.add(new Record(atts, new Object[]{4.4f, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{0.0f, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{1.1f, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{2.2f, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{3.3f, Instant.now()}));
+        b.add(new Sample(atts, new Object[]{4.4f, Instant.now()}));
         floatView = b.unmodifiableView();
 
         b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{Instant.now()}));
-        b.add(new Record(atts, new Object[]{Instant.now()}));
-        b.add(new Record(atts, new Object[]{Instant.now()}));
-        b.add(new Record(atts, new Object[]{Instant.now()}));
-        b.add(new Record(atts, new Object[]{Instant.now()}));
+        b.add(new Sample(atts, new Object[]{Instant.now()}));
+        b.add(new Sample(atts, new Object[]{Instant.now()}));
+        b.add(new Sample(atts, new Object[]{Instant.now()}));
+        b.add(new Sample(atts, new Object[]{Instant.now()}));
+        b.add(new Sample(atts, new Object[]{Instant.now()}));
         tsView = b.unmodifiableView();
     }
 

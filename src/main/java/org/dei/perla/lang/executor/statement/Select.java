@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
@@ -90,7 +90,7 @@ public final class Select implements Clause {
         // UPTO CLAUSE
         int ut;
         if (upto.getType() == WindowType.TIME) {
-            ut = buffer.recordsIn(upto.getDuration());
+            ut = buffer.samplesIn(upto.getDuration());
         } else {
             ut = upto.getSamples();
         }

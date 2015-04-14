@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.executor.statement.*;
@@ -41,17 +41,17 @@ public class ParserTest {
         });
     }
 
-    private static final Object[][] records;
+    private static final Object[][] samples;
     static {
-        records = new Object[4][];
-        records[0] = new Object[1];
-        records[0][0] = 94;
-        records[1] = new Object[1];
-        records[1][0] = 75;
-        records[2] = new Object[1];
-        records[2][0] =  50;
-        records[3] = new Object[1];
-        records[3][0] = 30;
+        samples = new Object[4][];
+        samples[0] = new Object[1];
+        samples[0][0] = 94;
+        samples[1] = new Object[1];
+        samples[1][0] = 75;
+        samples[2] = new Object[1];
+        samples[2][0] =  50;
+        samples[3] = new Object[1];
+        samples[3][0] = 30;
     }
 
     @Test
@@ -1216,13 +1216,13 @@ public class ParserTest {
         ife = ife.bind(atts, new ArrayList<>());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
-        d = ife.run(records[0]);
+        d = ife.run(samples[0]);
         assertThat(d, equalTo(Duration.ofSeconds(10)));
-        d = ife.run(records[1]);
+        d = ife.run(samples[1]);
         assertThat(d, equalTo(Duration.ofSeconds(40)));
-        d = ife.run(records[2]);
+        d = ife.run(samples[2]);
         assertThat(d, equalTo(Duration.ofMinutes(2)));
-        d = ife.run(records[3]);
+        d = ife.run(samples[3]);
         assertThat(d, equalTo(Duration.ofHours(1)));
     }
 
@@ -1259,13 +1259,13 @@ public class ParserTest {
         ife = ((SamplingIfEvery) s).getIfEvery();
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
-        d = ife.run(records[0]);
+        d = ife.run(samples[0]);
         assertThat(d, equalTo(Duration.ofSeconds(10)));
-        d = ife.run(records[1]);
+        d = ife.run(samples[1]);
         assertThat(d, equalTo(Duration.ofSeconds(40)));
-        d = ife.run(records[2]);
+        d = ife.run(samples[2]);
         assertThat(d, equalTo(Duration.ofMinutes(2)));
-        d = ife.run(records[3]);
+        d = ife.run(samples[3]);
         assertThat(d, equalTo(Duration.ofHours(1)));
     }
 

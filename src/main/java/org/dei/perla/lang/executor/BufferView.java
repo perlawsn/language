@@ -15,24 +15,24 @@ import java.util.function.BiConsumer;
 public interface BufferView {
 
     /**
-     * {@code length} returns the number of records in the {@code BufferView}.
+     * {@code length} returns the number of samples in the {@code BufferView}.
      *
-     * @return number of records in the {@code BufferView}.
+     * @return number of samples in the {@code BufferView}.
      */
     public int length();
 
     /**
-     * {@code release} releases the records in the {@code BufferView}. After
+     * {@code release} releases the samples in the {@code BufferView}. After
      * calling this method, further accesses to the contents of this object
      * will result in undefined behaviour.
      */
     public void release();
 
     /**
-     * {@code get} retrieves the ith oldest record in the {@code BufferView}.
+     * {@code get} retrieves the ith oldest sample in the {@code BufferView}.
      *
-     * @param i index of the record to retrieve
-     * @return Object array containing all the fields in the selected record
+     * @param i index of the sample to retrieve
+     * @return Object array containing all the fields in the selected sample
      * @throws IndexOutOfBoundsException if the index if out of range
      */
     public Object[] get(int i);
@@ -41,7 +41,7 @@ public interface BufferView {
 
     public void forEach(BiConsumer<Object[], BufferView> c, Expression cond);
 
-    public int recordsIn(Duration d);
+    public int samplesIn(Duration d);
 
     public BufferView subView(int samples);
 

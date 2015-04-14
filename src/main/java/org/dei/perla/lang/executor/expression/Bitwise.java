@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -153,9 +153,9 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public Object run(Object[] record, BufferView buffer) {
-        Object o1 = e1.run(record, buffer);
-        Object o2 = e2.run(record, buffer);
+    public Object run(Object[] sample, BufferView buffer) {
+        Object o1 = e1.run(sample, buffer);
+        Object o2 = e2.run(sample, buffer);
         return compute(op, o1, o2);
     }
 

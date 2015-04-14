@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.expression.CastInteger;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
@@ -90,12 +90,12 @@ public class IfEvery implements Clause {
         return ife;
     }
 
-    public Duration run(Object[] record) {
-        LogicValue c = (LogicValue) cond.run(record, null);
+    public Duration run(Object[] sample) {
+        LogicValue c = (LogicValue) cond.run(sample, null);
         if (!c.toBoolean()) {
-            return next.run(record);
+            return next.run(sample);
         }
-        int v = (int) value.run(record, null);
+        int v = (int) value.run(sample, null);
         return Duration.of(v, unit);
     }
 
@@ -130,7 +130,7 @@ public class IfEvery implements Clause {
             return this;
         }
 
-        public Duration run(Object[] record) {
+        public Duration run(Object[] sample) {
             throw new RuntimeException(
                     "Cannot run, IF-EVERY instance has an error");
         }

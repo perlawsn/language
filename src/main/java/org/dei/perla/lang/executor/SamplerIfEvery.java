@@ -3,8 +3,8 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.statement.IfEvery;
 import org.dei.perla.lang.executor.statement.Refresh;
@@ -176,7 +176,7 @@ public final class SamplerIfEvery implements Sampler {
         }
 
         @Override
-        public void newRecord(Task task, Record record) {
+        public void data(Task task, Sample sample) {
             if (status == STOPPED) {
                 return;
             }
@@ -184,7 +184,7 @@ public final class SamplerIfEvery implements Sampler {
             lk.lock();
             try {
                 if (status == SAMPLING) {
-                    Duration d = ife.run(record.values());
+                    Duration d = ife.run(sample.values());
                     if (d == rate) {
                         // Set the status back to sampling if the new sampling rate
                         // is the same as the old one
@@ -196,7 +196,7 @@ public final class SamplerIfEvery implements Sampler {
                     // The new sampling rate will be set in the SamplingHandler
 
                 } else if (status == INITIALIZING) {
-                    Duration d = ife.run(record.values());
+                    Duration d = ife.run(sample.values());
                     rate = d;
                     sampTask = fpc.get(atts, false, rate, sampHandler);
                     status = SAMPLING;
@@ -245,12 +245,12 @@ public final class SamplerIfEvery implements Sampler {
         }
 
         @Override
-        public void newRecord(Task task, Record record) {
+        public void data(Task task, Sample sample) {
             if (status == STOPPED) {
                 return;
             }
 
-            handler.data(sampling, record.values());
+            handler.data(sampling, sample.values());
         }
 
         @Override
@@ -284,7 +284,7 @@ public final class SamplerIfEvery implements Sampler {
         }
 
         @Override
-        public void newRecord(Task task, Record record) {
+        public void data(Task task, Sample sample) {
             lk.lock();
             try {
                 // Single shot sampling when the refresh event is triggered

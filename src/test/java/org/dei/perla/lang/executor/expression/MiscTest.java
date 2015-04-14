@@ -1,8 +1,8 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
@@ -75,8 +75,8 @@ public class MiscTest {
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(floatAtt));
-        Object[] record = new Object[]{4.4f};
-        assertThat(e.run(record, null), equalTo(4.4f));
+        Object[] sample = new Object[]{4.4f};
+        assertThat(e.run(sample, null), equalTo(4.4f));
     }
 
     @Test
@@ -136,8 +136,8 @@ public class MiscTest {
         assertFalse(cast.hasErrors());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
-        Object[] record = new Object[]{4};
-        assertThat(cast.run(record, null), equalTo(4));
+        Object[] sample = new Object[]{4};
+        assertThat(cast.run(sample, null), equalTo(4));
     }
 
     @Test
@@ -369,7 +369,7 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        Object[] record;
+        Object[] sample;
 
         Expression fi = new Field(intAtt.getId());
         assertFalse(fi.isComplete());
@@ -380,10 +380,10 @@ public class MiscTest {
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertThat(fi.getType(), equalTo(DataType.INTEGER));
-        record = new Object[]{4};
-        assertThat(fi.run(record, null), equalTo(4));
-        record = new Object[]{3};
-        assertThat(fi.run(record, null), equalTo(3));
+        sample = new Object[]{4};
+        assertThat(fi.run(sample, null), equalTo(4));
+        sample = new Object[]{3};
+        assertThat(fi.run(sample, null), equalTo(3));
 
         Expression fs = new Field(stringAtt.getId());
         assertFalse(fs.isComplete());
@@ -394,10 +394,10 @@ public class MiscTest {
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(stringAtt));
         assertThat(fs.getType(), equalTo(DataType.STRING));
-        record = new Object[]{"4"};
-        assertThat(fs.run(record, null), equalTo("4"));
-        record = new Object[]{"3"};
-        assertThat(fs.run(record, null), equalTo("3"));
+        sample = new Object[]{"4"};
+        assertThat(fs.run(sample, null), equalTo("4"));
+        sample = new Object[]{"3"};
+        assertThat(fs.run(sample, null), equalTo("3"));
 
         Expression fb = new Field(boolAtt.getId());
         assertFalse(fb.isComplete());
@@ -408,12 +408,12 @@ public class MiscTest {
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(boolAtt));
         assertThat(fb.getType(), equalTo(DataType.BOOLEAN));
-        record = new Object[]{true};
-        assertThat(fb.run(record, null), equalTo(LogicValue.TRUE));
-        record = new Object[]{null};
-        assertThat(fb.run(record, null), nullValue());
-        record = new Object[]{false};
-        assertThat(fb.run(record, null), equalTo(LogicValue.FALSE));
+        sample = new Object[]{true};
+        assertThat(fb.run(sample, null), equalTo(LogicValue.TRUE));
+        sample = new Object[]{null};
+        assertThat(fb.run(sample, null), nullValue());
+        sample = new Object[]{false};
+        assertThat(fb.run(sample, null), equalTo(LogicValue.FALSE));
 
         Expression incomplete = new Field("incomplete");
         assertFalse(incomplete.isComplete());
@@ -428,8 +428,8 @@ public class MiscTest {
                 intAtt
         });
         Buffer b = new ArrayBuffer(0, 1);
-        b.add(new Record(ra, new Object[]{Instant.now(), 1}));
-        b.add(new Record(ra, new Object[]{Instant.now(), 2}));
+        b.add(new Sample(ra, new Object[]{Instant.now(), 1}));
+        b.add(new Sample(ra, new Object[]{Instant.now(), 2}));
         BufferView view = b.unmodifiableView();
 
         Expression gts = new GroupTS();

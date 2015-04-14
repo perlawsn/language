@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Sample;
 
 /**
  * @author Guido Rota 18/02/15.
@@ -8,19 +8,19 @@ import org.dei.perla.core.record.Record;
 public interface Buffer {
 
     /**
-     * {@code length} returns the number of records inside the backing {@link
+     * {@code length} returns the number of samples inside the backing {@link
      * Buffer}.
      *
-     * @return number of records in the backing {@code Buffer}.
+     * @return number of samples in the backing {@code Buffer}.
      */
     public int length();
 
     /**
-     * {@code add} adds a {@link Record} to the {@code Buffer}.
+     * {@code add} adds a {@link Sample} to the {@code Buffer}.
      *
-     * @param r {@link Record} to add
+     * @param r {@link Sample} to add
      */
-    public void add(Record r);
+    public void add(Sample r);
 
     /**
      * {@code unmodifiableView} returns an unmodifiable view of the {@code

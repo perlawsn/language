@@ -1,8 +1,8 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
@@ -50,15 +50,15 @@ public class SelectTest {
     private static final BufferView view;
     static {
         Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:15.000Z"), 1, "1", 1.1f}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:18.000Z"), 2, "2", 2.2f}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f}));
-        b.add(new Record(atts, new Object[]{
+        b.add(new Sample(atts, new Object[]{
                 Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f}));
 
         view = b.unmodifiableView();
@@ -73,10 +73,10 @@ public class SelectTest {
 
         Select sel = new Select(fields, null, null, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(1));
-        Object[] r = records.get(0);
+        assertThat(samples.size(), equalTo(1));
+        Object[] r = samples.get(0);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(0)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -98,10 +98,10 @@ public class SelectTest {
 
         Select sel = new Select(fields, null, null, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(1));
-        Object[] r = records.get(0);
+        assertThat(samples.size(), equalTo(1));
+        Object[] r = samples.get(0);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(0)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -125,11 +125,11 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(3));
-        for (int i = 0; i < records.size(); i++) {
-            Object[] r = records.get(i);
+        assertThat(samples.size(), equalTo(3));
+        for (int i = 0; i < samples.size(); i++) {
+            Object[] r = samples.get(i);
             assertTrue(r[0] instanceof Instant);
             assertThat(r[0], equalTo(view.get(i)[0]));
             assertTrue(r[1] instanceof Integer);
@@ -152,11 +152,11 @@ public class SelectTest {
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Select sel = new Select(fields, upto, null, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(2));
-        for (int i = 0; i < records.size(); i++) {
-            Object[] r = records.get(i);
+        assertThat(samples.size(), equalTo(2));
+        for (int i = 0; i < samples.size(); i++) {
+            Object[] r = samples.get(i);
             assertTrue(r[0] instanceof Instant);
             assertThat(r[0], equalTo(view.get(i)[0]));
             assertTrue(r[1] instanceof Integer);
@@ -180,11 +180,11 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(3));
-        for (int i = 0; i < records.size(); i++) {
-            Object[] r = records.get(i);
+        assertThat(samples.size(), equalTo(3));
+        for (int i = 0; i < samples.size(); i++) {
+            Object[] r = samples.get(i);
             assertTrue(r[0] instanceof Instant);
             assertThat(r[0], equalTo(view.get(i)[0]));
             assertTrue(r[1] instanceof Integer);
@@ -212,10 +212,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(2));
-        Object[] r = records.get(0);
+        assertThat(samples.size(), equalTo(2));
+        Object[] r = samples.get(0);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(0)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -225,7 +225,7 @@ public class SelectTest {
         assertTrue(r[3] instanceof Float);
         assertThat(r[3], equalTo(view.get(0)[3]));
 
-        r = records.get(1);
+        r = samples.get(1);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(2)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -251,10 +251,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(2));
-        Object[] r = records.get(0);
+        assertThat(samples.size(), equalTo(2));
+        Object[] r = samples.get(0);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(0)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -266,7 +266,7 @@ public class SelectTest {
         assertTrue(r[4] instanceof Integer);
         assertThat(r[4], equalTo(10));
 
-        r = records.get(1);
+        r = samples.get(1);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(view.get(2)[0]));
         assertTrue(r[1] instanceof Integer);
@@ -295,10 +295,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, null, having, def);
         sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(1));
-        Object[] r = records.get(0);
+        assertThat(samples.size(), equalTo(1));
+        Object[] r = samples.get(0);
         assertTrue(r[0] instanceof Instant);
         assertThat(r[0], equalTo(def[0]));
         assertTrue(r[1] instanceof Integer);
@@ -315,9 +315,9 @@ public class SelectTest {
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
         Select sel = new Select(fields, null, group, null, null);
         sel = sel.bind(atts, atts);
-        List<Object[]> records = sel.select(view);
+        List<Object[]> samples = sel.select(view);
 
-        assertThat(records.size(), equalTo(3));
+        assertThat(samples.size(), equalTo(3));
     }
 
 }

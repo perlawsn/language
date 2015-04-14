@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -54,11 +54,11 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -67,11 +67,11 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create("4", DataType.STRING);
@@ -80,11 +80,11 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{"4"};
-        res = e.run(record, null);
+        sample = new Object[]{"4"};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{"3"};
-        res = e.run(record, null);
+        sample = new Object[]{"3"};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createEQ(trueExpr, trueExpr).run(null, null);
@@ -200,11 +200,11 @@ public class ComparisonTest {
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -213,11 +213,11 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create("4", DataType.STRING);
@@ -226,11 +226,11 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{"4"};
-        res = e.run(record, null);
+        sample = new Object[]{"4"};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{"3"};
-        res = e.run(record, null);
+        sample = new Object[]{"3"};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createNE(trueExpr, trueExpr).run(null, null);
@@ -350,16 +350,16 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGT(new Field("integer"), c);
         bound.clear();
         e = e.bind(atts, bound);
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -368,16 +368,16 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGT(new Field("float"), c);
         bound.clear();
         e = e.bind(atts, bound);
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGT(t1, t1).run(null, null);
@@ -490,18 +490,18 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGE(new Field("integer"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -510,18 +510,18 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
         e = Comparison.createGE(new Field("float"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
 
         res = Comparison.createGE(t1, t1).run(null, null);
@@ -634,18 +634,18 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLT(new Field("integer"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -654,18 +654,18 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLT(new Field("float"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLT(t1, t1).run(null, null);
@@ -776,18 +776,18 @@ public class ComparisonTest {
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
-        Object[] record = new Object[]{4};
-        Object res = e.run(record, null);
+        Object[] sample = new Object[]{4};
+        Object res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3};
-        res = e.run(record, null);
+        sample = new Object[]{3};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLE(new Field("integer"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         c = Constant.create(4.4f, DataType.FLOAT);
@@ -796,18 +796,18 @@ public class ComparisonTest {
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        record = new Object[]{4.4f};
-        res = e.run(record, null);
+        sample = new Object[]{4.4f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
-        record = new Object[]{3.3f};
-        res = e.run(record, null);
+        sample = new Object[]{3.3f};
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.FALSE));
         e = Comparison.createLE(new Field("float"), c);
         bound.clear();
         e = e.bind(atts, bound);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
-        res = e.run(record, null);
+        res = e.run(sample, null);
         assertThat(res, equalTo(LogicValue.TRUE));
 
         res = Comparison.createLE(t1, t1).run(null, null);

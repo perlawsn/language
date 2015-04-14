@@ -16,7 +16,7 @@ import java.time.Instant;
  *     <li>a {@link WindowSize} that defines the portion of {@link Buffer}
  *     on which the aggregation is to be performed</li>
  *     <li>an optional filter {@link Expression} that is used to determine
- *     which {@link Buffer} records are to be aggregated</li>
+ *     which {@link Buffer} samples are to be aggregated</li>
  * </ul>
  *
  * @author Guido Rota 27/02/15.
@@ -126,7 +126,7 @@ public abstract class Aggregate implements Expression {
     }
 
     @Override
-    public final Object run(Object[] record, BufferView view) {
+    public final Object run(Object[] sample, BufferView view) {
         Object res;
 
         switch (ws.getType()) {

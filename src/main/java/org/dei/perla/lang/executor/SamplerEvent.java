@@ -3,8 +3,8 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
-import org.dei.perla.core.record.Attribute;
-import org.dei.perla.core.record.Record;
+import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingEvent;
@@ -110,12 +110,12 @@ public class SamplerEvent implements Sampler {
         public void complete(Task task) { }
 
         @Override
-        public void newRecord(Task task, Record record) {
+        public void data(Task task, Sample sample) {
             if (status.intValue() == STOPPED) {
                 return;
             }
 
-            handler.data(sampling, record.values());
+            handler.data(sampling, sample.values());
         }
 
         @Override
@@ -145,7 +145,7 @@ public class SamplerEvent implements Sampler {
         }
 
         @Override
-        public void newRecord(Task task, Record record) {
+        public void data(Task task, Sample sample) {
             if (status.intValue() == STOPPED) {
                 return;
             }

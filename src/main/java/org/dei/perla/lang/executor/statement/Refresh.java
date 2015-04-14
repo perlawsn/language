@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.time.Duration;

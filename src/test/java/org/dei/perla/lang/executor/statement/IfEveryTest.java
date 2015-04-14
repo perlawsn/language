@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.record.Attribute;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
@@ -39,12 +39,12 @@ public class IfEveryTest {
         atts.add(boolAtt);
     }
 
-    private static final Object[][] records;
+    private static final Object[][] samples;
     static {
-        records = new Object[4][];
-        for (int i = 0; i < records.length; i++) {
-            records[i] = new Object[1];
-            records[i][0] = i;
+        samples = new Object[4][];
+        for (int i = 0; i < samples.length; i++) {
+            samples[i] = new Object[1];
+            samples[i][0] = i;
         }
     }
 
@@ -148,13 +148,13 @@ public class IfEveryTest {
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
 
-        d = ife.run(records[0]);
+        d = ife.run(samples[0]);
         assertThat(d, equalTo(Duration.ofSeconds(0)));
-        d = ife.run(records[1]);
+        d = ife.run(samples[1]);
         assertThat(d, equalTo(Duration.ofSeconds(1)));
-        d = ife.run(records[2]);
+        d = ife.run(samples[2]);
         assertThat(d, equalTo(Duration.ofSeconds(2)));
-        d = ife.run(records[3]);
+        d = ife.run(samples[3]);
         assertThat(d, equalTo(Duration.ofSeconds(3)));
     }
 
