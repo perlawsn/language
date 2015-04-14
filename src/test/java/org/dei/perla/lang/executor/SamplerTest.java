@@ -55,6 +55,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes());
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
+        sampler.start();
         fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -64,6 +65,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes());
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
+        sampler.start();
         fpc.awaitPeriod(200);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -73,8 +75,14 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes());
         sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
+        sampler.start();
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
+
+        // Stop sampler
+        sampler.stop();
+        assertThat(fpc.countPeriodic(), equalTo(0));
+        assertThat(fpc.countAsync(), equalTo(0));
     }
 
     @Test
@@ -95,6 +103,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes());
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
+        sampler.start();
         fpc.awaitPeriod(100);
         assertTrue(fpc.hasPeriod(1000));
         assertTrue(fpc.hasPeriod(100));
@@ -114,6 +123,11 @@ public class SamplerTest {
         fpc.awaitPeriod(200);
         assertTrue(fpc.hasPeriod(1000));
         assertThat(fpc.countPeriodic(), equalTo(2));
+
+        // Stop sampler
+        sampler.stop();
+        assertThat(fpc.countPeriodic(), equalTo(0));
+        assertThat(fpc.countAsync(), equalTo(0));
     }
 
     @Test
@@ -135,6 +149,7 @@ public class SamplerTest {
         fpc.setValues(vs);
         Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
+        sampler.start();
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
         assertThat(fpc.countAsync(), equalTo(1));
@@ -154,6 +169,11 @@ public class SamplerTest {
         fpc.triggerEvent();
         fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
+
+        // Stop sampler
+        sampler.stop();
+        assertThat(fpc.countPeriodic(), equalTo(0));
+        assertThat(fpc.countAsync(), equalTo(0));
     }
 
 }

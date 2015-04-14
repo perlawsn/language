@@ -51,7 +51,7 @@ public final class Sampler {
 
     protected Sampler(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
             QueryHandler<Sampling, Object[]> handler)
-            throws IllegalArgumentException, QueryException {
+            throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
         Conditions.checkIllegalArgument(!sampling.hasErrors(),
@@ -64,14 +64,22 @@ public final class Sampler {
         this.refresh = sampling.getRefresh();
         this.ife = sampling.getIfEvery();
 
-        ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
-        if (ifeTask == null) {
-            throw new QueryException(IFE_SAMPLING_ERROR);
-        }
     }
 
     public boolean isRunning() {
         return status != STOPPED;
+    }
+
+    public void start() throws QueryException {
+        lk.lock();
+        try {
+            Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+            if (t == null) {
+                throw new QueryException(IFE_SAMPLING_ERROR);
+            }
+        } finally {
+            lk.unlock();
+        }
     }
 
     public void stop() {
@@ -258,8 +266,9 @@ public final class Sampler {
             lk.lock();
             try {
                 // Single shot sampling when the refresh event is triggered
-                ifeTask = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
-                if (ifeTask == null) {
+                Task t = fpc.get(sampling.getIfEveryAttributes(), true,
+                        ifeHandler);
+                if (t == null) {
                     Exception e = new QueryException(IFE_SAMPLING_ERROR);
                     handler.error(sampling, e);
                 }
