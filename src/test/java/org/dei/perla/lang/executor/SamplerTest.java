@@ -141,6 +141,7 @@ public class SamplerTest {
 
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 35);
+        fpc.setValues(vs);
         assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         fpc.awaitPeriod(500);
@@ -148,9 +149,10 @@ public class SamplerTest {
 
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 50);
+        fpc.setValues(vs);
         assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
-        fpc.awaitPeriod(500);
+        fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
     }
 

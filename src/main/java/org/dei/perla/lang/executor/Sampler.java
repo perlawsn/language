@@ -115,14 +115,15 @@ public final class Sampler {
                 if (refresh == null) {
                     return;
 
-                } else if (refresh.getType() == RefreshType.EVENT) {
+                } else if (refresh.getType() == RefreshType.EVENT &&
+                        evtTask == null) {
                     evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
                     if (evtTask == null) {
                         Exception e = new QueryException(IFE_SAMPLING_ERROR);
                         handler.error(sampling, e);
                     }
 
-                } else {
+                } else if (refresh.getType() == RefreshType.TIME){
                     ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
                             refresh.getDuration(), ifeHandler);
                     if (ifeTask == null) {

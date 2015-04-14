@@ -240,7 +240,8 @@ public class SimulatorFpc implements Fpc {
         protected SimTask(List<Attribute> atts, TaskHandler handler) {
             this.handler = handler;
 
-            PipelineBuilder pb = SamplePipeline.newBuilder(atts);
+            PipelineBuilder pb = SamplePipeline.newBuilder(
+                    SimulatorFpc.this.atts);
             pb.reorder(atts);
             pipeline = pb.create();
         }
