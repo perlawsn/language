@@ -197,27 +197,27 @@ public class ParserTest {
         DataType d;
 
         p = new Parser(new StringReader("id"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.ID));
 
         p.ReInit(new StringReader("timestamp"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.TIMESTAMP));
 
         p.ReInit(new StringReader("boolean"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.BOOLEAN));
 
         p.ReInit(new StringReader("integer"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.INTEGER));
 
         p.ReInit(new StringReader("float"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.FLOAT));
 
         p.ReInit(new StringReader("string"));
-        d = p.FieldType();
+        d = p.Type();
         assertThat(d, equalTo(DataType.STRING));
     }
 

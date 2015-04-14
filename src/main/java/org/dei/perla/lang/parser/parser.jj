@@ -250,15 +250,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_EXECUTE:        "EXECUTE" >
+	< KEYWORD_EXECUTE:        "EXECUTE"   >
     |
-	< KEYWORD_IF:             "IF"      >
+	< KEYWORD_IF:             "IF"        >
     |
-	< KEYWORD_EXISTS:         "EXISTS"  >
+	< KEYWORD_EXISTS:         "EXISTS"    >
 	|
-	< KEYWORD_ALL:            "ALL"     >
+	< KEYWORD_ALL:            "ALL"       >
 	|
-	< KEYWORD_TYPE_SEPARATOR: ":"       >
+	< KEYWORD_TYPE_SEPARATOR: ":"         >
 }
 
 /*
@@ -624,7 +624,7 @@ void FieldDefinition(Errors err) :
 {}
 {
 	Identifier() // DataStructureField
-	FieldType()
+	Type()
 	[
 		<KEYWORD_DEFAULT>
 		Expression(ExpressionType.SIMPLE, err)
@@ -1168,7 +1168,7 @@ ComparisonOperation ComparisonOperation() :
 	{ return ComparisonOperation.NE; }
 }
 
-DataType FieldType() :
+DataType Type() :
 {}
 {
 	(
@@ -1724,15 +1724,22 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
 }
 
 Expression ExistsAttribute() :
-{}
+{
+	String att;
+	DataType type = null;
+}
 {
 	<KEYWORD_EXISTS>
 	"("
-	    (
-		Identifier() // FPC attribute
+        (
+        att = Identifier() // FPC attribute
+            [
+            <KEYWORD_TYPE_SEPARATOR>
+            type = Type()
+            ]
+        )
 		|
 		<KEYWORD_ALL>
-	    )
 	")"
 	{ return null; }
 }
