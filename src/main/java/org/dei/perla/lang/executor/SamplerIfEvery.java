@@ -22,31 +22,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class SamplerIfEvery implements Sampler {
 
-    // Exceptions
-    private static final QueryException IFE_INIT_EXCEPTION =
-            new QueryException("Initialization of IF EVERY sampling failed, " +
-                    "cannot retrieve sample the required attributes");
-
-    private static final QueryException IFE_SAMPLING_EXCEPTION =
-            new QueryException("Sampling of IF EVERY sampling attributes " +
-                    "failed");
-
-    private static final QueryException EVT_INIT_EXCEPTION =
-            new QueryException("Initialization of REFRESH ON EVENT sampling " +
-                    "failed, cannot retrieve the required events");
-
-    private static final QueryException EVT_SAMPLING_EXCEPTION =
-            new QueryException("Sampling of REFRESH ON EVENT events failed");
-
-    private static final QueryException EVT_STOPPED_EXCEPTION =
-            new QueryException("REFRESH ON EVENT sampling stopped prematurely");
-
-    private static final QueryException SAMP_STOPPED_EXCEPTION =
-            new QueryException("Sampling operation stopped prematurely");
-
-    private static final QueryException SAMP_EXCEPTION =
-            new QueryException("Unexpected error while sampling");
-
     // Sampler status
     private static final int INITIALIZING = 0;
     private static final int NEW_RATE = 1;
@@ -110,7 +85,7 @@ public final class SamplerIfEvery implements Sampler {
             status = INITIALIZING;
             Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
             if (t == null) {
-                throw IFE_INIT_EXCEPTION;
+                throw new QueryException(IFE_INIT_ERROR);
             }
         } finally {
             lk.unlock();
@@ -144,11 +119,22 @@ public final class SamplerIfEvery implements Sampler {
      * Simple utility method employed to propagate an error status and stop
      * the sampler
      *
-     * @param e Exception to propagate
+     * @param msg error message
+     * @param cause cause exception
      */
-    private void handleError(Exception e) {
+    private void handleError(String msg, Throwable cause) {
         stop();
-        handler.error(sampling, e);
+        handler.error(sampling, new QueryException(msg, cause));
+    }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     */
+    private void handleError(String msg) {
+        handleError(msg, null);
     }
 
     /**
@@ -174,14 +160,14 @@ public final class SamplerIfEvery implements Sampler {
                         evtTask == null) {
                     evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
                     if (evtTask == null) {
-                        handleError(EVT_INIT_EXCEPTION);
+                        handleError(EVT_INIT_ERROR);
                     }
 
                 } else if (refresh.getType() == RefreshType.TIME){
                     ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
                             refresh.getDuration(), ifeHandler);
                     if (ifeTask == null) {
-                        handleError(IFE_INIT_EXCEPTION);
+                        handleError(IFE_INIT_ERROR);
                     }
                 }
             } finally {
@@ -226,7 +212,7 @@ public final class SamplerIfEvery implements Sampler {
                 return;
             }
 
-            handleError(IFE_SAMPLING_EXCEPTION);
+            handleError(IFE_SAMPLING_ERROR, cause);
         }
 
     }
@@ -251,7 +237,7 @@ public final class SamplerIfEvery implements Sampler {
                     status = SAMPLING;
 
                 } else if (status == SAMPLING) {
-                    handleError(SAMP_STOPPED_EXCEPTION);
+                    handleError(SAMP_STOPPED_ERROR);
                 }
             } finally {
                 lk.unlock();
@@ -273,7 +259,7 @@ public final class SamplerIfEvery implements Sampler {
                 return;
             }
 
-            handleError(SAMP_EXCEPTION);
+            handleError(SAMP_ERROR, cause);
         }
 
     }
@@ -290,7 +276,7 @@ public final class SamplerIfEvery implements Sampler {
             lk.lock();
             try {
                 if (status != STOPPED) {
-                    handleError(EVT_STOPPED_EXCEPTION);
+                    handleError(EVT_STOPPED_ERROR);
                 }
             } finally {
                 lk.unlock();
@@ -305,7 +291,7 @@ public final class SamplerIfEvery implements Sampler {
                 Task t = fpc.get(sampling.getIfEveryAttributes(), true,
                         ifeHandler);
                 if (t == null) {
-                    handleError(IFE_INIT_EXCEPTION);
+                    handleError(IFE_INIT_ERROR);
                 }
             } finally {
                 lk.unlock();
@@ -314,7 +300,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            handleError(EVT_SAMPLING_EXCEPTION);
+            handleError(EVT_SAMPLING_ERROR, cause);
         }
 
     }

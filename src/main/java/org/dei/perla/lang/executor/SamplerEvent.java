@@ -11,8 +11,6 @@ import org.dei.perla.lang.executor.statement.SamplingEvent;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 14/04/15.
@@ -57,7 +55,7 @@ public class SamplerEvent implements Sampler {
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
         if (evtTask == null) {
             status.set(STOPPED);
-            throw new QueryException();
+            throw new QueryException(EVT_INIT_ERROR);
         }
     }
 
@@ -67,15 +65,39 @@ public class SamplerEvent implements Sampler {
             return;
         }
 
-        if (evtTask == null) {
-            return;
+        if (evtTask != null) {
+            evtTask.stop();
         }
-        evtTask.stop();
     }
 
     @Override
     public boolean isRunning() {
         return status.intValue() != STOPPED;
+    }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     * @param cause cause exception
+     */
+    private void handleError(String msg, Throwable cause) {
+        status.set(STOPPED);
+        if (evtTask != null) {
+            evtTask.stop();
+        }
+        handler.error(sampling, new QueryException(msg, cause));
+    }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     */
+    private void handleError(String msg) {
+        handleError(msg, null);
     }
 
 
@@ -102,7 +124,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handler.error(sampling, new QueryException(cause));
+            handleError(SAMP_ERROR, cause);
         }
 
     }
@@ -119,7 +141,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handler.error(sampling, new QueryException());
+            handleError(EVT_STOPPED_ERROR);
         }
 
         @Override
@@ -128,10 +150,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            Task t = fpc.get(atts, false, sampHandler);
-            if (t == null) {
-                // TODO: notify error
-            }
+            fpc.get(atts, false, sampHandler);
         }
 
         @Override
@@ -140,7 +159,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handler.error(sampling, new QueryException());
+            handleError(EVT_SAMPLING_ERROR, cause);
         }
 
     }
