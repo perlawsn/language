@@ -128,6 +128,30 @@ public class SamplerTest {
 
         SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err);
         assertTrue(err.isEmpty());
+        SimulatorFpc fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes());
+
+        vs.put(temperature, 25);
+        fpc.setValues(vs);
+        Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
+                new NoopQueryHandler<>());
+        fpc.awaitPeriod(1000);
+        assertThat(fpc.countPeriodic(), equalTo(1));
+        assertThat(fpc.countAsync(), equalTo(1));
+
+        // Trigger event, check if sampling rate changes
+        vs.put(temperature, 35);
+        assertThat(fpc.countAsync(), equalTo(1));
+        fpc.triggerEvent();
+        fpc.awaitPeriod(500);
+        assertThat(fpc.countPeriodic(), equalTo(1));
+
+        // Trigger event, check if sampling rate changes
+        vs.put(temperature, 50);
+        assertThat(fpc.countAsync(), equalTo(1));
+        fpc.triggerEvent();
+        fpc.awaitPeriod(500);
+        assertThat(fpc.countPeriodic(), equalTo(1));
     }
 
 }

@@ -15,6 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
+ * An instrumented FPC that simulates a basic data gathering device
+ *
  * @author Guido Rota 13/04/15.
  */
 public class SimulatorFpc implements Fpc {
@@ -23,8 +25,8 @@ public class SimulatorFpc implements Fpc {
     private final Condition cond = lk.newCondition();
 
     private final Map<Long, Integer> periods = new HashMap<>();
-    private int periodicCount = 0;
-    private int asyncCount = 0;
+    private final Set<PeriodicSimTask> periodicTasks = new HashSet<>();
+    private final Set<AsyncSimTask> asyncTasks = new HashSet<>();
 
     private final Object[] values;
     private final List<Attribute> atts;
@@ -39,6 +41,11 @@ public class SimulatorFpc implements Fpc {
         }
     }
 
+    /**
+     * Convenience method for adding a period to the period map
+     *
+     * IMPORTANT: Must be called under lock
+     */
     private void addPeriod(long period) {
         Integer count = periods.get(period);
         if (count == null) {
@@ -49,6 +56,11 @@ public class SimulatorFpc implements Fpc {
         periods.put(period, count);
     }
 
+    /**
+     * Convenience method for removing a period from the period map.
+     *
+     * IMPORTANT: Must be called under lock
+     */
     private void removePeriod(long period) {
         Integer count = periods.get(period);
         if (count == null || count == 0) {
@@ -58,6 +70,22 @@ public class SimulatorFpc implements Fpc {
         periods.put(period, count - 1);
     }
 
+    /**
+     * Triggers the production of a new sample on all event tasks
+     */
+    public void triggerEvent() {
+        lk.lock();
+        try {
+            asyncTasks.forEach(AsyncSimTask::trigger);
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
+     * Sets the values used by the FPC to generate new samples. This method
+     * can be used to inject specific output values for testing purposes.
+     */
     public void setValues(Map<Attribute, Object> newValues) {
         lk.lock();
         try {
@@ -73,6 +101,9 @@ public class SimulatorFpc implements Fpc {
         }
     }
 
+    /**
+     * Creates a new sample
+     */
     private Object[] newSample() {
         lk.lock();
         try {
@@ -116,7 +147,7 @@ public class SimulatorFpc implements Fpc {
     public int countPeriodic() {
         lk.lock();
         try {
-            return periodicCount;
+            return periodicTasks.size();
         } finally {
             lk.unlock();
         }
@@ -128,7 +159,7 @@ public class SimulatorFpc implements Fpc {
     public int countAsync() {
         lk.lock();
         try {
-            return asyncCount;
+            return asyncTasks.size();
         } finally {
             lk.unlock();
         }
@@ -157,17 +188,18 @@ public class SimulatorFpc implements Fpc {
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, TaskHandler handler) {
-        return new GetSimTask(atts, handler, this);
+        return new GetSimTask(atts, handler);
     }
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, long periodMs, TaskHandler handler) {
         lk.lock();
         try {
+            PeriodicSimTask t = new PeriodicSimTask(atts, periodMs, handler);
+            periodicTasks.add(t);
             addPeriod(periodMs);
-            periodicCount++;
             cond.signalAll();
-            return new PeriodicSimTask(atts, periodMs, handler, this);
+            return t;
         } finally {
             lk.unlock();
         }
@@ -175,11 +207,26 @@ public class SimulatorFpc implements Fpc {
 
     @Override
     public Task async(List<Attribute> atts, boolean strict, TaskHandler handler) {
-        throw new RuntimeException("unimplemented");
+        lk.lock();
+        try {
+            AsyncSimTask t = new AsyncSimTask(atts, handler);
+            asyncTasks.add(t);
+            return t;
+        } finally {
+            lk.unlock();
+        }
     }
 
     @Override
-    public void stop(Consumer<Fpc> handler) { }
+    public void stop(Consumer<Fpc> handler) {
+        lk.lock();
+        try {
+            periodicTasks.forEach(Task::stop);
+            asyncTasks.forEach(Task::stop);
+        } finally {
+            lk.unlock();
+        }
+    }
 
 
     /**
@@ -188,11 +235,9 @@ public class SimulatorFpc implements Fpc {
     private abstract class SimTask implements Task {
 
         protected final SamplePipeline pipeline;
-        protected final SimulatorFpc fpc;
         protected final TaskHandler handler;
 
-        protected SimTask(List<Attribute> atts, TaskHandler handler, SimulatorFpc fpc) {
-            this.fpc = fpc;
+        protected SimTask(List<Attribute> atts, TaskHandler handler) {
             this.handler = handler;
 
             PipelineBuilder pb = SamplePipeline.newBuilder(atts);
@@ -209,14 +254,15 @@ public class SimulatorFpc implements Fpc {
 
 
     /**
+     * Simulated one-off sampling operation
+     *
      * @author Guido Rota 13/04/15
      */
-    public class GetSimTask extends SimTask {
+    private class GetSimTask extends SimTask {
 
-        protected GetSimTask(List<Attribute> atts, TaskHandler handler,
-                SimulatorFpc fpc) {
-            super(atts, handler, fpc);
-            Record r = pipeline.run(fpc.newSample());
+        protected GetSimTask(List<Attribute> atts, TaskHandler handler) {
+            super(atts, handler);
+            Record r = pipeline.run(newSample());
             handler.newRecord(this, r);
             handler.complete(this);
         }
@@ -231,7 +277,10 @@ public class SimulatorFpc implements Fpc {
 
     }
 
+
     /**
+     * Simulated periodic sampling operation
+     *
      * @author Guido Rota 13/04/15
      */
     public class PeriodicSimTask extends SimTask {
@@ -241,8 +290,8 @@ public class SimulatorFpc implements Fpc {
         private final Thread generator;
 
         protected PeriodicSimTask(List<Attribute> atts, long periodMs,
-                TaskHandler handler, SimulatorFpc fpc) {
-            super(atts, handler, fpc);
+                TaskHandler handler) {
+            super(atts, handler);
             this.periodMs = periodMs;
             generator = new Thread(this::generateValues);
             generator.start();
@@ -251,7 +300,7 @@ public class SimulatorFpc implements Fpc {
         private void generateValues() {
             try {
                 while (true) {
-                    Record r = pipeline.run(fpc.newSample());
+                    Record r = pipeline.run(newSample());
                     handler.newRecord(this, r);
                     Thread.sleep(periodMs);
                 }
@@ -272,8 +321,45 @@ public class SimulatorFpc implements Fpc {
             try {
                 running = false;
                 generator.interrupt();
-                periodicCount--;
+                periodicTasks.remove(this);
                 removePeriod(periodMs);
+            } finally {
+                lk.unlock();
+            }
+        }
+
+    }
+
+
+    /**
+     * Simulated event sampling operation
+     *
+     * @author Guido Rota 14/04/15
+     */
+    private class AsyncSimTask extends SimTask {
+
+        private volatile boolean running = true;
+
+        private AsyncSimTask(List<Attribute> atts, TaskHandler handler) {
+            super(atts, handler);
+        }
+
+        protected void trigger() {
+            Record r = pipeline.run(newSample());
+            handler.newRecord(this, r);
+        }
+
+        @Override
+        public boolean isRunning() {
+            return running;
+        }
+
+        @Override
+        public void stop() {
+            lk.lock();
+            try {
+                asyncTasks.remove(this);
+                running = false;
             } finally {
                 lk.unlock();
             }

@@ -112,15 +112,23 @@ public final class Sampler {
 
             lk.lock();
             try {
-                if (refresh == null ||
-                        refresh.getType() == RefreshType.EVENT) {
+                if (refresh == null) {
                     return;
-                }
-                ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
-                        refresh.getDuration(), ifeHandler);
-                if (ifeTask == null) {
-                    Exception e = new QueryException(IFE_SAMPLING_ERROR);
-                    handler.error(sampling, e);
+
+                } else if (refresh.getType() == RefreshType.EVENT) {
+                    evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
+                    if (evtTask == null) {
+                        Exception e = new QueryException(IFE_SAMPLING_ERROR);
+                        handler.error(sampling, e);
+                    }
+
+                } else {
+                    ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
+                            refresh.getDuration(), ifeHandler);
+                    if (ifeTask == null) {
+                        Exception e = new QueryException(IFE_SAMPLING_ERROR);
+                        handler.error(sampling, e);
+                    }
                 }
             } finally {
                 lk.unlock();
