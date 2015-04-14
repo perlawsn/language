@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Guido Rota 13/04/15.
  */
-public class SamplerTest {
+public class SamplerIfEveryTest {
 
     private static final Attribute power =
             Attribute.create("power", DataType.INTEGER);
@@ -53,7 +53,7 @@ public class SamplerTest {
         // Test with power == 100
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(100);
@@ -63,7 +63,7 @@ public class SamplerTest {
         vs.put(power, 65);
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        sampler = new Sampler(samp, Collections.emptyList(), fpc,
+        sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(200);
@@ -73,7 +73,7 @@ public class SamplerTest {
         vs.put(power, 10);
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        sampler = new Sampler(samp, Collections.emptyList(), fpc,
+        sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(1000);
@@ -101,7 +101,7 @@ public class SamplerTest {
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
-        Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(100);
@@ -147,7 +147,7 @@ public class SamplerTest {
 
         vs.put(temperature, 25);
         fpc.setValues(vs);
-        Sampler sampler = new Sampler(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(1000);
