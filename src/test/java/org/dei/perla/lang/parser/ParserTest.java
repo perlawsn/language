@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
@@ -192,7 +193,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFieldType() throws Exception {
+    public void testType() throws Exception {
         Parser p;
         DataType d;
 
@@ -219,6 +220,36 @@ public class ParserTest {
         p.ReInit(new StringReader("string"));
         d = p.Type();
         assertThat(d, equalTo(DataType.STRING));
+    }
+
+    @Test
+    public void testTypeClass() throws Exception {
+        Parser p;
+        TypeClass c;
+
+        p = new Parser(new StringReader("id"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.ID));
+
+        p.ReInit(new StringReader("timestamp"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.TIMESTAMP));
+
+        p.ReInit(new StringReader("boolean"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.BOOLEAN));
+
+        p.ReInit(new StringReader("integer"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.INTEGER));
+
+        p.ReInit(new StringReader("float"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.FLOAT));
+
+        p.ReInit(new StringReader("string"));
+        c = p.TypeClass();
+        assertThat(c, equalTo(TypeClass.STRING));
     }
 
     @Test

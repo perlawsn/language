@@ -39,6 +39,7 @@ PARSER_BEGIN(Parser)
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
+    import org.dei.perla.core.registry.TypeClass;
 
 	public final class Parser {
 
@@ -420,17 +421,25 @@ TOKEN :
  */
 TOKEN :
 {
-	< TYPE_ID:      "ID"        >
+	< TYPE_ID:             "ID"        >
     |
-	< TYPE_TS:      "TIMESTAMP" >
+	< TYPE_TIMESTAMP:      "TIMESTAMP" >
     |
-	< TYPE_BOOLEAN: "BOOLEAN"   >
+	< TYPE_BOOLEAN:        "BOOLEAN"   >
     |
-	< TYPE_INTEGER: "INTEGER"   >
+	< TYPE_INTEGER:        "INTEGER"   >
     |
-	< TYPE_FLOAT:   "FLOAT"     >
+	< TYPE_FLOAT:          "FLOAT"     >
     |
-	< TYPE_STRING:  "STRING"    >
+	< TYPE_STRING:         "STRING"    >
+}
+
+/*
+ * TYPE CLASS WILDCARDS
+ */
+TOKEN :
+{
+	< TYPE_ANY: "ANY" >
 }
 
 /*
@@ -820,7 +829,7 @@ GroupByTS FieldGroupingByTs() :
     int count;
 }
 {
-	<TYPE_TS>
+	<TYPE_TIMESTAMP>
 	"("
 	d = Duration()
 	","
@@ -1175,7 +1184,7 @@ DataType Type() :
 	<TYPE_ID>
 	{ return DataType.ID; }
 	|
-	<TYPE_TS>
+	<TYPE_TIMESTAMP>
 	{ return DataType.TIMESTAMP; }
 	|
 	<TYPE_BOOLEAN>
@@ -1189,6 +1198,33 @@ DataType Type() :
 	|
 	<TYPE_STRING>
 	{ return DataType.STRING; }
+	)
+}
+
+TypeClass TypeClass() :
+{}
+{
+	(
+	<TYPE_ID>
+	{ return TypeClass.ID; }
+	|
+	<TYPE_TIMESTAMP>
+	{ return TypeClass.TIMESTAMP; }
+	|
+	<TYPE_BOOLEAN>
+	{ return TypeClass.BOOLEAN; }
+	|
+	<TYPE_INTEGER>
+	{ return TypeClass.INTEGER; }
+	|
+	<TYPE_FLOAT>
+	{ return TypeClass.FLOAT; }
+	|
+	<TYPE_STRING>
+	{ return TypeClass.STRING; }
+	|
+	<TYPE_ANY>
+	{ return TypeClass.ANY; }
 	)
 }
 
@@ -1726,7 +1762,7 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
 Expression ExistsAttribute() :
 {
 	String att;
-	DataType type = null;
+	TypeClass typeClass = TypeClass.ANY;
 }
 {
 	<KEYWORD_EXISTS>
@@ -1735,7 +1771,7 @@ Expression ExistsAttribute() :
         att = Identifier() // FPC attribute
             [
             <KEYWORD_TYPE_SEPARATOR>
-            type = Type()
+            typeClass = TypeClass()
             ]
         )
 		|
