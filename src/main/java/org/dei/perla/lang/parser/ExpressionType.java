@@ -8,6 +8,10 @@ package org.dei.perla.lang.parser;
  */
 public enum ExpressionType {
 
+    // Constant expression, no aggregation, IF EXISTS and references to FPC
+    // attributes
+    CONSTANT,
+
     // Simple expression, no IF EXIST and aggregations allowed
     SIMPLE,
 

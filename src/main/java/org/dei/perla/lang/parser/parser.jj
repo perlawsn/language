@@ -40,6 +40,7 @@ PARSER_BEGIN(Parser)
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
     import org.dei.perla.core.registry.TypeClass;
+    import org.dei.perla.core.registry.DataTemplate;
 
 	public final class Parser {
 
@@ -600,7 +601,7 @@ void SetParameterList(Errors err):
 {
 	Identifier()
 	"="
-	Expression(ExpressionType.SIMPLE, err)
+	Expression(ExpressionType.CONSTANT, err, null)
 }
 
 Statement CreationStatement(Errors err) :
@@ -632,11 +633,11 @@ void FieldDefinitionList(Errors err) :
 void FieldDefinition(Errors err) :
 {}
 {
-	Identifier() // DataStructureField
+	Identifier() // Data structure field
 	Type()
 	[
 		<KEYWORD_DEFAULT>
-		Expression(ExpressionType.SIMPLE, err)
+		Expression(ExpressionType.CONSTANT, err, null)
 	]
 }
 
@@ -676,6 +677,7 @@ List<String> FieldList() :
 
 Selection SelectionStatement(Errors err) :
 {
+	Constraints cons = new Constraints();
     WindowSize every;
     List<FieldSelection> fsl;
     GroupBy gby = null;
@@ -691,12 +693,12 @@ Selection SelectionStatement(Errors err) :
 {
     every = EveryClause(err)
     <KEYWORD_SELECT>
-    fsl = FieldSelectionList(err)
+    fsl = FieldSelectionList(err, cons)
 	[
 		gby = GroupByClause()
 	]
 	[
-		having = HavingClause(err)
+		having = HavingClause(err, cons)
 	]
 	[
 		upto = UpToClause(err)
@@ -717,15 +719,16 @@ Selection SelectionStatement(Errors err) :
 	    }
 	    sel = new Select(fields, upto, gby, having, def);
 	}
-	sampling = SamplingClause(err)
+	sampling = SamplingClause(err, cons)
 	[
 		// This optional where clause filters the sampled values before adding
 		// them to the local buffer
 	    <KEYWORD_WHERE>
-	    where = Expression(ExpressionType.SIMPLE, err) // No aggregates allowed
+	    // No aggregates allowed
+	    where = Expression(ExpressionType.SIMPLE, err, cons)
 	]
 	[
-		ExecuteIfClause(err)
+		ExecuteIfClause(err, cons)
 	]
 	[
 		terminate = TerminateAfterClause(err)
@@ -743,33 +746,33 @@ WindowSize EveryClause(Errors err) :
 	{ return ws; }
 }
 
-List<FieldSelection> FieldSelectionList(Errors err) :
+List<FieldSelection> FieldSelectionList(Errors err, Constraints cons) :
 {
     List<FieldSelection> fsl = new ArrayList<FieldSelection>();
     FieldSelection fs;
 }
 {
-	fs = FieldSelection(err)
+	fs = FieldSelection(err, cons)
 	{ fsl.add(fs); }
 	(
 		","
-		fs = FieldSelection(err)
+		fs = FieldSelection(err, cons)
 		{ fsl.add(fs); }
 	)*
 	{ return fsl; }
 }
 
-FieldSelection FieldSelection(Errors err) :
+FieldSelection FieldSelection(Errors err, Constraints cons) :
 {
     Expression field;
     Object def = null;
 }
 {
-	field = Expression(ExpressionType.AGGREGATE, err)
+	field = Expression(ExpressionType.AGGREGATE, err, cons)
 	[
 		<KEYWORD_DEFAULT>
 		(
-            def = Expression(ExpressionType.SIMPLE, err)
+            def = Expression(ExpressionType.SIMPLE, err, cons)
             |
             <CONSTANT_NULL>
 		)
@@ -839,13 +842,13 @@ GroupByTS FieldGroupingByTs() :
 	{ return new GroupByTS(d, count); }
 }
 
-Expression HavingClause(Errors err) :
+Expression HavingClause(Errors err, Constraints cons) :
 {
     Expression e;
 }
 {
 	<KEYWORD_HAVING>
-	e = Expression(ExpressionType.AGGREGATE, err)
+	e = Expression(ExpressionType.AGGREGATE, err, cons)
 	{ return e; }
 }
 
@@ -876,7 +879,7 @@ OnEmptySelection OnEmptySelectionClause() :
 	)
 }
 
-Sampling SamplingClause(Errors err) :
+Sampling SamplingClause(Errors err, Constraints cons) :
 {
 	Set<String> events;
 
@@ -891,7 +894,7 @@ Sampling SamplingClause(Errors err) :
 		{ return new SamplingEvent(events); }
 		|
 		(
-			ife = IfEveryClause(err)
+			ife = IfEveryClause(err, cons)
 			[
 				policy = OnUnsupportedSRClause()
 			]
@@ -923,7 +926,7 @@ Set<String> OnEventClause() :
 	{ return evs; }
 }
 
-IfEvery IfEveryClause(Errors err) :
+IfEvery IfEveryClause(Errors err, Constraints cons) :
 {
     IfEvery ife = null;
     IfEvery prev = null;
@@ -939,9 +942,9 @@ IfEvery IfEveryClause(Errors err) :
 	(
 		(
 		    <KEYWORD_IF>
-		    cond = Expression(ExpressionType.SIMPLE, err)
+		    cond = Expression(ExpressionType.SIMPLE, err, cons)
 		    <KEYWORD_EVERY>
-		    every = EveryDuration(err)
+		    every = EveryDuration(err, cons)
 		    {
 		        if (ife == null) {
 		            ife = IfEvery.create(cond, every.getValue(),
@@ -957,7 +960,7 @@ IfEvery IfEveryClause(Errors err) :
 		(
 			<KEYWORD_ELSE>
 			<KEYWORD_EVERY>
-			every = EveryDuration(err)
+			every = EveryDuration(err, cons)
 			{
 			    prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
 			        every.getUnit());
@@ -969,7 +972,7 @@ IfEvery IfEveryClause(Errors err) :
 	|
 	(
 	    <KEYWORD_EVERY>
-	    every = EveryDuration(err)
+	    every = EveryDuration(err, cons)
 	    {
 	        ife = IfEvery.create(Constant.TRUE, every.getValue(),
 	            every.getUnit());
@@ -979,13 +982,13 @@ IfEvery IfEveryClause(Errors err) :
 	{ return ife; }
 }
 
-Every EveryDuration(Errors err) :
+Every EveryDuration(Errors err, Constraints cons) :
 {
     Expression value;
     TemporalUnit unit;
 }
 {
-    value = Expression(ExpressionType.SIMPLE, err)
+    value = Expression(ExpressionType.SIMPLE, err, cons)
     unit = TimeUnit()
     {
         return new Every(value, unit);
@@ -1031,7 +1034,7 @@ Refresh RefreshClause() :
 	)
 }
 
-ExecuteIf ExecuteIfClause(Errors err) :
+ExecuteIf ExecuteIfClause(Errors err, Constraints cons) :
 {
     Expression cond;
     Refresh r = null;
@@ -1040,7 +1043,7 @@ ExecuteIf ExecuteIfClause(Errors err) :
 	<KEYWORD_EXECUTE>
 	<KEYWORD_IF>
 	// Allow IF EXISTS expression node, forbid aggregations
-	cond = Expression(ExpressionType.EXECUTE_IF, err)
+	cond = Expression(ExpressionType.EXECUTE_IF, err, cons)
 	[
 		r = RefreshClause()
 	]
@@ -1355,16 +1358,16 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-Expression Expression(ExpressionType type, Errors err) :
+Expression Expression(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanTerm(type, err)
+	e1 = BooleanTerm(type, err, cons)
 	(
 		<OPERATOR_OR>
-		e2 = BooleanTerm(type, err)
+		e2 = BooleanTerm(type, err, cons)
 		{
 		    e1 = Bool.createOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1373,16 +1376,16 @@ Expression Expression(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanTerm(ExpressionType type, Errors err) :
+Expression BooleanTerm(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanFactor(type, err)
+	e1 = BooleanFactor(type, err, cons)
 	(
 		<OPERATOR_AND>
-		e2 = BooleanFactor(type, err)
+		e2 = BooleanFactor(type, err, cons)
 		{
 		    e1 = Bool.createAND(e1, e2);
 		    addIfError(e1, token, err);
@@ -1391,16 +1394,16 @@ Expression BooleanTerm(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanFactor(ExpressionType type, Errors err) :
+Expression BooleanFactor(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BooleanNegation(type, err)
+	e1 = BooleanNegation(type, err, cons)
 	(
 		<OPERATOR_XOR>
-		e2 = BooleanNegation(type, err)
+		e2 = BooleanNegation(type, err, cons)
 		{
 		    e1 = Bool.createXOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1409,7 +1412,7 @@ Expression BooleanFactor(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BooleanNegation(ExpressionType type, Errors err) :
+Expression BooleanNegation(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e;
     boolean invert = false;
@@ -1419,7 +1422,7 @@ Expression BooleanNegation(ExpressionType type, Errors err) :
 		<OPERATOR_NOT>
 		{ invert = true; }
 	)*
-	e = BooleanPredicate(type, err)
+	e = BooleanPredicate(type, err, cons)
 	{
 	    if (invert) {
 	        return Bool.createNOT(e);
@@ -1429,18 +1432,18 @@ Expression BooleanNegation(ExpressionType type, Errors err) :
 	}
 }
 
-Expression BooleanPredicate(ExpressionType type, Errors err) :
+Expression BooleanPredicate(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e;
 }
 {
-    e = Comparison(type, err)
+    e = Comparison(type, err, cons)
     [
         e = Is(e, err)
         |
         e = Like(e, err)
         |
-        e = Between(e, type, err)
+        e = Between(e, type, err, cons)
     ]
     { return e; }
 }
@@ -1494,7 +1497,7 @@ Expression Like(Expression e, Errors err) :
     }
 }
 
-Expression Between(Expression e, ExpressionType type, Errors err) :
+Expression Between(Expression e, ExpressionType type, Errors err, Constraints cons) :
 {
     Expression b;
     Expression min;
@@ -1502,9 +1505,9 @@ Expression Between(Expression e, ExpressionType type, Errors err) :
 }
 {
     <KEYWORD_BETWEEN>
-    min = BitwiseExpression(type, err)
+    min = BitwiseExpression(type, err, cons)
     <OPERATOR_AND>
-    max = BitwiseExpression(type, err)
+    max = BitwiseExpression(type, err, cons)
     {
         b = Between.create(e, min, max);
         addIfError(b, token, err);
@@ -1512,17 +1515,17 @@ Expression Between(Expression e, ExpressionType type, Errors err) :
     }
 }
 
-Expression Comparison(ExpressionType type, Errors err) :
+Expression Comparison(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
     ComparisonOperation op;
 }
 {
-    e1 = BitwiseExpression(type, err)
+    e1 = BitwiseExpression(type, err, cons)
     [
         op = ComparisonOperation()
-        e2 = BitwiseExpression(type, err)
+        e2 = BitwiseExpression(type, err, cons)
         {
             e1 = Comparison.create(op, e1, e2);
             addIfError(e1, token, err);
@@ -1531,16 +1534,16 @@ Expression Comparison(ExpressionType type, Errors err) :
     { return e1; }
 }
 
-Expression BitwiseExpression(ExpressionType type, Errors err) :
+Expression BitwiseExpression(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseTerm(type, err)
+	e1 = BitwiseTerm(type, err, cons)
 	(
 		<OPERATOR_BITWISE_OR>
-		e2 = BitwiseTerm(type, err)
+		e2 = BitwiseTerm(type, err, cons)
 		{
 		    e1 = Bitwise.createOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1549,16 +1552,16 @@ Expression BitwiseExpression(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseTerm(ExpressionType type, Errors err) :
+Expression BitwiseTerm(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseFactor(type, err)
+	e1 = BitwiseFactor(type, err, cons)
 	(
 		<OPERATOR_BITWISE_AND>
-		e2 = BitwiseFactor(type, err)
+		e2 = BitwiseFactor(type, err, cons)
 		{
 		    e1 = Bitwise.createAND(e1, e2);
 		    addIfError(e1, token, err);
@@ -1567,16 +1570,16 @@ Expression BitwiseTerm(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseFactor(ExpressionType type, Errors err) :
+Expression BitwiseFactor(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
 }
 {
-	e1 = BitwiseShift(type, err)
+	e1 = BitwiseShift(type, err, cons)
 	(
 		<OPERATOR_BITWISE_XOR>
-		e2 = BitwiseShift(type, err)
+		e2 = BitwiseShift(type, err, cons)
 		{
 		    e1 = Bitwise.createXOR(e1, e2);
 		    addIfError(e1, token, err);
@@ -1585,14 +1588,14 @@ Expression BitwiseFactor(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseShift(ExpressionType type, Errors err) :
+Expression BitwiseShift(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
     BitwiseOperation op;
 }
 {
-	e1 = BitwiseNegation(type, err)
+	e1 = BitwiseNegation(type, err, cons)
 	[
 		(
 			<OPERATOR_BITWISE_LSH>
@@ -1601,7 +1604,7 @@ Expression BitwiseShift(ExpressionType type, Errors err) :
 			<OPERATOR_BITWISE_RSH>
 			{ op = BitwiseOperation.RSH; }
 		)
-		e2 = BitwiseNegation(type, err)
+		e2 = BitwiseNegation(type, err, cons)
 		{
 		    e1 = Bitwise.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1610,7 +1613,7 @@ Expression BitwiseShift(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression BitwiseNegation(ExpressionType type, Errors err) :
+Expression BitwiseNegation(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e;
     boolean not = false;
@@ -1620,7 +1623,7 @@ Expression BitwiseNegation(ExpressionType type, Errors err) :
 		<OPERATOR_BITWISE_NOT>
 		{ not = true; }
 	)*
-	e = ArithmeticExpression(type, err)
+	e = ArithmeticExpression(type, err, cons)
 	{
 	    if (not) {
 	        e = Bitwise.createNOT(e);
@@ -1630,14 +1633,14 @@ Expression BitwiseNegation(ExpressionType type, Errors err) :
 	}
 }
 
-Expression ArithmeticExpression(ExpressionType type, Errors err) :
+Expression ArithmeticExpression(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-	e1 = ArithmeticTerm(type, err)
+	e1 = ArithmeticTerm(type, err, cons)
 	(
 		(
 			<OPERATOR_PLUS>
@@ -1646,7 +1649,7 @@ Expression ArithmeticExpression(ExpressionType type, Errors err) :
 			<OPERATOR_MINUS>
 			{ op = ArithmeticOperation.SUBTRACTION; }
 		)
-		e2 = ArithmeticTerm(type, err)
+		e2 = ArithmeticTerm(type, err, cons)
 		{
 		    e1 = Arithmetic.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1655,14 +1658,14 @@ Expression ArithmeticExpression(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression ArithmeticTerm(ExpressionType type, Errors err) :
+Expression ArithmeticTerm(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
 }
 {
-	e1 = ArithmeticFactor(type, err)
+	e1 = ArithmeticFactor(type, err, cons)
 	(
 		(
 			<OPERATOR_MULTIPLY>
@@ -1674,7 +1677,7 @@ Expression ArithmeticTerm(ExpressionType type, Errors err) :
 			<OPERATOR_MODULO>
 			{ op = ArithmeticOperation.MODULO; }
 		)
-		e2 = ArithmeticFactor(type, err)
+		e2 = ArithmeticFactor(type, err, cons)
 		{
 		    e1 = Arithmetic.create(op, e1, e2);
 		    addIfError(e1, token, err);
@@ -1683,7 +1686,7 @@ Expression ArithmeticTerm(ExpressionType type, Errors err) :
 	{ return e1; }
 }
 
-Expression ArithmeticFactor(ExpressionType type, Errors err) :
+Expression ArithmeticFactor(ExpressionType type, Errors err, Constraints cons) :
 {
     Expression e;
     Sign s = Sign.PLUS;
@@ -1692,7 +1695,7 @@ Expression ArithmeticFactor(ExpressionType type, Errors err) :
 	[
 		s = Sign()
 	]
-	e = PrimaryExpression(type, err)
+	e = PrimaryExpression(type, err, cons)
 	{
 	    if (s == Sign.MINUS) {
 	        e = Arithmetic.createInverse(e);
@@ -1702,9 +1705,9 @@ Expression ArithmeticFactor(ExpressionType type, Errors err) :
 	}
 }
 
-Expression PrimaryExpression(ExpressionType type, Errors err) :
+Expression PrimaryExpression(ExpressionType type, Errors err, Constraints cons) :
 {
-    String s;
+    String id;
     Expression e;
 }
 {
@@ -1714,7 +1717,7 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
 	    return e;
 	}
 	|
-	e = ExistsAttribute()
+	e = ExistsAttribute(cons)
 	{
 		if (type != ExpressionType.EXECUTE_IF) {
 			String msg = "IF EXIST not allowed";
@@ -1727,7 +1730,7 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
 	|
 	(
 	"("
-        e = Expression(type, err)
+        e = Expression(type, err, cons)
         {
             addIfError(e, token, err);
             return e;
@@ -1742,10 +1745,11 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
             addError(msg, token, err);
             return new ErrorExpression(msg);
         }
+        cons.addRequired(DataTemplate.TIMESTAMP);
         return new GroupTS();
     }
     |
-    e = Aggregate(err)
+    e = Aggregate(err, cons)
     {
         if (type != ExpressionType.AGGREGATE) {
         	String msg = "aggregation not allowed";
@@ -1755,32 +1759,44 @@ Expression PrimaryExpression(ExpressionType type, Errors err) :
         return e;
     }
     |
-    s = Identifier() // FPC attribute
-    { return new Field(s); }
+    id = Identifier() // FPC attribute
+    {
+    	if (type == ExpressionType.CONSTANT) {
+    		String msg = "attributes not allowed in constant expression";
+    		addError(msg, token, err);
+    		return new ErrorExpression(msg);
+    	}
+    	cons.addIdentifier(id);
+    	return new Field(id);
+    }
 }
 
-Expression ExistsAttribute() :
+Expression ExistsAttribute(Constraints cons) :
 {
-	String att;
-	TypeClass typeClass = TypeClass.ANY;
+	String id;
+	TypeClass tc = TypeClass.ANY;
+	DataTemplate t;
+
 }
 {
 	<KEYWORD_EXISTS>
 	"("
         (
-        att = Identifier() // FPC attribute
+        id = Identifier() // FPC attribute
             [
             <KEYWORD_TYPE_SEPARATOR>
-            typeClass = TypeClass()
+            tc = TypeClass()
             ]
+        { cons.addRequired(id, tc); }
         )
 		|
 		<KEYWORD_ALL>
+		{ cons.setExistsAll(); }
 	")"
 	{ return null; }
 }
 
-Expression Aggregate(Errors err) :
+Expression Aggregate(Errors err, Constraints cons) :
 {
     Token t;
     AggregateOperation op;
@@ -1801,7 +1817,7 @@ Expression Aggregate(Errors err) :
             ws = WindowSize(err)
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, err)
+                filter = Expression(ExpressionType.SIMPLE, err, cons)
             ]
             ")"
         )
@@ -1810,12 +1826,12 @@ Expression Aggregate(Errors err) :
             op = AggregateOperation()
             { t = token; }
             "("
-            exp = Expression(ExpressionType.SIMPLE, err)
+            exp = Expression(ExpressionType.SIMPLE, err, cons)
             ","
             ws = WindowSize(err)
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, err)
+                filter = Expression(ExpressionType.SIMPLE, err, cons)
             ]
             ")"
         )
