@@ -1756,32 +1756,32 @@ Expression Aggregate(Errors err) :
 {
     (
         (
-        <FUNCTION_COUNT>
-        { t = token; }
-        { op = AggregateOperation.COUNT; }
-        "("
-        "*"
-        ","
-        ws = WindowSize(err)
-        [
+            <FUNCTION_COUNT>
+            { t = token; }
+            { op = AggregateOperation.COUNT; }
+            "("
+            "*"
             ","
-            filter = Expression(ExpressionType.SIMPLE, err)
-        ]
-        ")"
+            ws = WindowSize(err)
+            [
+                ","
+                filter = Expression(ExpressionType.SIMPLE, err)
+            ]
+            ")"
         )
         |
         (
-        op = AggregateOperation()
-        { t = token; }
-        "("
-        exp = Expression(ExpressionType.SIMPLE, err)
-        ","
-        ws = WindowSize(err)
-        [
+            op = AggregateOperation()
+            { t = token; }
+            "("
+            exp = Expression(ExpressionType.SIMPLE, err)
             ","
-            filter = Expression(ExpressionType.SIMPLE, err)
-        ]
-        ")"
+            ws = WindowSize(err)
+            [
+                ","
+                filter = Expression(ExpressionType.SIMPLE, err)
+            ]
+            ")"
         )
     )
     {
