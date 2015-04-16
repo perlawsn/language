@@ -13,9 +13,18 @@ import java.util.*;
  */
 public final class GroupBy implements Clause {
 
+    public static final GroupBy NONE = new GroupBy();
+
     private final Duration d;
     private final int count;
     private final List<? extends Expression> groups;
+
+    // Private constructor, only employed to create the NONE static reference
+    private GroupBy() {
+        d = null;
+        count = -1;
+        groups = null;
+    }
 
     public GroupBy(Duration d, int count) {
         this.d = d;
@@ -59,6 +68,10 @@ public final class GroupBy implements Clause {
         return groups;
     }
 
+    public boolean hasNoGroups() {
+        return d == null && (groups == null || groups.isEmpty());
+    }
+
     @Override
     public boolean hasErrors() {
         return false;
@@ -98,7 +111,7 @@ public final class GroupBy implements Clause {
             return tsGroups;
         }
 
-        // Further grouping if both timestamp and classic group by are specified
+        // Further grouping if both timestamp and classic groups are specified
         // in the query.
         List<BufferView> bufs = new LinkedList<>();
         for (BufferView tgb : tsGroups) {

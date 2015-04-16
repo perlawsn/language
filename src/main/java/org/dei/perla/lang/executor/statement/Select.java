@@ -92,7 +92,7 @@ public final class Select implements Clause {
                         "Unexpected upto WindowSize type " + upto.getType());
         }
 
-        if (group == null) {
+        if (group.hasNoGroups()) {
             selectBuffer(ut, buffer, rs);
         } else {
             // GROUP BY CLAUSE

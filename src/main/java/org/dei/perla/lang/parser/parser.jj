@@ -44,6 +44,8 @@ PARSER_BEGIN(Parser)
 
 	public final class Parser {
 
+        private static final Object[] EMPTY_DEFAULT = new Object[0];
+
 	    private static void addError(String msg, Token t, Errors err) {
 	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
 	    }
@@ -684,7 +686,7 @@ Selection SelectionStatement(Errors err) :
 	Set<String> ids = new TreeSet<String>();
     WindowSize every;
     List<FieldSelection> fsl;
-    GroupBy gby = null;
+    GroupBy gby = GroupBy.NONE;
     Expression having = Constant.TRUE;
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
@@ -719,7 +721,7 @@ Selection SelectionStatement(Errors err) :
 	        def[i++] = fs.getDefault();
 	    }
 	    if (oes == OnEmptySelection.INSERT_NOTHING) {
-	        def = new Object[0];
+	        def = EMPTY_DEFAULT;
 	    }
 	    sel = new Select(fields, upto, gby, having, def);
 	}
