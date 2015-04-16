@@ -46,24 +46,24 @@ public final class GroupBy implements Clause {
 
     protected Duration getDuration() {
         if (d == null) {
-            throw new RuntimeException("Cannot access duration in " +
-                    "value-based GROUP BY clause");
+            throw new RuntimeException("Cannot access groups GROUP BY clause " +
+                    "is not time-base");
         }
         return d;
     }
 
     protected int getCount() {
         if (d == null) {
-            throw new RuntimeException("Cannot access count in " +
-                    "value-based GROUP BY clause");
+            throw new RuntimeException("Cannot access groups GROUP BY clause " +
+                    "is not time-base");
         }
         return count;
     }
 
     protected List<? extends Expression> getGroups() {
         if (groups == null) {
-            throw new RuntimeException("Cannot access groups in time-based " +
-                    "GROUP BY clause");
+            throw new RuntimeException("Cannot access groups GROUP BY clause " +
+                    "is not value-base");
         }
         return groups;
     }
