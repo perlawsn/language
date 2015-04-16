@@ -1,5 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
+import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.expression.Expression;
 
@@ -9,18 +10,25 @@ import java.util.List;
 /**
  * @author Guido Rota 16/03/15.
  */
-public final class ExecuteIf implements Clause {
+public final class ExecutionConditions implements Clause {
 
     private final Expression cond;
+    private final List<DataTemplate> specs;
     private final Refresh refresh;
 
-    public ExecuteIf(Expression cond, Refresh refresh) {
+    public ExecutionConditions(Expression cond, List<DataTemplate> specs,
+            Refresh refresh) {
         this.cond = cond;
+        this.specs = specs;
         this.refresh = refresh;
     }
 
     public Expression getCondition() {
         return cond;
+    }
+
+    public List<DataTemplate> getSpecs() {
+        return specs;
     }
 
     @Override
@@ -33,13 +41,13 @@ public final class ExecuteIf implements Clause {
         return cond.isComplete() && refresh.isComplete();
     }
 
-    public ExecuteIf bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public ExecutionConditions bind(Collection<Attribute> atts, List<Attribute> bound) {
         Expression bcond = cond.bind(atts, bound);
         Refresh brefresh = null;
         if (refresh != null) {
             brefresh = refresh.bind(atts);
         }
-        return new ExecuteIf(bcond, brefresh);
+        return new ExecutionConditions(bcond, specs, brefresh);
     }
 
     public Refresh getRefresh() {

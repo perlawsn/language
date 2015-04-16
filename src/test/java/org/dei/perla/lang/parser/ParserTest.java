@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
@@ -16,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -467,15 +469,15 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("temperature"));
-        e = p.PrimaryExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.PrimaryExpression(ExpressionType.SIMPLE, err, ids);
         assertTrue(e instanceof Field);
         assertThat(((Field) e).getId(), equalTo("temperature"));
 
         p.ReInit(new StringReader("pressure"));
-        e = p.PrimaryExpression(ExpressionType.AGGREGATE, err, cons);
+        e = p.PrimaryExpression(ExpressionType.AGGREGATE, err, ids);
         assertTrue(e instanceof Field);
         assertThat(((Field) e).getId(), equalTo("pressure"));
         // TODO: continue with the remaining expressions
@@ -487,10 +489,10 @@ public class ParserTest {
         Expression e;
         Aggregate agg;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("count(*, 10 samples)"));
-        e = p.Aggregate(err, cons);
+        e = p.Aggregate(err, ids);
         assertTrue(e instanceof CountAggregate);
         agg = (Aggregate) e;
         assertThat(agg.getOperand(), nullValue());
@@ -498,7 +500,7 @@ public class ParserTest {
         assertThat(agg.getFilter(), nullValue());
 
         p.ReInit(new StringReader("count(*, 10 seconds, true)"));
-        e = p.Aggregate(err, cons);
+        e = p.Aggregate(err, ids);
         assertTrue(e instanceof CountAggregate);
         agg = (Aggregate) e;
         assertThat(agg.getOperand(), nullValue());
@@ -511,10 +513,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("-10"));
-        e = p.ArithmeticFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticFactor(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -522,7 +524,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(-10));
 
         p.ReInit(new StringReader("-temperature"));
-        e = p.ArithmeticFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticFactor(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -534,10 +536,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("pressure"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -545,7 +547,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("pressure"));
 
         p.ReInit(new StringReader("10 * -32"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -553,7 +555,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(-320));
 
         p.ReInit(new StringReader("100 / 10"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -561,7 +563,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(10));
 
         p.ReInit(new StringReader("temperature * 10"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -570,7 +572,7 @@ public class ParserTest {
                 equalTo(ArithmeticOperation.PRODUCT));
 
         p.ReInit(new StringReader("23 / pressure"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -579,7 +581,7 @@ public class ParserTest {
                 equalTo(ArithmeticOperation.DIVISION));
 
         p.ReInit(new StringReader("23 % pressure"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -588,7 +590,7 @@ public class ParserTest {
                 equalTo(ArithmeticOperation.MODULO));
 
         p.ReInit(new StringReader("23 * pressure / 25"));
-        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -602,10 +604,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("pressure"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -613,7 +615,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("pressure"));
 
         p.ReInit(new StringReader("10 + -32"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -621,7 +623,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(-22));
 
         p.ReInit(new StringReader("100 - 10"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -629,7 +631,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(90));
 
         p.ReInit(new StringReader("temperature + 10"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -638,7 +640,7 @@ public class ParserTest {
                 equalTo(ArithmeticOperation.ADDITION));
 
         p.ReInit(new StringReader("23 - pressure"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -647,7 +649,7 @@ public class ParserTest {
                 equalTo(ArithmeticOperation.SUBTRACTION));
 
         p.ReInit(new StringReader("11 - 23 + pressure / 25"));
-        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -661,10 +663,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("pressure"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -672,7 +674,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("pressure"));
 
         p.ReInit(new StringReader("10 << 32"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -680,7 +682,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(10 << 32));
 
         p.ReInit(new StringReader("100 >> 10"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -688,7 +690,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(100 >> 10));
 
         p.ReInit(new StringReader("temperature << 10"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -697,7 +699,7 @@ public class ParserTest {
                 equalTo(BitwiseOperation.LSH));
 
         p.ReInit(new StringReader("23 >> pressure"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -706,7 +708,7 @@ public class ParserTest {
                 equalTo(BitwiseOperation.RSH));
 
         p.ReInit(new StringReader("11 << pressure / 25"));
-        e = p.BitwiseShift(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -720,10 +722,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("pressure"));
-        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -731,7 +733,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("pressure"));
 
         p.ReInit(new StringReader("10 ^ 32"));
-        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -739,7 +741,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(10 ^ 32));
 
         p.ReInit(new StringReader("temperature ^ 10"));
-        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -748,7 +750,7 @@ public class ParserTest {
                 equalTo(BitwiseOperation.XOR));
 
         p.ReInit(new StringReader("11 ^ pressure - 25"));
-        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseFactor(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -762,10 +764,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("light"));
-        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -773,7 +775,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("light"));
 
         p.ReInit(new StringReader("10 & 32"));
-        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -781,7 +783,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(10 & 32));
 
         p.ReInit(new StringReader("temperature & 10"));
-        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -790,7 +792,7 @@ public class ParserTest {
                 equalTo(BitwiseOperation.AND));
 
         p.ReInit(new StringReader("23 & pressure * 74"));
-        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -804,10 +806,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("sound_level"));
-        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -815,7 +817,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("sound_level"));
 
         p.ReInit(new StringReader("10 | 32"));
-        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -823,7 +825,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(10 | 32));
 
         p.ReInit(new StringReader("temperature | 10"));
-        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -832,7 +834,7 @@ public class ParserTest {
                 equalTo(BitwiseOperation.OR));
 
         p.ReInit(new StringReader("23 | pressure & 74"));
-        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, cons);
+        e = p.BitwiseExpression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -846,10 +848,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -857,7 +859,7 @@ public class ParserTest {
         assertThat(((Field) e).getId(), equalTo("pressure"));
 
         p.ReInit(new StringReader("10 < 32"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -865,7 +867,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("1 > 10"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -873,7 +875,7 @@ public class ParserTest {
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
 
         p.ReInit(new StringReader("temperature < 10"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -882,7 +884,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.LT));
 
         p.ReInit(new StringReader("23 <= pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -891,7 +893,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.LE));
 
         p.ReInit(new StringReader("23 > pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -900,7 +902,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.GT));
 
         p.ReInit(new StringReader("23 >= pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -909,7 +911,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.GE));
 
         p.ReInit(new StringReader("23 = pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -918,7 +920,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.EQ));
 
         p.ReInit(new StringReader("23 != pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -927,7 +929,7 @@ public class ParserTest {
                 equalTo(ComparisonOperation.NE));
 
         p.ReInit(new StringReader("23 <> pressure"));
-        e = p.Comparison(ExpressionType.SIMPLE, err, cons);
+        e = p.Comparison(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(err.isEmpty());
@@ -941,19 +943,19 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
         Expression c = Constant.create(12, DataType.INTEGER);
         Field f = new Field("test");
 
         p = new Parser(new StringReader("between 0 and 43"));
-        e = p.Between(c, ExpressionType.SIMPLE, err, cons);
+        e = p.Between(c, ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Constant);
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         p.ReInit(new StringReader("between -12 and 45"));
-        e = p.Between(f, ExpressionType.SIMPLE, err, cons);
+        e = p.Between(f, ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Between);
@@ -1033,28 +1035,28 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("name like \"asdf\""));
-        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Like);
 
         p = new Parser(new StringReader("room between 0 and 23"));
-        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Between);
 
         p = new Parser(new StringReader("temperature is null"));
-        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof IsNull);
 
         p = new Parser(new StringReader("flag is unknown"));
-        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanPredicate(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Is);
@@ -1065,10 +1067,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("not flag"));
-        e = p.BooleanNegation(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanNegation(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Not);
@@ -1079,10 +1081,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("true xor flag"));
-        e = p.BooleanFactor(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanFactor(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Bool);
@@ -1094,10 +1096,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("true and flag"));
-        e = p.BooleanTerm(ExpressionType.SIMPLE, err, cons);
+        e = p.BooleanTerm(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Bool);
@@ -1109,10 +1111,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("true or flag"));
-        e = p.Expression(ExpressionType.SIMPLE, err, cons);
+        e = p.Expression(ExpressionType.SIMPLE, err, ids);
         assertFalse(e.isComplete());
         assertFalse(e.hasErrors());
         assertTrue(e instanceof Bool);
@@ -1124,10 +1126,10 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("not (2 << 4 > 0) && false"));
-        e = p.Expression(ExpressionType.SIMPLE, err, cons);
+        e = p.Expression(ExpressionType.SIMPLE, err, ids);
         assertTrue(e.isComplete());
         assertFalse(e.hasErrors());
         assertThat(e.run(null, null), equalTo(LogicValue.FALSE));
@@ -1175,17 +1177,17 @@ public class ParserTest {
         Every e;
         Expression c;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("5 seconds"));
-        e = p.EveryDuration(err, cons);
+        e = p.EveryDuration(err, ids);
         c = e.getValue();
         assertTrue(c instanceof Constant);
         assertThat(((Constant) c).getValue(), equalTo(5));
         assertThat(e.getUnit(), equalTo(ChronoUnit.SECONDS));
 
         p.ReInit(new StringReader("25 days"));
-        e = p.EveryDuration(err, cons);
+        e = p.EveryDuration(err, ids);
         c = e.getValue();
         assertTrue(c instanceof Constant);
         assertThat(((Constant) c).getValue(), equalTo(25));
@@ -1234,10 +1236,10 @@ public class ParserTest {
         IfEvery ife;
         Duration d;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("every 5 seconds"));
-        ife = p.IfEveryClause(err, cons);
+        ife = p.IfEveryClause(err, ids);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
@@ -1246,7 +1248,7 @@ public class ParserTest {
 
         p.ReInit(new StringReader(
                 "if false every 10 seconds else every 2 days"));
-        ife = p.IfEveryClause(err, cons);
+        ife = p.IfEveryClause(err, ids);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
@@ -1259,7 +1261,7 @@ public class ParserTest {
                 "if power > 40 every 2 minutes " +
                 "else every 1 hours"
         ));
-        ife = p.IfEveryClause(err, cons);
+        ife = p.IfEveryClause(err, ids);
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
@@ -1283,10 +1285,10 @@ public class ParserTest {
         IfEvery ife;
         Duration d;
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         p = new Parser(new StringReader("sampling every 5 seconds"));
-        s = p.SamplingClause(err, cons);
+        s = p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
         assertTrue(s.isComplete());
         assertTrue(s instanceof SamplingIfEvery);
@@ -1301,7 +1303,7 @@ public class ParserTest {
                 "if power > 40 every 2 minutes " +
                 "else every 1 hours"
         ));
-        s = p.SamplingClause(err, cons);
+        s = p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
         assertFalse(s.isComplete());
         assertFalse(s.hasErrors());
@@ -1323,11 +1325,11 @@ public class ParserTest {
     @Test
     public void testSamplingEvent() throws Exception {
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
 
         Parser p = new Parser(new StringReader(
                 "sampling on event alert, low_power"));
-        Sampling s = p.SamplingClause(err, cons);
+        Sampling s = p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
         assertFalse(s.isComplete());
         assertFalse(s.hasErrors());
@@ -1339,6 +1341,100 @@ public class ParserTest {
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(lowPowerAtt));
         assertTrue(bound.contains(alertAtt));
+    }
+
+    @Test
+    public void testSpecification() throws Exception {
+        Parser p = new Parser(new StringReader("temperature:ANY"));
+        DataTemplate t = p.Specification();
+        assertThat(t.getId(), equalTo("temperature"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+
+
+        p.ReInit(new StringReader("pressure:FLOAT"));
+        t = p.Specification();
+        assertThat(t.getId(), equalTo("pressure"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.FLOAT));
+    }
+
+    @Test
+    public void testSpecificationList() throws Exception {
+        Parser p = new Parser(new StringReader(
+                "temperature, pressure:FLOAT, room_name:STRING"));
+        List<DataTemplate> specs = p.SpecificationList();
+        assertThat(specs.size(), equalTo(3));
+        DataTemplate t = specs.get(0);
+        assertThat(t.getId(), equalTo("temperature"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+        t = specs.get(1);
+        assertThat(t.getId(), equalTo("pressure"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.FLOAT));
+        t = specs.get(2);
+        assertThat(t.getId(), equalTo("room_name"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.STRING));
+    }
+
+    @Test
+    public void testNodeSpecifications() throws Exception {
+        Parser p = new Parser(new StringReader(
+                "on nodes with temperature, pressure:FLOAT"
+        ));
+        List<DataTemplate> specs =
+                p.NodeSpecifications(Collections.emptyList());
+        assertThat(specs.size(), equalTo(2));
+        DataTemplate t = specs.get(0);
+        assertThat(t.getId(), equalTo("temperature"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+        t = specs.get(1);
+        assertThat(t.getId(), equalTo("pressure"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.FLOAT));
+
+        List<String> ids = Arrays.asList(new String[]{
+                "light",
+                "humidity",
+                "elevation"
+        });
+        p.ReInit(new StringReader("on nodes with all"));
+        specs = p.NodeSpecifications(ids);
+        assertThat(specs.size(), equalTo(3));
+        t = specs.get(0);
+        assertThat(t.getId(), equalTo("light"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+        t = specs.get(1);
+        assertThat(t.getId(), equalTo("humidity"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+        t = specs.get(2);
+        assertThat(t.getId(), equalTo("elevation"));
+        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+    }
+
+    @Test
+    public void testExecutionConditionsClause() throws Exception {
+        Errors err = new Errors();
+        List<String> ids = new ArrayList<>();
+
+        Parser p = new Parser(new StringReader(
+                "execute if battery > 20"
+        ));
+        ExecutionConditions e = p.ExecutionConditionsClause(err, ids);
+        assertFalse(e.getCondition().hasErrors());
+        assertThat(e.getSpecs(), nullValue());
+        assertThat(e.getRefresh(), nullValue());
+
+        p.ReInit(new StringReader(
+                "execute if battery > 20 " +
+                        "on nodes with temperature:INTEGER " +
+                        "refresh every 20 minutes"
+        ));
+        ids.clear();
+        e = p.ExecutionConditionsClause(err, ids);
+        assertFalse(e.getCondition().hasErrors());
+        assertThat(e.getSpecs().size(), equalTo(1));
+        assertTrue(e.getSpecs().contains(
+                DataTemplate.create("temperature", TypeClass.INTEGER)));
+        assertThat(e.getRefresh().getType(), equalTo(RefreshType.TIME));
+        assertThat(e.getRefresh().getDuration(),
+                equalTo(Duration.ofMinutes(20)));
     }
 
 }

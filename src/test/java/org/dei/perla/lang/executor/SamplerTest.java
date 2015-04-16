@@ -6,14 +6,11 @@ import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingEvent;
 import org.dei.perla.lang.executor.statement.SamplingIfEvery;
-import org.dei.perla.lang.parser.Constraints;
 import org.dei.perla.lang.parser.Parser;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -44,14 +41,14 @@ public class SamplerTest {
     public void testSimpleIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
                 "if power > 60 every 200 milliseconds " +
                 "if power > 20 every 400 milliseconds " +
                 "else every 1 seconds"));
 
-        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, cons);
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
 
         // Test with power == 100
@@ -93,7 +90,7 @@ public class SamplerTest {
     public void testTimeRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
                 "if power > 60 every 200 milliseconds " +
@@ -101,7 +98,7 @@ public class SamplerTest {
                 "else every 1 seconds " +
                 "refresh every 1 seconds"));
 
-        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, cons);
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
@@ -139,14 +136,14 @@ public class SamplerTest {
     public void testEventRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if temperature > 40 every 100 milliseconds " +
                 "if temperature > 30 every 500 milliseconds " +
                 "else every 1 seconds " +
                 "refresh on event fire"));
 
-        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, cons);
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes());
@@ -186,9 +183,9 @@ public class SamplerTest {
     public void testSamplerEvent() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        Constraints cons = new Constraints();
+        List<String> ids = new ArrayList<>();
         Parser p = new Parser(new StringReader("sampling on event fire"));
-        SamplingEvent samp = (SamplingEvent) p.SamplingClause(err, cons);
+        SamplingEvent samp = (SamplingEvent) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
 
         SimulatorFpc fpc = new SimulatorFpc(vs);

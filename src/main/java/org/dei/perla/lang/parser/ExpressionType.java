@@ -16,9 +16,6 @@ public enum ExpressionType {
     SIMPLE,
 
     // Aggregation nodes allowed
-    AGGREGATE,
-
-    // IF EXIST allowed, aggregations forbidden
-    EXECUTE_IF
+    AGGREGATE
 
 }
