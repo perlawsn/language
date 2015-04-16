@@ -683,7 +683,11 @@ List<String> FieldList() :
 
 Selection SelectionStatement(Errors err) :
 {
+	// All attribute identifiers are incrementally stored inside this
+	// structure, that is later employed by the EXECUTE IF clause when the
+	// user requires all attributes referenced in the query
 	Set<String> ids = new TreeSet<String>();
+
     WindowSize every;
     List<FieldSelection> fsl;
     GroupBy gby = GroupBy.NONE;
@@ -691,10 +695,8 @@ Selection SelectionStatement(Errors err) :
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     Sampling sampling;
-    Expression where = null;
+    Expression where = Constant.TRUE;
     WindowSize terminate = null;
-
-    Select sel;
 }
 {
     every = EveryClause(err)
