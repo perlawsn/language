@@ -11,15 +11,24 @@ import java.util.*;
  */
 public final class Refresh implements Clause {
 
+    public static final Refresh NEVER = new Refresh();
+
     private final RefreshType type;
     private final Duration d;
     private final Set<String> names;
     private final List<Attribute> events;
 
-    public Refresh(Duration d) {
-        this.d = d;
+    private Refresh() {
+        type = RefreshType.NEVER;
+        d = null;
         names = null;
         events = null;
+    }
+
+    public Refresh(Duration d) {
+        this.d = d;
+        names = Collections.emptySet();
+        events = Collections.emptyList();
         type = RefreshType.TIME;
     }
 
@@ -64,11 +73,10 @@ public final class Refresh implements Clause {
 
     @Override
     public boolean isComplete() {
-        if (names == null) {
-            return d != null;
-        } else {
+        if (names != null) {
             return events != null && names.size() == events.size();
         }
+        return true;
     }
 
     public Refresh bind(Collection<Attribute> atts) {
@@ -97,7 +105,8 @@ public final class Refresh implements Clause {
      */
     public static enum RefreshType {
         EVENT,
-        TIME
+        TIME,
+        NEVER
     }
 
 }

@@ -20,6 +20,14 @@ import static org.junit.Assert.*;
 public class RefreshTest {
 
     @Test
+    public void neverRefresh() {
+        Refresh r = Refresh.NEVER;
+        assertTrue(r.isComplete());
+        assertFalse(r.hasErrors());
+        assertThat(r.getType(), equalTo(RefreshType.NEVER));
+    }
+
+    @Test
     public void createTimedRefresh() {
         Duration d = Duration.ofSeconds(56);
         Refresh r = new Refresh(d);

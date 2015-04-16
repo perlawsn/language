@@ -153,22 +153,28 @@ public final class SamplerIfEvery implements Sampler {
 
             lk.lock();
             try {
-                if (refresh == null) {
-                    return;
-
-                } else if (refresh.getType() == RefreshType.EVENT &&
-                        evtTask == null) {
-                    evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
-                    if (evtTask == null) {
-                        handleError(EVT_INIT_ERROR);
-                    }
-
-                } else if (refresh.getType() == RefreshType.TIME){
-                    ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
-                            refresh.getDuration(), ifeHandler);
-                    if (ifeTask == null) {
-                        handleError(IFE_INIT_ERROR);
-                    }
+                switch (refresh.getType()) {
+                    case NEVER:
+                        return;
+                    case EVENT:
+                        if (evtTask != null) {
+                            return;
+                        }
+                        evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
+                        if (evtTask == null) {
+                            handleError(EVT_INIT_ERROR);
+                        }
+                        break;
+                    case TIME:
+                        ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
+                                refresh.getDuration(), ifeHandler);
+                        if (ifeTask == null) {
+                            handleError(IFE_INIT_ERROR);
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException(
+                                "Unexpected refresh type " + refresh.getType());
                 }
             } finally {
                 lk.unlock();

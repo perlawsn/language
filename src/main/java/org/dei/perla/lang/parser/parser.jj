@@ -889,7 +889,7 @@ Sampling SamplingClause(Errors err, Set<String> ids) :
 
 	IfEvery ife;
 	RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
-	Refresh refresh = null;
+	Refresh refresh = Refresh.NEVER;
 }
 {
 	<KEYWORD_SAMPLING>
@@ -1034,7 +1034,7 @@ Refresh RefreshClause() :
         { return new Refresh(d); }
 		|
         <KEYWORD_NEVER>
-        { return null; }
+        { return Refresh.NEVER; }
 	)
 }
 
@@ -1042,7 +1042,7 @@ ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
 {
     Expression cond = null;
     List<DataTemplate> specs = null;
-    Refresh r = null;
+    Refresh r = Refresh.NEVER;
 }
 {
 	<KEYWORD_EXECUTE>

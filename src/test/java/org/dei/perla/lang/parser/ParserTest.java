@@ -1205,7 +1205,7 @@ public class ParserTest {
 
         p.ReInit(new StringReader("refresh never"));
         r = p.RefreshClause();
-        assertThat(r, nullValue());
+        assertThat(r, equalTo(Refresh.NEVER));
 
         p.ReInit(new StringReader("refresh on event alert"));
         r = p.RefreshClause();
@@ -1411,7 +1411,7 @@ public class ParserTest {
         ExecutionConditions e = p.ExecutionConditionsClause(err, ids);
         assertFalse(e.getCondition().hasErrors());
         assertThat(e.getSpecs(), nullValue());
-        assertThat(e.getRefresh(), nullValue());
+        assertThat(e.getRefresh(), equalTo(Refresh.NEVER));
 
         p.ReInit(new StringReader(
                 "execute if battery > 20 " +
