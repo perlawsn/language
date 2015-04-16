@@ -41,7 +41,7 @@ public class SamplerTest {
     public void testSimpleIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
                 "if power > 60 every 200 milliseconds " +
@@ -90,7 +90,7 @@ public class SamplerTest {
     public void testTimeRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if power > 80 every 100 milliseconds " +
                 "if power > 60 every 200 milliseconds " +
@@ -136,7 +136,7 @@ public class SamplerTest {
     public void testEventRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
         Parser p = new Parser(new StringReader("sampling " +
                 "if temperature > 40 every 100 milliseconds " +
                 "if temperature > 30 every 500 milliseconds " +
@@ -183,7 +183,7 @@ public class SamplerTest {
     public void testSamplerEvent() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
         Parser p = new Parser(new StringReader("sampling on event fire"));
         SamplingEvent samp = (SamplingEvent) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());

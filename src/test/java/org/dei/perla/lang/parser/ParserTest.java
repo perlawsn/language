@@ -15,10 +15,7 @@ import java.io.StringReader;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -469,7 +466,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("temperature"));
         e = p.PrimaryExpression(ExpressionType.SIMPLE, err, ids);
@@ -489,7 +486,7 @@ public class ParserTest {
         Expression e;
         Aggregate agg;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("count(*, 10 samples)"));
         e = p.Aggregate(err, ids);
@@ -513,7 +510,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("-10"));
         e = p.ArithmeticFactor(ExpressionType.SIMPLE, err, ids);
@@ -536,7 +533,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("pressure"));
         e = p.ArithmeticTerm(ExpressionType.SIMPLE, err, ids);
@@ -604,7 +601,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("pressure"));
         e = p.ArithmeticExpression(ExpressionType.SIMPLE, err, ids);
@@ -663,7 +660,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("pressure"));
         e = p.BitwiseShift(ExpressionType.SIMPLE, err, ids);
@@ -722,7 +719,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("pressure"));
         e = p.BitwiseFactor(ExpressionType.SIMPLE, err, ids);
@@ -764,7 +761,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("light"));
         e = p.BitwiseTerm(ExpressionType.SIMPLE, err, ids);
@@ -806,7 +803,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("sound_level"));
         e = p.BitwiseExpression(ExpressionType.SIMPLE, err, ids);
@@ -848,7 +845,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("pressure"));
         e = p.Comparison(ExpressionType.SIMPLE, err, ids);
@@ -943,7 +940,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
         Expression c = Constant.create(12, DataType.INTEGER);
         Field f = new Field("test");
 
@@ -1035,7 +1032,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("name like \"asdf\""));
         e = p.BooleanPredicate(ExpressionType.SIMPLE, err, ids);
@@ -1067,7 +1064,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("not flag"));
         e = p.BooleanNegation(ExpressionType.SIMPLE, err, ids);
@@ -1081,7 +1078,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("true xor flag"));
         e = p.BooleanFactor(ExpressionType.SIMPLE, err, ids);
@@ -1096,7 +1093,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("true and flag"));
         e = p.BooleanTerm(ExpressionType.SIMPLE, err, ids);
@@ -1111,7 +1108,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("true or flag"));
         e = p.Expression(ExpressionType.SIMPLE, err, ids);
@@ -1126,7 +1123,7 @@ public class ParserTest {
         Parser p;
         Expression e;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("not (2 << 4 > 0) && false"));
         e = p.Expression(ExpressionType.SIMPLE, err, ids);
@@ -1177,7 +1174,7 @@ public class ParserTest {
         Every e;
         Expression c;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("5 seconds"));
         e = p.EveryDuration(err, ids);
@@ -1236,7 +1233,7 @@ public class ParserTest {
         IfEvery ife;
         Duration d;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("every 5 seconds"));
         ife = p.IfEveryClause(err, ids);
@@ -1285,7 +1282,7 @@ public class ParserTest {
         IfEvery ife;
         Duration d;
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         p = new Parser(new StringReader("sampling every 5 seconds"));
         s = p.SamplingClause(err, ids);
@@ -1325,7 +1322,7 @@ public class ParserTest {
     @Test
     public void testSamplingEvent() throws Exception {
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         Parser p = new Parser(new StringReader(
                 "sampling on event alert, low_power"));
@@ -1380,7 +1377,7 @@ public class ParserTest {
                 "on nodes with temperature, pressure:FLOAT"
         ));
         List<DataTemplate> specs =
-                p.NodeSpecifications(Collections.emptyList());
+                p.NodeSpecifications(Collections.emptySet());
         assertThat(specs.size(), equalTo(2));
         DataTemplate t = specs.get(0);
         assertThat(t.getId(), equalTo("temperature"));
@@ -1389,29 +1386,24 @@ public class ParserTest {
         assertThat(t.getId(), equalTo("pressure"));
         assertThat(t.getTypeClass(), equalTo(TypeClass.FLOAT));
 
-        List<String> ids = Arrays.asList(new String[]{
-                "light",
-                "humidity",
-                "elevation"
-        });
+        Set<String> ids = new TreeSet<>();
+        ids.add("light");
+        ids.add("humidity");
+        ids.add("elevation");
         p.ReInit(new StringReader("on nodes with all"));
         specs = p.NodeSpecifications(ids);
         assertThat(specs.size(), equalTo(3));
-        t = specs.get(0);
-        assertThat(t.getId(), equalTo("light"));
-        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
-        t = specs.get(1);
-        assertThat(t.getId(), equalTo("humidity"));
-        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
-        t = specs.get(2);
-        assertThat(t.getId(), equalTo("elevation"));
-        assertThat(t.getTypeClass(), equalTo(TypeClass.ANY));
+        assertTrue(specs.contains(DataTemplate.create("light", TypeClass.ANY)));
+        assertTrue(specs.contains(
+                DataTemplate.create("humidity", TypeClass.ANY)));
+        assertTrue(specs.contains(
+                DataTemplate.create("elevation", TypeClass.ANY)));
     }
 
     @Test
     public void testExecutionConditionsClause() throws Exception {
         Errors err = new Errors();
-        List<String> ids = new ArrayList<>();
+        Set<String> ids = new TreeSet<>();
 
         Parser p = new Parser(new StringReader(
                 "execute if battery > 20"

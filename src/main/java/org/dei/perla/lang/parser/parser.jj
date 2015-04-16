@@ -681,7 +681,7 @@ List<String> FieldList() :
 
 Selection SelectionStatement(Errors err) :
 {
-	List<String> ids = new ArrayList<String>();
+	Set<String> ids = new TreeSet<String>();
     WindowSize every;
     List<FieldSelection> fsl;
     GroupBy gby = null;
@@ -750,7 +750,7 @@ WindowSize EveryClause(Errors err) :
 	{ return ws; }
 }
 
-List<FieldSelection> FieldSelectionList(Errors err, List<String> ids) :
+List<FieldSelection> FieldSelectionList(Errors err, Set<String> ids) :
 {
     List<FieldSelection> fsl = new ArrayList<FieldSelection>();
     FieldSelection fs;
@@ -766,7 +766,7 @@ List<FieldSelection> FieldSelectionList(Errors err, List<String> ids) :
 	{ return fsl; }
 }
 
-FieldSelection FieldSelection(Errors err, List<String> ids) :
+FieldSelection FieldSelection(Errors err, Set<String> ids) :
 {
     Expression field;
     Object def = null;
@@ -846,7 +846,7 @@ GroupByTS FieldGroupingByTs() :
 	{ return new GroupByTS(d, count); }
 }
 
-Expression HavingClause(Errors err, List<String> ids) :
+Expression HavingClause(Errors err, Set<String> ids) :
 {
     Expression e;
 }
@@ -883,7 +883,7 @@ OnEmptySelection OnEmptySelectionClause() :
 	)
 }
 
-Sampling SamplingClause(Errors err, List<String> ids) :
+Sampling SamplingClause(Errors err, Set<String> ids) :
 {
 	Set<String> events;
 
@@ -930,7 +930,7 @@ Set<String> OnEventClause() :
 	{ return evs; }
 }
 
-IfEvery IfEveryClause(Errors err, List<String> ids) :
+IfEvery IfEveryClause(Errors err, Set<String> ids) :
 {
     IfEvery ife = null;
     IfEvery prev = null;
@@ -986,7 +986,7 @@ IfEvery IfEveryClause(Errors err, List<String> ids) :
 	{ return ife; }
 }
 
-Every EveryDuration(Errors err, List<String> ids) :
+Every EveryDuration(Errors err, Set<String> ids) :
 {
     Expression value;
     TemporalUnit unit;
@@ -1038,7 +1038,7 @@ Refresh RefreshClause() :
 	)
 }
 
-ExecutionConditions ExecutionConditionsClause(Errors err, List<String> ids) :
+ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
 {
     Expression cond = null;
     List<DataTemplate> specs = null;
@@ -1059,7 +1059,7 @@ ExecutionConditions ExecutionConditionsClause(Errors err, List<String> ids) :
 	{ return new ExecutionConditions(cond, specs, r); }
 }
 
-List<DataTemplate> NodeSpecifications(List<String> ids) :
+List<DataTemplate> NodeSpecifications(Set<String> ids) :
 {
 	List<DataTemplate> specs;
 }
@@ -1419,7 +1419,7 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-Expression Expression(ExpressionType type, Errors err, List<String> ids) :
+Expression Expression(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1437,7 +1437,7 @@ Expression Expression(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BooleanTerm(ExpressionType type, Errors err, List<String> ids) :
+Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1455,7 +1455,7 @@ Expression BooleanTerm(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BooleanFactor(ExpressionType type, Errors err, List<String> ids) :
+Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1473,7 +1473,7 @@ Expression BooleanFactor(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BooleanNegation(ExpressionType type, Errors err, List<String> ids) :
+Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     boolean invert = false;
@@ -1493,7 +1493,7 @@ Expression BooleanNegation(ExpressionType type, Errors err, List<String> ids) :
 	}
 }
 
-Expression BooleanPredicate(ExpressionType type, Errors err, List<String> ids) :
+Expression BooleanPredicate(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
 }
@@ -1558,7 +1558,7 @@ Expression Like(Expression e, Errors err) :
     }
 }
 
-Expression Between(Expression e, ExpressionType type, Errors err, List<String> ids) :
+Expression Between(Expression e, ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression b;
     Expression min;
@@ -1576,7 +1576,7 @@ Expression Between(Expression e, ExpressionType type, Errors err, List<String> i
     }
 }
 
-Expression Comparison(ExpressionType type, Errors err, List<String> ids) :
+Expression Comparison(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1595,7 +1595,7 @@ Expression Comparison(ExpressionType type, Errors err, List<String> ids) :
     { return e1; }
 }
 
-Expression BitwiseExpression(ExpressionType type, Errors err, List<String> ids) :
+Expression BitwiseExpression(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1613,7 +1613,7 @@ Expression BitwiseExpression(ExpressionType type, Errors err, List<String> ids) 
 	{ return e1; }
 }
 
-Expression BitwiseTerm(ExpressionType type, Errors err, List<String> ids) :
+Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1631,7 +1631,7 @@ Expression BitwiseTerm(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BitwiseFactor(ExpressionType type, Errors err, List<String> ids) :
+Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1649,7 +1649,7 @@ Expression BitwiseFactor(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BitwiseShift(ExpressionType type, Errors err, List<String> ids) :
+Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1674,7 +1674,7 @@ Expression BitwiseShift(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression BitwiseNegation(ExpressionType type, Errors err, List<String> ids) :
+Expression BitwiseNegation(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     boolean not = false;
@@ -1694,7 +1694,7 @@ Expression BitwiseNegation(ExpressionType type, Errors err, List<String> ids) :
 	}
 }
 
-Expression ArithmeticExpression(ExpressionType type, Errors err, List<String> ids) :
+Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1719,7 +1719,7 @@ Expression ArithmeticExpression(ExpressionType type, Errors err, List<String> id
 	{ return e1; }
 }
 
-Expression ArithmeticTerm(ExpressionType type, Errors err, List<String> ids) :
+Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
@@ -1747,7 +1747,7 @@ Expression ArithmeticTerm(ExpressionType type, Errors err, List<String> ids) :
 	{ return e1; }
 }
 
-Expression ArithmeticFactor(ExpressionType type, Errors err, List<String> ids) :
+Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     Sign s = Sign.PLUS;
@@ -1766,7 +1766,7 @@ Expression ArithmeticFactor(ExpressionType type, Errors err, List<String> ids) :
 	}
 }
 
-Expression PrimaryExpression(ExpressionType type, Errors err, List<String> ids) :
+Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
 {
     String id;
     Expression e;
@@ -1821,7 +1821,7 @@ Expression PrimaryExpression(ExpressionType type, Errors err, List<String> ids) 
     }
 }
 
-Expression Aggregate(Errors err, List<String> ids) :
+Expression Aggregate(Errors err, Set<String> ids) :
 {
     Token t;
     AggregateOperation op;
