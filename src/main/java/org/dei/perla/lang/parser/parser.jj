@@ -685,7 +685,7 @@ Selection SelectionStatement(Errors err) :
     WindowSize every;
     List<FieldSelection> fsl;
     GroupBy gby = null;
-    Expression having = null;
+    Expression having = Constant.TRUE;
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     Sampling sampling;
@@ -719,7 +719,7 @@ Selection SelectionStatement(Errors err) :
 	        def[i++] = fs.getDefault();
 	    }
 	    if (oes == OnEmptySelection.INSERT_NOTHING) {
-	        def = null;
+	        def = new Object[0];
 	    }
 	    sel = new Select(fields, upto, gby, having, def);
 	}
@@ -1827,7 +1827,7 @@ Expression Aggregate(Errors err, Set<String> ids) :
     AggregateOperation op;
     Expression exp = null;
     WindowSize ws;
-    Expression filter = null;
+    Expression filter = Constant.TRUE;
     Expression e;
 }
 {

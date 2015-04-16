@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
@@ -53,11 +52,8 @@ public class GroupByTest {
         g = new GroupBy(SEC_10, 5);
         assertThat(g.getDuration(), equalTo(SEC_10));
         assertThat(g.getCount(), equalTo(5));
-        assertThat(g.getGroups(), nullValue());
 
         g = new GroupBy(fields);
-        assertThat(g.getDuration(), nullValue());
-        assertThat(g.getCount(), equalTo(-1));
         for (int i = 0; i < fields.size(); i++) {
             assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }

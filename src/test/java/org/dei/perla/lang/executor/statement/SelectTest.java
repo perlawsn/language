@@ -71,7 +71,8 @@ public class SelectTest {
         fields.add(stringExpr);
         fields.add(floatExpr);
 
-        Select sel = new Select(fields, null, null, null, null);
+        Select sel = new Select(fields, WindowSize.ONE, null,
+                Constant.TRUE, new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -96,7 +97,8 @@ public class SelectTest {
         fields.add(floatExpr);
         fields.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
 
-        Select sel = new Select(fields, null, null, null, null);
+        Select sel = new Select(fields, WindowSize.ONE, null, Constant.TRUE,
+                new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -123,7 +125,8 @@ public class SelectTest {
         fields.add(floatExpr);
 
         WindowSize upto = new WindowSize(3);
-        Select sel = new Select(fields, upto, null, null, null);
+        Select sel = new Select(fields, upto, null, Constant.TRUE,
+                new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -150,7 +153,8 @@ public class SelectTest {
         fields.add(floatExpr);
 
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
-        Select sel = new Select(fields, upto, null, null, null);
+        Select sel = new Select(fields, upto, null, Constant.TRUE,
+                new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -178,7 +182,8 @@ public class SelectTest {
         fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
 
         WindowSize upto = new WindowSize(3);
-        Select sel = new Select(fields, upto, null, null, null);
+        Select sel = new Select(fields, upto, null, Constant.TRUE,
+                new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -210,7 +215,7 @@ public class SelectTest {
                 Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
-        Select sel = new Select(fields, upto, null, having, null);
+        Select sel = new Select(fields, upto, null, having, new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -249,7 +254,7 @@ public class SelectTest {
                 Constant.create(3, DataType.INTEGER));
 
         WindowSize upto = new WindowSize(3);
-        Select sel = new Select(fields, upto, null, having, null);
+        Select sel = new Select(fields, upto, null, having, new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 
@@ -313,7 +318,8 @@ public class SelectTest {
         fields.add(intExpr);
 
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
-        Select sel = new Select(fields, null, group, null, null);
+        Select sel = new Select(fields, WindowSize.ONE, group,
+                Constant.TRUE, new Object[0]);
         sel = sel.bind(atts, atts);
         List<Object[]> samples = sel.select(view);
 

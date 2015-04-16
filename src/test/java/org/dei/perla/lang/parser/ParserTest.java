@@ -17,7 +17,9 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -494,7 +496,7 @@ public class ParserTest {
         agg = (Aggregate) e;
         assertThat(agg.getOperand(), nullValue());
         assertThat(agg.getWindowSize(), equalTo(new WindowSize(10)));
-        assertThat(agg.getFilter(), nullValue());
+        assertThat(agg.getFilter(), equalTo(Constant.TRUE));
 
         p.ReInit(new StringReader("count(*, 10 seconds, true)"));
         e = p.Aggregate(err, ids);

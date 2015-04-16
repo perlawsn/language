@@ -16,8 +16,6 @@ import java.util.List;
  */
 public final class Select implements Clause {
 
-    private static final WindowSize DEFAULT_UPTO = new WindowSize(1);
-
     private final List<Expression> fields;
     private final WindowSize upto;
     private final GroupBy group;
@@ -27,11 +25,7 @@ public final class Select implements Clause {
     public Select(List<Expression> fields, WindowSize upto,
             GroupBy group, Expression having, Object[] def) {
         this.fields = Collections.unmodifiableList(fields);
-        if (upto == null) {
-            this.upto = DEFAULT_UPTO;
-        } else {
-            this.upto = upto;
-        }
+        this.upto = upto;
         this.group = group;
         this.having = having;
         this.def = def;
@@ -76,10 +70,7 @@ public final class Select implements Clause {
             bgroup = group.bind(atts, bound);
         }
 
-        Expression bhaving = null;
-        if (having != null) {
-            bhaving = having.bind(atts, bound);
-        }
+        Expression bhaving = having.bind(atts, bound);
 
         return new Select(bfields, upto, bgroup, bhaving, def);
     }
@@ -89,10 +80,16 @@ public final class Select implements Clause {
 
         // UPTO CLAUSE
         int ut;
-        if (upto.getType() == WindowType.TIME) {
-            ut = buffer.samplesIn(upto.getDuration());
-        } else {
-            ut = upto.getSamples();
+        switch (upto.getType()) {
+            case TIME:
+                ut = buffer.samplesIn(upto.getDuration());
+                break;
+            case SAMPLE:
+                ut = upto.getSamples();
+                break;
+            default:
+                throw new RuntimeException(
+                        "Unexpected upto WindowSize type " + upto.getType());
         }
 
         if (group == null) {
@@ -106,7 +103,7 @@ public final class Select implements Clause {
             }
         }
 
-        if (def != null && rs.isEmpty()) {
+        if (def.length > 0 && rs.isEmpty()) {
             // ON EMPTY SELECTION INSERT DEFAULT
             rs.add(def);
         }
@@ -118,8 +115,8 @@ public final class Select implements Clause {
         for (int i = 0; i < upto && i < buf.length(); i++) {
             Object[] cur = buf.get(i);
             // HAVING CLAUSE
-            if (having != null &&
-                    !LogicValue.toBoolean((LogicValue) having.run(cur, buf))) {
+            LogicValue valid = (LogicValue) having.run(cur, buf);
+            if (!LogicValue.toBoolean(valid)) {
                 continue;
             }
             // SELECTION

@@ -56,21 +56,13 @@ public final class SamplingIfEvery implements Sampling {
 
     @Override
     public boolean isComplete() {
-        if (refresh != null && !refresh.isComplete()) {
-            return false;
-        }
-        return ifevery.isComplete();
+        return refresh.isComplete() && ifevery.isComplete();
     }
 
     public SamplingIfEvery bind(Collection<Attribute> atts) {
         List<Attribute> bound = new ArrayList<>();
         IfEvery bifevery = ifevery.bind(atts, bound);
-
-        Refresh brefresh = null;
-        if (refresh != null) {
-            brefresh = refresh.bind(atts);
-        }
-
+        Refresh brefresh = refresh.bind(atts);
         return new SamplingIfEvery(bifevery, bound, ratePolicy, brefresh);
     }
 

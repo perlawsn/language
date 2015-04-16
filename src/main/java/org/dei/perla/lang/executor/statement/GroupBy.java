@@ -36,14 +36,26 @@ public final class GroupBy implements Clause {
     }
 
     protected Duration getDuration() {
+        if (d == null) {
+            throw new RuntimeException("Cannot access duration in " +
+                    "value-based GROUP BY clause");
+        }
         return d;
     }
 
     protected int getCount() {
+        if (d == null) {
+            throw new RuntimeException("Cannot access count in " +
+                    "value-based GROUP BY clause");
+        }
         return count;
     }
 
     protected List<? extends Expression> getGroups() {
+        if (groups == null) {
+            throw new RuntimeException("Cannot access groups in time-based " +
+                    "GROUP BY clause");
+        }
         return groups;
     }
 
@@ -67,8 +79,8 @@ public final class GroupBy implements Clause {
     }
 
     public GroupBy bind(Collection<Attribute> atts, List<Attribute> bound) {
-        if (groups == null) {
-            return new GroupBy(d, count);
+        if (isComplete()) {
+            return this;
         }
         List<Expression> bgroups = new ArrayList<>();
         groups.forEach(f -> bgroups.add(f.bind(atts, bound)));

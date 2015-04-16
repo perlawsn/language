@@ -43,10 +43,7 @@ public final class ExecutionConditions implements Clause {
 
     public ExecutionConditions bind(Collection<Attribute> atts, List<Attribute> bound) {
         Expression bcond = cond.bind(atts, bound);
-        Refresh brefresh = null;
-        if (refresh != null) {
-            brefresh = refresh.bind(atts);
-        }
+        Refresh brefresh = refresh.bind(atts);
         return new ExecutionConditions(bcond, specs, brefresh);
     }
 
