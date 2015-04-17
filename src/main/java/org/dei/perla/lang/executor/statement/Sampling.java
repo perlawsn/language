@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 
 import java.util.Collection;
 
@@ -9,6 +10,6 @@ import java.util.Collection;
  */
 public interface Sampling extends Clause {
 
-    public Sampling bind(Collection<Attribute> atts);
+    public Sampling bind(Collection<Attribute> atts, Errors err);
 
 }

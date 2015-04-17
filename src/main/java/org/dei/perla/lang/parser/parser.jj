@@ -35,7 +35,6 @@ PARSER_BEGIN(Parser)
 
     import org.dei.perla.lang.executor.expression.*;
     import org.dei.perla.lang.executor.statement.*;
-    import org.dei.perla.lang.executor.statement.IfEvery.ErrorIfEvery;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -46,6 +45,11 @@ PARSER_BEGIN(Parser)
 
         private static final Object[] EMPTY_DEFAULT = new Object[0];
 
+        private static Errors inContext(Errors parent, Token t) {
+        	return parent.inContext("Line %s, Column %s", t.beginLine, t
+        			.beginColumn);
+        }
+
 	    private static void addError(String msg, Token t, Errors err) {
 	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
 	    }
@@ -55,13 +59,6 @@ PARSER_BEGIN(Parser)
 	            return;
 	        }
 	        addError(((ErrorExpression) e).getError(), t, err);
-	    }
-
-	    private static void addIfError(IfEvery ife, Token t, Errors err) {
-	    	if (!(ife instanceof ErrorIfEvery)) {
-	    		return;
-	    	}
-	    	addError(((ErrorIfEvery) ife).getMessage(), t, err);
 	    }
 
 	}
@@ -695,6 +692,7 @@ Selection SelectionStatement(Errors err) :
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     Sampling sampling;
+    Select sel;
     Expression where = Constant.TRUE;
     WindowSize terminate = null;
 }
@@ -944,7 +942,7 @@ IfEvery IfEveryClause(Errors err, Set<String> ids) :
     Expression value;
     TemporalUnit unit;
 
-    Token t;
+	Errors subErr;
 }
 {
 	(
@@ -954,14 +952,14 @@ IfEvery IfEveryClause(Errors err, Set<String> ids) :
 		    <KEYWORD_EVERY>
 		    every = EveryDuration(err, ids)
 		    {
+		    	subErr = inContext(err, token);
 		        if (ife == null) {
 		            ife = IfEvery.create(cond, every.getValue(),
-		                every.getUnit());
-		            addIfError(ife, token, err);
+		                every.getUnit(), subErr);
 		            prev = ife;
 		        } else {
                     prev = IfEvery.create(prev, cond, every.getValue(),
-                        every.getUnit());
+                        every.getUnit(), subErr);
 		        }
 		    }
 		)+
@@ -970,9 +968,9 @@ IfEvery IfEveryClause(Errors err, Set<String> ids) :
 			<KEYWORD_EVERY>
 			every = EveryDuration(err, ids)
 			{
+				subErr = inContext(err, token);
 			    prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
-			        every.getUnit());
-			    addIfError(prev, token, err);
+			        every.getUnit(), subErr);
 			}
 		)
 		{ return ife; }
@@ -982,9 +980,9 @@ IfEvery IfEveryClause(Errors err, Set<String> ids) :
 	    <KEYWORD_EVERY>
 	    every = EveryDuration(err, ids)
 	    {
+	    	subErr = inContext(err, token);
 	        ife = IfEvery.create(Constant.TRUE, every.getValue(),
-	            every.getUnit());
-	        addIfError(ife, token, err);
+	            every.getUnit(), subErr);
 	    }
 	)
 	{ return ife; }

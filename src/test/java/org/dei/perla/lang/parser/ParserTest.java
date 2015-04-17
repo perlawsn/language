@@ -17,9 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -1264,7 +1262,8 @@ public class ParserTest {
         assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
-        ife = ife.bind(atts, new ArrayList<>());
+        ife = ife.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
         d = ife.run(samples[0]);
@@ -1307,7 +1306,9 @@ public class ParserTest {
         assertFalse(s.isComplete());
         assertFalse(s.hasErrors());
         assertTrue(s instanceof SamplingIfEvery);
-        s = s.bind(atts);
+        s = s.bind(atts, err);
+        assertTrue(err.isEmpty());
+        assertFalse(s.hasErrors());
         ife = ((SamplingIfEvery) s).getIfEvery();
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
@@ -1333,7 +1334,8 @@ public class ParserTest {
         assertFalse(s.isComplete());
         assertFalse(s.hasErrors());
         assertTrue(s instanceof SamplingEvent);
-        s = s.bind(atts);
+        s = s.bind(atts, err);
+        assertTrue(err.isEmpty());
         assertTrue(s.isComplete());
         assertFalse(s.hasErrors());
         List<Attribute> bound = ((SamplingEvent) s).getEvents();

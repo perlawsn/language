@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.*;
@@ -37,7 +38,7 @@ public final class SamplingEvent implements Sampling {
     }
 
     @Override
-    public SamplingEvent bind(Collection<Attribute> atts) {
+    public SamplingEvent bind(Collection<Attribute> atts, Errors err) {
         List<Attribute> events = new ArrayList<>();
         for (String e : names) {
             Attribute a = Expression.getById(e, atts);

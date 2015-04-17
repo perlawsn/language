@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
@@ -57,68 +58,80 @@ public class IfEveryTest {
     public void testSingle() {
         IfEvery e;
         Duration d;
+        Errors err = new Errors();
         Expression cInt = Constant.create(5, DataType.INTEGER);
         Expression cFloat = Constant.create(3.4f, DataType.FLOAT);
         Expression cString = Constant.create("test", DataType.STRING);
 
-        e = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS);
+        e = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(5)));
 
-        e = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS);
+        e = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(3)));
 
-        e = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS);
+        e = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS, err);
+        assertFalse(err.isEmpty());
         assertTrue(e.hasErrors());
     }
 
     @Test
     public void testBind() {
         IfEvery e;
+        Errors err = new Errors();
 
-        e = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS);
+        e = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS, err);
         assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
 
-        e = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS);
+        e = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(floatAtt));
 
-        e = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS);
+        e = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(floatAtt));
         assertTrue(bound.contains(boolAtt));
 
-        e = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS);
+        e = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.hasErrors());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertFalse(err.isEmpty());
         assertTrue(e.hasErrors());
-        assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(stringAtt));
     }
@@ -128,6 +141,7 @@ public class IfEveryTest {
         Duration d;
         IfEvery ife;
         IfEvery last;
+        Errors err = new Errors();
         Expression cond;
         Expression field = new Field("integer");
         Expression c0 = Constant.create(0, DataType.INTEGER);
@@ -135,16 +149,18 @@ public class IfEveryTest {
         Expression c2 = Constant.create(2, DataType.INTEGER);
 
         cond = Comparison.createEQ(field, c0);
-        ife = last = IfEvery.create(cond, field, ChronoUnit.SECONDS);
+        ife = last = IfEvery.create(cond, field, ChronoUnit.SECONDS, err);
         cond = Comparison.createEQ(field, c1);
-        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
+        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS, err);
         cond = Comparison.createEQ(field, c2);
-        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS);
-        last = IfEvery.create(last, Constant.TRUE, field, ChronoUnit.SECONDS);
+        last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS, err);
+        last = IfEvery.create(last, Constant.TRUE, field,
+                ChronoUnit.SECONDS, err);
 
         assertFalse(ife.hasErrors());
         assertFalse(ife.isComplete());
-        ife = ife.bind(atts, new ArrayList<>());
+        ife = ife.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertFalse(ife.hasErrors());
         assertTrue(ife.isComplete());
 

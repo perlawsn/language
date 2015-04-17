@@ -13,8 +13,7 @@ import java.io.StringReader;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 13/04/15.
@@ -53,7 +52,9 @@ public class SamplerTest {
 
         // Test with power == 100
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -63,7 +64,9 @@ public class SamplerTest {
         // Test with power == 65
         vs.put(power, 65);
         fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -73,7 +76,9 @@ public class SamplerTest {
         // Test with power == 10
         vs.put(power, 10);
         fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -102,7 +107,9 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -146,7 +153,9 @@ public class SamplerTest {
         SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, ids);
         assertTrue(err.isEmpty());
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
 
         vs.put(temperature, 25);
         fpc.setValues(vs);
@@ -189,7 +198,9 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        samp = samp.bind(fpc.getAttributes());
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        assertFalse(samp.hasErrors());
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,

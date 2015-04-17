@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Field;
 import org.junit.Test;
@@ -44,9 +45,11 @@ public class SamplingTest {
 
     @Test
     public void testSamplingIfEvery() {
+        Errors err = new Errors();
         IfEvery ife = IfEvery.create(Constant.TRUE,
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS);
+                ChronoUnit.SECONDS, err);
+        assertTrue(err.isEmpty());
         Refresh refresh = new Refresh(Duration.ofMinutes(10));
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
@@ -61,9 +64,11 @@ public class SamplingTest {
 
     @Test
     public void testSamplingIfEveryBind() {
+        Errors err = new Errors();
         IfEvery ife = IfEvery.create(new Field("boolean"),
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS);
+                ChronoUnit.SECONDS, err);
+        assertTrue(err.isEmpty());
         Refresh refresh = new Refresh(names);
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
@@ -73,7 +78,8 @@ public class SamplingTest {
         assertThat(s.getRatePolicy(),
                 equalTo(RatePolicy.SLOW_DOWN));
 
-        s = s.bind(atts);
+        s = s.bind(atts, err);
+        assertTrue(err.isEmpty());
         assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
         assertThat(s.getIfEveryAttributes().size(), equalTo(1));
@@ -84,10 +90,13 @@ public class SamplingTest {
 
     @Test
     public void testSamplingEvent() {
+        Errors err = new Errors();
+
         SamplingEvent s = new SamplingEvent(names);
         assertFalse(s.hasErrors());
         assertFalse(s.isComplete());
-        s = s.bind(atts);
+        s = s.bind(atts, err);
+        assertTrue(err.isEmpty());
         assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
         List<Attribute> bound = s.getEvents();

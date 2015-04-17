@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.ArrayList;
@@ -32,10 +33,10 @@ public final class Selection implements Statement {
         return select.isComplete() && sampling.isComplete();
     }
 
-    public Selection bind(Collection<Attribute> atts) {
+    public Selection bind(Collection<Attribute> atts, Errors err) {
         List<Attribute> bound = new ArrayList<>();
         Select bselect = select.bind(atts, bound);
-        Sampling bsampling = sampling.bind(atts);
+        Sampling bsampling = sampling.bind(atts, err);
         return new Selection(bselect, every, bsampling);
     }
 
