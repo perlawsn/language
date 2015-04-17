@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
@@ -44,46 +45,46 @@ public abstract class Aggregate implements Expression {
     }
 
     public static Expression create(AggregateOperation op, Expression e,
-            WindowSize ws, Expression filter) {
+            WindowSize ws, Expression filter, Errors err) {
         switch (op) {
             case AVG:
-                return AvgAggregate.create(e, ws, filter);
+                return AvgAggregate.create(e, ws, filter, err);
             case MIN:
-                return MinAggregate.create(e, ws, filter);
+                return MinAggregate.create(e, ws, filter, err);
             case MAX:
-                return MaxAggregate.create(e, ws, filter);
+                return MaxAggregate.create(e, ws, filter, err);
             case SUM:
-                return SumAggregate.create(e, ws, filter);
+                return SumAggregate.create(e, ws, filter, err);
             case COUNT:
-                return CountAggregate.create(ws, filter);
+                return CountAggregate.create(ws, filter, err);
             default:
                 throw new RuntimeException("unknown aggregate " + op);
         }
     }
 
     public static Expression createAvg(Expression e, WindowSize ws,
-            Expression filter) {
-        return AvgAggregate.create(e, ws, filter);
+            Expression filter, Errors err) {
+        return AvgAggregate.create(e, ws, filter, err);
     }
 
     public static Expression createMin(Expression e, WindowSize ws,
-            Expression filter) {
-        return MinAggregate.create(e, ws, filter);
+            Expression filter, Errors err) {
+        return MinAggregate.create(e, ws, filter, err);
     }
 
     public static Expression createMax(Expression e, WindowSize ws,
-            Expression filter) {
-        return MaxAggregate.create(e, ws, filter);
+            Expression filter, Errors err) {
+        return MaxAggregate.create(e, ws, filter, err);
     }
 
     public static Expression createSum(Expression e, WindowSize ws,
-            Expression filter) {
-        return SumAggregate.create(e, ws, filter);
+            Expression filter, Errors err) {
+        return SumAggregate.create(e, ws, filter, err);
     }
 
     public static Expression createCount(WindowSize ws,
-            Expression filter) {
-        return CountAggregate.create(ws, filter);
+            Expression filter, Errors err) {
+        return CountAggregate.create(ws, filter, err);
     }
 
     public Expression getOperand() {

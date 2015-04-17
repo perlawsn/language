@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -32,13 +33,15 @@ public final class Is implements Expression {
      *
      * @param e operand
      * @param l logic value
+     * @param err error tracking object
      * @return an expression for evaluating logic values
      */
-    public static Expression create(Expression e, LogicValue l) {
+    public static Expression create(Expression e, LogicValue l, Errors err) {
         DataType t = e.getType();
         if (t != null && t != DataType.BOOLEAN) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "boolean values are allowed");
+            err.addError("Incompatible operand type: only boolean values are " +
+                    "allowed");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant) {
@@ -69,9 +72,10 @@ public final class Is implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        return create(be, l);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        return create(be, l, err);
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -28,12 +29,14 @@ public final class Not implements Expression {
      * Creates a new expression that inverts the boolean value of its operand
      *
      * @param e operand
+     * @param err error tracking object
      * @return new {@code Not} expression
      */
-    public static Expression create(Expression e) {
+    public static Expression create(Expression e, Errors err) {
         if (e.getType() != null && e.getType() != DataType.BOOLEAN) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "boolean values are allowed in operator not");
+            err.addError("Incompatible operand type: only boolean values are " +
+                    "allowed in operator not");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant) {
@@ -60,9 +63,10 @@ public final class Not implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        return create(be);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        return create(be, err);
     }
 
     @Override

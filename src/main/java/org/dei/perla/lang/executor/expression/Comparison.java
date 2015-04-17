@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -34,10 +35,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new less-than comparison operation
      */
-    public static Expression createLT(Expression e1, Expression e2) {
-        return create(ComparisonOperation.LT, e1, e2);
+    public static Expression createLT(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.LT, e1, e2, err);
     }
 
     /**
@@ -46,10 +49,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new less-than-or-equal comparison operation
      */
-    public static Expression createLE(Expression e1, Expression e2) {
-        return create(ComparisonOperation.LE, e1, e2);
+    public static Expression createLE(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.LE, e1, e2, err);
     }
 
     /**
@@ -58,10 +63,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new greater-than comparison operation
      */
-    public static Expression createGT(Expression e1, Expression e2) {
-        return create(ComparisonOperation.GT, e1, e2);
+    public static Expression createGT(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.GT, e1, e2, err);
     }
 
     /**
@@ -70,10 +77,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new greater-than comparison operation
      */
-    public static Expression createGE(Expression e1, Expression e2) {
-        return create(ComparisonOperation.GE, e1, e2);
+    public static Expression createGE(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.GE, e1, e2, err);
     }
 
     /**
@@ -82,10 +91,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new equality comparison operation
      */
-    public static Expression createEQ(Expression e1, Expression e2) {
-        return create(ComparisonOperation.EQ, e1, e2);
+    public static Expression createEQ(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.EQ, e1, e2, err);
     }
 
     /**
@@ -94,10 +105,12 @@ public final class Comparison implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new inequality comparison operation
      */
-    public static Expression createNE(Expression e1, Expression e2) {
-        return create(ComparisonOperation.NE, e1, e2);
+    public static Expression createNE(Expression e1, Expression e2,
+            Errors err) {
+        return create(ComparisonOperation.NE, e1, e2, err);
     }
 
     /**
@@ -106,15 +119,17 @@ public final class Comparison implements Expression {
      * @param op operation type
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return new comparison expression of the desired type
      */
     public static Expression create(ComparisonOperation op,
-            Expression e1, Expression e2) {
+            Expression e1, Expression e2, Errors err) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
 
         if (t1 != null && t2 != null && t1 != t2) {
-            return new ErrorExpression("Incompatible operand types");
+            err.addError("Incompatible operand types");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -149,9 +164,10 @@ public final class Comparison implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be1 = e1.bind(atts, bound);
-        Expression be2 = e2.bind(atts, bound);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be1 = e1.bind(atts, bound, err);
+        Expression be2 = e2.bind(atts, bound, err);
         return new Comparison(op, be1, be2);
     }
 

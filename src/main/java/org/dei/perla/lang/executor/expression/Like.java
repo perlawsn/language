@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -43,20 +44,31 @@ public final class Like implements Expression {
      *
      * @param e operand
      * @param pattern pattern to be matched
+     * @param err error tracking object
      * @return new {@code Like} expression
      */
-    public static Expression create(Expression e, String pattern) {
+    public static Expression create(Expression e, String pattern, Errors err) {
         pattern = pattern.replace("_", ".");
         pattern = pattern.replace("%", ".*");
 
-        return create(e, Pattern.compile(pattern));
+        return create(e, Pattern.compile(pattern), err);
     }
 
-    public static Expression create(Expression e, Pattern p) {
+    /**
+     * Creates a new expression that indicates if a string operand matches
+     * the given pattern.
+     *
+     * @param e operand
+     * @param pattern pattern to be matched
+     * @param err error tracking object
+     * @return new {@code Like} expression
+     */
+    public static Expression create(Expression e, Pattern p, Errors err) {
         DataType t = e.getType();
         if (t != null && t != DataType.STRING) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "string values are allowed in operator like");
+            err.addError("Incompatible operand type: only string values are " +
+                    "allowed in operator like");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant) {
@@ -83,9 +95,10 @@ public final class Like implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        return create(be, p);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        return create(be, p, err);
     }
 
     @Override

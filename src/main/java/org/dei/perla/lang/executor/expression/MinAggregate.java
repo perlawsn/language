@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
@@ -31,23 +32,24 @@ public final class MinAggregate extends Aggregate {
      * @param ws portion of buffer to aggregate
      * @param filter optional filtering expression to determine which samples
      *               must be aggregated
+     * @param err error tracking object
      * @return new {@code MinAggregate} instance
      */
     public static Expression create(Expression e, WindowSize ws,
-            Expression filter) {
+            Expression filter, Errors err) {
         DataType t = e.getType();
         if (t != null && t != DataType.INTEGER &&
                 t != DataType.FLOAT && t != DataType.TIMESTAMP) {
-            return new ErrorExpression("Incompatible operand type: " +
-                    "only float, integer and timestampjexpressions are " +
-                    "allowed in min aggregations");
+            err.addError("Incompatible operand type: only float, integer and " +
+                    "timestampjexpressions are allowed in min aggregations");
+            return ErrorExpression.INSTANCE;
         }
 
         if (filter != null) {
             if (filter.getType() != null &&
                     filter.getType() != DataType.BOOLEAN) {
-                return new ErrorExpression("Aggregation filter must be of " +
-                        "type boolean");
+                err.addError("Aggregation filter must be of type boolean");
+                return ErrorExpression.INSTANCE;
             }
         }
 
@@ -55,13 +57,14 @@ public final class MinAggregate extends Aggregate {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
         Expression bf = null;
         if (filter != null) {
-            bf = filter.bind(atts, bound);
+            bf = filter.bind(atts, bound, err);
         }
-        return create(be, ws, bf);
+        return create(be, ws, bf, err);
     }
 
     @Override

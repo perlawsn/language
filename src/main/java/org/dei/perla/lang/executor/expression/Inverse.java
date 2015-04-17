@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -28,13 +29,15 @@ public final class Inverse implements Expression {
      * Creates a new arithmetic expression that inverts the sign of its operand
      *
      * @param e operand
+     * @param err error tracking object
      * @return new arithmetic inversion expression
      */
-    public static Expression create(Expression e) {
+    public static Expression create(Expression e, Errors err) {
         DataType t = e.getType();
         if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "integer and float values are allowed");
+            err.addError("Incompatible operand type: only integer and float " +
+                    "values are allowed");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant) {
@@ -61,9 +64,10 @@ public final class Inverse implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        return create(be);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        return create(be, err);
     }
 
     @Override

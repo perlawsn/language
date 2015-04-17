@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
@@ -29,15 +30,16 @@ public final class CountAggregate extends Aggregate {
      * @param ws portion of buffer to aggregate
      * @param filter optional filtering expression to determine which samples
      *               must be aggregated
+     * @param err error tracking object
      * @return new {@code CountAggregate} instance
      */
     public static Expression create(WindowSize ws,
-            Expression filter) {
+            Expression filter, Errors err) {
         if (filter != null) {
             if (filter.getType() != null &&
                     filter.getType() != DataType.BOOLEAN) {
-                return new ErrorExpression("Aggregation filter must be of " +
-                        "type boolean");
+                err.addError("Aggregation filter must be of type boolean");
+                return ErrorExpression.INSTANCE;
             }
         }
 
@@ -45,12 +47,13 @@ public final class CountAggregate extends Aggregate {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
         Expression bf = null;
         if (filter != null) {
-            bf = filter.bind(atts, bound);
+            bf = filter.bind(atts, bound, err);
         }
-        return create(ws, bf);
+        return create(ws, bf, err);
     }
 
     @Override

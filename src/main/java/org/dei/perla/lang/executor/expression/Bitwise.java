@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -35,10 +36,12 @@ public final class Bitwise implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return a bitwise AND expression between two operands.
      */
-    public static Expression createAND(Expression e1, Expression e2) {
-        return create(BitwiseOperation.AND, e1, e2);
+    public static Expression createAND(Expression e1, Expression e2,
+            Errors err) {
+        return create(BitwiseOperation.AND, e1, e2, err);
     }
 
     /**
@@ -47,10 +50,12 @@ public final class Bitwise implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return a bitwise OR expression between two operands.
      */
-    public static Expression createOR(Expression e1, Expression e2) {
-        return create(BitwiseOperation.OR, e1, e2);
+    public static Expression createOR(Expression e1, Expression e2,
+            Errors err) {
+        return create(BitwiseOperation.OR, e1, e2, err);
     }
 
     /**
@@ -59,10 +64,12 @@ public final class Bitwise implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return a bitwise XOR expression between two operands.
      */
-    public static Expression createXOR(Expression e1, Expression e2) {
-        return create(BitwiseOperation.XOR, e1, e2);
+    public static Expression createXOR(Expression e1, Expression e2,
+            Errors err) {
+        return create(BitwiseOperation.XOR, e1, e2, err);
     }
 
     /**
@@ -70,10 +77,12 @@ public final class Bitwise implements Expression {
      *
      * @param e1 value to shift
      * @param e2 shift amount
+     * @param err error tracking object
      * @return a right shift expression
      */
-    public static Expression createRSH(Expression e1, Expression e2) {
-        return create(BitwiseOperation.RSH, e1, e2);
+    public static Expression createRSH(Expression e1, Expression e2,
+            Errors err) {
+        return create(BitwiseOperation.RSH, e1, e2, err);
     }
 
     /**
@@ -81,40 +90,44 @@ public final class Bitwise implements Expression {
      *
      * @param e1 value to shift
      * @param e2 shift amount
+     * @param err error tracking object
      * @return a left shift expression
      */
-    public static Expression createLSH(Expression e1, Expression e2) {
-        return create(BitwiseOperation.LSH, e1, e2);
+    public static Expression createLSH(Expression e1, Expression e2,
+            Errors err) {
+        return create(BitwiseOperation.LSH, e1, e2, err);
     }
 
     /**
      * Creates an expression that complements a value
      *
      * @param e1 value to complement
+     * @param err error tracking object
      * @return a bitwise complement expression
      */
-    public static Expression createNOT(Expression e) {
-        return BitwiseNot.create(e);
+    public static Expression createNOT(Expression e, Errors err) {
+        return BitwiseNot.create(e, err);
     }
 
-     /**
-     * Creates a bitwise expression of the desired type
-     *
-     * @param op operation type
-     * @param e1 first operand
-     * @param e2 second operand
-     * @return an bitwise expression of the desired type
-     */
-
+    /**
+    * Creates a bitwise expression of the desired type
+    *
+    * @param op operation type
+    * @param e1 first operand
+    * @param e2 second operand
+    * @param err error tracking object
+    * @return an bitwise expression of the desired type
+    */
     public static Expression create(BitwiseOperation op,
-            Expression e1, Expression e2) {
+            Expression e1, Expression e2, Errors err) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
 
         if (t1 != null && t1 != DataType.INTEGER ||
                 t2 != null && t2 != DataType.INTEGER) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "integer operands are allowed in " + op + " comparisons");
+            err.addError("Incompatible operand type: only integer operands " +
+                    "are allowed in " + op + " comparisons");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -146,10 +159,11 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be1 = e1.bind(atts, bound);
-        Expression be2 = e2.bind(atts, bound);
-        return create(op, be1, be2);
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound,
+            Errors err) {
+        Expression be1 = e1.bind(atts, bound, err);
+        Expression be2 = e2.bind(atts, bound, err);
+        return create(op, be1, be2, err);
     }
 
     @Override

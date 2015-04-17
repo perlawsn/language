@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -41,10 +42,12 @@ public final class Arithmetic implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression that adds two operands.
      */
-    public static Expression createAddition(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.ADDITION, e1, e2);
+    public static Expression createAddition(Expression e1, Expression e2,
+            Errors err) {
+        return create(ArithmeticOperation.ADDITION, e1, e2, err);
     }
 
     /**
@@ -52,10 +55,12 @@ public final class Arithmetic implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression that subtracts two operands.
      */
-    public static Expression createSubtraction(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.SUBTRACTION, e1, e2);
+    public static Expression createSubtraction(Expression e1, Expression e2,
+            Errors err) {
+        return create(ArithmeticOperation.SUBTRACTION, e1, e2, err);
     }
 
     /**
@@ -63,10 +68,12 @@ public final class Arithmetic implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression that multiplies two operands.
      */
-    public static Expression createProduct(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.PRODUCT, e1, e2);
+    public static Expression createProduct(Expression e1, Expression e2,
+            Errors err) {
+        return create(ArithmeticOperation.PRODUCT, e1, e2, err);
     }
 
     /**
@@ -74,10 +81,12 @@ public final class Arithmetic implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression that divides two operands.
      */
-    public static Expression createDivision(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.DIVISION, e1, e2);
+    public static Expression createDivision(Expression e1, Expression e2,
+            Errors err) {
+        return create(ArithmeticOperation.DIVISION, e1, e2, err);
     }
 
     /**
@@ -86,20 +95,23 @@ public final class Arithmetic implements Expression {
      *
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression that performs the modulo between two
      * operands.
      */
-    public static Expression createModulo(Expression e1, Expression e2) {
-        return create(ArithmeticOperation.MODULO, e1, e2);
+    public static Expression createModulo(Expression e1, Expression e2,
+            Errors err) {
+        return create(ArithmeticOperation.MODULO, e1, e2, err);
     }
 
     /**
      * Creates an arithmetic expression that inverts the sign of its operand.
      * @param e operand
+     * @param err error tracking object
      * @return an arithmetic expression that inverts the sign of its operand.
      */
-    public static Expression createInverse(Expression e) {
-        return Inverse.create(e);
+    public static Expression createInverse(Expression e, Errors err) {
+        return Inverse.create(e, err);
     }
 
     /**
@@ -108,30 +120,33 @@ public final class Arithmetic implements Expression {
      * @param op operation type
      * @param e1 first operand
      * @param e2 second operand
+     * @param err error tracking object
      * @return an arithmetic expression of the desired type
      */
     public static Expression create(ArithmeticOperation op,
-            Expression e1, Expression e2) {
+            Expression e1, Expression e2, Errors err) {
         DataType t1 = e1.getType();
         DataType t2 = e2.getType();
 
         if (op == ArithmeticOperation.MODULO && t1 != null && t2 != null &&
                 t1 != DataType.INTEGER && t2 != DataType.INTEGER) {
-            return new ErrorExpression("Incompatible operand type, modulo " +
-                    "operation is only allowed on integer values");
+            err.addError("Incompatible operand type, modulo operation is only" +
+                    " allowed on integer values");
+            return ErrorExpression.INSTANCE;
         }
         if (t1 != null && t1 != DataType.INTEGER && t1 != DataType.FLOAT ||
                 t2 != null && t2 != DataType.INTEGER && t2 != DataType.FLOAT) {
-            return new ErrorExpression("Incompatible operand type: only " +
-                    "integer operands are allowed in " + op + " operations");
+            err.addError("Incompatible operand type: only integer operands " +
+                    "are allowed in " + op + " operations");
+            return ErrorExpression.INSTANCE;
         }
 
         if (t1 != t2 && t1 != null && t2 != null) {
             if (t1 == DataType.INTEGER) {
-                e1 = CastFloat.create(e1);
+                e1 = CastFloat.create(e1, err);
                 t1 = DataType.FLOAT;
             } else {
-                e2 = CastFloat.create(e2);
+                e2 = CastFloat.create(e2, err);
                 t2 = DataType.FLOAT;
             }
         }
@@ -169,10 +184,11 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be1 = e1.bind(atts, bound);
-        Expression be2 = e2.bind(atts, bound);
-        return create(op, be1, be2);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be1 = e1.bind(atts, bound, err);
+        Expression be2 = e2.bind(atts, bound, err);
+        return create(op, be1, be2, err);
     }
 
     @Override

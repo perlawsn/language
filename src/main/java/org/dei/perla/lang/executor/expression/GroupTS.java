@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -37,7 +38,8 @@ public class GroupTS implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
         int i = Expression.indexOf(id, bound);
         if (i != -1) {
             return new ConcreteGroupTS(i);

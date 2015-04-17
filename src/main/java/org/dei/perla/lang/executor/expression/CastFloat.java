@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -29,16 +30,18 @@ public final class CastFloat implements Expression {
      * Creates a new expression that performs an integer to float cast.
      *
      * @param e value to be cast to float
+     * @param err error tracking object
      * @return an expression that casts integer values to float
      */
-    public static Expression create(Expression e) {
+    public static Expression create(Expression e, Errors err) {
         DataType t = e.getType();
         if (t == DataType.FLOAT) {
             return e;
         }
 
         if (t != null && t != DataType.INTEGER) {
-            return new ErrorExpression("Cannot cast " + t + " to float");
+            err.addError("Cannot cast " + t + " to float");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant) {
@@ -68,9 +71,10 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        return CastFloat.create(be);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        return CastFloat.create(be, err);
     }
 
     @Override

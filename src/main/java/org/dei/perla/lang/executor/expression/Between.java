@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 
 import java.util.Collection;
@@ -36,17 +37,19 @@ public final class Between implements Expression {
      * @param e value to be tested
      * @param min minimum value allowed
      * @param max maximum value allowed
+     * @param err error tracking object
      * @return new {@code Between} expression
      */
     public static Expression create(Expression e, Expression min,
-            Expression max) {
+            Expression max, Errors err) {
         DataType t = e.getType();
         DataType tmin = min.getType();
         DataType tmax = max.getType();
 
         if (t != null && tmin != null && tmax != null &&
                 t != tmin && t != tmax) {
-            return new ErrorExpression("Incompatible operand types");
+            err.addError("Incompatible operand types");
+            return ErrorExpression.INSTANCE;
         }
 
         if (e instanceof Constant && min instanceof Constant && max
@@ -76,11 +79,12 @@ public final class Between implements Expression {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression be = e.bind(atts, bound);
-        Expression bmin = min.bind(atts, bound);
-        Expression bmax = max.bind(atts, bound);
-        return create(be, bmin, bmax);
+    public Expression bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression be = e.bind(atts, bound, err);
+        Expression bmin = min.bind(atts, bound, err);
+        Expression bmax = max.bind(atts, bound, err);
+        return create(be, bmin, bmax, err);
     }
 
     @Override
