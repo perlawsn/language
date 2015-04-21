@@ -45,7 +45,7 @@ public class MiscTest {
     }
 
     @Test
-    public void castFloat() throws BindingException {
+    public void castFloat() {
         Errors err = new Errors();
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
@@ -54,7 +54,8 @@ public class MiscTest {
         assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(null, null), equalTo(1f));
@@ -62,21 +63,23 @@ public class MiscTest {
         e = CastFloat.create(cFloat, err);
         assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(null, null), equalTo(1.2f));
     }
 
     @Test
-    public void castFloatBind() throws BindingException {
+    public void castFloatBind() {
         Errors err = new Errors();
 
         Expression e = CastFloat.create(new Field("float"), err);
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(floatAtt));
@@ -102,7 +105,7 @@ public class MiscTest {
     }
 
     @Test
-    public void castInteger() throws BindingException {
+    public void castInteger() {
         Errors err = new Errors();
         Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
@@ -111,7 +114,8 @@ public class MiscTest {
         assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(null, null), equalTo(1));
@@ -119,19 +123,21 @@ public class MiscTest {
         e = CastInteger.create(cFloat, err);
         assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(null, null), equalTo(1));
     }
 
     @Test
-    public void castIntegerBind() throws BindingException {
+    public void castIntegerBind() {
         Errors err = new Errors();
         Expression cast = CastInteger.create(new Field("integer"), err);
         assertFalse(cast.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        cast = cast.bind(atts, bound);
+        cast = cast.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(cast.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
@@ -157,12 +163,13 @@ public class MiscTest {
     }
 
     @Test
-    public void constantTest() throws BindingException {
+    public void constantTest() {
         Errors err = new Errors();
         Expression e = Constant.create(1, DataType.INTEGER);
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(null, null), equalTo(1));
@@ -170,33 +177,37 @@ public class MiscTest {
         e = Constant.create("test", DataType.STRING);
         assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.STRING));
         assertThat(e.run(null, null), equalTo("test"));
 
         e = Constant.UNKNOWN;
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
-    public void constantNullTest() throws BindingException {
+    public void constantNullTest() {
         Errors err = new Errors();
         Expression e = Constant.NULL;
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
 
         e = Constant.create(null, DataType.INTEGER);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -204,7 +215,8 @@ public class MiscTest {
 
         e = Constant.create(null, DataType.FLOAT);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -212,7 +224,8 @@ public class MiscTest {
 
         e = Constant.create(null, DataType.STRING);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -220,7 +233,8 @@ public class MiscTest {
 
         e = Constant.create(null, DataType.BOOLEAN);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -228,7 +242,8 @@ public class MiscTest {
 
         e = Constant.create(null, DataType.TIMESTAMP);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -236,7 +251,8 @@ public class MiscTest {
 
         e = Constant.create(null, DataType.ID);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), nullValue());
         assertThat(((Constant) e).getValue(), nullValue());
@@ -244,12 +260,13 @@ public class MiscTest {
     }
 
     @Test
-    public void testConstantLogic() throws BindingException {
+    public void testConstantLogic() {
         Errors err = new Errors();
         Expression e = Constant.TRUE;
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
@@ -264,14 +281,16 @@ public class MiscTest {
 
         e = Constant.FALSE;
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
 
         e = Constant.create(LogicValue.FALSE, DataType.BOOLEAN);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.FALSE));
@@ -279,14 +298,16 @@ public class MiscTest {
 
         e = Constant.UNKNOWN;
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.UNKNOWN));
 
         e = Constant.create(LogicValue.UNKNOWN, DataType.BOOLEAN);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.UNKNOWN));
@@ -294,19 +315,21 @@ public class MiscTest {
     }
 
     @Test
-    public void testConstantInteger() throws BindingException {
+    public void testConstantInteger() {
         Errors err = new Errors();
         Expression e = Constant.INTEGER_0;
         assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(0));
 
         e = Constant.create(0, DataType.INTEGER);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(0));
@@ -314,14 +337,16 @@ public class MiscTest {
 
         e = Constant.INTEGER_1;
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(1));
 
         e = Constant.create(1, DataType.INTEGER);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(1));
@@ -329,14 +354,16 @@ public class MiscTest {
 
         e = Constant.INTEGER_2;
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(2));
 
         e = Constant.create(2, DataType.INTEGER);
         assertTrue(e.isComplete());
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(((Constant) e).getValue(), equalTo(2));
@@ -344,14 +371,15 @@ public class MiscTest {
     }
 
     @Test
-    public void fieldTest() throws BindingException {
+    public void fieldTest() {
         Errors err = new Errors();
         Object[] sample;
 
         Expression fi = new Field(intAtt.getId());
         assertFalse(fi.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        fi = fi.bind(atts, bound);
+        fi = fi.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(fi.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
@@ -364,7 +392,8 @@ public class MiscTest {
         Expression fs = new Field(stringAtt.getId());
         assertFalse(fs.isComplete());
         bound.clear();
-        fs = fs.bind(atts, bound);
+        fs = fs.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(fi.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(stringAtt));
@@ -377,7 +406,8 @@ public class MiscTest {
         Expression fb = new Field(boolAtt.getId());
         assertFalse(fb.isComplete());
         bound.clear();
-        fb = fb.bind(atts, bound);
+        fb = fb.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertTrue(fb.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(boolAtt));
@@ -395,7 +425,7 @@ public class MiscTest {
     }
 
     @Test
-    public void groupTSTest() throws BindingException {
+    public void groupTSTest() {
         Errors err = new Errors();
         List<Attribute> ra = Arrays.asList(new Attribute[]{
                 Attribute.TIMESTAMP,
@@ -412,7 +442,8 @@ public class MiscTest {
         assertThat(gts.run(null, null), nullValue());
 
         List<Attribute> bound = new ArrayList<>();
-        gts = gts.bind(atts, bound);
+        gts = gts.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(Attribute.TIMESTAMP));
         assertTrue(gts.isComplete());

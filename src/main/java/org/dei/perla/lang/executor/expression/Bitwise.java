@@ -154,10 +154,10 @@ public final class Bitwise extends Expression {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts, List<Attribute> bound,
+    public Expression bind(Collection<Attribute> atts, List<Attribute> bound,
             Errors err) {
-        Expression be1 = e1.doBind(atts, bound, err);
-        Expression be2 = e2.doBind(atts, bound, err);
+        Expression be1 = e1.bind(atts, bound, err);
+        Expression be2 = e2.bind(atts, bound, err);
         return create(op, be1, be2, err);
     }
 

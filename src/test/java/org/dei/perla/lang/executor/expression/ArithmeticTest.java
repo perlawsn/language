@@ -48,7 +48,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createAddition(e1, intField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -64,7 +65,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createAddition(e1, floatField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -142,7 +144,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -151,7 +154,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -160,7 +164,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(intAtt));
         assertTrue(bound.contains(floatAtt));
@@ -174,7 +179,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createSubtraction(e1, intField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -190,7 +196,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createSubtraction(e1, floatField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -268,7 +275,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -277,7 +285,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -286,7 +295,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(intAtt));
         assertTrue(bound.contains(floatAtt));
@@ -300,7 +310,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createProduct(e1, intField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -316,7 +327,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createProduct(e1, floatField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -394,7 +406,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -403,7 +416,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -412,7 +426,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(intAtt));
         assertTrue(bound.contains(floatAtt));
@@ -426,7 +441,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createDivision(e1, intField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -442,7 +458,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createDivision(e1, floatField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -520,7 +537,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -529,7 +547,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -538,7 +557,7 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(intAtt));
         assertTrue(bound.contains(floatAtt));
@@ -552,7 +571,8 @@ public class ArithmeticTest {
 
         Expression e = Arithmetic.createModulo(e1, intField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -614,7 +634,8 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -623,7 +644,7 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -632,7 +653,7 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
@@ -650,7 +671,8 @@ public class ArithmeticTest {
 
         e = Arithmetic.createInverse(floatField, err);
         assertTrue(err.isEmpty());
-        e = e.bind(atts, new ArrayList<>());
+        e = e.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{5.4f};
         assertThat(e.run(sample, null), equalTo(-(Float) sample[0]));
@@ -667,7 +689,7 @@ public class ArithmeticTest {
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
-        e = e.bind(atts, bound);
+        e = e.bind(atts, bound, err);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());

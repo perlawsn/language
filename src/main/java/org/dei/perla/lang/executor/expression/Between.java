@@ -74,11 +74,11 @@ public final class Between extends Expression {
     }
 
     @Override
-    protected Expression doBind(Collection<Attribute> atts,
+    protected Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.doBind(atts, bound, err);
-        Expression bmin = min.doBind(atts, bound, err);
-        Expression bmax = max.doBind(atts, bound, err);
+        Expression be = e.bind(atts, bound, err);
+        Expression bmin = min.bind(atts, bound, err);
+        Expression bmax = max.bind(atts, bound, err);
         return create(be, bmin, bmax, err);
     }
 

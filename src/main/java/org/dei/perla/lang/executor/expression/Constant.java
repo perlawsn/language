@@ -100,7 +100,7 @@ public final class Constant extends Expression {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         return this;
     }

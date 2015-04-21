@@ -47,11 +47,11 @@ public final class CountAggregate extends Aggregate {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression bf = null;
         if (filter != null) {
-            bf = filter.doBind(atts, bound, err);
+            bf = filter.bind(atts, bound, err);
         }
         return create(ws, bf, err);
     }

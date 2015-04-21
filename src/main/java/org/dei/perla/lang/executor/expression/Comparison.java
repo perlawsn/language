@@ -159,10 +159,10 @@ public final class Comparison extends Expression {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be1 = e1.doBind(atts, bound, err);
-        Expression be2 = e2.doBind(atts, bound, err);
+        Expression be1 = e1.bind(atts, bound, err);
+        Expression be2 = e2.bind(atts, bound, err);
         return new Comparison(op, be1, be2);
     }
 

@@ -47,7 +47,7 @@ public class Field extends Expression {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         int i = Expression.indexOf(id, bound);
         if (i != -1) {

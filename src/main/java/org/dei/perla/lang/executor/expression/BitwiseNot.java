@@ -62,9 +62,9 @@ public final class BitwiseNot extends Expression {
     }
 
     @Override
-    public Expression doBind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.doBind(atts, bound, err);
+        Expression be = e.bind(atts, bound, err);
         return create(be, err);
     }
 
