@@ -45,21 +45,16 @@ PARSER_BEGIN(Parser)
 
         private static final Object[] EMPTY_DEFAULT = new Object[0];
 
-        private static Errors inContext(Errors parent, Token t) {
-        	return parent.inContext("Line %s, Column %s", t.beginLine, t
-        			.beginColumn);
+        private static Errors inContext(Token t) {
+        	return new Errors("Line %s, Column %s", t.beginLine, t.beginColumn);
         }
 
-	    private static void addError(String msg, Token t, Errors err) {
-	        err.addError("Line " + t.beginLine + ", Column " + t.beginColumn + ": " + msg);
-	    }
-
-	    private static void addIfError(Expression e, Token t, Errors err) {
-	        if (!(e instanceof ErrorExpression)) {
-	            return;
-	        }
-	        addError(((ErrorExpression) e).getError(), t, err);
-	    }
+        private static void addError(Errors dst, Errors src) {
+        	if (src.isEmpty()) {
+        		return;
+        	}
+        	dst.addError(src.asString());
+        }
 
 	}
 
@@ -1425,6 +1420,8 @@ Expression Expression(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BooleanTerm(type, err, ids)
@@ -1432,8 +1429,9 @@ Expression Expression(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_OR>
 		e2 = BooleanTerm(type, err, ids)
 		{
-		    e1 = Bool.createOR(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bool.createOR(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1443,6 +1441,8 @@ Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BooleanFactor(type, err, ids)
@@ -1450,8 +1450,9 @@ Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_AND>
 		e2 = BooleanFactor(type, err, ids)
 		{
-		    e1 = Bool.createAND(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bool.createAND(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1461,6 +1462,8 @@ Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BooleanNegation(type, err, ids)
@@ -1468,8 +1471,9 @@ Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_XOR>
 		e2 = BooleanNegation(type, err, ids)
 		{
-		    e1 = Bool.createXOR(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bool.createXOR(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1479,6 +1483,8 @@ Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     boolean invert = false;
+
+    Errors subErr;
 }
 {
 	(
@@ -1488,8 +1494,9 @@ Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
 	e = BooleanPredicate(type, err, ids)
 	{
 	    if (invert) {
-	        return Bool.createNOT(e);
-	        addIfError(e, token, err);
+	    	subErr = inContext(token);
+	        e = Bool.createNOT(e, subErr);
+	        addError(err, subErr);
 	    }
 	    return e;
 	}
@@ -1515,32 +1522,34 @@ Expression Is(Expression e, Errors err) :
 {
     boolean invert = false;
     Expression is;
+
+    Errors subErr;
 }
 {
     <KEYWORD_IS>
+    { subErr = inContext(token); }
     [
         <OPERATOR_NOT>
         { invert = true; }
     ]
     (
         <CONSTANT_BOOLEAN_TRUE>
-        { is = Is.create(e, LogicValue.TRUE); }
+        { is = Is.create(e, LogicValue.TRUE, subErr); }
         |
         <CONSTANT_BOOLEAN_FALSE>
-        { is = Is.create(e, LogicValue.FALSE); }
+        { is = Is.create(e, LogicValue.FALSE, subErr); }
         |
         <CONSTANT_BOOLEAN_UNKNOWN>
-        { is = Is.create(e, LogicValue.UNKNOWN); }
+        { is = Is.create(e, LogicValue.UNKNOWN, subErr); }
         |
         <CONSTANT_NULL>
         { is = IsNull.create(e); }
     )
     {
-        addIfError(is, token, err);
         if (invert) {
-            is = Bool.createNOT(is);
-            addIfError(is, token, err);
+            is = Bool.createNOT(is, subErr);
         }
+    	addError(err, subErr);
         return is;
     }
 }
@@ -1549,13 +1558,16 @@ Expression Like(Expression e, Errors err) :
 {
     String pattern;
     Expression like;
+
+    Errors subErr;
 }
 {
     <KEYWORD_LIKE>
     pattern = ConstantString()
     {
-        like = Like.create(e, pattern);
-        addIfError(like, token, err);
+    	subErr = inContext(token);
+        like = Like.create(e, pattern, subErr);
+        addError(err, subErr);
         return like;
     }
 }
@@ -1565,6 +1577,8 @@ Expression Between(Expression e, ExpressionType type, Errors err, Set<String> id
     Expression b;
     Expression min;
     Expression max;
+
+    Errors subErr;
 }
 {
     <KEYWORD_BETWEEN>
@@ -1572,8 +1586,9 @@ Expression Between(Expression e, ExpressionType type, Errors err, Set<String> id
     <OPERATOR_AND>
     max = BitwiseExpression(type, err, ids)
     {
-        b = Between.create(e, min, max);
-        addIfError(b, token, err);
+    	subErr = inContext(token);
+        b = Between.create(e, min, max, subErr);
+        addError(err, subErr);
         return b;
     }
 }
@@ -1583,6 +1598,8 @@ Expression Comparison(ExpressionType type, Errors err, Set<String> ids) :
     Expression e1;
     Expression e2;
     ComparisonOperation op;
+
+    Errors subErr;
 }
 {
     e1 = BitwiseExpression(type, err, ids)
@@ -1590,8 +1607,9 @@ Expression Comparison(ExpressionType type, Errors err, Set<String> ids) :
         op = ComparisonOperation()
         e2 = BitwiseExpression(type, err, ids)
         {
-            e1 = Comparison.create(op, e1, e2);
-            addIfError(e1, token, err);
+        	subErr = inContext(token);
+            e1 = Comparison.create(op, e1, e2, subErr);
+            addError(err, subErr);
         }
     ]
     { return e1; }
@@ -1601,6 +1619,8 @@ Expression BitwiseExpression(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BitwiseTerm(type, err, ids)
@@ -1608,8 +1628,9 @@ Expression BitwiseExpression(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_BITWISE_OR>
 		e2 = BitwiseTerm(type, err, ids)
 		{
-		    e1 = Bitwise.createOR(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bitwise.createOR(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1619,6 +1640,8 @@ Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BitwiseFactor(type, err, ids)
@@ -1626,8 +1649,9 @@ Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_BITWISE_AND>
 		e2 = BitwiseFactor(type, err, ids)
 		{
-		    e1 = Bitwise.createAND(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bitwise.createAND(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1637,6 +1661,8 @@ Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e1;
     Expression e2;
+
+    Errors subErr;
 }
 {
 	e1 = BitwiseShift(type, err, ids)
@@ -1644,8 +1670,9 @@ Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
 		<OPERATOR_BITWISE_XOR>
 		e2 = BitwiseShift(type, err, ids)
 		{
-		    e1 = Bitwise.createXOR(e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bitwise.createXOR(e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1656,6 +1683,8 @@ Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
     Expression e1;
     Expression e2;
     BitwiseOperation op;
+
+    Errors subErr;
 }
 {
 	e1 = BitwiseNegation(type, err, ids)
@@ -1669,8 +1698,9 @@ Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
 		)
 		e2 = BitwiseNegation(type, err, ids)
 		{
-		    e1 = Bitwise.create(op, e1, e2);
-		    addIfError(e1, token, err);
+			subErr = inContext(token);
+		    e1 = Bitwise.create(op, e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	]
 	{ return e1; }
@@ -1680,17 +1710,22 @@ Expression BitwiseNegation(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     boolean not = false;
+
+    Errors subErr = null;
 }
 {
 	(
 		<OPERATOR_BITWISE_NOT>
-		{ not = true; }
+		{
+			subErr = inContext(token);
+			not = true;
+		}
 	)*
 	e = ArithmeticExpression(type, err, ids)
 	{
 	    if (not) {
-	        e = Bitwise.createNOT(e);
-	        addIfError(e, token, err);
+	        e = Bitwise.createNOT(e, subErr);
+	        addError(err, subErr);
 	    }
 	    return e;
 	}
@@ -1701,9 +1736,12 @@ Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
+
+    Errors subErr;
 }
 {
 	e1 = ArithmeticTerm(type, err, ids)
+	{ subErr = inContext(token); }
 	(
 		(
 			<OPERATOR_PLUS>
@@ -1714,8 +1752,8 @@ Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids
 		)
 		e2 = ArithmeticTerm(type, err, ids)
 		{
-		    e1 = Arithmetic.create(op, e1, e2);
-		    addIfError(e1, token, err);
+		    e1 = Arithmetic.create(op, e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1726,9 +1764,12 @@ Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
     Expression e1;
     Expression e2;
     ArithmeticOperation op;
+
+    Errors subErr;
 }
 {
 	e1 = ArithmeticFactor(type, err, ids)
+	{ subErr = inContext(token); }
 	(
 		(
 			<OPERATOR_MULTIPLY>
@@ -1742,8 +1783,8 @@ Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
 		)
 		e2 = ArithmeticFactor(type, err, ids)
 		{
-		    e1 = Arithmetic.create(op, e1, e2);
-		    addIfError(e1, token, err);
+		    e1 = Arithmetic.create(op, e1, e2, subErr);
+		    addError(err, subErr);
 		}
 	)*
 	{ return e1; }
@@ -1753,6 +1794,8 @@ Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
 {
     Expression e;
     Sign s = Sign.PLUS;
+
+    Errors subErr;
 }
 {
 	[
@@ -1761,8 +1804,9 @@ Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
 	e = PrimaryExpression(type, err, ids)
 	{
 	    if (s == Sign.MINUS) {
-	        e = Arithmetic.createInverse(e);
-	        addIfError(e, token, err);
+	    	subErr = inContext(token);
+	        e = Arithmetic.createInverse(e, subErr);
+	        addError(err, subErr);
 	    }
 	    return e;
 	}
@@ -1772,22 +1816,18 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
 {
     String id;
     Expression e;
+
+    Errors subErr;
 }
 {
 	e = Constant()
-	{
-	    addIfError(e, token, err);
-	    return e;
-	}
+	{ return e; }
 	|
 	(
-	"("
+		"("
         e = Expression(type, err, ids)
-        {
-            addIfError(e, token, err);
-            return e;
-        }
-        ")"
+        { return e; }
+    	")"
 	)
 	|
     <KEYWORD_GROUPTS>
@@ -1831,6 +1871,7 @@ Expression Aggregate(Errors err, Set<String> ids) :
     WindowSize ws;
     Expression filter = Constant.TRUE;
     Expression e;
+    Errors subErr;
 }
 {
     (
@@ -1864,8 +1905,9 @@ Expression Aggregate(Errors err, Set<String> ids) :
         )
     )
     {
-        e = Aggregate.create(op, exp, ws, filter);
-        addIfError(e, t, err);
+    	subErr = inContext(t);
+        e = Aggregate.create(op, exp, ws, filter, err);
+        err.addError(subErr);
         return e;
     }
 }
