@@ -2,6 +2,8 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.BindingException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -32,12 +34,13 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseANDTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(12, DataType.INTEGER);
         Expression e2 = Constant.create(5639, DataType.INTEGER);
 
-        Expression e = Bitwise.createAND(e1, e2);
+        Expression e = Bitwise.createAND(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(12 & 5639));
@@ -45,14 +48,17 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseANDIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Bitwise.createAND(c, new Field("integer"));
+        Expression e = Bitwise.createAND(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createAND(new Field("integer"), c);
+        e = Bitwise.createAND(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -60,91 +66,73 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseANDNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Bitwise.createAND(c, nul);
+        Expression e = Bitwise.createAND(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createAND(nul, c);
+        e = Bitwise.createAND(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createAND(nul, nul);
+        e = Bitwise.createAND(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseANDErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Bitwise.createAND(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createAND(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createAND(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseANDBindTest() {
+    public void bitwiseANDBindTest() throws BindingException {
+        Errors err = new Errors();
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Bitwise.createAND(f, c);
+        Expression e = Bitwise.createAND(f, c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createAND(c, f);
+        e = Bitwise.createAND(c, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createAND(f, f);
+        e = Bitwise.createAND(f, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
     public void bitwiseORTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(51452, DataType.INTEGER);
         Expression e2 = Constant.create(93849, DataType.INTEGER);
 
-        Expression e = Bitwise.createOR(e1, e2);
+        Expression e = Bitwise.createOR(e1, e2, err);
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(51452 | 93849));
@@ -152,14 +140,17 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseORIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Bitwise.createOR(c, new Field("integer"));
+        Expression e = Bitwise.createOR(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createOR(new Field("integer"), c);
+        e = Bitwise.createOR(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -167,90 +158,72 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseORNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Bitwise.createOR(c, nul);
+        Expression e = Bitwise.createOR(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createOR(nul, c);
+        e = Bitwise.createOR(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createOR(nul, nul);
+        e = Bitwise.createOR(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseORErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Bitwise.createOR(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createOR(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createOR(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseORBindTest() {
+    public void bitwiseORBindTest() throws BindingException {
+        Errors err = new Errors();
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Bitwise.createOR(f, c);
+        Expression e = Bitwise.createOR(f, c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createOR(c, f);
+        e = Bitwise.createOR(c, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createOR(f, f);
+        e = Bitwise.createOR(f, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
     public void bitwiseXORTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(902833, DataType.INTEGER);
         Expression e2 = Constant.create(32112, DataType.INTEGER);
 
-        Expression e = Bitwise.createXOR(e1, e2);
+        Expression e = Bitwise.createXOR(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(902833 ^ 32112));
@@ -258,14 +231,17 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseXORIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Bitwise.createXOR(c, new Field("integer"));
+        Expression e = Bitwise.createXOR(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createXOR(new Field("integer"), c);
+        e = Bitwise.createXOR(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -273,89 +249,71 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseXORNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Bitwise.createXOR(c, nul);
+        Expression e = Bitwise.createXOR(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createXOR(nul, c);
+        e = Bitwise.createXOR(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createXOR(nul, nul);
+        e = Bitwise.createXOR(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseXORErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Bitwise.createXOR(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createXOR(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createXOR(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseXORBindTest() {
+    public void bitwiseXORBindTest() throws BindingException {
+        Errors err = new Errors();
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Bitwise.createXOR(f, c);
+        Expression e = Bitwise.createXOR(f, c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createXOR(c, f);
+        e = Bitwise.createXOR(c, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createXOR(f, f);
+        e = Bitwise.createXOR(f, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
     public void bitwiseNOTTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(7382, DataType.INTEGER);
 
-        Expression e = Bitwise.createNOT(e1);
+        Expression e = Bitwise.createNOT(e1, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(~7382));
@@ -363,7 +321,9 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseNOTIncompleteTest() {
-        Expression e = Bitwise.createNOT(new Field("integer"));
+        Errors err = new Errors();
+        Expression e = Bitwise.createNOT(new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
@@ -371,45 +331,38 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseNOTNullTest() {
-        Expression e = Bitwise.createNOT(Constant.NULL);
+        Errors err = new Errors();
+        Expression e = Bitwise.createNOT(Constant.NULL, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseNOTErrorTest() {
-        Expression err = new ErrorExpression("test");
-
-        Expression e = Bitwise.createNOT(err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseNOTBindTest() {
+    public void bitwiseNOTBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression f = new Field("integer");
 
-        Expression e = Bitwise.createNOT(f);
+        Expression e = Bitwise.createNOT(f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
     public void bitwiseLSHTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(7382, DataType.INTEGER);
         Expression e2 = Constant.create(8, DataType.INTEGER);
 
-        Expression e = Bitwise.createLSH(e1, e2);
+        Expression e = Bitwise.createLSH(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(7382 << 8));
@@ -417,14 +370,17 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseLSHIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Bitwise.createLSH(c, new Field("integer"));
+        Expression e = Bitwise.createLSH(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createLSH(new Field("integer"), c);
+        e = Bitwise.createLSH(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -432,90 +388,72 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseLSHNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Bitwise.createLSH(c, nul);
+        Expression e = Bitwise.createLSH(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createLSH(nul, c);
+        e = Bitwise.createLSH(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createLSH(nul, nul);
+        e = Bitwise.createLSH(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseLSHErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Bitwise.createLSH(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createLSH(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createLSH(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseLSHBindTest() {
+    public void bitwiseLSHBindTest() throws BindingException {
+        Errors err = new Errors();
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Bitwise.createLSH(f, c);
+        Expression e = Bitwise.createLSH(f, c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createLSH(c, f);
+        e = Bitwise.createLSH(c, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createLSH(f, f);
+        e = Bitwise.createLSH(f, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
     public void bitwiseRSHTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(7382, DataType.INTEGER);
         Expression e2 = Constant.create(8, DataType.INTEGER);
 
-        Expression e = Bitwise.createRSH(e1, e2);
+        Expression e = Bitwise.createRSH(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
         assertThat(res, equalTo(7382 >> 8));
@@ -523,14 +461,17 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseRSHIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Bitwise.createRSH(c, new Field("integer"));
+        Expression e = Bitwise.createRSH(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createRSH(new Field("integer"), c);
+        e = Bitwise.createRSH(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -538,80 +479,61 @@ public class BitwiseTest {
 
     @Test
     public void bitwiseRSHNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Bitwise.createRSH(c, nul);
+        Expression e = Bitwise.createRSH(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createRSH(nul, c);
+        e = Bitwise.createRSH(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Bitwise.createRSH(nul, nul);
+        e = Bitwise.createRSH(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void bitwiseRSHErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Bitwise.createRSH(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createRSH(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Bitwise.createRSH(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void bitwiseRSHBindTest() {
+    public void bitwiseRSHBindTest() throws BindingException {
+        Errors err = new Errors();
         Field f = new Field("integer");
         Expression c = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Bitwise.createRSH(f, c);
+        Expression e = Bitwise.createRSH(f, c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createRSH(c, f);
+        e = Bitwise.createRSH(c, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Bitwise.createRSH(f, f);
+        e = Bitwise.createRSH(f, f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
 }

@@ -108,8 +108,8 @@ public class MiscTest {
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
 
         Expression e = CastInteger.create(cInt, err);
-        assertTrue(e.isComplete());
         assertTrue(err.isEmpty());
+        assertTrue(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertTrue(bound.isEmpty());
@@ -117,8 +117,8 @@ public class MiscTest {
         assertThat(e.run(null, null), equalTo(1));
 
         e = CastInteger.create(cFloat, err);
-        assertTrue(e.isComplete());
         assertTrue(err.isEmpty());
+        assertTrue(e.isComplete());
         e = e.bind(atts, bound);
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
@@ -143,15 +143,15 @@ public class MiscTest {
     public void castIntegerNull() {
         Errors err = new Errors();
         Expression cast = CastInteger.create(Constant.NULL, err);
-        assertTrue(cast.isComplete());
         assertTrue(err.isEmpty());
+        assertTrue(cast.isComplete());
         assertThat(cast.getType(), nullValue());
         assertThat(cast.run(null, null), equalTo(null));
         assertThat(cast, equalTo(Constant.NULL));
 
         cast = CastInteger.create(new Field("incomplete"), err);
-        assertFalse(cast.isComplete());
         assertTrue(err.isEmpty());
+        assertFalse(cast.isComplete());
         assertThat(cast.getType(), equalTo(DataType.INTEGER));
         assertThat(cast.run(null, null), equalTo(null));
     }
@@ -168,8 +168,8 @@ public class MiscTest {
         assertThat(e.run(null, null), equalTo(1));
 
         e = Constant.create("test", DataType.STRING);
-        assertTrue(e.isComplete());
         assertTrue(err.isEmpty());
+        assertTrue(e.isComplete());
         e = e.bind(atts, bound);
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.STRING));
@@ -177,7 +177,6 @@ public class MiscTest {
 
         e = Constant.UNKNOWN;
         assertTrue(e.isComplete());
-        assertTrue(err.isEmpty());
         e = e.bind(atts, bound);
         assertTrue(bound.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -256,9 +255,9 @@ public class MiscTest {
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
 
         e = Constant.create(LogicValue.TRUE, DataType.BOOLEAN);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertTrue(bound.isEmpty());
-        assertTrue(err.isEmpty());
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(((Constant) e).getValue(), equalTo(LogicValue.TRUE));
         assertThat(e, equalTo(Constant.TRUE));

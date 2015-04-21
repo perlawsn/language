@@ -2,6 +2,8 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.BindingException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -40,13 +42,14 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void additionIntegerTest() {
+    public void additionIntegerTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
-        Expression e = Arithmetic.createAddition(e1, intField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createAddition(e1, intField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
         assertThat(e.run(sample, null), equalTo(1 + 4));
@@ -55,13 +58,14 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void additionFloatTest() {
+    public void additionFloatTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
-        Expression e = Arithmetic.createAddition(e1, floatField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createAddition(e1, floatField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
         assertThat(e.run(sample, null), equalTo(4.4f + 1.5f));
@@ -71,119 +75,106 @@ public class ArithmeticTest {
 
     @Test
     public void additionMixedTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e2 = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Arithmetic.createAddition(e1, e2);
-        assertFalse(e.hasErrors());
+        Expression e = Arithmetic.createAddition(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(1.5f + 5f));
 
-        e = Arithmetic.createAddition(e2, e1);
-        assertFalse(e.hasErrors());
+        e = Arithmetic.createAddition(e2, e1, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(1.5f + 5f));
     }
 
     @Test
     public void additionNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Arithmetic.createAddition(c, nul);
+        Expression e = Arithmetic.createAddition(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createAddition(nul, c);
+        e = Arithmetic.createAddition(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createAddition(nul, nul);
+        e = Arithmetic.createAddition(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
     public void additionIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Arithmetic.createAddition(c, new Field("integer"));
+        Expression e = Arithmetic.createAddition(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createAddition(new Field("integer"), c);
+        e = Arithmetic.createAddition(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void additionErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Arithmetic.createAddition(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createAddition(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createAddition(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void additionBindTest() {
+    public void additionBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
-        Expression e = Arithmetic.createAddition(c1, f1);
+        Expression e = Arithmetic.createAddition(c1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Arithmetic.createAddition(f1, c1);
+        e = Arithmetic.createAddition(f1, c1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
 
-        e = Arithmetic.createAddition(f1, f2);
+        e = Arithmetic.createAddition(f1, f2, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
-        assertFalse(e.hasErrors());
         bound.clear();
         e = e.bind(atts, bound);
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(intAtt));
         assertTrue(bound.contains(floatAtt));
         assertTrue(e.isComplete());
-        assertFalse(e.hasErrors());
     }
 
     @Test
-    public void subtractionIntegerTest() {
+    public void subtractionIntegerTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
-        Expression e = Arithmetic.createSubtraction(e1, intField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createSubtraction(e1, intField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -193,11 +184,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void subtractionFloatTest() {
+    public void subtractionFloatTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
-        Expression e = Arithmetic.createSubtraction(e1, floatField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createSubtraction(e1, floatField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -208,32 +201,39 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionMixedTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e2 = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Arithmetic.createSubtraction(e1, e2);
+        Expression e = Arithmetic.createSubtraction(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(1.5f - 5f));
 
-        e = Arithmetic.createSubtraction(e2, e1);
+        e = Arithmetic.createSubtraction(e2, e1, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(5f - 1.5f));
     }
 
     @Test
     public void subtractionNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Arithmetic.createSubtraction(c, nul);
+        Expression e = Arithmetic.createSubtraction(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createSubtraction(nul, c);
+        e = Arithmetic.createSubtraction(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createSubtraction(nul, nul);
+        e = Arithmetic.createSubtraction(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -241,44 +241,31 @@ public class ArithmeticTest {
 
     @Test
     public void subtractionIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Arithmetic.createSubtraction(c, new Field("integer"));
+        Expression e = Arithmetic.createSubtraction(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createSubtraction(new Field("integer"), c);
+        e = Arithmetic.createSubtraction(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void subtractionErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Arithmetic.createSubtraction(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createSubtraction(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createSubtraction(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void subtractionBindTest() {
+    public void subtractionBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
-        Expression e = Arithmetic.createSubtraction(c1, f1);
+        Expression e = Arithmetic.createSubtraction(c1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
@@ -286,7 +273,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createSubtraction(f1, c1);
+        e = Arithmetic.createSubtraction(f1, c1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -294,7 +282,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createSubtraction(f1, f2);
+        e = Arithmetic.createSubtraction(f1, f2, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -305,11 +294,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void productIntegerTest() {
+    public void productIntegerTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
-        Expression e = Arithmetic.createProduct(e1, intField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createProduct(e1, intField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -319,11 +310,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void productFloatTest() {
+    public void productFloatTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
-        Expression e = Arithmetic.createProduct(e1, floatField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createProduct(e1, floatField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -334,26 +327,32 @@ public class ArithmeticTest {
 
     @Test
     public void productMixedTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e2 = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Arithmetic.createProduct(e1, e2);
+        Expression e = Arithmetic.createProduct(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(1.5f * 5f));
 
-        e = Arithmetic.createProduct(e2, e1);
+        e = Arithmetic.createProduct(e2, e1, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(5f * 1.5f));
     }
 
     @Test
     public void productIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Arithmetic.createProduct(c, new Field("integer"));
+        Expression e = Arithmetic.createProduct(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createProduct(new Field("integer"), c);
+        e = Arithmetic.createProduct(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -361,50 +360,38 @@ public class ArithmeticTest {
 
     @Test
     public void productNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Arithmetic.createProduct(c, nul);
+        Expression e = Arithmetic.createProduct(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createProduct(nul, c);
+        e = Arithmetic.createProduct(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createProduct(nul, nul);
+        e = Arithmetic.createProduct(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void productErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Arithmetic.createProduct(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createProduct(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createProduct(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void productBindTest() {
+    public void productBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
-        Expression e = Arithmetic.createProduct(c1, f1);
+        Expression e = Arithmetic.createProduct(c1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
@@ -412,7 +399,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createProduct(f1, c1);
+        e = Arithmetic.createProduct(f1, c1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -420,7 +408,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createProduct(f1, f2);
+        e = Arithmetic.createProduct(f1, f2, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -431,11 +420,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void divisionIntegerTest() {
+    public void divisionIntegerTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
-        Expression e = Arithmetic.createDivision(e1, intField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createDivision(e1, intField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -445,11 +436,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void divisionFloatTest() {
+    public void divisionFloatTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
-        Expression e = Arithmetic.createDivision(e1, floatField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createDivision(e1, floatField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{4.4f};
@@ -460,26 +453,32 @@ public class ArithmeticTest {
 
     @Test
     public void divisionMixedTest() {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1.5f, DataType.FLOAT);
         Expression e2 = Constant.create(5, DataType.INTEGER);
 
-        Expression e = Arithmetic.createDivision(e1, e2);
+        Expression e = Arithmetic.createDivision(e1, e2, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(1.5f / 5f));
 
-        e = Arithmetic.createDivision(e2, e1);
+        e = Arithmetic.createDivision(e2, e1, err);
+        assertTrue(err.isEmpty());
         assertThat(e.run(null, null), equalTo(5f / 1.5f));
     }
 
     @Test
     public void divisionIncompleteTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Arithmetic.createDivision(c, new Field("integer"));
+        Expression e = Arithmetic.createDivision(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createDivision(new Field("integer"), c);
+        e = Arithmetic.createDivision(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -487,50 +486,38 @@ public class ArithmeticTest {
 
     @Test
     public void divisionNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Arithmetic.createDivision(c, nul);
+        Expression e = Arithmetic.createDivision(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createDivision(nul, c);
+        e = Arithmetic.createDivision(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createDivision(nul, nul);
+        e = Arithmetic.createDivision(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void divisionErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Arithmetic.createDivision(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createDivision(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createDivision(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void divisionBindTest() {
+    public void divisionBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression c1 = Constant.create(1.5f, DataType.FLOAT);
         Field f1 = new Field("integer");
         Field f2 = new Field("float");
 
-        Expression e = Arithmetic.createDivision(c1, f1);
+        Expression e = Arithmetic.createDivision(c1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
@@ -538,7 +525,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createDivision(f1, c1);
+        e = Arithmetic.createDivision(f1, c1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -546,7 +534,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createDivision(f1, f2);
+        e = Arithmetic.createDivision(f1, f2, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -557,11 +546,13 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void moduloTest() {
+    public void moduloTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
-        Expression e = Arithmetic.createModulo(e1, intField);
-        e = e.bind(atts, new ArrayList<>());
 
+        Expression e = Arithmetic.createModulo(e1, intField, err);
+        assertTrue(err.isEmpty());
+        e = e.bind(atts, new ArrayList<>());
         assertTrue(e.isComplete());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object[] sample = new Object[]{4};
@@ -571,15 +562,18 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void moduloIncompleteTest() {
+    public void moduloIncompleteTest() throws BindingException {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
 
-        Expression e = Arithmetic.createModulo(c, new Field("integer"));
+        Expression e = Arithmetic.createModulo(c, new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createModulo(new Field("integer"), c);
+        e = Arithmetic.createModulo(new Field("integer"), c, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
@@ -587,49 +581,37 @@ public class ArithmeticTest {
 
     @Test
     public void moduloNullTest() {
+        Errors err = new Errors();
         Expression c = Constant.create(43, DataType.INTEGER);
         Expression nul = Constant.NULL;
 
-        Expression e = Arithmetic.createModulo(c, nul);
+        Expression e = Arithmetic.createModulo(c, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createModulo(nul, c);
+        e = Arithmetic.createModulo(nul, c, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
 
-        e = Arithmetic.createModulo(nul, nul);
+        e = Arithmetic.createModulo(nul, nul, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         res = e.run(null, null);
         assertThat(res, nullValue());
     }
 
     @Test
-    public void moduloErrorTest() {
-        Expression err = new ErrorExpression("test");
-        Expression c = Constant.create(85, DataType.INTEGER);
-
-        Expression e = Arithmetic.createModulo(err, c);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createModulo(c, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-
-        e = Arithmetic.createModulo(err, err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
-    }
-
-    @Test
-    public void moduloBindTest() {
+    public void moduloBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression c1 = Constant.create(1, DataType.INTEGER);
         Field f1 = new Field("integer");
 
-        Expression e = Arithmetic.createModulo(c1, f1);
+        Expression e = Arithmetic.createModulo(c1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
@@ -637,7 +619,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createModulo(f1, c1);
+        e = Arithmetic.createModulo(f1, c1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -645,7 +628,8 @@ public class ArithmeticTest {
         assertTrue(bound.contains(intAtt));
         assertTrue(e.isComplete());
 
-        e = Arithmetic.createModulo(f1, f1);
+        e = Arithmetic.createModulo(f1, f1, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound);
@@ -655,14 +639,17 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void inverseTest() {
+    public void inverseTest() throws BindingException {
+        Errors err = new Errors();
         Expression e1 = Constant.create(1, DataType.INTEGER);
 
-        Expression e = Arithmetic.createInverse(e1);
+        Expression e = Arithmetic.createInverse(e1, err);
+        assertTrue(err.isEmpty());
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(null, null), equalTo(-1));
 
-        e = Arithmetic.createInverse(floatField);
+        e = Arithmetic.createInverse(floatField, err);
+        assertTrue(err.isEmpty());
         e = e.bind(atts, new ArrayList<>());
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         Object[] sample = new Object[]{5.4f};
@@ -672,10 +659,12 @@ public class ArithmeticTest {
     }
 
     @Test
-    public void inverseBindTest() {
+    public void inverseBindTest() throws BindingException {
+        Errors err = new Errors();
         Expression f = new Field("integer");
 
-        Expression e = Arithmetic.createInverse(f);
+        Expression e = Arithmetic.createInverse(f, err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound);
@@ -686,7 +675,9 @@ public class ArithmeticTest {
 
     @Test
     public void inverseIncompleteTest() {
-        Expression e = Arithmetic.createInverse(new Field("integer"));
+        Errors err = new Errors();
+        Expression e = Arithmetic.createInverse(new Field("integer"), err);
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
@@ -694,19 +685,12 @@ public class ArithmeticTest {
 
     @Test
     public void inverseNullTest() {
-        Expression e = Arithmetic.createInverse(Constant.NULL);
+        Errors err = new Errors();
+        Expression e = Arithmetic.createInverse(Constant.NULL, err);
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         Object res = e.run(null, null);
         assertThat(res, nullValue());
-    }
-
-    @Test
-    public void inverseErrorTest() {
-        Expression err = new ErrorExpression("test");
-
-        Expression e = Arithmetic.createInverse(err);
-        assertTrue(e.isComplete());
-        assertTrue(e.hasErrors());
     }
 
 }
