@@ -67,11 +67,6 @@ public final class Refresh implements Clause {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
     public boolean isComplete() {
         if (names != null) {
             return events != null && names.size() == events.size();

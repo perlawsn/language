@@ -5,8 +5,6 @@ package org.dei.perla.lang.executor.statement;
  */
 public interface Clause {
 
-    public boolean hasErrors();
-
     public boolean isComplete();
 
 }

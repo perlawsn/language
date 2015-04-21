@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Guido Rota 02/03/15.
  */
-public final class Not implements Expression {
+public final class Not extends Expression {
 
     private final Expression e;
 
@@ -36,7 +36,7 @@ public final class Not implements Expression {
         if (e.getType() != null && e.getType() != DataType.BOOLEAN) {
             err.addError("Incompatible operand type: only boolean values are " +
                     "allowed in operator not");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e instanceof Constant) {
@@ -58,14 +58,9 @@ public final class Not implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         return create(be, err);
     }
 

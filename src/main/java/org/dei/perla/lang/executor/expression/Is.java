@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Guido Rota 12/03/15.
  */
-public final class Is implements Expression {
+public final class Is extends Expression {
 
     private final Expression e;
     private final LogicValue l;
@@ -41,7 +41,7 @@ public final class Is implements Expression {
         if (t != null && t != DataType.BOOLEAN) {
             err.addError("Incompatible operand type: only boolean values are " +
                     "allowed");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e instanceof Constant) {
@@ -67,14 +67,9 @@ public final class Is implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         return create(be, l, err);
     }
 

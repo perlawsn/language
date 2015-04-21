@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  *
  * @author Guido Rota 13/03/15.
  */
-public final class Like implements Expression {
+public final class Like extends Expression {
 
     private final Expression e;
     private final Pattern p;
@@ -68,7 +68,7 @@ public final class Like implements Expression {
         if (t != null && t != DataType.STRING) {
             err.addError("Incompatible operand type: only string values are " +
                     "allowed in operator like");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e instanceof Constant) {
@@ -90,14 +90,9 @@ public final class Like implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         return create(be, p, err);
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Guido Rota 09/03/15.
  */
-public final class Comparison implements Expression {
+public final class Comparison extends Expression {
 
     private final Expression e1;
     private final Expression e2;
@@ -129,7 +129,7 @@ public final class Comparison implements Expression {
 
         if (t1 != null && t2 != null && t1 != t2) {
             err.addError("Incompatible operand types");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -159,15 +159,10 @@ public final class Comparison implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e1.hasErrors() || e2.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be1 = e1.bind(atts, bound, err);
-        Expression be2 = e2.bind(atts, bound, err);
+        Expression be1 = e1.doBind(atts, bound, err);
+        Expression be2 = e2.doBind(atts, bound, err);
         return new Comparison(op, be1, be2);
     }
 

@@ -65,7 +65,7 @@ public class IfEvery implements Clause {
         }
 
         if (t == DataType.FLOAT) {
-            value = CastInteger.create(value);
+            value = CastInteger.create(value, err);
         }
 
         return new IfEvery(cond, value, unit);
@@ -80,14 +80,6 @@ public class IfEvery implements Clause {
     }
 
     @Override
-    public boolean hasErrors() {
-        if (error || next != null && next.hasErrors()) {
-            return true;
-        }
-        return value.hasErrors() || cond.hasErrors();
-    }
-
-    @Override
     public boolean isComplete() {
         if (error) {
             throw new IllegalStateException("Cannot determine if clause is " +
@@ -99,15 +91,15 @@ public class IfEvery implements Clause {
         return cond.isComplete() && value.isComplete();
     }
 
-    public IfEvery bind(Collection<Attribute> atts, List<Attribute> bound,
-            Errors err) {
+    public IfEvery bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
         if (error) {
             throw new IllegalStateException("Cannot bind, IF EVERY clause " +
                     "contains errors");
         }
 
-        Expression bcond = cond.bind(atts, bound);
-        Expression bvalue = value.bind(atts, bound);
+        Expression bcond = cond.bind(atts, bound, err);
+        Expression bvalue = value.bind(atts, bound, err);
         IfEvery ife = IfEvery.create(bcond, bvalue, unit, err);
         if (next != null) {
             ife.next = next.bind(atts, bound, err);

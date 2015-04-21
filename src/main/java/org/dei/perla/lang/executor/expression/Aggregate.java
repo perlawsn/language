@@ -22,7 +22,7 @@ import java.time.Instant;
  *
  * @author Guido Rota 27/02/15.
  */
-public abstract class Aggregate implements Expression {
+public abstract class Aggregate extends Expression {
 
     protected final Expression e;
     protected final WindowSize ws;
@@ -112,17 +112,6 @@ public abstract class Aggregate implements Expression {
             return false;
         } else {
             return true;
-        }
-    }
-
-    @Override
-    public boolean hasErrors() {
-        if (e != null && e.hasErrors()) {
-            return true;
-        } else if (filter != null && filter.hasErrors()) {
-            return true;
-        } else {
-            return false;
         }
     }
 

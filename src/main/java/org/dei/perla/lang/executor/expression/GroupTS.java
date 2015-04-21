@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Guido Rota 03/03/15.
  */
-public class GroupTS implements Expression {
+public class GroupTS extends Expression {
 
     private static final String id = Attribute.TIMESTAMP.getId();
 
@@ -33,12 +33,7 @@ public class GroupTS implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         int i = Expression.indexOf(id, bound);
         if (i != -1) {
@@ -75,11 +70,6 @@ public class GroupTS implements Expression {
         @Override
         public boolean isComplete() {
             return true;
-        }
-
-        @Override
-        public boolean hasErrors() {
-            return false;
         }
 
         @Override

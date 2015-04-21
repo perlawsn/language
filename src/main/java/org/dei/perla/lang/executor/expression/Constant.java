@@ -12,7 +12,7 @@ import java.util.List;
  * A class representing an expression that returns a constant value
  * @author Guido Rota 23/02/15.
  */
-public final class Constant implements Expression {
+public final class Constant extends Expression {
 
     // CONSTANT NULL
     public static final Constant NULL =
@@ -100,12 +100,7 @@ public final class Constant implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         return this;
     }

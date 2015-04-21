@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Guido Rota 13/03/15.
  */
-public final class IsNull implements Expression {
+public final class IsNull extends Expression {
 
     private final Expression e;
 
@@ -53,14 +53,9 @@ public final class IsNull implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         return create(be);
     }
 

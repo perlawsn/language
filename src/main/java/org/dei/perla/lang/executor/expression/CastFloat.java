@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Guido Rota 27/02/15.
  */
-public final class CastFloat implements Expression {
+public final class CastFloat extends Expression {
 
     private final Expression e;
 
@@ -41,7 +41,7 @@ public final class CastFloat implements Expression {
 
         if (t != null && t != DataType.INTEGER) {
             err.addError("Cannot cast " + t + " to float");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e instanceof Constant) {
@@ -66,14 +66,9 @@ public final class CastFloat implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         return CastFloat.create(be, err);
     }
 

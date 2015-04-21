@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
@@ -52,25 +53,21 @@ public final class Select implements Clause {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
     public boolean isComplete() {
         return false;
     }
 
-    public Select bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public Select bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
         List<Expression> bfields = new ArrayList<>();
-        fields.forEach(f -> bfields.add(f.bind(atts, bound)));
+        fields.forEach(f -> bfields.add(f.bind(atts, bound, err)));
 
         GroupBy bgroup = null;
         if (group != null) {
-            bgroup = group.bind(atts, bound);
+            bgroup = group.bind(atts, bound, err);
         }
 
-        Expression bhaving = having.bind(atts, bound);
+        Expression bhaving = having.bind(atts, bound, err);
 
         return new Select(bfields, upto, bgroup, bhaving, def);
     }

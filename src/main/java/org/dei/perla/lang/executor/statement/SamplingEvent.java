@@ -28,11 +28,6 @@ public final class SamplingEvent implements Sampling {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
     public boolean isComplete() {
         return !events.isEmpty();
     }

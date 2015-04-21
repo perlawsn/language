@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Guido Rota 10/03/15.
  */
-public final class Bitwise implements Expression {
+public final class Bitwise extends Expression {
 
     private final BitwiseOperation op;
     private final Expression e1;
@@ -127,7 +127,7 @@ public final class Bitwise implements Expression {
                 t2 != null && t2 != DataType.INTEGER) {
             err.addError("Incompatible operand type: only integer operands " +
                     "are allowed in " + op + " comparisons");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -154,15 +154,10 @@ public final class Bitwise implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e1.hasErrors() || e2.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts, List<Attribute> bound,
+    public Expression doBind(Collection<Attribute> atts, List<Attribute> bound,
             Errors err) {
-        Expression be1 = e1.bind(atts, bound, err);
-        Expression be2 = e2.bind(atts, bound, err);
+        Expression be1 = e1.doBind(atts, bound, err);
+        Expression be2 = e2.doBind(atts, bound, err);
         return create(op, be1, be2, err);
     }
 

@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Expression;
 
 import java.util.Collection;
@@ -32,17 +33,13 @@ public final class ExecutionConditions implements Clause {
     }
 
     @Override
-    public boolean hasErrors() {
-        return cond.hasErrors() || refresh.hasErrors();
-    }
-
-    @Override
     public boolean isComplete() {
         return cond.isComplete() && refresh.isComplete();
     }
 
-    public ExecutionConditions bind(Collection<Attribute> atts, List<Attribute> bound) {
-        Expression bcond = cond.bind(atts, bound);
+    public ExecutionConditions bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
+        Expression bcond = cond.bind(atts, bound, err);
         Refresh brefresh = refresh.bind(atts);
         return new ExecutionConditions(bcond, specs, brefresh);
     }

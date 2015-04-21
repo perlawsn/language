@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Guido Rota 12/03/15.
  */
-public final class Between implements Expression {
+public final class Between extends Expression {
 
     private final Expression e;
     private final Expression min;
@@ -49,7 +49,7 @@ public final class Between implements Expression {
         if (t != null && tmin != null && tmax != null &&
                 t != tmin && t != tmax) {
             err.addError("Incompatible operand types");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e instanceof Constant && min instanceof Constant && max
@@ -74,16 +74,11 @@ public final class Between implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e.hasErrors() || min.hasErrors() || max.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    protected Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
-        Expression bmin = min.bind(atts, bound, err);
-        Expression bmax = max.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
+        Expression bmin = min.doBind(atts, bound, err);
+        Expression bmax = max.doBind(atts, bound, err);
         return create(be, bmin, bmax, err);
     }
 

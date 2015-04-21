@@ -51,11 +51,6 @@ public final class SamplingIfEvery implements Sampling {
     }
 
     @Override
-    public boolean hasErrors() {
-        return ifevery.hasErrors();
-    }
-
-    @Override
     public boolean isComplete() {
         return refresh.isComplete() && ifevery.isComplete();
     }

@@ -39,7 +39,7 @@ public final class CountAggregate extends Aggregate {
             if (filter.getType() != null &&
                     filter.getType() != DataType.BOOLEAN) {
                 err.addError("Aggregation filter must be of type boolean");
-                return ErrorExpression.INSTANCE;
+                return Constant.NULL;
             }
         }
 
@@ -47,11 +47,11 @@ public final class CountAggregate extends Aggregate {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression bf = null;
         if (filter != null) {
-            bf = filter.bind(atts, bound, err);
+            bf = filter.doBind(atts, bound, err);
         }
         return create(ws, bf, err);
     }

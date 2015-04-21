@@ -42,14 +42,14 @@ public final class MaxAggregate extends Aggregate {
                 t != DataType.FLOAT && t != DataType.TIMESTAMP) {
             err.addError("Incompatible operand type: only float, integer and " +
                     "timestampjexpressions are allowed in max aggregations");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (filter != null) {
             if (filter.getType() != null &&
                     filter.getType() != DataType.BOOLEAN) {
                 err.addError("Aggregation filter must be of type boolean");
-                return ErrorExpression.INSTANCE;
+                return Constant.NULL;
             }
         }
 
@@ -57,12 +57,12 @@ public final class MaxAggregate extends Aggregate {
     }
 
     @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
+        Expression be = e.doBind(atts, bound, err);
         Expression bf = null;
         if (filter != null) {
-            bf = filter.bind(atts, bound, err);
+            bf = filter.doBind(atts, bound, err);
         }
         return create(be, ws, bf, err);
     }

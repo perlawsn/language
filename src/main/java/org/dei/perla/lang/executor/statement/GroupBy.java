@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Check;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 
@@ -73,11 +74,6 @@ public final class GroupBy implements Clause {
     }
 
     @Override
-    public boolean hasErrors() {
-        return false;
-    }
-
-    @Override
     public boolean isComplete() {
         if (groups == null) {
             return true;
@@ -91,12 +87,13 @@ public final class GroupBy implements Clause {
         return true;
     }
 
-    public GroupBy bind(Collection<Attribute> atts, List<Attribute> bound) {
+    public GroupBy bind(Collection<Attribute> atts,
+            List<Attribute> bound, Errors err) {
         if (isComplete()) {
             return this;
         }
         List<Expression> bgroups = new ArrayList<>();
-        groups.forEach(f -> bgroups.add(f.bind(atts, bound)));
+        groups.forEach(f -> bgroups.add(f.bind(atts, bound, err)));
         return new GroupBy(d, count, bgroups);
     }
 

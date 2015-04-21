@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Guido Rota 10/03/15.
  */
-public final class Arithmetic implements Expression {
+public final class Arithmetic extends Expression {
 
     private final ArithmeticOperation op;
     private final Expression e1;
@@ -132,13 +132,13 @@ public final class Arithmetic implements Expression {
                 t1 != DataType.INTEGER && t2 != DataType.INTEGER) {
             err.addError("Incompatible operand type, modulo operation is only" +
                     " allowed on integer values");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
         if (t1 != null && t1 != DataType.INTEGER && t1 != DataType.FLOAT ||
                 t2 != null && t2 != DataType.INTEGER && t2 != DataType.FLOAT) {
             err.addError("Incompatible operand type: only integer operands " +
                     "are allowed in " + op + " operations");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (t1 != t2 && t1 != null && t2 != null) {
@@ -179,15 +179,10 @@ public final class Arithmetic implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e1.hasErrors() || e2.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    protected Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be1 = e1.bind(atts, bound, err);
-        Expression be2 = e2.bind(atts, bound, err);
+        Expression be1 = e1.doBind(atts, bound, err);
+        Expression be2 = e2.doBind(atts, bound, err);
         return create(op, be1, be2, err);
     }
 

@@ -24,18 +24,13 @@ public final class Selection implements Statement {
     }
 
     @Override
-    public boolean hasErrors() {
-        throw new RuntimeException("unimplemented");
-    }
-
-    @Override
     public boolean isComplete() {
         return select.isComplete() && sampling.isComplete();
     }
 
     public Selection bind(Collection<Attribute> atts, Errors err) {
         List<Attribute> bound = new ArrayList<>();
-        Select bselect = select.bind(atts, bound);
+        Select bselect = select.bind(atts, bound, err);
         Sampling bsampling = sampling.bind(atts, err);
         return new Selection(bselect, every, bsampling);
     }

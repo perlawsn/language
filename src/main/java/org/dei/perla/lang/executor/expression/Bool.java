@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Guido Rota 10/03/15.
  */
-public final class Bool implements Expression {
+public final class Bool extends Expression {
 
     private final BoolOperation op;
     private final Expression e1;
@@ -100,7 +100,7 @@ public final class Bool implements Expression {
                 t2 != null && t2 != DataType.BOOLEAN) {
             err.addError("Incompatible operand type: only boolean operands " +
                     "are allowed in boolean operations");
-            return ErrorExpression.INSTANCE;
+            return Constant.NULL;
         }
 
         if (e1 instanceof Constant && e2 instanceof Constant) {
@@ -127,15 +127,10 @@ public final class Bool implements Expression {
     }
 
     @Override
-    public boolean hasErrors() {
-        return e1.hasErrors() || e2.hasErrors();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
+    public Expression doBind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression be1 = e1.bind(atts, bound, err);
-        Expression be2 = e2.bind(atts, bound, err);
+        Expression be1 = e1.doBind(atts, bound, err);
+        Expression be2 = e2.doBind(atts, bound, err);
         return create(op, be1, be2, err);
     }
 
