@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Comparison;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guido Rota 23/02/15.
@@ -531,8 +533,12 @@ public class ArrayBufferTest {
         List<Attribute> bound = new ArrayList<>();
         bound.add(Attribute.TIMESTAMP);
         bound.add(Attribute.create("integer", DataType.INTEGER));
+        Errors err = new Errors();
         Expression where = Comparison.createGT(new Field("integer"),
-                Constant.create(5, DataType.INTEGER)).bind(atts, bound);
+                Constant.create(5, DataType.INTEGER), err);
+        assertTrue(err.isEmpty());
+        where = where.bind(atts, bound, err);
+        assertTrue(err.isEmpty());
         sub.forEach((r, view) -> count.value++, where);
         assertThat(count.value, equalTo(5));
         sub.release();

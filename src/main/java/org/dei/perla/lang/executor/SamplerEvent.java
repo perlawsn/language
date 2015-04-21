@@ -36,8 +36,6 @@ public class SamplerEvent implements Sampler {
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
-        Conditions.checkIllegalArgument(!sampling.hasErrors(),
-                "Sampling clause contains errors.");
 
         this.sampling = sampling;
         this.fpc = fpc;

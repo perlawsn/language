@@ -65,21 +65,21 @@ public class IfEveryTest {
 
         e = IfEvery.create(Constant.TRUE, cInt, ChronoUnit.DAYS, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(5)));
 
         e = IfEvery.create(Constant.TRUE, cFloat, ChronoUnit.DAYS, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         d = e.run(null);
         assertThat(d, equalTo(Duration.ofDays(3)));
 
         e = IfEvery.create(Constant.TRUE, cString, ChronoUnit.MONTHS, err);
         assertFalse(err.isEmpty());
-        assertTrue(e.hasErrors());
+        assertFalse(err.isEmpty());
     }
 
     @Test
@@ -88,37 +88,37 @@ public class IfEveryTest {
         Errors err = new Errors();
 
         e = IfEvery.create(Constant.TRUE, fInt, ChronoUnit.SECONDS, err);
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         List<Attribute> bound = new ArrayList<>();
         e = e.bind(atts, bound, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(intAtt));
 
         e = IfEvery.create(Constant.TRUE, fFloat, ChronoUnit.SECONDS, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(floatAtt));
 
         e = IfEvery.create(fBool, fFloat, ChronoUnit.SECONDS, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(e.isComplete());
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(floatAtt));
@@ -126,12 +126,12 @@ public class IfEveryTest {
 
         e = IfEvery.create(Constant.TRUE, fString, ChronoUnit.SECONDS, err);
         assertTrue(err.isEmpty());
-        assertFalse(e.hasErrors());
+        assertTrue(err.isEmpty());
         assertFalse(e.isComplete());
         bound.clear();
         e = e.bind(atts, bound, err);
         assertFalse(err.isEmpty());
-        assertTrue(e.hasErrors());
+        assertFalse(err.isEmpty());
         assertThat(bound.size(), equalTo(1));
         assertTrue(bound.contains(stringAtt));
     }
@@ -148,20 +148,20 @@ public class IfEveryTest {
         Expression c1 = Constant.create(1, DataType.INTEGER);
         Expression c2 = Constant.create(2, DataType.INTEGER);
 
-        cond = Comparison.createEQ(field, c0);
+        cond = Comparison.createEQ(field, c0, err);
         ife = last = IfEvery.create(cond, field, ChronoUnit.SECONDS, err);
-        cond = Comparison.createEQ(field, c1);
+        cond = Comparison.createEQ(field, c1, err);
         last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS, err);
-        cond = Comparison.createEQ(field, c2);
+        cond = Comparison.createEQ(field, c2, err);
         last = IfEvery.create(last, cond, field, ChronoUnit.SECONDS, err);
         last = IfEvery.create(last, Constant.TRUE, field,
                 ChronoUnit.SECONDS, err);
 
-        assertFalse(ife.hasErrors());
+        assertTrue(err.isEmpty());
         assertFalse(ife.isComplete());
         ife = ife.bind(atts, new ArrayList<>(), err);
         assertTrue(err.isEmpty());
-        assertFalse(ife.hasErrors());
+        assertTrue(err.isEmpty());
         assertTrue(ife.isComplete());
 
         d = ife.run(samples[0]);

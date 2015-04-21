@@ -179,7 +179,7 @@ public final class Arithmetic extends Expression {
     }
 
     @Override
-    protected Expression bind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression be1 = e1.bind(atts, bound, err);
         Expression be2 = e2.bind(atts, bound, err);

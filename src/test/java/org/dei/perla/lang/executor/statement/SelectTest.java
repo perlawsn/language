@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
@@ -65,6 +66,7 @@ public class SelectTest {
     }
     @Test
     public void plainSelect() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
@@ -73,7 +75,8 @@ public class SelectTest {
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE,
                 Constant.TRUE, new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -90,16 +93,19 @@ public class SelectTest {
 
     @Test
     public void aggregateSelect() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(3), null));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(3), null, err));
+        assertTrue(err.isEmpty());
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -118,6 +124,7 @@ public class SelectTest {
 
     @Test
     public void uptoSamples() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
@@ -127,7 +134,8 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));
@@ -146,6 +154,7 @@ public class SelectTest {
 
     @Test
     public void uptoDuration() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
@@ -155,7 +164,8 @@ public class SelectTest {
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -174,17 +184,19 @@ public class SelectTest {
 
     @Test
     public void uptoAggregate() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null, err));
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));
@@ -205,6 +217,7 @@ public class SelectTest {
 
     @Test
     public void having() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
@@ -212,11 +225,12 @@ public class SelectTest {
         fields.add(floatExpr);
 
         Expression having = Comparison.createNE(intExpr,
-                Constant.create(3, DataType.INTEGER));
+                Constant.create(3, DataType.INTEGER), err);
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, having, new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -243,20 +257,24 @@ public class SelectTest {
 
     @Test
     public void havingAggregate() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null, err));
+        assertTrue(err.isEmpty());
 
         Expression having = Comparison.createNE(intExpr,
-                Constant.create(3, DataType.INTEGER));
+                Constant.create(3, DataType.INTEGER), err);
+        assertTrue(err.isEmpty());
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, having,
                 new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -287,12 +305,14 @@ public class SelectTest {
 
     @Test
     public void insertOnEmpty() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(intExpr);
 
         Expression having = Comparison.createEQ(intExpr,
-                Constant.create(10, DataType.INTEGER));
+                Constant.create(10, DataType.INTEGER), err);
+        assertTrue(err.isEmpty());
 
         Object[] def = new Object[2];
         def[0] = Instant.now();
@@ -300,7 +320,8 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, having, def);
-        sel.bind(atts, atts);
+        sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -313,6 +334,7 @@ public class SelectTest {
 
     @Test
     public void groupByTimestamp() throws InterruptedException {
+        Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tsExpr);
         fields.add(new GroupTS());
@@ -321,7 +343,8 @@ public class SelectTest {
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
         Select sel = new Select(fields, WindowSize.ONE, group,
                 Constant.TRUE, new Object[0]);
-        sel = sel.bind(atts, atts);
+        sel = sel.bind(atts, atts, err);
+        assertTrue(err.isEmpty());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));

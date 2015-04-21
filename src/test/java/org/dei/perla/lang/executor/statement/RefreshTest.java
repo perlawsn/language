@@ -23,7 +23,6 @@ public class RefreshTest {
     public void neverRefresh() {
         Refresh r = Refresh.NEVER;
         assertTrue(r.isComplete());
-        assertFalse(r.hasErrors());
         assertThat(r.getType(), equalTo(RefreshType.NEVER));
     }
 
@@ -32,7 +31,6 @@ public class RefreshTest {
         Duration d = Duration.ofSeconds(56);
         Refresh r = new Refresh(d);
         assertTrue(r.isComplete());
-        assertFalse(r.hasErrors());
         assertThat(r.getType(), equalTo(RefreshType.TIME));
         assertThat(r.getDuration(), equalTo(d));
     }
@@ -53,12 +51,10 @@ public class RefreshTest {
 
         Refresh r = new Refresh(names);
         assertFalse(r.isComplete());
-        assertFalse(r.hasErrors());
         List<Attribute> bound = r.getEvents();
         assertThat(bound.size(), equalTo(0));
         r = r.bind(atts);
         assertTrue(r.isComplete());
-        assertFalse(r.hasErrors());
         bound = r.getEvents();
         assertThat(bound.size(), equalTo(2));
         assertTrue(bound.contains(lb));

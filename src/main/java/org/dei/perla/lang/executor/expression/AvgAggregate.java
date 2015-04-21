@@ -55,7 +55,7 @@ public final class AvgAggregate extends Aggregate {
     }
 
     @Override
-    protected Expression bind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression be = e.bind(atts, bound, err);
         Expression bf = null;

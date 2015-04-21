@@ -90,7 +90,7 @@ public abstract class Expression {
      * @return new {@code Expression} instance bound to the data attributes
      * passed as parameter.
      */
-    protected abstract Expression bind(Collection<Attribute> atts,
+    public abstract Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err);
 
     /**

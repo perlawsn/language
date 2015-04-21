@@ -54,7 +54,6 @@ public class SamplingTest {
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
                 RatePolicy.DO_NOT_SAMPLE, refresh);
-        assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
         assertThat(s.getIfEvery(), equalTo(ife));
         assertThat(s.getRefresh(), equalTo(refresh));
@@ -73,14 +72,12 @@ public class SamplingTest {
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
                 RatePolicy.SLOW_DOWN, refresh);
-        assertFalse(s.hasErrors());
         assertFalse(s.isComplete());
         assertThat(s.getRatePolicy(),
                 equalTo(RatePolicy.SLOW_DOWN));
 
         s = s.bind(atts, err);
         assertTrue(err.isEmpty());
-        assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
         assertThat(s.getIfEveryAttributes().size(), equalTo(1));
         assertTrue(s.getIfEveryAttributes().contains(boolAtt));
@@ -93,11 +90,9 @@ public class SamplingTest {
         Errors err = new Errors();
 
         SamplingEvent s = new SamplingEvent(names);
-        assertFalse(s.hasErrors());
         assertFalse(s.isComplete());
         s = s.bind(atts, err);
         assertTrue(err.isEmpty());
-        assertFalse(s.hasErrors());
         assertTrue(s.isComplete());
         List<Attribute> bound = s.getEvents();
         assertThat(bound.size(), equalTo(2));

@@ -8,7 +8,6 @@ import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.statement.IfEvery;
 import org.dei.perla.lang.executor.statement.Refresh;
-import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
 import org.dei.perla.lang.executor.statement.Sampling;
 import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 
@@ -56,8 +55,6 @@ public final class SamplerIfEvery implements Sampler {
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
-        Conditions.checkIllegalArgument(!sampling.hasErrors(),
-                "Sampling clause contains errors.");
 
         this.sampling = sampling;
         this.atts = atts;

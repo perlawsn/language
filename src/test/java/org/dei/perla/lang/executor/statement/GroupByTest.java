@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.Field;
 import org.junit.Test;
@@ -11,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -68,12 +68,15 @@ public class GroupByTest {
 
     @Test
     public void bind() {
+        Errors err = new Errors();
+
         GroupBy g = new GroupBy(SEC_10, 54, fields);
         for (Expression e : g.getGroups()) {
             assertFalse(e.isComplete());
         }
 
-        GroupBy ng = g.bind(atts, new ArrayList<>());
+        GroupBy ng = g.bind(atts, new ArrayList<>(), err);
+        assertTrue(err.isEmpty());
         assertThat(ng.getDuration(), equalTo(g.getDuration()));
         assertThat(ng.getCount(), equalTo(g.getCount()));
     }

@@ -17,26 +17,13 @@ import java.util.List;
  */
 public class IfEvery implements Clause {
 
-    // Static instance of IfEvery clause which always returns true when the
-    // method hasErrors() is invoked
-    private final static IfEvery ERROR_CLAUSE = new IfEvery();
-
-    private final boolean error;
     private final Expression cond;
     private final Expression value;
     private final TemporalUnit unit;
 
     private IfEvery next = null;
 
-    private IfEvery() {
-        error = true;
-        cond = null;
-        value = null;
-        unit = null;
-    }
-
     private IfEvery(Expression cond, Expression value, TemporalUnit unit) {
-        error = false;
         this.cond = cond;
         this.value = value;
         this.unit = unit;
@@ -55,13 +42,13 @@ public class IfEvery implements Clause {
         if (t != null && t != DataType.BOOLEAN) {
             err.addError("Incompatible data type, IF EVERY condition must be " +
                     "of type boolean");
-            return ERROR_CLAUSE;
+            return null;
         }
         t = value.getType();
         if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
             err.addError("Incompatible data type, IF EVERY sampling period " +
                     "must be a numeric value");
-            return ERROR_CLAUSE;
+            return null;
         }
 
         if (t == DataType.FLOAT) {
@@ -81,10 +68,6 @@ public class IfEvery implements Clause {
 
     @Override
     public boolean isComplete() {
-        if (error) {
-            throw new IllegalStateException("Cannot determine if clause is " +
-                    "complete, IF EVERY clause contains an error");
-        }
         if (next != null && !next.isComplete()) {
             return false;
         }
@@ -93,14 +76,13 @@ public class IfEvery implements Clause {
 
     public IfEvery bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        if (error) {
-            throw new IllegalStateException("Cannot bind, IF EVERY clause " +
-                    "contains errors");
-        }
-
         Expression bcond = cond.bind(atts, bound, err);
         Expression bvalue = value.bind(atts, bound, err);
         IfEvery ife = IfEvery.create(bcond, bvalue, unit, err);
+        if (ife == null) {
+            return null;
+        }
+
         if (next != null) {
             ife.next = next.bind(atts, bound, err);
         }
@@ -108,11 +90,6 @@ public class IfEvery implements Clause {
     }
 
     public Duration run(Object[] sample) {
-        if (error) {
-            throw new IllegalStateException("Cannot run, IF EVERY clause " +
-                    "contains errors");
-        }
-
         LogicValue c = (LogicValue) cond.run(sample, null);
         if (!c.toBoolean()) {
             return next.run(sample);

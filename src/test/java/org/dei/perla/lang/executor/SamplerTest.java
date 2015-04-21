@@ -13,7 +13,8 @@ import java.io.StringReader;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guido Rota 13/04/15.
@@ -54,7 +55,6 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -66,7 +66,6 @@ public class SamplerTest {
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -78,7 +77,6 @@ public class SamplerTest {
         fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -109,7 +107,6 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
@@ -155,7 +152,6 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
 
         vs.put(temperature, 25);
         fpc.setValues(vs);
@@ -200,7 +196,6 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        assertFalse(samp.hasErrors());
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,

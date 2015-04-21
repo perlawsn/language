@@ -74,7 +74,7 @@ public final class Between extends Expression {
     }
 
     @Override
-    protected Expression bind(Collection<Attribute> atts,
+    public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression be = e.bind(atts, bound, err);
         Expression bmin = min.bind(atts, bound, err);
