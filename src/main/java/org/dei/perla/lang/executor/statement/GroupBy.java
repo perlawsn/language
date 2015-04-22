@@ -45,7 +45,7 @@ public final class GroupBy implements Clause {
         this.groups = Collections.unmodifiableList(groups);
     }
 
-    protected Duration getDuration() {
+    public Duration getDuration() {
         if (d == null) {
             throw new RuntimeException("Cannot access groups GROUP BY clause " +
                     "is not time-base");
@@ -53,7 +53,7 @@ public final class GroupBy implements Clause {
         return d;
     }
 
-    protected int getCount() {
+    public int getCount() {
         if (d == null) {
             throw new RuntimeException("Cannot access groups GROUP BY clause " +
                     "is not time-base");
@@ -61,7 +61,7 @@ public final class GroupBy implements Clause {
         return count;
     }
 
-    protected List<? extends Expression> getGroups() {
+    public List<? extends Expression> getGroups() {
         if (groups == null) {
             throw new RuntimeException("Cannot access groups GROUP BY clause " +
                     "is not value-base");

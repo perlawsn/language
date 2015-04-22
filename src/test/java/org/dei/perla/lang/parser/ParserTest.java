@@ -1391,6 +1391,17 @@ public class ParserTest {
     }
 
     @Test
+    public void testGroupBy() throws Exception {
+        Parser p = new Parser(new StringReader(
+                "group by timestamp(20 seconds, 10 groups), building, room"
+        ));
+        GroupBy gb = p.GroupByClause();
+        assertThat(gb.getDuration(), equalTo(Duration.ofSeconds(20)));
+        assertThat(gb.getCount(), equalTo(10));
+        assertThat(gb.getGroups().size(), equalTo(2));
+    }
+
+    @Test
     public void testSelectionQuery() throws Exception {
         Errors err = new Errors();
 
