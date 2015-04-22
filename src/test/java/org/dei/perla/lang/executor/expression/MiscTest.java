@@ -5,7 +5,6 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.ArrayBuffer;
-import org.dei.perla.lang.executor.BindingException;
 import org.dei.perla.lang.executor.Buffer;
 import org.dei.perla.lang.executor.BufferView;
 import org.junit.Test;
