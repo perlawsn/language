@@ -45,14 +45,17 @@ PARSER_BEGIN(Parser)
 
         private static final Object[] EMPTY_DEFAULT = new Object[0];
 
-        private static final String ERROR_STRING = "Line %s, Column %s";
+        private static final String ERROR_STRING = "Error near element %s" +
+        		"(line %s, column %s): ";
 
         private static void addError(String msg, Token t, Errors err) {
-        	err.addError(ERROR_STRING + msg, t.beginLine, t.beginColumn);
+        	err.addError(ERROR_STRING + msg, t.image, t.beginLine,
+        			t.beginColumn);
         }
 
         private static Errors inContext(Errors err, Token t) {
-        	return err.inContext(ERROR_STRING, t.beginLine, t.beginColumn);
+        	return err.inContext(ERROR_STRING, t.image, t.beginLine,
+        			t.beginColumn);
         }
 
 	}
@@ -640,7 +643,7 @@ void FieldDefinition(Errors err) :
 
 Statement InsertionStatement(Errors err) :
 {
-    Selection sel;
+    SelectionQuery sel;
 }
 {
 	<KEYWORD_INSERT>
@@ -672,7 +675,7 @@ List<String> FieldList() :
 	{ return sl; }
 }
 
-Selection SelectionStatement(Errors err) :
+SelectionQuery SelectionStatement(Errors err) :
 {
 	// All attribute identifiers are incrementally stored inside this
 	// structure, that is later employed by the EXECUTE IF clause when the
@@ -734,7 +737,7 @@ Selection SelectionStatement(Errors err) :
 	[
 		terminate = TerminateAfterClause(err)
 	]
-	{ return null; }
+	{ return new SelectionQuery(sel, every, sampling, where, ec, terminate); }
 }
 
 WindowSize EveryClause(Errors err) :

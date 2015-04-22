@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Guido Rota 04/03/15.
  */
-public final class Selection implements Statement {
+public final class SelectionQuery implements Statement {
 
     private final Select select;
     private final WindowSize every;
@@ -27,7 +27,7 @@ public final class Selection implements Statement {
     // where expression of the sampling clause
     private final List<Attribute> selAtts;
 
-    public Selection(Select select, WindowSize every, Sampling sampling,
+    public SelectionQuery(Select select, WindowSize every, Sampling sampling,
             Expression where, ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
         this.every = every;
@@ -38,7 +38,7 @@ public final class Selection implements Statement {
         selAtts = Collections.emptyList();
     }
 
-    private Selection(Select select, List<Attribute> selAtts, WindowSize every,
+    private SelectionQuery(Select select, List<Attribute> selAtts, WindowSize every,
             Sampling sampling, Expression where, ExecutionConditions cond,
             WindowSize terminate) {
         this.select = select;
@@ -54,12 +54,36 @@ public final class Selection implements Statement {
         return selAtts;
     }
 
+    public Select getSelect() {
+        return select;
+    }
+
+    public WindowSize getEvery() {
+        return every;
+    }
+
+    public Sampling getSampling() {
+        return sampling;
+    }
+
+    public Expression getWhere() {
+        return where;
+    }
+
+    public ExecutionConditions getExecutionConditions() {
+        return cond;
+    }
+
+    public WindowSize getTerminate() {
+        return terminate;
+    }
+
     @Override
     public boolean isComplete() {
         return select.isComplete() && sampling.isComplete();
     }
 
-    public Selection bind(Collection<Attribute> atts) throws BindingException {
+    public SelectionQuery bind(Collection<Attribute> atts) throws BindingException {
         Errors err = new Errors();
 
         List<Attribute> selAtts = new ArrayList<>();
@@ -73,7 +97,7 @@ public final class Selection implements Statement {
             throw new BindingException(err.asString());
         }
 
-        return new Selection(bselect, selAtts, every, bsampling, bwhere, bcond,
+        return new SelectionQuery(bselect, selAtts, every, bsampling, bwhere, bcond,
                 terminate);
     }
 

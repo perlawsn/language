@@ -1202,9 +1202,9 @@ public class ParserTest {
 
         p.ReInit(new StringReader(
                 "if power > 80 every 10 seconds " +
-                "if power > 60 every 40 seconds " +
-                "if power > 40 every 2 minutes " +
-                "else every 1 hours"
+                        "if power > 60 every 40 seconds " +
+                        "if power > 40 every 2 minutes " +
+                        "else every 1 hours"
         ));
         ife = p.IfEveryClause(err, ids);
         assertTrue(err.isEmpty());
@@ -1388,6 +1388,34 @@ public class ParserTest {
         ids.clear();
         e = p.ExecutionConditionsClause(err, ids);
         assertFalse(err.isEmpty());
+    }
+
+    @Test
+    public void testSelectionQuery() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every 20 minutes " +
+                        "select room, avg(temperature, 1 minutes)" +
+                        "group by room " +
+                        "having temperature > 20 " +
+                        "sampling every 20 seconds " +
+                        "execute if power > 30 " +
+                        "on nodes with all " +
+                        "refresh every 2 hours " +
+                        "terminate after 60 days"
+
+        ));
+        SelectionQuery q = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+
+        WindowSize every = q.getEvery();
+        assertThat(every.getType(), equalTo(WindowType.TIME));
+        assertThat(every.getDuration(), equalTo(Duration.ofMinutes(20)));
+
+        WindowSize terminate = q.getTerminate();
+        assertThat(terminate.getType(), equalTo(WindowType.TIME));
+        assertThat(terminate.getDuration(), equalTo(Duration.ofDays(60)));
     }
 
 }
