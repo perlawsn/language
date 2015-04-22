@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
@@ -430,9 +429,9 @@ public class MiscTest {
                 Attribute.TIMESTAMP,
                 intAtt
         });
-        Buffer b = new ArrayBuffer(0, 1);
-        b.add(new Sample(ra, new Object[]{Instant.now(), 1}));
-        b.add(new Sample(ra, new Object[]{Instant.now(), 2}));
+        Buffer b = new ArrayBuffer(atts, 1);
+        b.add(new Object[]{Instant.now(), 1});
+        b.add(new Object[]{Instant.now(), 2});
         BufferView view = b.unmodifiableView();
 
         Expression gts = new GroupTS();

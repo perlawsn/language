@@ -1,8 +1,9 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.sample.Attribute;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,9 +23,12 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
     private int len;
     private boolean hasView = false;
 
-    public ArrayBuffer(int tsIdx, int cap) {
+    public ArrayBuffer(List<Attribute> atts, int cap) {
         data = new Object[cap][];
-        this.tsIdx = tsIdx;
+        this.tsIdx = atts.indexOf(Attribute.TIMESTAMP);
+        if (tsIdx < 0) {
+            throw new IllegalArgumentException("Missing timestamp attribute");
+        }
         this.cap = cap;
         this.len = 0;
     }
@@ -43,13 +47,13 @@ public final class ArrayBuffer extends ArrayBufferReleaser implements Buffer {
     }
 
     @Override
-    public void add(Sample r) {
+    public void add(Object[] s) {
         idxLk.lock();
         try {
             if (len == cap) {
                 grow();
             }
-            data[len] = r.values();
+            data[len] = s;
             len++;
         } finally {
             idxLk.unlock();

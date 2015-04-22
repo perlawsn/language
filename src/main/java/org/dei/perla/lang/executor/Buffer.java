@@ -18,9 +18,9 @@ public interface Buffer {
     /**
      * {@code add} adds a {@link Sample} to the {@code Buffer}.
      *
-     * @param r {@link Sample} to add
+     * @param s {@link Sample} to add
      */
-    public void add(Sample r);
+    public void add(Object[] s);
 
     /**
      * {@code unmodifiableView} returns an unmodifiable view of the {@code

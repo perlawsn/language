@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.ArrayBuffer;
 import org.dei.perla.lang.executor.Buffer;
@@ -50,17 +49,17 @@ public class SelectTest {
 
     private static final BufferView view;
     static {
-        Buffer b = new ArrayBuffer(0, 512);
-        b.add(new Sample(atts, new Object[]{
-                Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f}));
-        b.add(new Sample(atts, new Object[]{
-                Instant.parse("2015-02-23T15:07:15.000Z"), 1, "1", 1.1f}));
-        b.add(new Sample(atts, new Object[]{
-                Instant.parse("2015-02-23T15:07:18.000Z"), 2, "2", 2.2f}));
-        b.add(new Sample(atts, new Object[]{
-                Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f}));
-        b.add(new Sample(atts, new Object[]{
-                Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f}));
+        Buffer b = new ArrayBuffer(atts, 512);
+        b.add(new Object[]{
+                Instant.parse("2015-02-23T15:07:00.000Z"), 0, "0", 0.0f});
+        b.add(new Object[]{
+                Instant.parse("2015-02-23T15:07:15.000Z"), 1, "1", 1.1f});
+        b.add(new Object[]{
+                Instant.parse("2015-02-23T15:07:18.000Z"), 2, "2", 2.2f});
+        b.add(new Object[]{
+                Instant.parse("2015-02-23T15:07:25.000Z"), 3, "3", 3.3f});
+        b.add(new Object[]{
+                Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f});
 
         view = b.unmodifiableView();
     }
