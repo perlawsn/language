@@ -15,6 +15,8 @@ public class SelectExecutor {
     private final SelectionQuery query;
     private final Select select;
 
+    private final Buffer buffer;
+
     private final Sampler sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
 
@@ -22,6 +24,9 @@ public class SelectExecutor {
         this.fpc = fpc;
         this.query = query;
         select = query.getSelect();
+
+        // TODO: forecast average buffer length
+        buffer = new ArrayBuffer(query.getSelectAttributes(), 512);
         sampler = createSampler(query.getSampling(),
                 query.getSelectAttributes());
     }
@@ -54,12 +59,12 @@ public class SelectExecutor {
 
         @Override
         public void error(Sampling source, Throwable error) {
-
+            // TODO: Escalate
         }
 
         @Override
         public void data(Sampling source, Object[] value) {
-
+            buffer.add(value);
         }
 
     }
