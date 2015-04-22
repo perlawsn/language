@@ -6,10 +6,10 @@ import org.dei.perla.core.utils.Errors;
 import java.util.Collection;
 
 /**
+ * Simple marking interface.
+ *
  * @author Guido Rota 16/03/15.
  */
 public interface Statement extends Clause {
-
-    public Statement bind(Collection<Attribute> atts, Errors err);
 
 }

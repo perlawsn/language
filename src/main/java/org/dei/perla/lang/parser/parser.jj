@@ -688,6 +688,7 @@ Selection SelectionStatement(Errors err) :
     Sampling sampling;
     Select sel;
     Expression where = Constant.TRUE;
+    ExecutionConditions ec = ExecutionConditions.ALL_NODES;
     WindowSize terminate = null;
 }
 {
@@ -728,7 +729,7 @@ Selection SelectionStatement(Errors err) :
 	    where = Expression(ExpressionType.SIMPLE, err, ids)
 	]
 	[
-		ExecutionConditionsClause(err, ids)
+		ec = ExecutionConditionsClause(err, ids)
 	]
 	[
 		terminate = TerminateAfterClause(err)
@@ -1052,7 +1053,7 @@ ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
 	[
 		r = RefreshClause()
 	]
-	{ return new ExecutionConditions(cond, specs, r); }
+	{ return ExecutionConditions.create(cond, specs, r, err); }
 }
 
 List<DataTemplate> NodeSpecifications(Set<String> ids) :
