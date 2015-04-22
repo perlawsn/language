@@ -1352,6 +1352,7 @@ public class ParserTest {
                 "execute if battery > 20"
         ));
         ExecutionConditions e = p.ExecutionConditionsClause(err, ids);
+        assertTrue(err.isEmpty());
         assertThat(e.getSpecs(), nullValue());
         assertThat(e.getRefresh(), equalTo(Refresh.NEVER));
 
@@ -1362,12 +1363,31 @@ public class ParserTest {
         ));
         ids.clear();
         e = p.ExecutionConditionsClause(err, ids);
+        assertTrue(err.isEmpty());
         assertThat(e.getSpecs().size(), equalTo(1));
         assertTrue(e.getSpecs().contains(
                 DataTemplate.create("temperature", TypeClass.INTEGER)));
         assertThat(e.getRefresh().getType(), equalTo(RefreshType.TIME));
         assertThat(e.getRefresh().getDuration(),
                 equalTo(Duration.ofMinutes(20)));
+
+        // Wrong ExecutionCondition clause
+        p.ReInit(new StringReader(
+                "execute refresh every 15 days"
+        ));
+        ids.clear();
+        e = p.ExecutionConditionsClause(err, ids);
+        assertFalse(err.isEmpty());
+
+        // Test if an error is generated when the condition always evaluates to
+        // false
+        err = new Errors();
+        p.ReInit(new StringReader(
+                "execute if 5 > 12"
+        ));
+        ids.clear();
+        e = p.ExecutionConditionsClause(err, ids);
+        assertFalse(err.isEmpty());
     }
 
 }

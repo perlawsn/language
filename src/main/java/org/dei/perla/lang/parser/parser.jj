@@ -1840,6 +1840,8 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
     		addError(msg, token, err);
     		return Constant.NULL;
     	}
+    	// Track all attribute identifier. They will later be referenced if
+    	// the query contains a EXECUTE ON NODES WITH ALL clause
     	ids.add(id);
     	return new Field(id);
     }

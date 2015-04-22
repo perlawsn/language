@@ -5,6 +5,7 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.Constant;
 import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.LogicValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,8 +47,15 @@ public final class ExecutionConditions implements Clause {
             List<DataTemplate> specs, Refresh refresh, Errors err) {
         if (cond == null && specs == null) {
             err.addError("Incomplete execution conditions, ");
-            return ALL_NODES;
+            return null;
         }
+
+        if (cond != null && cond instanceof Constant &&
+                cond.run(null, null) == LogicValue.FALSE) {
+            err.addError("Execution condition always evaluates to false");
+            return null;
+        }
+
         return new ExecutionConditions(cond, specs, refresh);
     }
 

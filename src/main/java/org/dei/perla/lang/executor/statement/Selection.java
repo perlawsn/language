@@ -64,8 +64,9 @@ public final class Selection implements Statement {
 
         List<Attribute> selAtts = new ArrayList<>();
         Select bselect = select.bind(atts, selAtts, err);
-        Sampling bsampling = sampling.bind(atts, err);
         Expression bwhere = where.bind(atts, selAtts, err);
+
+        Sampling bsampling = sampling.bind(atts, err);
         ExecutionConditions bcond = cond.bind(atts, err);
 
         if (!err.isEmpty()) {
