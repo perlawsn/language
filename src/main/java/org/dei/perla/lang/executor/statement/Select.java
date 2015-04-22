@@ -32,23 +32,23 @@ public final class Select implements Clause {
         this.def = def;
     }
 
-    protected List<Expression> getFields() {
+    public List<Expression> getFields() {
         return fields;
     }
 
-    protected WindowSize getUpTo() {
+    public WindowSize getUpTo() {
         return upto;
     }
 
-    protected GroupBy getGroupBy() {
+    public GroupBy getGroupBy() {
         return group;
     }
 
-    protected Expression getHaving() {
+    public Expression getHaving() {
         return having;
     }
 
-    protected Object[] getDefault() {
+    public Object[] getDefault() {
         return def;
     }
 

@@ -1410,6 +1410,7 @@ public class ParserTest {
                         "select room, avg(temperature, 1 minutes)" +
                         "group by room " +
                         "having temperature > 20 " +
+                        "up to 12 samples " +
                         "sampling every 20 seconds " +
                         "execute if power > 30 " +
                         "on nodes with all " +
@@ -1420,9 +1421,26 @@ public class ParserTest {
         SelectionQuery q = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
 
+        Select sel = q.getSelect();
+
+        WindowSize upto = sel.getUpTo();
+        assertThat(upto.getType(), equalTo(WindowType.SAMPLE));
+        assertThat(upto.getSamples(), equalTo(12));
+
+        GroupBy gb = sel.getGroupBy();
+        assertThat(gb.getGroups().size(), equalTo(1));
+
+        assertTrue(sel.getHaving() instanceof Comparison);
+        assertTrue(q.getSampling() instanceof SamplingIfEvery);
+
         WindowSize every = q.getEvery();
         assertThat(every.getType(), equalTo(WindowType.TIME));
         assertThat(every.getDuration(), equalTo(Duration.ofMinutes(20)));
+
+        ExecutionConditions ec = q.getExecutionConditions();
+        assertTrue(ec.getCondition() instanceof Comparison);
+        assertThat(ec.getRefresh().getType(), equalTo(RefreshType.TIME));
+        assertThat(ec.getRefresh().getDuration(), equalTo(Duration.ofHours(2)));
 
         WindowSize terminate = q.getTerminate();
         assertThat(terminate.getType(), equalTo(WindowType.TIME));
