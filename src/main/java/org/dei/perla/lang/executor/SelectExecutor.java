@@ -1,8 +1,12 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.core.fpc.Task;
+import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.statement.*;
+import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
 import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
 import java.util.List;
@@ -37,16 +41,15 @@ public class SelectExecutor {
     private final Sampler sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
     private final Runnable selectRunnable = new SelectRunnable();
+    private final TaskHandler refEvtHand = new EventRefreshHandler();
+    private final TaskHandler refDataHand = new RefreshDataHandler();
 
     private Future<?> selectFuture;
     private ScheduledFuture<?> everyTimer;
 
     private AtomicInteger status = new AtomicInteger(STOPPED);
 
-    // Number of times the sampling operation has been triggered
-    private volatile int triggered = 0;
-
-    // Sample count lock
+    // Select trigger lock
     private final Lock lk = new ReentrantLock();
 
     // Number of samples to receive before triggering a selection operation.
@@ -56,6 +59,9 @@ public class SelectExecutor {
     // Number of samples still to receive until the next selection operation is
     // triggered
     private int samplesLeft;
+
+    // Number of times the sampling operation has been triggered
+    private volatile int triggered = 0;
 
     public SelectExecutor(SelectionQuery query,
             QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
@@ -106,6 +112,15 @@ public class SelectExecutor {
             long periodMs = every.getDuration().toMillis();
             everyTimer = scheduleEveryTimer(periodMs);
         }
+
+        ExecutionConditions ec = query.getExecutionConditions();
+        Refresh ecr = ec.getRefresh();
+        switch (ecr.getType()) {
+            case TIME:
+                break;
+            case EVENT:
+                break;
+        }
     }
 
     private ScheduledFuture<?> scheduleEveryTimer(long periodMs) {
@@ -145,14 +160,13 @@ public class SelectExecutor {
 
         @Override
         public void data(Sampling source, Object[] value) {
-            buffer.add(value);
-            if (sampleCount == 0) {
-                // time-based every, nothing left to do
-                return;
-            }
-
             lk.lock();
             try {
+                buffer.add(value);
+                if (sampleCount == 0) {
+                    // time-based every, nothing left to do
+                    return;
+                }
                 samplesLeft--;
                 if (samplesLeft > 0) {
                     return;
@@ -184,8 +198,66 @@ public class SelectExecutor {
                 rs.forEach(r -> handler.data(query, r));
                 view.release();
 
-                triggered--;
-            } while (triggered > 0 && !Thread.interrupted());
+                lk.lock();
+                try {
+                    triggered--;
+                    if (triggered == 0) {
+                        return;
+                    }
+                } finally {
+                    lk.unlock();
+                }
+            } while (!Thread.interrupted());
+        }
+
+    }
+
+    /**
+     * Task handler employed to retrieve the data necessary for evaluating
+     * the execute-if condition
+     *
+     * @author Guido Rota 23/04/2014
+     */
+    private class RefreshDataHandler implements TaskHandler {
+
+        @Override
+        public void complete(Task task) {
+            // TODO: Escalate if running
+        }
+
+        @Override
+        public void data(Task task, Sample sample) {
+
+        }
+
+        @Override
+        public void error(Task task, Throwable cause) {
+            // TODO: Escalate error
+        }
+
+    }
+
+    /**
+     * Event handler employed to start a one-shot sampling to retrieve the
+     * execute-if condition
+     *
+     * @author Guido Rota 23/04/2015
+     */
+    private class EventRefreshHandler implements TaskHandler {
+
+        @Override
+        public void complete(Task task) {
+            // TODO: Escalate if
+        }
+
+        @Override
+        public void data(Task task, Sample sample) {
+            // TODO: check if the query can continue or not
+        }
+
+        @Override
+        public void error(Task task, Throwable cause) {
+            // TODO: Escalate error
         }
 
     }
