@@ -5,9 +5,9 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.statement.*;
 import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -21,6 +21,11 @@ public class SelectExecutor {
     private static final int PAUSED = 2;
     private static final int TERMINATED = 3;
 
+    private static final ExecutorService pool =
+            Executors.newCachedThreadPool();
+    private static final ScheduledExecutorService timer =
+            Executors.newSingleThreadScheduledExecutor();
+
     private final SelectionQuery query;
     private final Select select;
 
@@ -31,12 +36,18 @@ public class SelectExecutor {
 
     private final Sampler sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
-    private final Thread everyThread;
+    private final Runnable selectRunnable = new SelectRunnable();
 
+    private Future<?> selectFuture;
+    private ScheduledFuture<?> everyTimer;
+
+    private AtomicInteger status = new AtomicInteger(STOPPED);
+
+    // Number of times the sampling operation has been triggered
+    private volatile int triggered = 0;
+
+    // Sample count lock
     private final Lock lk = new ReentrantLock();
-    private volatile int status = STOPPED;
-
-    private final Condition selectCond = lk.newCondition();
 
     // Number of samples to receive before triggering a selection operation.
     // This value is used to reset the samplesLeft counter.
@@ -44,9 +55,7 @@ public class SelectExecutor {
 
     // Number of samples still to receive until the next selection operation is
     // triggered
-    private volatile int samplesLeft;
-
-    private final Duration everyPeriod;
+    private int samplesLeft;
 
     public SelectExecutor(SelectionQuery query,
             QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
@@ -60,22 +69,13 @@ public class SelectExecutor {
         sampler = createSampler(query.getSampling(),
                 query.getSelectAttributes());
 
-        everyThread = new Thread(new EveryRunnable());
         WindowSize every = query.getEvery();
-        switch (every.getType()) {
-            case SAMPLE:
-                sampleCount = every.getSamples();
-                samplesLeft = sampleCount;
-                everyPeriod = Duration.ZERO;
-                break;
-            case TIME:
-                sampleCount = 0;
-                samplesLeft = 0;
-                everyPeriod = every.getDuration();
-                break;
-            default:
-                throw new RuntimeException("Unkown WindowSize type found in " +
-                        "EVERY clause" + every.getType());
+        if (every.getType() == WindowType.SAMPLE) {
+            sampleCount = every.getSamples();
+            samplesLeft = sampleCount;
+        } else {
+            sampleCount = 0;
+            samplesLeft = 0;
         }
     }
 
@@ -96,25 +96,38 @@ public class SelectExecutor {
     }
 
     public void start() throws QueryException {
-        lk.lock();
-        try {
-            sampler.start();
-            everyThread.start();
-            // TODO: Complete
-            status = RUNNING;
-        } finally {
-            lk.unlock();
+        if (!status.compareAndSet(STOPPED, RUNNING)) {
+            return;
+        }
+
+        sampler.start();
+        WindowSize every = query.getEvery();
+        if (every.getType() == WindowType.TIME) {
+            long periodMs = every.getDuration().toMillis();
+            everyTimer = scheduleEveryTimer(periodMs);
         }
     }
 
+    private ScheduledFuture<?> scheduleEveryTimer(long periodMs) {
+        Runnable task = () -> {
+            // TODO: schedule new selection
+        };
+        return timer.scheduleWithFixedDelay(task, periodMs, periodMs,
+                TimeUnit.MILLISECONDS);
+    }
+
     public void stop() {
-        lk.lock();
-        try {
-            status = STOPPED;
-            sampler.stop();
-            everyThread.interrupt();
-        } finally {
-            lk.unlock();
+        int old = status.getAndSet(STOPPED);
+        if (old == STOPPED || old == TERMINATED) {
+            return;
+        }
+
+        sampler.stop();
+        if (everyTimer != null) {
+            everyTimer.cancel(false);
+        }
+        if (selectFuture != null) {
+            selectFuture.cancel(false);
         }
     }
 
@@ -132,14 +145,23 @@ public class SelectExecutor {
 
         @Override
         public void data(Sampling source, Object[] value) {
+            buffer.add(value);
+            if (sampleCount == 0) {
+                // time-based every, nothing left to do
+                return;
+            }
+
             lk.lock();
             try {
-                buffer.add(value);
-                if (samplesLeft > Integer.MIN_VALUE) {
-                    samplesLeft--;
+                samplesLeft--;
+                if (samplesLeft > 0) {
+                    return;
                 }
-                if (samplesLeft == 0) {
-                    selectCond.signal();
+
+                samplesLeft += sampleCount;
+                triggered++;
+                if (triggered == 1) {
+                    selectFuture = pool.submit(selectRunnable);
                 }
             } finally {
                 lk.unlock();
@@ -151,40 +173,19 @@ public class SelectExecutor {
     /**
      * @author Guido Rota 23/04/2015
      */
-    private class EveryRunnable implements Runnable {
+    private class SelectRunnable implements Runnable {
 
         @Override
         public void run() {
-            while (status == RUNNING && !Thread.interrupted()) {
-                try {
-                    waitEvery();
-                } catch (InterruptedException e) {
-                    if (status == RUNNING) {
-                        // TODO: escalate
-                    }
-                }
-
-                // TODO: check concurrency!!!
+            do {
+                // perform sampling
                 BufferView view = buffer.unmodifiableView();
-                List<Object[]> records = select.select(view);
-                // Distribute query output
-                records.forEach(r -> handler.data(query, r));
+                List<Object[]> rs = select.select(view);
+                rs.forEach(r -> handler.data(query, r));
                 view.release();
 
-                // Update samples left only after the selection is done
-                samplesLeft += sampleCount;
-            }
-        }
-
-        private void waitEvery() throws InterruptedException {
-            if (everyPeriod != Duration.ZERO) {
-                Thread.sleep(everyPeriod.toMillis());
-
-            } else {
-                while (samplesLeft > 0 && status == RUNNING) {
-                    selectCond.await();
-                }
-            }
+                triggered--;
+            } while (triggered > 0 && !Thread.interrupted());
         }
 
     }
