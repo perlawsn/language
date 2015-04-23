@@ -21,9 +21,11 @@ public class SelectExecutor {
     private static final int PAUSED = 2;
     private static final int TERMINATED = 3;
 
-    private final Fpc fpc;
     private final SelectionQuery query;
     private final Select select;
+
+    private final QueryHandler<SelectionQuery, Object[]> handler;
+    private final Fpc fpc;
 
     private final Buffer buffer;
 
@@ -35,19 +37,23 @@ public class SelectExecutor {
     private volatile int status = STOPPED;
 
     private final Condition selectCond = lk.newCondition();
+
     // Number of samples to receive before triggering a selection operation.
     // This value is used to reset the samplesLeft counter.
     private final int sampleCount;
+
     // Number of samples still to receive until the next selection operation is
     // triggered
     private volatile int samplesLeft;
 
     private final Duration everyPeriod;
 
-    public SelectExecutor(SelectionQuery query, Fpc fpc) {
-        this.fpc = fpc;
+    public SelectExecutor(SelectionQuery query,
+            QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
         this.query = query;
         select = query.getSelect();
+        this.fpc = fpc;
+        this.handler = handler;
 
         // TODO: forecast average buffer length
         buffer = new ArrayBuffer(query.getSelectAttributes(), 512);
@@ -102,7 +108,14 @@ public class SelectExecutor {
     }
 
     public void stop() {
-        throw new RuntimeException("unimplemented");
+        lk.lock();
+        try {
+            status = STOPPED;
+            sampler.stop();
+            everyThread.interrupt();
+        } finally {
+            lk.unlock();
+        }
     }
 
     /**
@@ -125,9 +138,7 @@ public class SelectExecutor {
                 if (samplesLeft > Integer.MIN_VALUE) {
                     samplesLeft--;
                 }
-                if (samplesLeft != 0) {
-                    samplesLeft--;
-                } else {
+                if (samplesLeft == 0) {
                     selectCond.signal();
                 }
             } finally {
@@ -144,7 +155,7 @@ public class SelectExecutor {
 
         @Override
         public void run() {
-            while (status == RUNNING) {
+            while (status == RUNNING && !Thread.interrupted()) {
                 try {
                     waitEvery();
                 } catch (InterruptedException e) {
@@ -153,7 +164,12 @@ public class SelectExecutor {
                     }
                 }
 
-                // TODO: perform selection
+                // TODO: check concurrency!!!
+                BufferView view = buffer.unmodifiableView();
+                List<Object[]> records = select.select(view);
+                // Distribute query output
+                records.forEach(r -> handler.data(query, r));
+                view.release();
 
                 // Update samples left only after the selection is done
                 samplesLeft += sampleCount;
@@ -165,7 +181,7 @@ public class SelectExecutor {
                 Thread.sleep(everyPeriod.toMillis());
 
             } else {
-                while (samplesLeft != 0 && status == RUNNING) {
+                while (samplesLeft > 0 && status == RUNNING) {
                     selectCond.await();
                 }
             }
