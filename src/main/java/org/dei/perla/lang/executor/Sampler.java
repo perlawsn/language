@@ -28,9 +28,16 @@ public interface Sampler {
 
     public static final String SAMP_ERROR = "Unexpected error while sampling";
 
-
+    /**
+     * Starts the sampling operation.
+     *
+     * @throws QueryException if the sampling operation cannot be started
+     */
     public void start() throws QueryException;
 
+    /**
+     * Stops the sampling operation
+     */
     public void stop();
 
     public boolean isRunning();
