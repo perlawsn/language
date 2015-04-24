@@ -17,8 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SamplerEvent implements Sampler {
 
-    private static final int STOPPED = 0;
-    private static final int STARTED = 1;
+    private static final int INITIALIZING = 0;
+    private static final int RUNNING = 1;
+    private static final int STOPPING = 2;
+    private static final int STOPPED = 3;
 
     private final SamplingEvent sampling;
     private final Fpc fpc;
@@ -45,9 +47,10 @@ public class SamplerEvent implements Sampler {
 
     @Override
     public void start() throws QueryException {
-        if (!status.compareAndSet(STOPPED, STARTED)) {
-            throw new IllegalStateException(
-                    "Cannot start, SamplerIfEvery is already running");
+        while (!status.compareAndSet(STOPPED, INITIALIZING)) {
+            if (isRunning()) {
+                return;
+            }
         }
 
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
@@ -56,22 +59,30 @@ public class SamplerEvent implements Sampler {
             throw new QueryException("Initialization of REFRESH ON EVENT " +
                     "sampling failed, cannot retrieve the required events");
         }
+
+        status.set(RUNNING);
     }
 
     @Override
     public void stop() {
-        if (!status.compareAndSet(STARTED, STOPPED)) {
-            return;
+        while (!status.compareAndSet(RUNNING, STOPPING)) {
+            if (!isRunning()) {
+                return;
+            }
         }
 
         if (evtTask != null) {
-            evtTask.stop();
+            Task t = evtTask;
+            evtTask = null;
+            t.stop();
         }
+
+        status.set(STOPPED);
     }
 
     @Override
     public boolean isRunning() {
-        return status.intValue() != STOPPED;
+        return status.intValue() <= RUNNING;
     }
 
     /**
@@ -82,10 +93,7 @@ public class SamplerEvent implements Sampler {
      * @param cause cause exception
      */
     private void handleError(String msg, Throwable cause) {
-        status.set(STOPPED);
-        if (evtTask != null) {
-            evtTask.stop();
-        }
+        stop();
         handler.error(sampling, new QueryException(msg, cause));
     }
 
@@ -110,7 +118,7 @@ public class SamplerEvent implements Sampler {
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status.intValue() == STOPPED) {
+            if (!isRunning()) {
                 return;
             }
 
@@ -119,7 +127,7 @@ public class SamplerEvent implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status.intValue() == STOPPED) {
+            if (!isRunning()) {
                 return;
             }
 
@@ -136,16 +144,14 @@ public class SamplerEvent implements Sampler {
 
         @Override
         public void complete(Task task) {
-            if (status.intValue() == STOPPED) {
-                return;
+            if (isRunning() && task == evtTask) {
+                handleError("REFRESH ON EVENT sampling stopped prematurely");
             }
-
-            handleError("REFRESH ON EVENT sampling stopped prematurely");
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status.intValue() == STOPPED) {
+            if (!isRunning()) {
                 return;
             }
 
@@ -154,7 +160,7 @@ public class SamplerEvent implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status.intValue() == STOPPED) {
+            if (!isRunning()) {
                 return;
             }
 

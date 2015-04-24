@@ -23,13 +23,10 @@ public final class Refresher {
     private static final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(12);
 
-    public static final String EVT_INIT_ERROR =
-            "Initialization of REFRESH ON EVENT sampling failed, cannot " +
-                    "retrieve the required events";
-
-    private static final int RUNNING = 0;
-    private static final int STOPPING = 1;
-    private static final int STOPPED = 2;
+    private static final int INITIALIZING = 0;
+    private static final int RUNNING = 1;
+    private static final int STOPPING = 2;
+    private static final int STOPPED = 3;
 
     private final Refresh refresh;
     private final QueryHandler<Refresh, Void> handler;
@@ -39,8 +36,8 @@ public final class Refresher {
 
     private final TaskHandler evtHand = new EventHandler();
 
-    private Task evtTask;
-    private ScheduledFuture<?> timer;
+    private volatile Task evtTask;
+    private volatile ScheduledFuture<?> timer;
 
     public Refresher(Refresh refresh, QueryHandler<Refresh, Void> handler,
             Fpc fpc) {
@@ -50,11 +47,11 @@ public final class Refresher {
     }
 
     public void start() throws QueryException {
-        do {
-            if (status.intValue() == RUNNING) {
+        while (!status.compareAndSet(STOPPED, INITIALIZING)) {
+            if (isRunning()) {
                 return;
             }
-        } while (!status.compareAndSet(STOPPED, RUNNING));
+        }
 
         switch (refresh.getType()) {
             case TIME:
@@ -67,6 +64,8 @@ public final class Refresher {
                 throw new RuntimeException("Unexpected " + refresh.getType()
                         + "refresh type");
         }
+
+        status.set(RUNNING);
     }
 
     private void startTimeRefresh() throws QueryException {
@@ -87,8 +86,10 @@ public final class Refresher {
     }
 
     public void stop() {
-        if (!status.compareAndSet(RUNNING, STOPPING)) {
-            return;
+        while (!status.compareAndSet(RUNNING, STOPPING)) {
+            if (!isRunning()) {
+                return;
+            }
         }
 
         if (evtTask != null) {
@@ -106,8 +107,31 @@ public final class Refresher {
     }
 
     public boolean isRunning() {
-        return status.intValue() == RUNNING;
+        return status.intValue() <= RUNNING;
     }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     * @param cause cause exception
+     */
+    private void handleError(String msg, Throwable cause) {
+        stop();
+        handler.error(refresh, new QueryException(msg, cause));
+    }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     */
+    private void handleError(String msg) {
+        handleError(msg, null);
+    }
+
 
     /**
      * TaskHandler for managing the events that trigger the refresh clause
@@ -119,16 +143,14 @@ public final class Refresher {
 
         @Override
         public void complete(Task task) {
-            if (status.intValue() == RUNNING) {
-                Exception e = new QueryException("REFRESH ON EVENT sampling " +
-                        "stopped prematurely");
-                handler.error(refresh, e);
+            if (isRunning() && task == evtTask) {
+                handleError("REFRESH ON EVENT sampling stopped prematurely");
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status.intValue() != RUNNING) {
+            if (!isRunning()) {
                 return;
             }
 
@@ -137,8 +159,11 @@ public final class Refresher {
 
         @Override
         public void error(Task task, Throwable cause) {
-            stop();
-            handler.error(refresh, cause);
+            if (!isRunning()) {
+                return;
+            }
+
+            handleError("REFRESH ON EVENT sampling generated an error", cause);
         }
 
     }
