@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Guido Rota 14/04/15.
  */
-public class SamplerEvent implements Sampler {
+public final class SamplerEvent implements Sampler {
 
     private static final int INITIALIZING = 0;
     private static final int RUNNING = 1;

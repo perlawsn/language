@@ -7,7 +7,6 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.statement.Refresh;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

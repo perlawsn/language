@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 22/04/15.
  */
-public class SelectExecutor {
+public final class SelectExecutor {
 
     private static final int STOPPED = 0;
     private static final int RUNNING = 1;
