@@ -96,6 +96,10 @@ public final class Refresher {
         }
     }
 
+    public boolean isRunning() {
+        return status.intValue() == RUNNING;
+    }
+
     /**
      * TaskHandler for managing the events that trigger the refresh clause
      * being executed

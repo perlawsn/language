@@ -15,6 +15,8 @@ public class LatchingQueryHandler<E extends Clause, T>
     private int waitCount;
     private Throwable error;
 
+    private int dataCount = 0;
+
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
 
@@ -52,6 +54,7 @@ public class LatchingQueryHandler<E extends Clause, T>
     public void data(E source, T value) {
         lk.lock();
         try {
+            dataCount++;
             if (waitCount == 0) {
                 return;
             }
@@ -60,6 +63,15 @@ public class LatchingQueryHandler<E extends Clause, T>
             if (waitCount == 0) {
                 cond.signalAll();
             }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    public int getDataCount() {
+        lk.lock();
+        try {
+            return dataCount;
         } finally {
             lk.unlock();
         }
