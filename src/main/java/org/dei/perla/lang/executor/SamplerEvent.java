@@ -53,7 +53,8 @@ public class SamplerEvent implements Sampler {
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
         if (evtTask == null) {
             status.set(STOPPED);
-            throw new QueryException(EVT_INIT_ERROR);
+            throw new QueryException("Initialization of REFRESH ON EVENT " +
+                    "sampling failed, cannot retrieve the required events");
         }
     }
 
@@ -122,7 +123,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handleError(SAMP_ERROR, cause);
+            handleError("Unexpected error while sampling", cause);
         }
 
     }
@@ -139,7 +140,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handleError(EVT_STOPPED_ERROR);
+            handleError("REFRESH ON EVENT sampling stopped prematurely");
         }
 
         @Override
@@ -157,7 +158,7 @@ public class SamplerEvent implements Sampler {
                 return;
             }
 
-            handleError(EVT_SAMPLING_ERROR, cause);
+            handleError("Sampling of REFRESH ON EVENT events failed", cause);
         }
 
     }

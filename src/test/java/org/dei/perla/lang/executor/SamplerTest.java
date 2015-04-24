@@ -111,24 +111,22 @@ public class SamplerTest {
                 new NoopQueryHandler<>());
         sampler.start();
         fpc.awaitPeriod(100);
-        assertTrue(fpc.hasPeriod(1000));
         assertTrue(fpc.hasPeriod(100));
-        assertThat(fpc.countPeriodic(), equalTo(2));
+        assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Change power level, check if sampling rate lowers
         vs.put(power, 70);
         fpc.setValues(vs);
         fpc.awaitPeriod(200);
-        assertTrue(fpc.hasPeriod(1000));
         assertTrue(fpc.hasPeriod(200));
-        assertThat(fpc.countPeriodic(), equalTo(2));
+        assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Change power level, check if sampling rate lowers
         vs.put(power, 10);
         fpc.setValues(vs);
         fpc.awaitPeriod(200);
-        assertTrue(fpc.hasPeriod(1000));
-        assertThat(fpc.countPeriodic(), equalTo(2));
+        assertTrue(fpc.hasPeriod(200));
+        assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Stop sampler
         sampler.stop();

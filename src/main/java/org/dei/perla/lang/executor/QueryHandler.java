@@ -7,7 +7,7 @@ import org.dei.perla.lang.executor.statement.Clause;
  */
 public interface QueryHandler<E extends Clause, T> {
 
-    public void error(E source, Throwable error);
+    public void error(E source, Throwable cause);
 
     public void data(E source, T value);
 

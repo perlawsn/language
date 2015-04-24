@@ -32,18 +32,20 @@ public final class SamplerIfEvery implements Sampler {
     private final List<Attribute> atts;
     private final Fpc fpc;
     private final QueryHandler<Sampling, Object[]> handler;
-    private final Refresh refresh;
     private final IfEvery ife;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler ifeHandler = new IfEveryHandler();
-    private final TaskHandler evtHandler = new EventHandler();
+    private final QueryHandler<Refresh, Void> refHandler = new RefreshHandler();
 
     private final Lock lk = new ReentrantLock();
     // Current status
     private volatile int status = STOPPED;
     // Current sampling rate
     private Duration rate = Duration.ofSeconds(0);
+
+    // Refresh clause executor
+    private final Refresher refresher;
 
     // Running sampling tasks
     private Task ifeTask = null;
@@ -60,9 +62,14 @@ public final class SamplerIfEvery implements Sampler {
         this.atts = atts;
         this.fpc = fpc;
         this.handler = handler;
-        this.refresh = sampling.getRefresh();
         this.ife = sampling.getIfEvery();
 
+        Refresh r = sampling.getRefresh();
+        if (r != Refresh.NEVER) {
+            refresher = new Refresher(r, refHandler, fpc);
+        } else {
+            refresher = null;
+        }
     }
 
     @Override
@@ -82,7 +89,8 @@ public final class SamplerIfEvery implements Sampler {
             status = INITIALIZING;
             Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
             if (t == null) {
-                throw new QueryException(IFE_INIT_ERROR);
+                throw new QueryException("Initialization of IF EVERY sampling" +
+                        " failed, cannot retrieve sample the required attributes");
             }
         } finally {
             lk.unlock();
@@ -91,11 +99,11 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public void stop() {
+        lk.lock();
         if (status == STOPPED) {
             return;
         }
 
-        lk.lock();
         try {
             status = STOPPED;
             if (ifeTask != null) {
@@ -106,6 +114,9 @@ public final class SamplerIfEvery implements Sampler {
             }
             if (evtTask != null) {
                 evtTask.stop();
+            }
+            if (refresher != null) {
+                refresher.stop();
             }
         } finally {
             lk.unlock();
@@ -144,35 +155,19 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            if (status == STOPPED) {
-                return;
-            }
-
             lk.lock();
             try {
-                switch (refresh.getType()) {
-                    case NEVER:
-                        return;
-                    case EVENT:
-                        if (evtTask != null) {
-                            return;
-                        }
-                        evtTask = fpc.async(refresh.getEvents(), false, evtHandler);
-                        if (evtTask == null) {
-                            handleError(EVT_INIT_ERROR);
-                        }
-                        break;
-                    case TIME:
-                        ifeTask = fpc.get(sampling.getIfEveryAttributes(), true,
-                                refresh.getDuration(), ifeHandler);
-                        if (ifeTask == null) {
-                            handleError(IFE_INIT_ERROR);
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException(
-                                "Unexpected refresh type " + refresh.getType());
+                if (status == STOPPED) {
+                    return;
                 }
+
+                if (refresher != null && !refresher.isRunning()) {
+                    refresher.start();
+                }
+
+            } catch (QueryException e) {
+                handleError("Error starting refresh execution in IF-EVERY " +
+                                "clause", e);
             } finally {
                 lk.unlock();
             }
@@ -180,12 +175,12 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status == STOPPED) {
-                return;
-            }
-
             lk.lock();
             try {
+                if (status == STOPPED) {
+                    return;
+                }
+
                 if (status == SAMPLING) {
                     Duration d = ife.run(sample.values());
                     if (d == rate) {
@@ -215,7 +210,8 @@ public final class SamplerIfEvery implements Sampler {
                 return;
             }
 
-            handleError(IFE_SAMPLING_ERROR, cause);
+            handleError("Sampling of IF EVERY sampling attributes failed",
+                    cause);
         }
 
     }
@@ -229,18 +225,18 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            if (status == STOPPED) {
-                return;
-            }
-
             lk.lock();
             try {
+                if (status == STOPPED) {
+                    return;
+                }
+
                 if (status == NEW_RATE) {
                     sampTask = fpc.get(atts, false, rate, sampHandler);
                     status = SAMPLING;
 
                 } else if (status == SAMPLING) {
-                    handleError(SAMP_STOPPED_ERROR);
+                    handleError("Sampling operation stopped prematurely");
                 }
             } finally {
                 lk.unlock();
@@ -249,61 +245,48 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status == STOPPED) {
-                return;
-            }
+            lk.lock();
+            try {
+                if (status == STOPPED) {
+                    return;
+                }
 
-            handler.data(sampling, sample.values());
+                handler.data(sampling, sample.values());
+            } finally {
+                lk.unlock();
+            }
         }
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status == STOPPED) {
-                return;
-            }
+            lk.lock();
+            try {
+                if (status == STOPPED) {
+                    return;
+                }
 
-            handleError(SAMP_ERROR, cause);
+                handleError("Unexpected error while sampling", cause);
+            } finally {
+                lk.unlock();
+            }
         }
 
     }
 
-    /**
-     * TaskHandler employed to sample the REFRESH ON events
-     *
-     * @author Guido Rota 09/04/2015
-     */
-    private class EventHandler implements TaskHandler {
+    private class RefreshHandler implements QueryHandler<Refresh, Void> {
 
         @Override
-        public void complete(Task task) {
-            lk.lock();
-            try {
-                if (status != STOPPED) {
-                    handleError(EVT_STOPPED_ERROR);
-                }
-            } finally {
-                lk.unlock();
-            }
+        public void error(Refresh source, Throwable cause) {
+            handleError("Refresh execution error in IF-EVERY clause", cause);
         }
 
         @Override
-        public void data(Task task, Sample sample) {
-            lk.lock();
-            try {
-                // Single shot sampling when the refresh event is triggered
-                Task t = fpc.get(sampling.getIfEveryAttributes(), true,
-                        ifeHandler);
-                if (t == null) {
-                    handleError(IFE_INIT_ERROR);
-                }
-            } finally {
-                lk.unlock();
+        public void data(Refresh source, Void value) {
+            Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+            if (t == null) {
+                handleError("Initialization of IF EVERY sampling" +
+                        " failed, cannot retrieve sample the required attributes");
             }
-        }
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            handleError(EVT_SAMPLING_ERROR, cause);
         }
 
     }
