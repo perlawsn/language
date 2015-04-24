@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -58,6 +59,7 @@ public class SamplerTest {
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
+        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -69,6 +71,7 @@ public class SamplerTest {
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
+        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(200);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -80,11 +83,13 @@ public class SamplerTest {
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
+        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Stop sampler
         sampler.stop();
+        assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
     }
@@ -132,6 +137,24 @@ public class SamplerTest {
         sampler.stop();
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
+
+        // Restart sampler
+        sampler.start();
+        assertTrue(sampler.isRunning());
+
+        // Change power level, check if sampling rate lowers
+        vs.put(power, 70);
+        fpc.setValues(vs);
+        fpc.awaitPeriod(200);
+        assertTrue(fpc.hasPeriod(200));
+        assertThat(fpc.countPeriodic(), equalTo(1));
+
+        // Change power level, check if sampling rate lowers
+        vs.put(power, 10);
+        fpc.setValues(vs);
+        fpc.awaitPeriod(200);
+        assertTrue(fpc.hasPeriod(200));
+        assertThat(fpc.countPeriodic(), equalTo(1));
     }
 
     @Test
@@ -156,6 +179,7 @@ public class SamplerTest {
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler<>());
         sampler.start();
+        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
         assertThat(fpc.countAsync(), equalTo(1));
@@ -178,6 +202,60 @@ public class SamplerTest {
 
         // Stop sampler
         sampler.stop();
+        assertFalse(sampler.isRunning());
+        assertThat(fpc.countPeriodic(), equalTo(0));
+        assertThat(fpc.countAsync(), equalTo(0));
+
+        // Restart sampler
+        sampler.start();
+        assertTrue(sampler.isRunning());
+
+        // Trigger event, check if sampling rate changes
+        vs.put(temperature, 35);
+        fpc.setValues(vs);
+        assertThat(fpc.countAsync(), equalTo(1));
+        fpc.triggerEvent();
+        fpc.awaitPeriod(500);
+        assertThat(fpc.countPeriodic(), equalTo(1));
+
+        // Trigger event, check if sampling rate changes
+        vs.put(temperature, 50);
+        fpc.setValues(vs);
+        assertThat(fpc.countAsync(), equalTo(1));
+        fpc.triggerEvent();
+        fpc.awaitPeriod(100);
+        assertThat(fpc.countPeriodic(), equalTo(1));
+    }
+
+    @Test
+    public void testSamplerIfEveryError() throws Exception {
+        Map<Attribute, Object> vs = new HashMap<>(values);
+        Errors err = new Errors();
+        Set<String> ids = new TreeSet<>();
+        Parser p = new Parser(new StringReader("sampling " +
+                "if temperature > 40 every 100 milliseconds " +
+                "if temperature > 30 every 500 milliseconds " +
+                "else every 1 seconds " +
+                "refresh on event fire"));
+
+        SamplingIfEvery samp = (SamplingIfEvery) p.SamplingClause(err, ids);
+        assertTrue(err.isEmpty());
+        SimulatorFpc fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+
+        vs.put(temperature, 25);
+        fpc.setValues(vs);
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
+                new NoopQueryHandler<>());
+        sampler.start();
+        assertTrue(sampler.isRunning());
+        fpc.awaitPeriod(1000);
+        assertThat(fpc.countPeriodic(), equalTo(1));
+        assertThat(fpc.countAsync(), equalTo(1));
+
+        fpc.triggerError();
+        assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
     }
@@ -199,6 +277,7 @@ public class SamplerTest {
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
         sampler.start();
+        assertTrue(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         assertThat(fpc.countAsync(), equalTo(1));
@@ -208,7 +287,33 @@ public class SamplerTest {
         assertThat(fpc.countAsync(), equalTo(1));
 
         sampler.stop();
+        assertFalse(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(0));
+    }
+
+    @Test
+    public void testSamplerEventError() throws Exception {
+        Map<Attribute, Object> vs = new HashMap<>(values);
+        Errors err = new Errors();
+        Set<String> ids = new TreeSet<>();
+        Parser p = new Parser(new StringReader("sampling on event fire"));
+        SamplingEvent samp = (SamplingEvent) p.SamplingClause(err, ids);
+        assertTrue(err.isEmpty());
+
+        SimulatorFpc fpc = new SimulatorFpc(vs);
+        samp = samp.bind(fpc.getAttributes(), err);
+        assertTrue(err.isEmpty());
+        LatchingQueryHandler<Sampling, Object[]> handler = new
+                LatchingQueryHandler<>(3);
+        SamplerEvent sampler = new SamplerEvent(samp,
+                Collections.emptyList(), fpc, handler);
+        sampler.start();
+        assertTrue(sampler.isRunning());
+
+        fpc.triggerError();
+        assertFalse(sampler.isRunning());
+        assertThat(fpc.countAsync(), equalTo(0));
+        assertThat(fpc.countPeriodic(), equalTo(0));
     }
 
 }

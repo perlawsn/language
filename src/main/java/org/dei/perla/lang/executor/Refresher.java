@@ -28,7 +28,8 @@ public final class Refresher {
                     "retrieve the required events";
 
     private static final int RUNNING = 0;
-    private static final int STOPPED = 1;
+    private static final int STOPPING = 1;
+    private static final int STOPPED = 2;
 
     private final Refresh refresh;
     private final QueryHandler<Refresh, Void> handler;
@@ -49,9 +50,11 @@ public final class Refresher {
     }
 
     public void start() throws QueryException {
-        if (!status.compareAndSet(STOPPED, RUNNING)) {
-            return;
-        }
+        do {
+            if (status.intValue() == RUNNING) {
+                return;
+            }
+        } while (!status.compareAndSet(STOPPED, RUNNING));
 
         switch (refresh.getType()) {
             case TIME:
@@ -84,7 +87,7 @@ public final class Refresher {
     }
 
     public void stop() {
-        if (!status.compareAndSet(RUNNING, STOPPED)) {
+        if (!status.compareAndSet(RUNNING, STOPPING)) {
             return;
         }
 
@@ -94,6 +97,8 @@ public final class Refresher {
         if (timer != null) {
             timer.cancel(false);
         }
+
+        status.set(STOPPED);
     }
 
     public boolean isRunning() {
@@ -128,7 +133,7 @@ public final class Refresher {
 
         @Override
         public void error(Task task, Throwable cause) {
-            status.set(STOPPED);
+            stop();
             handler.error(refresh, cause);
         }
 

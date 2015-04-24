@@ -24,7 +24,8 @@ public final class SamplerIfEvery implements Sampler {
     private static final int INITIALIZING = 0;
     private static final int NEW_RATE = 1;
     private static final int SAMPLING = 2;
-    private static final int STOPPED = 3;
+    private static final int STOPPING = 3;
+    private static final int STOPPED = 4;
 
     private final SamplingIfEvery sampling;
     // Attributes required by the data management section of the query
@@ -39,8 +40,9 @@ public final class SamplerIfEvery implements Sampler {
 
     // Current status
     private final AtomicInteger status = new AtomicInteger(STOPPED);
+
     // Current sampling rate
-    private Duration rate = Duration.ofSeconds(0);
+    private Duration rate = Duration.ZERO;
 
     // Refresh clause executor
     private final Refresher refresher;
@@ -72,15 +74,16 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public boolean isRunning() {
-        return status.intValue() != STOPPED;
+        return status.intValue() < STOPPING;
     }
 
     @Override
     public void start() throws QueryException {
-        if (!status.compareAndSet(STOPPED, INITIALIZING)) {
-            throw new IllegalStateException(
-                    "Cannot start, SamplerIfEvery is already running");
-        }
+        do {
+            if (status.intValue() < STOPPING) {
+                return;
+            }
+        } while (!status.compareAndSet(STOPPED, INITIALIZING));
 
         Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (t == null) {
@@ -91,7 +94,8 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public void stop() {
-        status.set(STOPPED);
+        status.set(STOPPING);
+        rate = Duration.ZERO;
 
         if (ifeTask != null) {
             ifeTask.stop();
@@ -108,6 +112,8 @@ public final class SamplerIfEvery implements Sampler {
         if (refresher != null) {
             refresher.stop();
         }
+
+        status.set(STOPPED);
     }
 
     /**
@@ -142,7 +148,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            if (status.intValue() == STOPPED) {
+            if (status.intValue() > STOPPING) {
                 return;
             }
 
@@ -178,7 +184,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status.intValue() == STOPPED) {
+            if (status.intValue() > STOPPING) {
                 return;
             }
 
@@ -206,7 +212,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void data(Task task, Sample sample) {
-            if (status.intValue() == STOPPED) {
+            if (status.intValue() > STOPPING) {
                 return;
             }
 
@@ -215,7 +221,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status.intValue() == STOPPED) {
+            if (status.intValue() > STOPPING) {
                 return;
             }
 
@@ -233,11 +239,19 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void error(Refresh source, Throwable cause) {
+            if (status.intValue() > STOPPING) {
+                return;
+            }
+
             handleError("Refresh execution error in IF-EVERY clause", cause);
         }
 
         @Override
         public void data(Refresh source, Void value) {
+            if (status.intValue() > STOPPING) {
+                return;
+            }
+
             Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
             if (t == null) {
                 handleError("Initialization of IF EVERY sampling" +

@@ -184,6 +184,20 @@ public class SelectExecutor {
 
     }
 
+    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+
+        @Override
+        public void error(Refresh source, Throwable cause) {
+
+        }
+
+        @Override
+        public void data(Refresh source, Void value) {
+
+        }
+
+    }
+
     /**
      * @author Guido Rota 23/04/2015
      */

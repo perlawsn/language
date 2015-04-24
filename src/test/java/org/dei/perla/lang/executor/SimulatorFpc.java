@@ -83,6 +83,19 @@ public class SimulatorFpc implements Fpc {
     }
 
     /**
+     * Triggers the production of an error
+     */
+    public void triggerError() {
+        lk.lock();
+        try {
+            periodicTasks.forEach(PeriodicSimTask::triggerError);
+            asyncTasks.forEach(AsyncSimTask::triggerError);
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
      * Sets the values used by the FPC to generate new samples. This method
      * can be used to inject specific output values for testing purposes.
      */
@@ -120,7 +133,8 @@ public class SimulatorFpc implements Fpc {
     public void awaitPeriod(long period) throws InterruptedException {
         lk.lock();
         try {
-            while (!periods.containsKey(period)) {
+            while (!periods.containsKey(period) ||
+                    periods.get(period) == 0) {
                 cond.await();
             }
         } finally {
@@ -311,6 +325,11 @@ public class SimulatorFpc implements Fpc {
             }
         }
 
+        protected void triggerError() {
+            Exception e = new RuntimeException("simulated error");
+            handler.error(this, e);
+        }
+
         @Override
         public boolean isRunning() {
             return running;
@@ -348,6 +367,11 @@ public class SimulatorFpc implements Fpc {
         protected void trigger() {
             Sample r = pipeline.run(newSample());
             handler.data(this, r);
+        }
+
+        protected void triggerError() {
+            Exception e = new RuntimeException("simulated error");
+            handler.error(this, e);
         }
 
         @Override
