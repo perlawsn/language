@@ -98,16 +98,19 @@ public final class SamplerIfEvery implements Sampler {
         rate = Duration.ZERO;
 
         if (ifeTask != null) {
-            ifeTask.stop();
+            Task t = ifeTask;
             ifeTask = null;
+            t.stop();
         }
         if (sampTask != null) {
-            sampTask.stop();
+            Task t = sampTask;
             sampTask = null;
+            t.stop();
         }
         if (evtTask != null) {
-            evtTask.stop();
+            Task t = evtTask;
             evtTask = null;
+            t.stop();
         }
         if (refresher != null) {
             refresher.stop();
@@ -205,7 +208,7 @@ public final class SamplerIfEvery implements Sampler {
         public void complete(Task task) {
             if (status.compareAndSet(NEW_RATE, SAMPLING)) {
                 sampTask = fpc.get(atts, false, rate, sampHandler);
-            } else if (status.intValue() == SAMPLING) {
+            } else if (status.intValue() == SAMPLING && task == sampTask) {
                 handleError("Sampling operation stopped prematurely");
             }
         }

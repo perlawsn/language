@@ -92,10 +92,14 @@ public final class Refresher {
         }
 
         if (evtTask != null) {
-            evtTask.stop();
+            Task t = evtTask;
+            evtTask = null;
+            t.stop();
         }
         if (timer != null) {
-            timer.cancel(false);
+            ScheduledFuture<?> t = timer;
+            timer = null;
+            t.cancel(false);
         }
 
         status.set(STOPPED);
