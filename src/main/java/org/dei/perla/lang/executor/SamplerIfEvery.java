@@ -41,7 +41,7 @@ public final class SamplerIfEvery implements Sampler {
     private final ReadWriteLock lk = new ReentrantReadWriteLock();
 
     // Current status
-    private volatile int status = STOPPED;
+    private int status = STOPPED;
 
     // Current sampling rate
     private Duration rate = Duration.ZERO;

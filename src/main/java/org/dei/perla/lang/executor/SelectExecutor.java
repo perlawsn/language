@@ -117,9 +117,11 @@ public final class SelectExecutor {
         Refresh ecr = ec.getRefresh();
         switch (ecr.getType()) {
             case TIME:
-                break;
+                // TODO: implement
+                throw new RuntimeException("unimplemented");
             case EVENT:
-                break;
+                // TODO: implement
+                throw new RuntimeException("unimplemented");
         }
     }
 
@@ -145,6 +147,7 @@ public final class SelectExecutor {
             selectFuture.cancel(false);
         }
     }
+
 
     /**
      * Sampling handler class
@@ -172,6 +175,7 @@ public final class SelectExecutor {
                     return;
                 }
 
+                // TODO: use CAS?
                 samplesLeft += sampleCount;
                 triggered++;
                 if (triggered == 1) {
@@ -183,6 +187,7 @@ public final class SelectExecutor {
         }
 
     }
+
 
     private class RefreshHandler implements QueryHandler<Refresh, Void> {
 
@@ -197,6 +202,7 @@ public final class SelectExecutor {
         }
 
     }
+
 
     /**
      * @author Guido Rota 23/04/2015
