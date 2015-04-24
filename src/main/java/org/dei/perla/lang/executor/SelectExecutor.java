@@ -43,8 +43,6 @@ public class SelectExecutor {
     private final Sampler sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
     private final Runnable selectRunnable = new SelectRunnable();
-    private final TaskHandler refEvtHand = new EventRefreshHandler();
-    private final TaskHandler refDataHand = new RefreshDataHandler();
 
     private Future<?> selectFuture;
     private ScheduledFuture<?> everyTimer;
@@ -210,56 +208,6 @@ public class SelectExecutor {
                     lk.unlock();
                 }
             } while (!Thread.interrupted());
-        }
-
-    }
-
-    /**
-     * Task handler employed to retrieve the data necessary for evaluating
-     * the execute-if condition
-     *
-     * @author Guido Rota 23/04/2014
-     */
-    private class RefreshDataHandler implements TaskHandler {
-
-        @Override
-        public void complete(Task task) {
-            // TODO: Escalate if running
-        }
-
-        @Override
-        public void data(Task task, Sample sample) {
-
-        }
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            // TODO: Escalate error
-        }
-
-    }
-
-    /**
-     * Event handler employed to start a one-shot sampling to retrieve the
-     * execute-if condition
-     *
-     * @author Guido Rota 23/04/2015
-     */
-    private class EventRefreshHandler implements TaskHandler {
-
-        @Override
-        public void complete(Task task) {
-            // TODO: Escalate if
-        }
-
-        @Override
-        public void data(Task task, Sample sample) {
-            // TODO: check if the query can continue or not
-        }
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            // TODO: Escalate error
         }
 
     }

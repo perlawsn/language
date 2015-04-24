@@ -13,8 +13,7 @@ import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -38,9 +37,8 @@ public final class SamplerIfEvery implements Sampler {
     private final TaskHandler ifeHandler = new IfEveryHandler();
     private final QueryHandler<Refresh, Void> refHandler = new RefreshHandler();
 
-    private final Lock lk = new ReentrantLock();
     // Current status
-    private volatile int status = STOPPED;
+    private final AtomicInteger status = new AtomicInteger(STOPPED);
     // Current sampling rate
     private Duration rate = Duration.ofSeconds(0);
 
@@ -74,52 +72,41 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public boolean isRunning() {
-        return status != STOPPED;
+        return status.intValue() != STOPPED;
     }
 
     @Override
     public void start() throws QueryException {
-        if (status != STOPPED) {
+        if (!status.compareAndSet(STOPPED, INITIALIZING)) {
             throw new IllegalStateException(
                     "Cannot start, SamplerIfEvery is already running");
         }
 
-        lk.lock();
-        try {
-            status = INITIALIZING;
-            Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
-            if (t == null) {
-                throw new QueryException("Initialization of IF EVERY sampling" +
-                        " failed, cannot retrieve sample the required attributes");
-            }
-        } finally {
-            lk.unlock();
+        Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+        if (t == null) {
+            throw new QueryException("Initialization of IF EVERY sampling" +
+                    " failed, cannot retrieve sample the required attributes");
         }
     }
 
     @Override
     public void stop() {
-        lk.lock();
-        if (status == STOPPED) {
-            return;
-        }
+        status.set(STOPPED);
 
-        try {
-            status = STOPPED;
-            if (ifeTask != null) {
-                ifeTask.stop();
-            }
-            if (sampTask != null) {
-                sampTask.stop();
-            }
-            if (evtTask != null) {
-                evtTask.stop();
-            }
-            if (refresher != null) {
-                refresher.stop();
-            }
-        } finally {
-            lk.unlock();
+        if (ifeTask != null) {
+            ifeTask.stop();
+            ifeTask = null;
+        }
+        if (sampTask != null) {
+            sampTask.stop();
+            sampTask = null;
+        }
+        if (evtTask != null) {
+            evtTask.stop();
+            evtTask = null;
+        }
+        if (refresher != null) {
+            refresher.stop();
         }
     }
 
@@ -155,58 +142,43 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            lk.lock();
-            try {
-                if (status == STOPPED) {
-                    return;
-                }
+            if (status.intValue() == STOPPED) {
+                return;
+            }
 
+            try {
                 if (refresher != null && !refresher.isRunning()) {
                     refresher.start();
                 }
-
             } catch (QueryException e) {
                 handleError("Error starting refresh execution in IF-EVERY " +
                                 "clause", e);
-            } finally {
-                lk.unlock();
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            lk.lock();
-            try {
-                if (status == STOPPED) {
+            if (status.compareAndSet(SAMPLING, NEW_RATE)) {
+                Duration d = ife.run(sample.values());
+                if (d == rate) {
+                    // Set the status back to sampling if the new sampling rate
+                    // is the same as the old one
+                    status.set(SAMPLING);
                     return;
                 }
-
-                if (status == SAMPLING) {
-                    Duration d = ife.run(sample.values());
-                    if (d == rate) {
-                        // Set the status back to sampling if the new sampling rate
-                        // is the same as the old one
-                        return;
-                    }
-                    status = NEW_RATE;
-                    rate = d;
-                    sampTask.stop();
-                    // The new sampling rate will be set in the SamplingHandler
-
-                } else if (status == INITIALIZING) {
-                    Duration d = ife.run(sample.values());
-                    rate = d;
-                    sampTask = fpc.get(atts, false, rate, sampHandler);
-                    status = SAMPLING;
-                }
-            } finally {
-                lk.unlock();
+                rate = d;
+                sampTask.stop();
+                // The new sampling rate will be set in the SamplingHandler
+            } else if (status.compareAndSet(INITIALIZING, SAMPLING)) {
+                Duration d = ife.run(sample.values());
+                rate = d;
+                sampTask = fpc.get(atts, false, rate, sampHandler);
             }
         }
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (status == STOPPED) {
+            if (status.intValue() == STOPPED) {
                 return;
             }
 
@@ -225,54 +197,38 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            lk.lock();
-            try {
-                if (status == STOPPED) {
-                    return;
-                }
-
-                if (status == NEW_RATE) {
-                    sampTask = fpc.get(atts, false, rate, sampHandler);
-                    status = SAMPLING;
-
-                } else if (status == SAMPLING) {
-                    handleError("Sampling operation stopped prematurely");
-                }
-            } finally {
-                lk.unlock();
+            if (status.compareAndSet(NEW_RATE, SAMPLING)) {
+                sampTask = fpc.get(atts, false, rate, sampHandler);
+            } else if (status.intValue() == SAMPLING) {
+                handleError("Sampling operation stopped prematurely");
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            lk.lock();
-            try {
-                if (status == STOPPED) {
-                    return;
-                }
-
-                handler.data(sampling, sample.values());
-            } finally {
-                lk.unlock();
+            if (status.intValue() == STOPPED) {
+                return;
             }
+
+            handler.data(sampling, sample.values());
         }
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.lock();
-            try {
-                if (status == STOPPED) {
-                    return;
-                }
-
-                handleError("Unexpected error while sampling", cause);
-            } finally {
-                lk.unlock();
+            if (status.intValue() == STOPPED) {
+                return;
             }
+
+            handleError("Unexpected error while sampling", cause);
         }
 
     }
 
+    /**
+     * Handler for the refresh clause executor
+     *
+     * @author Guido Rota 24/04/2015
+     */
     private class RefreshHandler implements QueryHandler<Refresh, Void> {
 
         @Override
