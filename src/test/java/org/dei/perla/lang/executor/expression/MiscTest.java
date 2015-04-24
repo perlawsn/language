@@ -3,9 +3,9 @@ package org.dei.perla.lang.executor.expression;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.ArrayBuffer;
-import org.dei.perla.lang.executor.Buffer;
-import org.dei.perla.lang.executor.BufferView;
+import org.dei.perla.lang.executor.buffer.ArrayBuffer;
+import org.dei.perla.lang.executor.buffer.Buffer;
+import org.dei.perla.lang.executor.buffer.BufferView;
 import org.junit.Test;
 
 import java.time.Instant;

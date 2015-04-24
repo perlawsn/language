@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor;
+package org.dei.perla.lang.executor.buffer;
 
 /**
  * The implementation as an abstract class was chosen instead of an

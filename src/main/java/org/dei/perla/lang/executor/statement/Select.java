@@ -2,10 +2,9 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.BufferView;
+import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.executor.expression.Expression;
 import org.dei.perla.lang.executor.expression.LogicValue;
-import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
 import java.util.ArrayList;
 import java.util.Collection;

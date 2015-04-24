@@ -5,8 +5,10 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.lang.executor.buffer.ArrayBuffer;
+import org.dei.perla.lang.executor.buffer.Buffer;
+import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.executor.statement.*;
-import org.dei.perla.lang.executor.statement.Refresh.RefreshType;
 import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
 import java.util.List;

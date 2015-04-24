@@ -2,7 +2,7 @@ package org.dei.perla.lang.executor.expression;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.BufferView;
+import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.executor.statement.WindowSize;
 
 import java.time.Instant;
