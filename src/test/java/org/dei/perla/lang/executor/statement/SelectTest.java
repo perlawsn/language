@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -63,6 +64,7 @@ public class SelectTest {
 
         view = b.unmodifiableView();
     }
+
     @Test
     public void plainSelect() throws InterruptedException {
         Errors err = new Errors();
@@ -74,8 +76,10 @@ public class SelectTest {
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE,
                 Constant.TRUE, new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -103,8 +107,10 @@ public class SelectTest {
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -133,8 +139,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));
@@ -163,8 +171,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(Duration.ofSeconds(10));
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -194,8 +204,10 @@ public class SelectTest {
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
                 new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));
@@ -228,8 +240,10 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, having, new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -274,6 +288,7 @@ public class SelectTest {
                 new Object[0]);
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(2));
@@ -319,8 +334,10 @@ public class SelectTest {
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, having, def);
-        sel.bind(atts, atts, err);
+        assertFalse(sel.isComplete());
+        sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(1));
@@ -342,8 +359,10 @@ public class SelectTest {
         GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
         Select sel = new Select(fields, WindowSize.ONE, group,
                 Constant.TRUE, new Object[0]);
+        assertFalse(sel.isComplete());
         sel = sel.bind(atts, atts, err);
         assertTrue(err.isEmpty());
+        assertTrue(sel.isComplete());
         List<Object[]> samples = sel.select(view);
 
         assertThat(samples.size(), equalTo(3));

@@ -3,12 +3,14 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.executor.expression.*;
 import org.dei.perla.lang.parser.Parser;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
@@ -20,30 +22,56 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectionQueryTest {
 
-    private static final Attribute temp =
+    private static final Attribute tempAtt =
             Attribute.create("temperature", DataType.INTEGER);
-    private static final Attribute hum =
+    private static final Attribute humAtt =
             Attribute.create("humidity", DataType.INTEGER);
+    private static final Attribute alarmAtt =
+            Attribute.create("alarm", DataType.BOOLEAN);
 
     private static final List<Attribute> atts = Arrays.asList(new Attribute[]{
-            temp,
-            hum
+            tempAtt,
+            humAtt,
+            alarmAtt
     });
 
+    private static final Expression tempField = new Field("temperature");
+    private static final Expression humField = new Field("humidity");
+
     @Test
-    public void testBinding() throws Exception {
+    public void testSamplingQuery() throws Exception {
         Errors err = new Errors();
-
-        Parser p = new Parser(new StringReader(
-                "every 1 samples " +
-                        "select temperature, humidity " +
-                        "sampling every 300 milliseconds "
-        ));
-
-        SelectionQuery s = p.SelectionStatement(err);
+        List<Expression> fields = new ArrayList<>();
+        fields.add(tempField);
+        fields.add(humField);
+        fields.add(Aggregate.createSum(tempField, new WindowSize(5),
+                null, err));
         assertTrue(err.isEmpty());
-        assertFalse(s.isComplete());
-        s.bind(atts);
-        assertTrue(s.isComplete());
+
+        Expression having = Comparison.createGE(humField,
+                Constant.INTEGER_0, err);
+        assertTrue(err.isEmpty());
+
+        Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE, having,
+                new Object[0]);
+        assertTrue(err.isEmpty());
+
+        Set<String> events = new HashSet<>();
+        events.add("alarm");
+        Sampling samp = new SamplingEvent(events);
+
+        SelectionQuery query = new SelectionQuery(sel, WindowSize.ONE, samp,
+                Constant.TRUE, ExecutionConditions.ALL_NODES, null);
+
+        assertThat(query.getSelect(), equalTo(sel));
+        assertThat(query.getSampling(), equalTo(samp));
+        assertThat(query.getEvery(), equalTo(WindowSize.ONE));
+        assertThat(query.getTerminate(), equalTo(null));
+        assertThat(query.getExecutionConditions(),
+                equalTo(ExecutionConditions.ALL_NODES));
+
+        query = query.bind(atts);
+        assertTrue(query.isComplete());
     }
+
 }

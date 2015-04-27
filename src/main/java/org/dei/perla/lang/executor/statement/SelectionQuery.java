@@ -80,7 +80,7 @@ public final class SelectionQuery implements Statement {
 
     @Override
     public boolean isComplete() {
-        return select.isComplete() && sampling.isComplete();
+        return select.isComplete() && sampling.isComplete() && cond.isComplete();
     }
 
     public SelectionQuery bind(Collection<Attribute> atts) throws BindingException {

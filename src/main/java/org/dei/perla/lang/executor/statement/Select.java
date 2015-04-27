@@ -53,7 +53,13 @@ public final class Select implements Clause {
 
     @Override
     public boolean isComplete() {
-        throw new RuntimeException("unimplemented");
+        for (Expression f : fields) {
+            if (!f.isComplete()) {
+                return false;
+            }
+        }
+
+        return group.isComplete() && having.isComplete();
     }
 
     public Select bind(Collection<Attribute> atts,

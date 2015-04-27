@@ -50,7 +50,7 @@ public class SelectExecutorTest {
 
         SelectionQuery s = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
-        s.bind(atts);
+        s = s.bind(atts);
         assertTrue(s.isComplete());
     }
 
