@@ -110,4 +110,9 @@ public final class Constant extends Expression {
         return value;
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append(value);
+    }
+
 }

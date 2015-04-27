@@ -207,4 +207,15 @@ public final class Comparison extends Expression {
         return LogicValue.fromBoolean(res);
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(")
+                .append(e1)
+                .append(" ")
+                .append(op)
+                .append(" ")
+                .append(e2)
+                .append(")");
+    }
+
 }

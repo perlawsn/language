@@ -77,4 +77,11 @@ public final class BitwiseNot extends Expression {
         return ~(Integer) o;
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("~(")
+                .append(e)
+                .append(")");
+    }
+
 }

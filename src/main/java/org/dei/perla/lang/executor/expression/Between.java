@@ -108,4 +108,12 @@ public final class Between extends Expression {
         }
     }
 
+    @Override
+    public void buildString(StringBuilder bld) {
+        bld.append("BETWEEN ")
+                .append(min)
+                .append(" AND ")
+                .append(max);
+    }
+
 }

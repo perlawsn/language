@@ -14,15 +14,15 @@ public enum ComparisonOperation {
     EQ("="),
     NE("!=");
 
-    private final String name;
+    private final String symbol;
 
-    ComparisonOperation(String name) {
-        this.name = name;
+    ComparisonOperation(String symbol) {
+        this.symbol = symbol;
     }
 
     @Override
     public String toString() {
-        return name;
+        return symbol;
     }
 
 }

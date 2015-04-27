@@ -13,15 +13,15 @@ public enum ArithmeticOperation {
     DIVISION("/"),
     MODULO("%");
 
-    private final String name;
+    private final String symbol;
 
-    ArithmeticOperation(String name) {
-        this.name = name;
+    ArithmeticOperation(String symbol) {
+        this.symbol = symbol;
     }
 
     @Override
     public String toString() {
-        return name;
+        return symbol;
     }
 
 }

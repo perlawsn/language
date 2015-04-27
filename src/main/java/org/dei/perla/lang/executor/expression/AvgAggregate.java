@@ -102,4 +102,15 @@ public final class AvgAggregate extends Aggregate {
         }
     }
 
+    @Override
+    public void buildString(StringBuilder bld) {
+        bld.append("AVG(")
+                .append(e)
+                .append(", ")
+                .append("ws")
+                .append(", ")
+                .append("filter")
+                .append(")");
+    }
+
 }

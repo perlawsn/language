@@ -13,15 +13,15 @@ public enum BitwiseOperation {
     RSH(">>"),
     LSH("<<");
 
-    private final String name;
+    private final String symbol;
 
-    BitwiseOperation(String name) {
-        this.name = name;
+    BitwiseOperation(String symbol) {
+        this.symbol = symbol;
     }
 
     @Override
     public String toString() {
-        return name;
+        return symbol;
     }
 
 }

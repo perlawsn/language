@@ -82,4 +82,11 @@ public final class CastFloat extends Expression {
         return ((Integer) o).floatValue();
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("FLOAT( ")
+                .append(e)
+                .append(")");
+    }
+
 }

@@ -133,4 +133,13 @@ public abstract class Expression {
      */
     public abstract Object run(Object[] sample, BufferView buffer);
 
+    @Override
+    public final String toString() {
+        StringBuilder bld = new StringBuilder();
+        buildString(bld);
+        return bld.toString();
+    }
+
+    protected abstract void buildString(StringBuilder bld);
+
 }

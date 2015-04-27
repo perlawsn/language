@@ -81,4 +81,11 @@ public final class CastInteger extends Expression {
         return ((Float) o).intValue();
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("INTEGER( ")
+                .append(e)
+                .append(")");
+    }
+
 }

@@ -189,4 +189,15 @@ public final class Bitwise extends Expression {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(")
+                .append(e1)
+                .append(" ")
+                .append(op)
+                .append(" ")
+                .append(e2)
+                .append(")");
+    }
+
 }
