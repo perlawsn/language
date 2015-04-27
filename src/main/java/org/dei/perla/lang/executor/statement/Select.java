@@ -53,7 +53,7 @@ public final class Select implements Clause {
 
     @Override
     public boolean isComplete() {
-        return false;
+        throw new RuntimeException("unimplemented");
     }
 
     public Select bind(Collection<Attribute> atts,

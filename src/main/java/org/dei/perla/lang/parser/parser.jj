@@ -412,7 +412,7 @@ TOKEN :
     |
 	< TIMEUNIT_H:  "hours"        | "h"  >
     |
-	< TIMEUNIT_MS: "milliseconds" | "ms" >
+	< TIMEUNIT_MS: "milliseconds" | "millis" | "ms" >
     |
 	< TIMEUNIT_D:  "days"         | "d"  >
 }
