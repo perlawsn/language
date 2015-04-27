@@ -45,7 +45,7 @@ public class SelectionQueryTest {
         fields.add(tempField);
         fields.add(humField);
         fields.add(Aggregate.createSum(tempField, new WindowSize(5),
-                null, err));
+                Constant.TRUE, err));
         assertTrue(err.isEmpty());
 
         Expression having = Comparison.createGE(humField,

@@ -21,26 +21,24 @@ public final class CountAggregate extends Aggregate {
      * created using the static {@code create} method.
      */
     private CountAggregate(WindowSize ws, Expression filter) {
-        super(null, ws, filter, DataType.INTEGER);
+        super(Constant.NULL, ws, filter, DataType.INTEGER);
     }
 
     /**
      * Creates a new {@code CountAggregate} expression node.
      *
      * @param ws portion of buffer to aggregate
-     * @param filter optional filtering expression to determine which samples
-     *               must be aggregated
+     * @param filter filtering expression to determine which samples must be
+     *               aggregated
      * @param err error tracking object
      * @return new {@code CountAggregate} instance
      */
     public static Expression create(WindowSize ws,
             Expression filter, Errors err) {
-        if (filter != null) {
-            if (filter.getType() != null &&
-                    filter.getType() != DataType.BOOLEAN) {
-                err.addError("Aggregation filter must be of type boolean");
-                return Constant.NULL;
-            }
+        if (filter.getType() != null &&
+                filter.getType() != DataType.BOOLEAN) {
+            err.addError("Aggregation filter must be of type boolean");
+            return Constant.NULL;
         }
 
         return new CountAggregate(ws, filter);
@@ -49,10 +47,7 @@ public final class CountAggregate extends Aggregate {
     @Override
     public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        Expression bf = null;
-        if (filter != null) {
-            bf = filter.bind(atts, bound, err);
-        }
+        Expression bf = filter.bind(atts, bound, err);
         return create(ws, bf, err);
     }
 

@@ -118,11 +118,6 @@ public final class ArrayBufferView extends ArrayBufferReleaser
 
     @Override
     public void forEach(BiConsumer<Object[], BufferView> c, Expression e) {
-        if (e == null) {
-            forEach(c);
-            return;
-        }
-
         for (int i = oldest; i <= newest; i++) {
             LogicValue cond = (LogicValue) e.run(data[i], this);
             if (!LogicValue.toBoolean(cond)) {

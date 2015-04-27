@@ -492,7 +492,7 @@ public class ParserTest {
         e = p.Aggregate(err, ids);
         assertTrue(e instanceof CountAggregate);
         agg = (Aggregate) e;
-        assertThat(agg.getOperand(), nullValue());
+        assertThat(agg.getOperand(), equalTo(Constant.NULL));
         assertThat(agg.getWindowSize(), equalTo(new WindowSize(10)));
         assertThat(agg.getFilter(), equalTo(Constant.TRUE));
 
@@ -500,7 +500,7 @@ public class ParserTest {
         e = p.Aggregate(err, ids);
         assertTrue(e instanceof CountAggregate);
         agg = (Aggregate) e;
-        assertThat(agg.getOperand(), nullValue());
+        assertThat(agg.getOperand(), equalTo(Constant.NULL));
         assertThat(agg.getWindowSize(),
                 equalTo(new WindowSize(Duration.ofSeconds(10))));
     }

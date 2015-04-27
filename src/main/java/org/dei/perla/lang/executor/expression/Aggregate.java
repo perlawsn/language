@@ -106,13 +106,7 @@ public abstract class Aggregate extends Expression {
 
     @Override
     public boolean isComplete() {
-        if (e != null && !e.isComplete()) {
-            return false;
-        } else if (filter != null && !filter.isComplete()) {
-            return false;
-        } else {
-            return true;
-        }
+        return e.isComplete() && filter.isComplete();
     }
 
     @Override

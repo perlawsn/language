@@ -102,7 +102,8 @@ public class SelectTest {
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(3), null, err));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(3),
+                Constant.TRUE, err));
         assertTrue(err.isEmpty());
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE, Constant.TRUE,
@@ -199,7 +200,8 @@ public class SelectTest {
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null, err));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(5),
+                Constant.TRUE, err));
 
         WindowSize upto = new WindowSize(3);
         Select sel = new Select(fields, upto, GroupBy.NONE, Constant.TRUE,
@@ -276,7 +278,8 @@ public class SelectTest {
         fields.add(intExpr);
         fields.add(stringExpr);
         fields.add(floatExpr);
-        fields.add(Aggregate.createSum(intExpr, new WindowSize(5), null, err));
+        fields.add(Aggregate.createSum(intExpr, new WindowSize(5),
+                Constant.TRUE, err));
         assertTrue(err.isEmpty());
 
         Expression having = Comparison.createNE(intExpr,

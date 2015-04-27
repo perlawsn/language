@@ -29,8 +29,8 @@ public final class AvgAggregate extends Aggregate {
      *
      * @param e expression to average
      * @param ws portion of buffer to aggregate
-     * @param filter optional filtering expression to determine which samples
-     *               must be aggregated
+     * @param filter filtering expression to determine which samples must be
+     *               aggregated
      * @param err error tracking object
      * @return new {@code AvgAggregate} instance
      */
@@ -43,12 +43,10 @@ public final class AvgAggregate extends Aggregate {
             return Constant.NULL;
         }
 
-        if (filter != null) {
-            if (filter.getType() != null &&
-                    filter.getType() != DataType.BOOLEAN) {
-                err.addError("Aggregation filter must be of type boolean");
-                return Constant.NULL;
-            }
+        if (filter.getType() != null &&
+                filter.getType() != DataType.BOOLEAN) {
+            err.addError("Aggregation filter must be of type boolean");
+            return Constant.NULL;
         }
 
         return new AvgAggregate(e, ws, filter);
@@ -58,10 +56,7 @@ public final class AvgAggregate extends Aggregate {
     public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
         Expression be = e.bind(atts, bound, err);
-        Expression bf = null;
-        if (filter != null) {
-            bf = filter.bind(atts, bound, err);
-        }
+        Expression bf = filter.bind(atts, bound, err);
         return create(be, ws, bf, err);
     }
 
