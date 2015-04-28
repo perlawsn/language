@@ -74,13 +74,6 @@ public class SelectExecutorTest {
         assertFalse(exec.isRunning());
         Thread.sleep(300);
         assertThat(handler.getDataCount(), equalTo(count));
-
-
-        // Test restart
-        exec.start();
-        assertTrue(exec.isRunning());
-        Thread.sleep(300);
-        assertThat(handler.getDataCount(), greaterThan(count));
     }
 
     @Test
@@ -114,13 +107,6 @@ public class SelectExecutorTest {
         assertFalse(exec.isRunning());
         Thread.sleep(300);
         assertThat(handler.getDataCount(), equalTo(count));
-
-
-        // Test restart
-        exec.start();
-        assertTrue(exec.isRunning());
-        Thread.sleep(300);
-        assertThat(handler.getDataCount(), greaterThan(count));
     }
 
     @Test

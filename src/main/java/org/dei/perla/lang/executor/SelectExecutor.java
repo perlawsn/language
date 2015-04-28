@@ -21,11 +21,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class SelectExecutor {
 
-    // TODO: add a TERMINATED condition to avoid re-starting of an executor
-    // whose terminate-after has already expired
-    private static final int RUNNING = 1;
-    private static final int PAUSED = 2;
-    private static final int STOPPED = 4;
+    private static final int STOPPED = 0;
+    private static final int READY = 1;
+    private static final int RUNNING = 2;
+    private static final int PAUSED = 3;
 
     private static final ExecutorService pool =
             Executors.newCachedThreadPool();
@@ -50,7 +49,7 @@ public final class SelectExecutor {
     private ScheduledFuture<?> terminateTimer;
 
     private final Lock lk = new ReentrantLock();
-    private volatile int status = STOPPED;
+    private volatile int status = READY;
 
     // Number of samples to receive before triggering a selection operation.
     // This value is used to reset the samplesLeft counter.
@@ -142,7 +141,7 @@ public final class SelectExecutor {
     public boolean isRunning() {
         lk.lock();
         try {
-            return status < STOPPED;
+            return status >= RUNNING;
         } finally {
             lk.unlock();
         }
@@ -151,6 +150,11 @@ public final class SelectExecutor {
     public void start() throws QueryException {
         lk.lock();
         try {
+            if (status != READY) {
+                throw new IllegalStateException(
+                        "Cannot restart SelectExecutor");
+            }
+
             sampler.start();
             startEvery(query.getEvery());
 
@@ -203,6 +207,10 @@ public final class SelectExecutor {
     public void stop() {
         lk.lock();
         try {
+            if (status == STOPPED) {
+                return;
+            }
+
             status = STOPPED;
             sampler.stop();
             if (everyTimer != null) {
