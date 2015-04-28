@@ -692,7 +692,7 @@ SelectionQuery SelectionStatement(Errors err) :
     Select sel;
     Expression where = Constant.TRUE;
     ExecutionConditions ec = ExecutionConditions.ALL_NODES;
-    WindowSize terminate = null;
+    WindowSize terminate = WindowSize.ZERO;
 }
 {
     every = EveryClause(err)

@@ -7,6 +7,7 @@ import java.time.Duration;
  */
 public final class WindowSize {
 
+    public static final WindowSize ZERO = new WindowSize(0);
     public static final WindowSize ONE = new WindowSize(1);
 
     private final WindowType type;
@@ -54,27 +55,24 @@ public final class WindowSize {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof WindowSize)) {
+    public boolean equals(Object other) {
+        if (!(other instanceof WindowSize)) {
             return false;
         }
 
-        WindowSize other = (WindowSize) o;
-        if (samples != -1) {
-            return samples == other.samples;
-        } else {
-            return other.d != null && d.equals(other.d);
+        WindowSize o = (WindowSize) other;
+        if (o.type != type) {
+            return false;
         }
-    }
 
-    /**
-     * @author Guido Rota 30/03/2014
-     */
-    public static enum WindowType {
-
-        TIME,
-        SAMPLE
-
+        switch (type) {
+            case TIME:
+                return d.equals(o.d);
+            case SAMPLE:
+                return samples == o.samples;
+            default:
+                throw new RuntimeException("Unexpected WindowSize type " + type);
+        }
     }
 
     @Override
@@ -85,8 +83,19 @@ public final class WindowSize {
             case SAMPLE:
                 return samples + " SAMPLES";
             default:
-                throw new RuntimeException("Unexpected WindowSize type " +type);
+                throw new RuntimeException("Unexpected WindowSize type " + type);
         }
+    }
+
+
+    /**
+     * @author Guido Rota 30/03/2014
+     */
+    public static enum WindowType {
+
+        TIME,
+        SAMPLE
+
     }
 
 }

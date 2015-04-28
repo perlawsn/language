@@ -61,12 +61,12 @@ public class SelectionQueryTest {
         Sampling samp = new SamplingEvent(events);
 
         SelectionQuery query = new SelectionQuery(sel, WindowSize.ONE, samp,
-                Constant.TRUE, ExecutionConditions.ALL_NODES, null);
+                Constant.TRUE, ExecutionConditions.ALL_NODES, WindowSize.ZERO);
 
         assertThat(query.getSelect(), equalTo(sel));
         assertThat(query.getSampling(), equalTo(samp));
         assertThat(query.getEvery(), equalTo(WindowSize.ONE));
-        assertThat(query.getTerminate(), equalTo(null));
+        assertThat(query.getTerminate(), equalTo(WindowSize.ZERO));
         assertThat(query.getExecutionConditions(),
                 equalTo(ExecutionConditions.ALL_NODES));
 

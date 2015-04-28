@@ -411,16 +411,19 @@ public class ParserTest {
         p = new Parser(new StringReader("10 seconds"));
         ws = p.WindowSize(err);
         assertTrue(err.isEmpty());
+        assertThat(ws.getType(), equalTo(WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofSeconds(10)));
 
         p.ReInit(new StringReader("2 samples"));
         ws = p.WindowSize(err);
         assertTrue(err.isEmpty());
+        assertThat(ws.getType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(2));
 
         p.ReInit(new StringReader("one"));
         ws = p.WindowSize(err);
         assertTrue(err.isEmpty());
+        assertThat(ws.getType(), equalTo(WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(1));
     }
 
@@ -1445,6 +1448,34 @@ public class ParserTest {
         WindowSize terminate = q.getTerminate();
         assertThat(terminate.getType(), equalTo(WindowType.TIME));
         assertThat(terminate.getDuration(), equalTo(Duration.ofDays(60)));
+    }
+
+    @Test
+    public void testSelectionQueryDefaults() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select room, temperature " +
+                        "sampling every 20 minutes"
+        ));
+        SelectionQuery q = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+
+        Select sel = q.getSelect();
+        assertThat(sel.getUpTo(), equalTo(WindowSize.ONE));
+        assertThat(sel.getHaving(), equalTo(Constant.TRUE));
+        assertThat(sel.getGroupBy(), equalTo(GroupBy.NONE));
+        assertThat(sel.getDefault().length, equalTo(0));
+
+        assertThat(q.getWhere(), equalTo(Constant.TRUE));
+        assertThat(q.getEvery(), equalTo(WindowSize.ONE));
+        assertThat(q.getTerminate(), equalTo(WindowSize.ZERO));
+
+        ExecutionConditions cond = q.getExecutionConditions();
+        assertThat(cond.getRefresh(), equalTo(Refresh.NEVER));
+        assertThat(cond.getCondition(), equalTo(Constant.TRUE));
+        assertTrue(cond.getSpecs().isEmpty());
     }
 
 }

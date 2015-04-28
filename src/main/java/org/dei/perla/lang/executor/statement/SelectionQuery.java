@@ -27,6 +27,16 @@ public final class SelectionQuery implements Statement {
     // where expression of the sampling clause
     private final List<Attribute> selAtts;
 
+    /**
+     *
+     * @param select
+     * @param every
+     * @param sampling
+     * @param where
+     * @param cond
+     * @param terminate terminate condition. A WindowSize.ZERO value
+     *                  indicates that the query never terminates.
+     */
     public SelectionQuery(Select select, WindowSize every, Sampling sampling,
             Expression where, ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
