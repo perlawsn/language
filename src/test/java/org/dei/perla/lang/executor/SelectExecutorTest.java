@@ -13,6 +13,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -123,7 +124,7 @@ public class SelectExecutorTest {
     }
 
     @Test
-    public void testTimedTerminateAfter() throws Exception {
+    public void testRecordTerminateAfter() throws Exception {
         SimulatorFpc fpc = new SimulatorFpc(values);
         Errors err = new Errors();
 
@@ -131,7 +132,7 @@ public class SelectExecutorTest {
                 "every one " +
                         "select temperature, humidity " +
                         "sampling every 30 milliseconds " +
-                        "terminate after 3 samples"
+                        "terminate after 3 selections"
         ));
 
         SelectionQuery query = p.SelectionStatement(err);
@@ -141,6 +142,79 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(3);
+        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        assertFalse(exec.isRunning());
+        exec.start();
+        assertTrue(exec.isRunning());
+        handler.await();
+
+        assertFalse(exec.isRunning());
+        assertThat(handler.getDataCount(), equalTo(3));
+    }
+
+    @Test
+    public void testTimedTerminateAfter() throws Exception {
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select temperature, humidity " +
+                        "sampling every 30 milliseconds " +
+                        "terminate after 300 milliseconds"
+        ));
+
+        SelectionQuery query = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+        query = query.bind(atts);
+        assertTrue(query.isComplete());
+
+        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+                new LatchingQueryHandler<>(1);
+        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        assertFalse(exec.isRunning());
+        exec.start();
+        assertTrue(exec.isRunning());
+        Thread.sleep(400);
+
+        assertFalse(exec.isRunning());
+        assertThat(handler.getDataCount(), greaterThanOrEqualTo(8));
+    }
+
+    @Test
+    public void testWhereSampling() throws Exception {
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select temperature, humidity " +
+                        "sampling every 30 milliseconds " +
+                        "where temperature > 30 " +
+                        "terminate after 1 selections"
+        ));
+
+        SelectionQuery query = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+        query = query.bind(atts);
+        assertTrue(query.isComplete());
+
+        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+                new LatchingQueryHandler<>(1);
+        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        assertFalse(exec.isRunning());
+        exec.start();
+        assertTrue(exec.isRunning());
+
+        Thread.sleep(100);
+        assertThat(handler.getDataCount(), equalTo(0));
+
+        Map<Attribute, Object> v = new HashMap<>(values);
+        v.put(temp, 35);
+        fpc.setValues(v);
+        handler.await();
+        assertFalse(exec.isRunning());
+        assertThat(handler.getDataCount(), equalTo(1));
     }
 
 }

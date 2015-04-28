@@ -5,6 +5,8 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
+import org.dei.perla.lang.executor.expression.Expression;
+import org.dei.perla.lang.executor.expression.LogicValue;
 import org.dei.perla.lang.executor.statement.*;
 import org.dei.perla.lang.executor.statement.WindowSize.WindowType;
 
@@ -32,6 +34,7 @@ public final class SelectExecutor {
 
     private final SelectionQuery query;
     private final Select select;
+    private final Expression where;
 
     private final QueryHandler<SelectionQuery, Object[]> handler;
     private final Fpc fpc;
@@ -72,6 +75,7 @@ public final class SelectExecutor {
             QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
         this.query = query;
         select = query.getSelect();
+        where = query.getWhere();
         this.fpc = fpc;
         this.handler = handler;
 
@@ -96,7 +100,7 @@ public final class SelectExecutor {
         }
 
         // Initialize TERMINATE data
-        WindowSize terminate = query.getEvery();
+        WindowSize terminate = query.getTerminate();
         switch (terminate.getType()) {
             case SAMPLE:
                 recordsToTermination = terminate.getSamples();
@@ -238,6 +242,12 @@ public final class SelectExecutor {
                 return;
             }
 
+            // Check if the new sample satisfies the WHERE condition
+            LogicValue v = (LogicValue) where.run(sample, null);
+            if (!v.toBoolean()) {
+                return;
+            }
+
             // Add sample to the buffer
             buffer.add(sample);
 
@@ -297,23 +307,32 @@ public final class SelectExecutor {
 
         @Override
         public void run() {
-            while (!Thread.interrupted()) {
-                // Execute data management section and notify new record
+            while (!Thread.interrupted() && status == RUNNING) {
+                // Execute data management section
                 BufferView view = buffer.unmodifiableView();
                 List<Object[]> rs = select.select(view);
-                rs.forEach(r -> handler.data(query, r));
-                view.release();
 
-                // Check sample-based termination condition
-                recordsProduced++;
-                if (recordsToTermination != 0 &&
-                        recordsProduced == recordsToTermination) {
-                    stop();
-                }
+                lk.lock();
+                try {
+                    // Notify new records and check termination conditions.
+                    // the following operations are performed under lock to
+                    // guarantee precise TERMINATE AFTER semantics
+                    rs.forEach(r -> handler.data(query, r));
+                    view.release();
 
-                // Check if a new selection was triggered while this was running
-                if (triggered.decrementAndGet() == 0) {
-                    return;
+                    // Check sample-based termination condition
+                    recordsProduced++;
+                    if (recordsToTermination != 0 &&
+                            recordsProduced == recordsToTermination) {
+                        stop();
+                    }
+
+                    // Check if a new selection was triggered while this was running
+                    if (triggered.decrementAndGet() == 0) {
+                        return;
+                    }
+                } finally {
+                    lk.unlock();
                 }
             }
         }
