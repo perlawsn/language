@@ -93,6 +93,15 @@ public final class SelectExecutor {
         }
     }
 
+    public boolean isRunning() {
+        lk.lock();
+        try {
+            return status < STOPPED;
+        } finally {
+            lk.unlock();
+        }
+    }
+
     public void start() throws QueryException {
         lk.lock();
         try {
@@ -122,7 +131,9 @@ public final class SelectExecutor {
 
     private ScheduledFuture<?> scheduleEveryTimer(long periodMs) {
         Runnable task = () -> {
-            // TODO: schedule new selection
+            if (triggered.incrementAndGet() == 1) {
+                selectFuture = pool.submit(selectRunnable);
+            }
         };
         return timer.scheduleWithFixedDelay(task, periodMs, periodMs,
                 TimeUnit.MILLISECONDS);

@@ -107,6 +107,11 @@ public final class SelectionQuery implements Statement {
             throw new BindingException(err.asString());
         }
 
+        // Add timestamp attribute if not explicitly included in the query
+        if (!selAtts.contains(Attribute.TIMESTAMP)) {
+            selAtts.add(Attribute.TIMESTAMP);
+        }
+
         return new SelectionQuery(bselect, selAtts, every, bsampling, bwhere, bcond,
                 terminate);
     }

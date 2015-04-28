@@ -247,7 +247,7 @@ public final class SamplerIfEvery implements Sampler {
         public void data(Task task, Sample sample) {
             // Not locking on purpose. We accept a weaker synchronization
             // guarantee in exchange for lower data latency.
-            if (status != STOPPED) {
+            if (status == STOPPED) {
                 return;
             }
 
