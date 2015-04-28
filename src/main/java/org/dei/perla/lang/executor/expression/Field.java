@@ -104,6 +104,11 @@ public class Field extends Expression {
 
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append(id);
+    }
+
     /**
      * A special concrete field type deisgned to handle boolean values. This
      * field is responsible for translating the boolean data received from

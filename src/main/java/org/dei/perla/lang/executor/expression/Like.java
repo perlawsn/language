@@ -110,4 +110,13 @@ public final class Like extends Expression {
         return LogicValue.fromBoolean(m.find());
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(")
+                .append(e)
+                .append(" LIKE ")
+                .append(p)
+                .append(")");
+    }
+
 }

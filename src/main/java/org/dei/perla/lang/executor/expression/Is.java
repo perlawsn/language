@@ -87,4 +87,13 @@ public final class Is extends Expression {
         return LogicValue.fromBoolean(o.equals(l));
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(")
+                .append(e)
+                .append(" IS ")
+                .append(l)
+                .append(")");
+    }
+
 }

@@ -107,9 +107,9 @@ public final class AvgAggregate extends Aggregate {
         bld.append("AVG(")
                 .append(e)
                 .append(", ")
-                .append("ws")
+                .append(ws)
                 .append(", ")
-                .append("filter")
+                .append(filter)
                 .append(")");
     }
 

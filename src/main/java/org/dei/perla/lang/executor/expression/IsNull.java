@@ -69,4 +69,11 @@ public final class IsNull extends Expression {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(")
+                .append(e)
+                .append(" IS NULL)");
+    }
+
 }

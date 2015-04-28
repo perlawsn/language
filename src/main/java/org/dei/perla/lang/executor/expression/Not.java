@@ -70,4 +70,11 @@ public final class Not extends Expression {
         return LogicValue.not(l);
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("NOT(")
+                .append(e)
+                .append(")");
+    }
+
 }

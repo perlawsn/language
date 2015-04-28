@@ -91,4 +91,15 @@ public final class SumAggregate extends Aggregate {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("SUM(")
+                .append(e)
+                .append(", ")
+                .append(ws)
+                .append(", ")
+                .append(filter)
+                .append(")");
+    }
+
 }

@@ -118,4 +118,15 @@ public final class MinAggregate extends Aggregate {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("MIN(")
+                .append(e)
+                .append(", ")
+                .append(ws)
+                .append(", ")
+                .append(filter)
+                .append(")");
+    }
+
 }

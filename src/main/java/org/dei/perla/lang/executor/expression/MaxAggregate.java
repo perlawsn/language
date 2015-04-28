@@ -118,4 +118,15 @@ public final class MaxAggregate extends Aggregate {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("MAX(")
+                .append(e)
+                .append(", ")
+                .append(ws)
+                .append(", ")
+                .append(filter)
+                .append(")");
+    }
+
 }

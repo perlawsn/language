@@ -86,4 +86,11 @@ public final class Inverse extends Expression {
         }
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("(-")
+                .append(e)
+                .append(")");
+    }
+
 }

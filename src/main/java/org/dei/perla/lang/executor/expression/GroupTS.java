@@ -54,6 +54,11 @@ public class GroupTS extends Expression {
         return null;
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("timestamp");
+    }
+
     private static final class ConcreteGroupTS extends GroupTS {
 
         private final int tsIdx;

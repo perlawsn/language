@@ -58,4 +58,15 @@ public final class CountAggregate extends Aggregate {
         return count.value;
     }
 
+    @Override
+    protected void buildString(StringBuilder bld) {
+        bld.append("COUNT(")
+                .append(e)
+                .append(", ")
+                .append(ws)
+                .append(", ")
+                .append(filter)
+                .append(")");
+    }
+
 }
