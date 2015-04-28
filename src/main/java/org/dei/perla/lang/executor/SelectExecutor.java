@@ -1,7 +1,10 @@
 package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.core.fpc.Task;
+import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.sample.Sample;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -33,6 +36,7 @@ public final class SelectExecutor {
 
     private final SelectionQuery query;
     private final Select select;
+    private final ExecutionConditions execCond;
     private final Expression where;
 
     private final QueryHandler<SelectionQuery, Object[]> handler;
@@ -42,8 +46,11 @@ public final class SelectExecutor {
 
     private final Sampler sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
+    private final ExecIfRefreshHandler execIfRefHand = new ExecIfRefreshHandler();
+    private final ExecIfTaskHandler execIfTaskHand = new ExecIfTaskHandler();
     private final Runnable selectRunnable = new SelectRunnable();
 
+    private Refresher executeIfRefresher;
     private Future<?> selectFuture;
     private ScheduledFuture<?> everyTimer;
     private ScheduledFuture<?> terminateTimer;
@@ -74,6 +81,7 @@ public final class SelectExecutor {
             QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
         this.query = query;
         select = query.getSelect();
+        execCond = query.getExecutionConditions();
         where = query.getWhere();
         this.fpc = fpc;
         this.handler = handler;
@@ -157,19 +165,7 @@ public final class SelectExecutor {
 
             sampler.start();
             startEvery(query.getEvery());
-
-            // EXECUTION CONDITIONS
-            ExecutionConditions ec = query.getExecutionConditions();
-            Refresh ecr = ec.getRefresh();
-            switch (ecr.getType()) {
-                case TIME:
-                    // TODO: implement
-                    throw new RuntimeException("unimplemented");
-                case EVENT:
-                    // TODO: implement
-                    throw new RuntimeException("unimplemented");
-            }
-
+            startExecuteIf(query.getExecutionConditions());
             startTerminateAfter(query.getTerminate());
 
             status = RUNNING;
@@ -204,6 +200,17 @@ public final class SelectExecutor {
                 TimeUnit.MILLISECONDS);
     }
 
+    private void startExecuteIf(ExecutionConditions ec)
+            throws QueryException {
+        if (ec.getRefresh() == Refresh.NEVER) {
+            return;
+        }
+
+        executeIfRefresher = new Refresher(ec.getRefresh(),
+                execIfRefHand, fpc);
+        executeIfRefresher.start();
+    }
+
     public void stop() {
         lk.lock();
         try {
@@ -230,6 +237,28 @@ public final class SelectExecutor {
         }
     }
 
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     * @param cause cause exception
+     */
+    private void handleError(String msg, Throwable cause) {
+        stop();
+        handler.error(query, new QueryException(msg, cause));
+    }
+
+    /**
+     * Simple utility method employed to propagate an error status and stop
+     * the sampler
+     *
+     * @param msg error message
+     */
+    private void handleError(String msg) {
+        handleError(msg, null);
+    }
+
 
     /**
      * Sampling handler class
@@ -240,8 +269,17 @@ public final class SelectExecutor {
             implements QueryHandler<Sampling, Object[]> {
 
         @Override
-        public void error(Sampling source, Throwable error) {
-            // TODO: Stop and Escalate
+        public void error(Sampling source, Throwable cause) {
+            lk.lock();
+            try {
+                if (status < RUNNING) {
+                    return;
+                }
+
+                handleError("Error while sampling data", cause);
+            } finally {
+                lk.unlock();
+            }
         }
 
         @Override
@@ -293,22 +331,85 @@ public final class SelectExecutor {
     }
 
 
-    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+    /**
+     * Execution condition refresh handler
+     *
+     * @author Guido Rota 23/04/2015
+     */
+    private class ExecIfRefreshHandler implements QueryHandler<Refresh, Void> {
 
         @Override
         public void error(Refresh source, Throwable cause) {
+            lk.lock();
+            try {
+                if (status < RUNNING) {
+                    return;
+                }
 
+                handleError("Error while refreshing EXECUTE-IF condition",
+                        cause);
+            } finally {
+                lk.unlock();
+            }
         }
 
         @Override
         public void data(Refresh source, Void value) {
-
+            Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+            if (t == null) {
+                handleError("Cannot start sampling task to retrieve data " +
+                        "required to evaluate the EXECUTE-IF clause");
+            }
         }
 
     }
 
 
     /**
+     * Execution condition sampling handler
+     *
+     * @author Guido Rota 28/04/2015
+     */
+    private class ExecIfTaskHandler implements TaskHandler {
+
+        @Override
+        public void complete(Task task) { }
+
+        @Override
+        public void data(Task task, Sample sample) {
+            Expression cond = execCond.getCondition();
+            LogicValue v = (LogicValue) cond.run(sample.values(), null);
+
+            if (v.toBoolean()) {
+                // TODO: RESUME
+                throw new RuntimeException("unimplemented");
+            } else {
+                // TODO: PAUSE
+                throw new RuntimeException("unimplemented");
+            }
+        }
+
+        @Override
+        public void error(Task task, Throwable cause) {
+            lk.lock();
+            try {
+                if (status < RUNNING) {
+                    return;
+                }
+
+                handleError("Error while sampling data to compute" +
+                        "EXECUTE-IF clause");
+            } finally {
+                lk.unlock();
+            }
+        }
+
+    }
+
+
+    /**
+     * Data management thread code
+     *
      * @author Guido Rota 23/04/2015
      */
     private class SelectRunnable implements Runnable {
