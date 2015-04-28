@@ -19,6 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class SelectExecutor {
 
+    // TODO: add a TERMINATED condition to avoid re-starting of an executor
+    // whose terminate-after has already expired
     private static final int RUNNING = 1;
     private static final int PAUSED = 2;
     private static final int STOPPED = 4;
@@ -42,6 +44,7 @@ public final class SelectExecutor {
 
     private Future<?> selectFuture;
     private ScheduledFuture<?> everyTimer;
+    private ScheduledFuture<?> terminateTimer;
 
     private final Lock lk = new ReentrantLock();
     private volatile int status = STOPPED;
@@ -56,6 +59,15 @@ public final class SelectExecutor {
 
     private final AtomicInteger triggered = new AtomicInteger(0);
 
+    // Number of record to generate before terminating the query
+    private final int recordsToTermination;
+
+    // Total number of records produced by the query. It is only employed as
+    // part of the mechanism used to terminate query execution in a
+    // sample-based terminate after clause, so we don't really care if it
+    // overflows.
+    private volatile int recordsProduced = 0;
+
     public SelectExecutor(SelectionQuery query,
             QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
         this.query = query;
@@ -68,12 +80,33 @@ public final class SelectExecutor {
         sampler = createSampler(query.getSampling(),
                 query.getSelectAttributes());
 
+        // Initialize EVERY data
         WindowSize every = query.getEvery();
-        if (every.getType() == WindowType.SAMPLE) {
-            sampleCount = every.getSamples();
-            samplesLeft.set(sampleCount);
-        } else {
-            sampleCount = 0;
+        switch (every.getType()) {
+            case SAMPLE:
+                sampleCount = every.getSamples();
+                samplesLeft.set(sampleCount);
+                break;
+            case TIME:
+                sampleCount = 0;
+                break;
+            default:
+                throw new RuntimeException("Unexpected WindowSize type " +
+                        every.getType() + " found in EVERY clause");
+        }
+
+        // Initialize TERMINATE data
+        WindowSize terminate = query.getEvery();
+        switch (terminate.getType()) {
+            case SAMPLE:
+                recordsToTermination = terminate.getSamples();
+                break;
+            case TIME:
+                recordsToTermination = 0;
+                break;
+            default:
+                throw new RuntimeException("Unexpected WindowSize type " +
+                        terminate.getType() + " found in TERMINATE clause");
         }
     }
 
@@ -93,6 +126,15 @@ public final class SelectExecutor {
         }
     }
 
+    /**
+     * Indicates if the query is running or not.
+     *
+     * <p>It is important to note that the executor may be running even if no
+     * new output records are produced. This may happen when the execution
+     * condition turns false during query execution.
+     *
+     * @return true if the executor is running, false otherwise
+     */
     public boolean isRunning() {
         lk.lock();
         try {
@@ -106,12 +148,9 @@ public final class SelectExecutor {
         lk.lock();
         try {
             sampler.start();
-            WindowSize every = query.getEvery();
-            if (every.getType() == WindowType.TIME) {
-                long periodMs = every.getDuration().toMillis();
-                everyTimer = scheduleEveryTimer(periodMs);
-            }
+            startEvery(query.getEvery());
 
+            // EXECUTION CONDITIONS
             ExecutionConditions ec = query.getExecutionConditions();
             Refresh ecr = ec.getRefresh();
             switch (ecr.getType()) {
@@ -123,19 +162,37 @@ public final class SelectExecutor {
                     throw new RuntimeException("unimplemented");
             }
 
+            startTerminateAfter(query.getTerminate());
+
             status = RUNNING;
         } finally {
             lk.unlock();
         }
     }
 
-    private ScheduledFuture<?> scheduleEveryTimer(long periodMs) {
+    private void startEvery(WindowSize every) {
+        if (every.getType() != WindowType.TIME) {
+            return;
+        }
+
+        long periodMs = every.getDuration().toMillis();
         Runnable task = () -> {
             if (triggered.incrementAndGet() == 1) {
                 selectFuture = pool.submit(selectRunnable);
             }
         };
-        return timer.scheduleWithFixedDelay(task, periodMs, periodMs,
+        everyTimer = timer.scheduleWithFixedDelay(task, periodMs, periodMs,
+                TimeUnit.MILLISECONDS);
+    }
+
+    private void startTerminateAfter(WindowSize terminate) {
+        if (terminate.isZero() ||
+                terminate.getType() == WindowType.SAMPLE) {
+            return;
+        }
+
+        long delayMs = terminate.getDuration().toMillis();
+        terminateTimer = timer.schedule(this::stop, delayMs,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -146,9 +203,15 @@ public final class SelectExecutor {
             sampler.stop();
             if (everyTimer != null) {
                 everyTimer.cancel(false);
+                everyTimer = null;
             }
             if (selectFuture != null) {
                 selectFuture.cancel(false);
+                selectFuture = null;
+            }
+            if (terminateTimer != null) {
+                terminateTimer.cancel(false);
+                terminateTimer = null;
             }
         } finally {
             lk.unlock();
@@ -235,12 +298,20 @@ public final class SelectExecutor {
         @Override
         public void run() {
             while (!Thread.interrupted()) {
-                // perform sampling
+                // Execute data management section and notify new record
                 BufferView view = buffer.unmodifiableView();
                 List<Object[]> rs = select.select(view);
                 rs.forEach(r -> handler.data(query, r));
                 view.release();
 
+                // Check sample-based termination condition
+                recordsProduced++;
+                if (recordsToTermination != 0 &&
+                        recordsProduced == recordsToTermination) {
+                    stop();
+                }
+
+                // Check if a new selection was triggered while this was running
                 if (triggered.decrementAndGet() == 0) {
                     return;
                 }

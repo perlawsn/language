@@ -43,7 +43,7 @@ public class SelectExecutorTest {
     });
 
     @Test
-    public void testPlainSampleExecution() throws Exception {
+    public void testSampleEvery() throws Exception {
         SimulatorFpc fpc = new SimulatorFpc(values);
         Errors err = new Errors();
 
@@ -83,7 +83,7 @@ public class SelectExecutorTest {
     }
 
     @Test
-    public void testPlainTimedExecution() throws Exception {
+    public void testTimedEvery() throws Exception {
         SimulatorFpc fpc = new SimulatorFpc(values);
         Errors err = new Errors();
 
@@ -120,6 +120,27 @@ public class SelectExecutorTest {
         assertTrue(exec.isRunning());
         Thread.sleep(300);
         assertThat(handler.getDataCount(), greaterThan(count));
+    }
+
+    @Test
+    public void testTimedTerminateAfter() throws Exception {
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select temperature, humidity " +
+                        "sampling every 30 milliseconds " +
+                        "terminate after 3 samples"
+        ));
+
+        SelectionQuery query = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+        query = query.bind(atts);
+        assertTrue(query.isComplete());
+
+        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+                new LatchingQueryHandler<>(3);
     }
 
 }
