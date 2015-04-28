@@ -12,7 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 24/04/15.
@@ -22,21 +23,17 @@ public final class Refresher {
     private static final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(12);
 
-    private static final int INITIALIZING = 0;
-    private static final int RUNNING = 1;
-    private static final int STOPPING = 2;
-    private static final int STOPPED = 3;
-
     private final Refresh refresh;
     private final QueryHandler<Refresh, Void> handler;
     private final Fpc fpc;
 
-    private final AtomicInteger status = new AtomicInteger(STOPPED);
+    private final Lock lk = new ReentrantLock();
+    private volatile boolean running = false;
 
     private final TaskHandler evtHand = new EventHandler();
 
-    private volatile Task evtTask;
-    private volatile ScheduledFuture<?> timer;
+    private Task evtTask;
+    private ScheduledFuture<?> timer;
 
     public Refresher(Refresh refresh, QueryHandler<Refresh, Void> handler,
             Fpc fpc) {
@@ -46,25 +43,23 @@ public final class Refresher {
     }
 
     public void start() throws QueryException {
-        while (!status.compareAndSet(STOPPED, INITIALIZING)) {
-            if (isRunning()) {
-                return;
+        lk.lock();
+        try {
+            switch (refresh.getType()) {
+                case TIME:
+                    startTimeRefresh();
+                    break;
+                case EVENT:
+                    startEventRefresh();
+                    break;
+                default:
+                    throw new RuntimeException("Unexpected " + refresh.getType()
+                            + "refresh type");
             }
+            running = true;
+        } finally {
+            lk.unlock();
         }
-
-        switch (refresh.getType()) {
-            case TIME:
-                startTimeRefresh();
-                break;
-            case EVENT:
-                startEventRefresh();
-                break;
-            default:
-                throw new RuntimeException("Unexpected " + refresh.getType()
-                        + "refresh type");
-        }
-
-        status.set(RUNNING);
     }
 
     private void startTimeRefresh() throws QueryException {
@@ -85,28 +80,29 @@ public final class Refresher {
     }
 
     public void stop() {
-        while (!status.compareAndSet(RUNNING, STOPPING)) {
-            if (!isRunning()) {
-                return;
+        lk.lock();
+        try {
+            running = false;
+            if (evtTask != null) {
+                evtTask.stop();
+                evtTask = null;
             }
+            if (timer != null) {
+                timer.cancel(false);
+                timer = null;
+            }
+        } finally {
+            lk.unlock();
         }
-
-        if (evtTask != null) {
-            Task t = evtTask;
-            evtTask = null;
-            t.stop();
-        }
-        if (timer != null) {
-            ScheduledFuture<?> t = timer;
-            timer = null;
-            t.cancel(false);
-        }
-
-        status.set(STOPPED);
     }
 
     public boolean isRunning() {
-        return status.intValue() <= RUNNING;
+        lk.lock();
+        try {
+            return running;
+        } finally {
+            lk.unlock();
+        }
     }
 
     /**
@@ -142,14 +138,21 @@ public final class Refresher {
 
         @Override
         public void complete(Task task) {
-            if (isRunning() && task == evtTask) {
-                handleError("REFRESH ON EVENT sampling stopped prematurely");
+            lk.lock();
+            try {
+                if (running && task == evtTask) {
+                    handleError("REFRESH ON EVENT sampling stopped prematurely");
+                }
+            } finally {
+                lk.unlock();
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            if (!isRunning()) {
+            // Not locking on purpose. We accept a weaker synchronization
+            // guarantee in exchange for lower data latency
+            if (!running) {
                 return;
             }
 
@@ -158,11 +161,16 @@ public final class Refresher {
 
         @Override
         public void error(Task task, Throwable cause) {
-            if (!isRunning()) {
-                return;
-            }
+            lk.lock();
+            try {
+                if (!running) {
+                    return;
+                }
 
-            handleError("REFRESH ON EVENT sampling generated an error", cause);
+                handleError("REFRESH ON EVENT sampling generated an error", cause);
+            } finally {
+                lk.unlock();
+            }
         }
 
     }

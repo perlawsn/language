@@ -13,8 +13,8 @@ import org.dei.perla.lang.executor.statement.SamplingIfEvery;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 24/03/15.
@@ -38,10 +38,8 @@ public final class SamplerIfEvery implements Sampler {
     private final TaskHandler ifeHandler = new IfEveryHandler();
     private final QueryHandler<Refresh, Void> refHandler = new RefreshHandler();
 
-    private final ReadWriteLock lk = new ReentrantReadWriteLock();
-
-    // Current status
-    private int status = STOPPED;
+    private final Lock lk = new ReentrantLock();
+    private volatile int status = STOPPED;
 
     // Current sampling rate
     private Duration rate = Duration.ZERO;
@@ -76,17 +74,17 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public boolean isRunning() {
-        lk.readLock().lock();
+        lk.lock();
         try {
             return status != STOPPED;
         } finally {
-            lk.readLock().unlock();
+            lk.unlock();
         }
     }
 
     @Override
     public void start() throws QueryException {
-        lk.writeLock().lock();
+        lk.lock();
         try {
             if (isRunning()) {
                 return;
@@ -99,37 +97,34 @@ public final class SamplerIfEvery implements Sampler {
                         " failed, cannot retrieve sample the required attributes");
             }
         } finally {
-            lk.writeLock().unlock();
+            lk.unlock();
         }
     }
 
     @Override
     public void stop() {
-        lk.writeLock().lock();
+        lk.lock();
         try {
             status = STOPPED;
             rate = Duration.ZERO;
 
             if (ifeTask != null) {
-                Task t = ifeTask;
+                ifeTask.stop();
                 ifeTask = null;
-                t.stop();
             }
             if (sampTask != null) {
-                Task t = sampTask;
+                sampTask.stop();
                 sampTask = null;
-                t.stop();
             }
             if (evtTask != null) {
-                Task t = evtTask;
+                evtTask.stop();
                 evtTask = null;
-                t.stop();
             }
             if (refresher != null) {
                 refresher.stop();
             }
         } finally {
-            lk.writeLock().unlock();
+            lk.unlock();
         }
     }
 
@@ -165,7 +160,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (!isRunning()) {
                     return;
@@ -178,13 +173,13 @@ public final class SamplerIfEvery implements Sampler {
                 handleError("Error starting refresh execution in IF-EVERY " +
                         "clause", e);
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (status == SAMPLING) {
                     Duration d = ife.run(sample.values());
@@ -204,13 +199,13 @@ public final class SamplerIfEvery implements Sampler {
                     status = SAMPLING;
                 }
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (!isRunning()) {
                     return;
@@ -219,7 +214,7 @@ public final class SamplerIfEvery implements Sampler {
                 handleError("Sampling of IF EVERY sampling attributes failed",
                         cause);
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
@@ -234,7 +229,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void complete(Task task) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (status == NEW_RATE) {
                     sampTask = fpc.get(atts, false, rate, sampHandler);
@@ -244,27 +239,24 @@ public final class SamplerIfEvery implements Sampler {
                     handleError("Sampling operation stopped prematurely");
                 }
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            lk.readLock().lock();
-            try {
-                if (!isRunning()) {
-                    return;
-                }
-
-                handler.data(sampling, sample.values());
-            } finally {
-                lk.readLock().unlock();
+            // Not locking on purpose. We accept a weaker synchronization
+            // guarantee in exchange for lower data latency.
+            if (status != STOPPED) {
+                return;
             }
+
+            handler.data(sampling, sample.values());
         }
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (!isRunning()) {
                     return;
@@ -272,7 +264,7 @@ public final class SamplerIfEvery implements Sampler {
 
                 handleError("Unexpected error while sampling", cause);
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
@@ -287,7 +279,7 @@ public final class SamplerIfEvery implements Sampler {
 
         @Override
         public void error(Refresh source, Throwable cause) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (!isRunning()) {
                     return;
@@ -295,13 +287,13 @@ public final class SamplerIfEvery implements Sampler {
 
                 handleError("Refresh execution error in IF-EVERY clause", cause);
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 
         @Override
         public void data(Refresh source, Void value) {
-            lk.writeLock().lock();
+            lk.lock();
             try {
                 if (!isRunning()) {
                     return;
@@ -313,7 +305,7 @@ public final class SamplerIfEvery implements Sampler {
                             " failed, cannot retrieve sample the required attributes");
                 }
             } finally {
-                lk.writeLock().unlock();
+                lk.unlock();
             }
         }
 

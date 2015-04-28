@@ -77,4 +77,16 @@ public final class WindowSize {
 
     }
 
+    @Override
+    public String toString() {
+        switch(type) {
+            case TIME:
+                return d.toString();
+            case SAMPLE:
+                return samples + " SAMPLES";
+            default:
+                throw new RuntimeException("Unexpected WindowSize type " +type);
+        }
+    }
+
 }
