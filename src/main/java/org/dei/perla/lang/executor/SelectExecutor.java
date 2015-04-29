@@ -39,8 +39,7 @@ public final class SelectExecutor {
     private final ExecutionConditions execCond;
     private final Expression where;
 
-    private final QueryHandler<? super SelectionQuery, Object[]>
-            handler;
+    private final QueryHandler<? super SelectionQuery, Object[]> handler;
     private final Fpc fpc;
 
     private final Buffer buffer;
@@ -181,7 +180,7 @@ public final class SelectExecutor {
         }
     }
 
-    public void resume() {
+    private void resume() {
         try {
             doStart(true);
         } catch (QueryException e) {
@@ -192,7 +191,7 @@ public final class SelectExecutor {
     private void doStart(boolean resume) throws QueryException {
         if (!resume && status != READY) {
             throw new IllegalStateException(
-                    "Cannot restart SelectExecutor");
+                    "Cannot restart, SelectExecutor has been stopped");
         }
 
         if (resume && status != PAUSED) {
@@ -270,7 +269,12 @@ public final class SelectExecutor {
     }
 
     private void pause() {
-        doStop(true);
+        lk.lock();
+        try {
+            doStop(true);
+        } finally {
+            lk.unlock();
+        }
     }
 
     /**

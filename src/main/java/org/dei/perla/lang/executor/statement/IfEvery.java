@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author Guido Rota 23/03/15.
  */
-public class IfEvery {
+public final class IfEvery {
 
     private final Expression cond;
     private final Expression value;
