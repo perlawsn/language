@@ -39,7 +39,8 @@ public final class SelectExecutor {
     private final ExecutionConditions execCond;
     private final Expression where;
 
-    private final QueryHandler<SelectionQuery, Object[]> handler;
+    private final QueryHandler<? super SelectionQuery, Object[]>
+            handler;
     private final Fpc fpc;
 
     private final Buffer buffer;
@@ -78,7 +79,8 @@ public final class SelectExecutor {
     private volatile int recordsProduced = 0;
 
     public SelectExecutor(SelectionQuery query,
-            QueryHandler<SelectionQuery, Object[]> handler, Fpc fpc) {
+            QueryHandler<? super SelectionQuery, Object[]> handler,
+            Fpc fpc) {
         this.query = query;
         select = query.getSelect();
         execCond = query.getExecutionConditions();
@@ -155,40 +157,57 @@ public final class SelectExecutor {
         }
     }
 
-    public void start() throws QueryException {
-        doStart(false);
+    /**
+     * Checks if the {@code SelectExecutor} has been paused. The only
+     * intended use of this method is inside the query executor unit tests.
+     *
+     * @return true if the executor is paused, false otherwise
+     */
+    protected boolean isPaused() {
+        lk.lock();
+        try {
+            return status == PAUSED;
+        } finally {
+            lk.unlock();
+        }
     }
 
-    private void resume() {
+    public void start() throws QueryException {
+        lk.lock();
+        try {
+            doStart(false);
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    public void resume() {
         try {
             doStart(true);
         } catch (QueryException e) {
-            handleError("Cannot resume");
+            handleError("Error while resuming executor", e);
         }
     }
 
     private void doStart(boolean resume) throws QueryException {
-        lk.lock();
-        try {
-            if (!resume && status != READY) {
-                throw new IllegalStateException(
-                        "Cannot restart SelectExecutor");
-            }
-
-            if (resume && status != PAUSED) {
-                throw new IllegalStateException(
-                        "Cannot resume, SelectExecutor is not in paused state");
-            }
-
-            sampler.start();
-            startEvery(query.getEvery());
-            startExecuteIf(query.getExecutionConditions());
-            startTerminateAfter(query.getTerminate());
-
-            status = RUNNING;
-        } finally {
-            lk.unlock();
+        if (!resume && status != READY) {
+            throw new IllegalStateException(
+                    "Cannot restart SelectExecutor");
         }
+
+        if (resume && status != PAUSED) {
+            throw new IllegalStateException(
+                    "Cannot resume, SelectExecutor is not in paused state");
+        }
+
+        sampler.start();
+        startEvery(query.getEvery());
+        startTerminateAfter(query.getTerminate());
+        if (!resume) {
+            startExecuteIf(query.getExecutionConditions());
+        }
+
+        status = RUNNING;
     }
 
     /*
@@ -242,16 +261,14 @@ public final class SelectExecutor {
      * SelectExecutor} cannot be re-started again.
      */
     public void stop() {
-        doStop(false);
+        lk.lock();
+        try {
+            doStop(false);
+        } finally {
+            lk.unlock();
+        }
     }
 
-    /**
-     * Pauses the execution. The {@code resume()} method can be invoked to
-     * re-start the execution.
-     *
-     * <p>This method is only invoked locally by the {@code SelectExecutor}
-     * class.
-     */
     private void pause() {
         doStop(true);
     }
@@ -265,31 +282,30 @@ public final class SelectExecutor {
      *              is stopped altogether, preventing any further re-start.
      */
     private void doStop(boolean pause) {
-        lk.lock();
-        try {
-            if (!pause && status == STOPPED) {
-                return;
-            } else if (pause && status != RUNNING) {
-                throw new IllegalStateException(
-                        "Cannot pause, SelectExecutor is not running");
-            }
+        if (!pause && status == STOPPED) {
+            return;
+        } else if (pause && status != RUNNING) {
+            throw new IllegalStateException(
+                    "Cannot pause, SelectExecutor is not running");
+        }
 
-            status = pause ? PAUSED : STOPPED;
-            sampler.stop();
-            if (everyTimer != null) {
-                everyTimer.cancel(false);
-                everyTimer = null;
-            }
-            if (selectFuture != null) {
-                selectFuture.cancel(false);
-                selectFuture = null;
-            }
-            if (terminateTimer != null) {
-                terminateTimer.cancel(false);
-                terminateTimer = null;
-            }
-        } finally {
-            lk.unlock();
+        status = pause ? PAUSED : STOPPED;
+        sampler.stop();
+        if (everyTimer != null) {
+            everyTimer.cancel(false);
+            everyTimer = null;
+        }
+        if (selectFuture != null) {
+            selectFuture.cancel(false);
+            selectFuture = null;
+        }
+        if (terminateTimer != null) {
+            terminateTimer.cancel(false);
+            terminateTimer = null;
+        }
+        if (!pause && executeIfRefresher != null) {
+            executeIfRefresher.stop();
+            executeIfRefresher = null;
         }
     }
 
@@ -433,15 +449,18 @@ public final class SelectExecutor {
 
         @Override
         public void data(Task task, Sample sample) {
-            Expression cond = execCond.getCondition();
-            LogicValue v = (LogicValue) cond.run(sample.values(), null);
+            lk.lock();
+            try {
+                Expression cond = execCond.getCondition();
+                LogicValue v = (LogicValue) cond.run(sample.values(), null);
 
-            if (v.toBoolean()) {
-                // TODO: RESUME
-                throw new RuntimeException("unimplemented");
-            } else {
-                // TODO: PAUSE
-                throw new RuntimeException("unimplemented");
+                if (v.toBoolean()) {
+                    resume();
+                } else {
+                    pause();
+                }
+            } finally {
+                lk.unlock();
             }
         }
 

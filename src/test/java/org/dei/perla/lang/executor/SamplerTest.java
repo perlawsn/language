@@ -13,9 +13,7 @@ import java.io.StringReader;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 13/04/15.
@@ -57,7 +55,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(100);
@@ -69,7 +67,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(200);
@@ -81,7 +79,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
@@ -113,7 +111,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(100);
         assertTrue(fpc.hasPeriod(100));
@@ -177,7 +175,7 @@ public class SamplerTest {
         vs.put(temperature, 25);
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
@@ -247,7 +245,7 @@ public class SamplerTest {
         vs.put(temperature, 25);
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler<>());
+                new NoopQueryHandler());
         sampler.start();
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);

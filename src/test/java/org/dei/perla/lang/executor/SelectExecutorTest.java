@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.*;
 
@@ -208,6 +209,45 @@ public class SelectExecutorTest {
         handler.await();
         assertFalse(exec.isRunning());
         assertThat(handler.getDataCount(), equalTo(1));
+    }
+
+    @Test
+    public void testExecuteIf() throws Exception {
+        Map<Attribute, Object> v = new HashMap(values);
+        v.put(temp, 20);
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select temperature, humidity " +
+                        "sampling every 30 milliseconds " +
+                        "execute if temperature > 30 " +
+                        "refresh every 100 milliseconds"
+        ));
+
+        SelectionQuery query = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+        query = query.bind(atts);
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
+
+        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+                new LatchingQueryHandler<>(1);
+        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        assertFalse(exec.isRunning());
+        exec.start();
+        assertTrue(exec.isRunning());
+        Thread.sleep(200);
+
+        assertTrue(exec.isPaused());
+        int count = handler.getDataCount();
+        v.put(temp, 40);
+        fpc.setValues(v);
+        Thread.sleep(200);
+        assertTrue(exec.isRunning());
+        assertThat(handler.getDataCount(), greaterThan(count));
     }
 
 }

@@ -3,13 +3,13 @@ package org.dei.perla.lang.executor;
 /**
  * @author Guido Rota 13/04/15.
  */
-public class NoopQueryHandler<E, T>
-        implements QueryHandler<E, T> {
+public class NoopQueryHandler
+        implements QueryHandler<Object, Object[]> {
 
     @Override
-    public void error(E source, Throwable error) { }
+    public void error(Object source, Throwable error) { }
 
     @Override
-    public void data(E source, T value) { }
+    public void data(Object source, Object[] value) { }
 
 }

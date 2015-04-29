@@ -24,7 +24,7 @@ public final class Refresher {
             Executors.newScheduledThreadPool(12);
 
     private final Refresh refresh;
-    private final QueryHandler<Refresh, Void> handler;
+    private final QueryHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
     private final Lock lk = new ReentrantLock();
@@ -35,8 +35,8 @@ public final class Refresher {
     private Task evtTask;
     private ScheduledFuture<?> timer;
 
-    public Refresher(Refresh refresh, QueryHandler<Refresh, Void> handler,
-            Fpc fpc) {
+    public Refresher(Refresh refresh,
+            QueryHandler<? super Refresh, Void> handler, Fpc fpc) {
         this.refresh = refresh;
         this.handler = handler;
         this.fpc = fpc;

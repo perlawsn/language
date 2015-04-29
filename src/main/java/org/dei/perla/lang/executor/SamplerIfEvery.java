@@ -31,7 +31,7 @@ public final class SamplerIfEvery implements Sampler {
     // Attributes required by the data management section of the query
     private final List<Attribute> atts;
     private final Fpc fpc;
-    private final QueryHandler<Sampling, Object[]> handler;
+    private final QueryHandler<? super Sampling, Object[]> handler;
     private final IfEvery ife;
 
     private final TaskHandler sampHandler = new SamplingHandler();
@@ -53,7 +53,7 @@ public final class SamplerIfEvery implements Sampler {
     private Task evtTask = null;
 
     protected SamplerIfEvery(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
-            QueryHandler<Sampling, Object[]> handler)
+            QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
