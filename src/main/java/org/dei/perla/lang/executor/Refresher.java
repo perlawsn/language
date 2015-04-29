@@ -42,7 +42,7 @@ public final class Refresher {
         this.fpc = fpc;
     }
 
-    public void start() throws QueryException {
+    public void start() {
         lk.lock();
         try {
             switch (refresh.getType()) {
@@ -62,19 +62,19 @@ public final class Refresher {
         }
     }
 
-    private void startTimeRefresh() throws QueryException {
+    private void startTimeRefresh() {
         long period = refresh.getDuration().toMillis();
         timer = scheduler.scheduleAtFixedRate(() -> {
             handler.data(refresh, null);
         }, period, period, TimeUnit.MILLISECONDS);
     }
 
-    private void startEventRefresh() throws QueryException {
+    private void startEventRefresh() {
         List<Attribute> es = refresh.getEvents();
         evtTask = fpc.async(es, true, evtHand);
 
         if (evtTask == null) {
-            throw new QueryException("Initialization of REFRESH ON EVENT " +
+            handleError("Initialization of REFRESH ON EVENT " +
                     "sampling failed, cannot retrieve the required events");
         }
     }

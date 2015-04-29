@@ -472,8 +472,6 @@ public final class SelectExecutor {
                 } else {
                     pause();
                 }
-            } catch (QueryException e) {
-                handleError("Error starting EXECUTE IF refresher", e);
             } finally {
                 lk.unlock();
             }
@@ -482,8 +480,7 @@ public final class SelectExecutor {
         /*
          * Starts the EXECUTE IF clause
          */
-        private void startExecuteIf(ExecutionConditions ec)
-                throws QueryException {
+        private void startExecuteIf(ExecutionConditions ec) {
             // Avoid starting the refresher for the EXECUTE IF clause when not
             // necessary, i.e. if the refresh clause is trivially set to never or
             // if the execute if condition is constant and does not require any

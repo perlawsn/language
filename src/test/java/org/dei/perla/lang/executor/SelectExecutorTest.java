@@ -25,6 +25,8 @@ public class SelectExecutorTest {
             Attribute.create("temperature", DataType.INTEGER);
     private static final Attribute hum =
             Attribute.create("humidity", DataType.INTEGER);
+    private static final Attribute alarm =
+            Attribute.create("alarm", DataType.BOOLEAN);
 
     private static final Map<Attribute, Object> values;
     static {
@@ -32,13 +34,15 @@ public class SelectExecutorTest {
         m.put(Attribute.TIMESTAMP, Instant.now());
         m.put(temp, 0);
         m.put(hum, 0);
+        m.put(alarm, false);
         values = Collections.unmodifiableMap(m);
     }
 
     private static final List<Attribute> atts = Arrays.asList(new Attribute[] {
             Attribute.TIMESTAMP,
             temp,
-            hum
+            hum,
+            alarm
     });
 
     @Test
@@ -212,7 +216,7 @@ public class SelectExecutorTest {
     }
 
     @Test
-    public void testExecuteIf() throws Exception {
+    public void testExecuteIfTimedRefresh() throws Exception {
         Map<Attribute, Object> v = new HashMap(values);
         v.put(temp, 20);
         SimulatorFpc fpc = new SimulatorFpc(values);
@@ -241,13 +245,78 @@ public class SelectExecutorTest {
         assertTrue(exec.isRunning());
         Thread.sleep(400);
 
+        // Change fpc values and check if sampling starts
         assertTrue(exec.isPaused());
-        int count = handler.getDataCount();
+        assertThat(handler.getDataCount(), equalTo(0));
         v.put(temp, 40);
+        fpc.setValues(v);
+        handler.await();
+        assertTrue(exec.isRunning());
+        assertFalse(exec.isPaused());
+        assertThat(handler.getDataCount(), greaterThan(0));
+
+        // Change fpc values and check if sampling pauses
+        v.put(temp, 20);
         fpc.setValues(v);
         Thread.sleep(200);
         assertTrue(exec.isRunning());
-        assertThat(handler.getDataCount(), greaterThan(count));
+        assertTrue(exec.isPaused());
+        int count = handler.getDataCount();
+        Thread.sleep(200);
+        assertThat(handler.getDataCount(), equalTo(count));
+    }
+
+    @Test
+    public void testExecuteIfEventRefresh() throws Exception {
+        Map<Attribute, Object> v = new HashMap(values);
+        v.put(temp, 20);
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "every one " +
+                        "select temperature, humidity " +
+                        "sampling every 30 milliseconds " +
+                        "execute if temperature > 30 " +
+                        "refresh on event alarm"
+        ));
+
+        SelectionQuery query = p.SelectionStatement(err);
+        assertTrue(err.isEmpty());
+        query = query.bind(atts);
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
+
+        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+                new LatchingQueryHandler<>(1);
+        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        assertFalse(exec.isRunning());
+        exec.start();
+        assertTrue(exec.isRunning());
+        Thread.sleep(400);
+
+        // Change fpc values and check if sampling starts
+        assertTrue(exec.isPaused());
+        assertThat(handler.getDataCount(), equalTo(0));
+        v.put(temp, 40);
+        fpc.setValues(v);
+        fpc.triggerEvent();
+        handler.await();
+        assertTrue(exec.isRunning());
+        assertFalse(exec.isPaused());
+        assertThat(handler.getDataCount(), greaterThan(0));
+
+
+        // Change fpc values and check if sampling pauses
+        v.put(temp, 20);
+        fpc.setValues(v);
+        fpc.triggerEvent();
+        assertTrue(exec.isRunning());
+        assertTrue(exec.isPaused());
+        int count = handler.getDataCount();
+        Thread.sleep(200);
+        assertThat(handler.getDataCount(), equalTo(count));
     }
 
 }

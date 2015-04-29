@@ -44,12 +44,12 @@ public final class SamplerEvent implements Sampler {
     }
 
     @Override
-    public void start() throws QueryException {
+    public void start() {
         lk.lock();
         try {
             evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
             if (evtTask == null) {
-                throw new QueryException("Initialization of REFRESH ON EVENT " +
+                handleError("Initialization of REFRESH ON EVENT " +
                         "sampling failed, cannot retrieve the required events");
             }
             running = true;

@@ -169,9 +169,6 @@ public final class SamplerIfEvery implements Sampler {
                 if (refresher != null && !refresher.isRunning()) {
                     refresher.start();
                 }
-            } catch (QueryException e) {
-                handleError("Error starting refresh execution in IF-EVERY " +
-                        "clause", e);
             } finally {
                 lk.unlock();
             }
