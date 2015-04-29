@@ -1,5 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
+import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
@@ -45,13 +46,13 @@ public final class ExecutionConditions {
 
     public static ExecutionConditions create(Expression cond,
             List<DataTemplate> specs, Refresh refresh, Errors err) {
-        if (cond == null && specs == null) {
-            err.addError("Incomplete execution conditions, ");
-            return null;
+        DataType ct = cond.getType();
+        if (ct != null && ct != DataType.BOOLEAN) {
+            err.addError("Execution condition must be of type BOOLEAN");
         }
 
         if (cond != null && cond instanceof Constant &&
-                cond.run(null, null) == LogicValue.FALSE) {
+                ((LogicValue) cond.run(null, null)).toBoolean() == false) {
             err.addError("Execution condition always evaluates to false");
             return null;
         }

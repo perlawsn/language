@@ -1356,7 +1356,7 @@ public class ParserTest {
         ));
         ExecutionConditions e = p.ExecutionConditionsClause(err, ids);
         assertTrue(err.isEmpty());
-        assertThat(e.getSpecs(), nullValue());
+        assertTrue(e.getSpecs().isEmpty());
         assertThat(e.getRefresh(), equalTo(Refresh.NEVER));
 
         p.ReInit(new StringReader(
@@ -1374,13 +1374,14 @@ public class ParserTest {
         assertThat(e.getRefresh().getDuration(),
                 equalTo(Duration.ofMinutes(20)));
 
-        // Wrong ExecutionCondition clause
+        // Test ExecutionCondition clause that only refreshes the list of
+        // FPCs on which the query is running
         p.ReInit(new StringReader(
                 "execute refresh every 15 days"
         ));
         ids.clear();
         e = p.ExecutionConditionsClause(err, ids);
-        assertFalse(err.isEmpty());
+        assertTrue(err.isEmpty());
 
         // Test if an error is generated when the condition always evaluates to
         // false

@@ -26,8 +26,9 @@ public final class SelectExecutor {
 
     private static final int STOPPED = 0;
     private static final int READY = 1;
-    private static final int RUNNING = 2;
-    private static final int PAUSED = 3;
+    private static final int INITIALIZING = 2;
+    private static final int RUNNING = 3;
+    private static final int PAUSED = 4;
 
     private static final ExecutorService pool =
             Executors.newCachedThreadPool();
@@ -150,7 +151,7 @@ public final class SelectExecutor {
     public boolean isRunning() {
         lk.lock();
         try {
-            return status >= RUNNING;
+            return status >= INITIALIZING;
         } finally {
             lk.unlock();
         }
@@ -179,14 +180,32 @@ public final class SelectExecutor {
                         "Cannot restart, SelectExecutor has been stopped");
             }
 
-            sampler.start();
-            startEvery(query.getEvery());
             startTerminateAfter(query.getTerminate());
-            startExecuteIf(query.getExecutionConditions());
 
-            status = RUNNING;
+            ExecutionConditions ec = query.getExecutionConditions();
+            if (ec.getAttributes().isEmpty()) {
+                // Start sampling immediately if the execution condition is
+                // empty or if its value is static.
+                sampler.start();
+                startEvery(query.getEvery());
+                status = RUNNING;
+
+            } else {
+                // Evaluate the execution condition before starting the
+                // main sampling operation
+                status = INITIALIZING;
+                triggerExecuteIfEvaluation();
+            }
         } finally {
             lk.unlock();
+        }
+    }
+
+    private void triggerExecuteIfEvaluation() {
+        Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+        if (t == null) {
+            handleError("Cannot start sampling task to retrieve data " +
+                    "required to evaluate the EXECUTE-IF clause");
         }
     }
 
@@ -220,25 +239,6 @@ public final class SelectExecutor {
         long delayMs = terminate.getDuration().toMillis();
         terminateTimer = timer.schedule(this::stop, delayMs,
                 TimeUnit.MILLISECONDS);
-    }
-
-    /*
-     * Starts the EXECUTE IF clause
-     */
-    private void startExecuteIf(ExecutionConditions ec)
-            throws QueryException {
-        // Avoid starting the refresher for the EXECUTE IF clause when not
-        // necessary, i.e. if the refresh clause is trivially set to never or
-        // if the execute if condition is constant and does not require any
-        // data from the device in order to be evaluated.
-        if (ec.getRefresh() == Refresh.NEVER ||
-                ec.getAttributes().isEmpty()) {
-            return;
-        }
-
-        executeIfRefresher = new Refresher(ec.getRefresh(),
-                execIfRefHand, fpc);
-        executeIfRefresher.start();
     }
 
     /**
@@ -439,11 +439,7 @@ public final class SelectExecutor {
 
         @Override
         public void data(Refresh source, Void value) {
-            Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
-            if (t == null) {
-                handleError("Cannot start sampling task to retrieve data " +
-                        "required to evaluate the EXECUTE-IF clause");
-            }
+            triggerExecuteIfEvaluation();
         }
 
     }
@@ -463,6 +459,11 @@ public final class SelectExecutor {
         public void data(Task task, Sample sample) {
             lk.lock();
             try {
+                if (status == INITIALIZING) {
+                    startExecuteIf(query.getExecutionConditions());
+                    status = RUNNING;
+                }
+
                 Expression cond = execCond.getCondition();
                 LogicValue v = (LogicValue) cond.run(sample.values(), null);
 
@@ -471,9 +472,30 @@ public final class SelectExecutor {
                 } else {
                     pause();
                 }
+            } catch (QueryException e) {
+                handleError("Error starting EXECUTE IF refresher", e);
             } finally {
                 lk.unlock();
             }
+        }
+
+        /*
+         * Starts the EXECUTE IF clause
+         */
+        private void startExecuteIf(ExecutionConditions ec)
+                throws QueryException {
+            // Avoid starting the refresher for the EXECUTE IF clause when not
+            // necessary, i.e. if the refresh clause is trivially set to never or
+            // if the execute if condition is constant and does not require any
+            // data from the device in order to be evaluated.
+            if (ec.getRefresh() == Refresh.NEVER ||
+                    ec.getAttributes().isEmpty()) {
+                return;
+            }
+
+            executeIfRefresher = new Refresher(ec.getRefresh(),
+                    execIfRefHand, fpc);
+            executeIfRefresher.start();
         }
 
         @Override

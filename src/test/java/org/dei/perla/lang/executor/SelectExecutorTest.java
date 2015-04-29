@@ -239,7 +239,7 @@ public class SelectExecutorTest {
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
-        Thread.sleep(200);
+        Thread.sleep(400);
 
         assertTrue(exec.isPaused());
         int count = handler.getDataCount();
