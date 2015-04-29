@@ -4,16 +4,11 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.expression.*;
-import org.dei.perla.lang.parser.Parser;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.StringReader;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -71,7 +66,10 @@ public class SelectionQueryTest {
                 equalTo(ExecutionConditions.ALL_NODES));
 
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSampling().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getWhere().isComplete());
     }
 
 }

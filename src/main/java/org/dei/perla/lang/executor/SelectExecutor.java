@@ -156,11 +156,28 @@ public final class SelectExecutor {
     }
 
     public void start() throws QueryException {
+        doStart(false);
+    }
+
+    private void resume() {
+        try {
+            doStart(true);
+        } catch (QueryException e) {
+            handleError("Cannot resume");
+        }
+    }
+
+    private void doStart(boolean resume) throws QueryException {
         lk.lock();
         try {
-            if (status != READY) {
+            if (!resume && status != READY) {
                 throw new IllegalStateException(
                         "Cannot restart SelectExecutor");
+            }
+
+            if (resume && status != PAUSED) {
+                throw new IllegalStateException(
+                        "Cannot resume, SelectExecutor is not in paused state");
             }
 
             sampler.start();
@@ -174,6 +191,9 @@ public final class SelectExecutor {
         }
     }
 
+    /*
+     * starts the EVERY clause
+     */
     private void startEvery(WindowSize every) {
         if (every.getType() != WindowType.TIME) {
             return;
@@ -189,6 +209,9 @@ public final class SelectExecutor {
                 TimeUnit.MILLISECONDS);
     }
 
+    /*
+     * Starts the TERMINATE AFTER clause
+     */
     private void startTerminateAfter(WindowSize terminate) {
         if (terminate.isZero() ||
                 terminate.getType() == WindowType.SAMPLE) {
@@ -200,6 +223,9 @@ public final class SelectExecutor {
                 TimeUnit.MILLISECONDS);
     }
 
+    /*
+     * Starts the EXECUTE IF clause
+     */
     private void startExecuteIf(ExecutionConditions ec)
             throws QueryException {
         if (ec.getRefresh() == Refresh.NEVER) {
@@ -211,14 +237,44 @@ public final class SelectExecutor {
         executeIfRefresher.start();
     }
 
+    /**
+     * Stops the execution. After this method is called, the {@code
+     * SelectExecutor} cannot be re-started again.
+     */
     public void stop() {
+        doStop(false);
+    }
+
+    /**
+     * Pauses the execution. The {@code resume()} method can be invoked to
+     * re-start the execution.
+     *
+     * <p>This method is only invoked locally by the {@code SelectExecutor}
+     * class.
+     */
+    private void pause() {
+        doStop(true);
+    }
+
+    /**
+     * Stops the execution. The {@code pause} parameter can be used to
+     * determine whether the execution has to be paused or stopped altogether
+     * (no further resume allowed in the latter case).
+     *
+     * @param pause if true, the executor is paused. If false, the executor
+     *              is stopped altogether, preventing any further re-start.
+     */
+    private void doStop(boolean pause) {
         lk.lock();
         try {
-            if (status == STOPPED) {
+            if (!pause && status == STOPPED) {
                 return;
+            } else if (pause && status != RUNNING) {
+                throw new IllegalStateException(
+                        "Cannot pause, SelectExecutor is not running");
             }
 
-            status = STOPPED;
+            status = pause ? PAUSED : STOPPED;
             sampler.stop();
             if (everyTimer != null) {
                 everyTimer.cancel(false);

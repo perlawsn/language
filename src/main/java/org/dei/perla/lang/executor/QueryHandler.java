@@ -1,11 +1,9 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.Clause;
-
 /**
  * @author Guido Rota 10/04/15.
  */
-public interface QueryHandler<E extends Clause, T> {
+public interface QueryHandler<E, T> {
 
     public void error(E source, Throwable cause);
 

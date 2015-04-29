@@ -1,7 +1,5 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.Clause;
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 13/04/15.
  */
-public class LatchingQueryHandler<E extends Clause, T>
+public class LatchingQueryHandler<E, T>
         implements QueryHandler<E, T> {
 
     private int waitCount;

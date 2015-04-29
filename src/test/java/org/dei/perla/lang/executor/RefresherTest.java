@@ -4,7 +4,6 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.statement.Refresh;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -12,9 +11,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 24/04/15.

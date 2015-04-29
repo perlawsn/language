@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * @author Guido Rota 16/03/15.
  */
-public final class Refresh implements Clause {
+public final class Refresh {
 
     public static final Refresh NEVER = new Refresh();
 
@@ -66,7 +66,6 @@ public final class Refresh implements Clause {
         return type;
     }
 
-    @Override
     public boolean isComplete() {
         if (names != null) {
             return events != null && names.size() == events.size();

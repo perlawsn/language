@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Guido Rota 02/03/15.
  */
-public final class Select implements Clause {
+public final class Select {
 
     private final List<Expression> fields;
     private final WindowSize upto;
@@ -51,7 +51,17 @@ public final class Select implements Clause {
         return def;
     }
 
-    @Override
+    /**
+     * This method indicates if all the field references inside the data
+     * management clause are bound.
+     *
+     * <p>It is important to note that the {@code Select} clause does not
+     * neet to be complete in order to be executed.
+     *
+     * @return true if all the components of the data management clause are
+     * complete (i.e., all field references are bound to an actual FPC
+     * attribute).
+     */
     public boolean isComplete() {
         for (Expression f : fields) {
             if (!f.isComplete()) {

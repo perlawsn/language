@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author Guido Rota 23/03/15.
  */
-public class IfEvery implements Clause {
+public class IfEvery {
 
     private final Expression cond;
     private final Expression value;
@@ -66,7 +66,6 @@ public class IfEvery implements Clause {
         this.next = next;
     }
 
-    @Override
     public boolean isComplete() {
         if (next != null && !next.isComplete()) {
             return false;

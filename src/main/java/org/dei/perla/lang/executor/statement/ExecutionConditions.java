@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @author Guido Rota 16/03/15.
  */
-public final class ExecutionConditions implements Clause {
+public final class ExecutionConditions {
 
     public static final ExecutionConditions ALL_NODES =
             new ExecutionConditions(Constant.TRUE, Collections.emptyList(),
@@ -75,7 +75,6 @@ public final class ExecutionConditions implements Clause {
         return refresh;
     }
 
-    @Override
     public boolean isComplete() {
         return cond.isComplete() && refresh.isComplete();
     }

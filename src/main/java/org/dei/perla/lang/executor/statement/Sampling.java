@@ -8,8 +8,10 @@ import java.util.Collection;
 /**
  * @author Guido Rota 30/03/15.
  */
-public interface Sampling extends Clause {
+public interface Sampling {
 
     public Sampling bind(Collection<Attribute> atts, Errors err);
+
+    public boolean isComplete();
 
 }

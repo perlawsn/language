@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * @author Guido Rota 04/03/15.
  */
-public final class GroupBy implements Clause {
+public final class GroupBy {
 
     public static final GroupBy NONE = new GroupBy();
 
@@ -73,7 +73,6 @@ public final class GroupBy implements Clause {
         return d == null && (groups == null || groups.isEmpty());
     }
 
-    @Override
     public boolean isComplete() {
         if (groups == null) {
             return true;

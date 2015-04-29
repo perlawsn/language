@@ -12,11 +12,8 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 24/04/15.
@@ -57,7 +54,9 @@ public class SelectExecutorTest {
         SelectionQuery query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(10);
@@ -90,7 +89,9 @@ public class SelectExecutorTest {
         SelectionQuery query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(10);
@@ -124,7 +125,9 @@ public class SelectExecutorTest {
         SelectionQuery query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(3);
@@ -153,7 +156,9 @@ public class SelectExecutorTest {
         SelectionQuery query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);
@@ -183,7 +188,9 @@ public class SelectExecutorTest {
         SelectionQuery query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
-        assertTrue(query.isComplete());
+        assertTrue(query.getWhere().isComplete());
+        assertTrue(query.getExecutionConditions().isComplete());
+        assertTrue(query.getSelect().isComplete());
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);

@@ -10,6 +10,6 @@ import java.util.Collection;
  *
  * @author Guido Rota 16/03/15.
  */
-public interface Statement extends Clause {
+public interface Statement {
 
 }
