@@ -174,39 +174,20 @@ public final class SelectExecutor {
     public void start() throws QueryException {
         lk.lock();
         try {
-            doStart(false);
+            if (status != READY) {
+                throw new IllegalStateException(
+                        "Cannot restart, SelectExecutor has been stopped");
+            }
+
+            sampler.start();
+            startEvery(query.getEvery());
+            startTerminateAfter(query.getTerminate());
+            startExecuteIf(query.getExecutionConditions());
+
+            status = RUNNING;
         } finally {
             lk.unlock();
         }
-    }
-
-    private void resume() {
-        try {
-            doStart(true);
-        } catch (QueryException e) {
-            handleError("Error while resuming executor", e);
-        }
-    }
-
-    private void doStart(boolean resume) throws QueryException {
-        if (!resume && status != READY) {
-            throw new IllegalStateException(
-                    "Cannot restart, SelectExecutor has been stopped");
-        }
-
-        if (resume && status != PAUSED) {
-            throw new IllegalStateException(
-                    "Cannot resume, SelectExecutor is not in paused state");
-        }
-
-        sampler.start();
-        startEvery(query.getEvery());
-        startTerminateAfter(query.getTerminate());
-        if (!resume) {
-            startExecuteIf(query.getExecutionConditions());
-        }
-
-        status = RUNNING;
     }
 
     /*
@@ -246,7 +227,12 @@ public final class SelectExecutor {
      */
     private void startExecuteIf(ExecutionConditions ec)
             throws QueryException {
-        if (ec.getRefresh() == Refresh.NEVER) {
+        // Avoid starting the refresher for the EXECUTE IF clause when not
+        // necessary, i.e. if the refresh clause is trivially set to never or
+        // if the execute if condition is constant and does not require any
+        // data from the device in order to be evaluated.
+        if (ec.getRefresh() == Refresh.NEVER ||
+                ec.getAttributes().isEmpty()) {
             return;
         }
 
@@ -262,38 +248,47 @@ public final class SelectExecutor {
     public void stop() {
         lk.lock();
         try {
-            doStop(false);
-        } finally {
-            lk.unlock();
-        }
-    }
+            if (status == STOPPED) {
+                return;
+            }
 
-    private void pause() {
-        lk.lock();
-        try {
-            doStop(true);
+            status = STOPPED;
+            sampler.stop();
+            if (everyTimer != null) {
+                everyTimer.cancel(false);
+                everyTimer = null;
+            }
+            if (selectFuture != null) {
+                selectFuture.cancel(false);
+                selectFuture = null;
+            }
+            if (terminateTimer != null) {
+                terminateTimer.cancel(false);
+                terminateTimer = null;
+            }
+            if (executeIfRefresher != null) {
+                executeIfRefresher.stop();
+                executeIfRefresher = null;
+            }
         } finally {
             lk.unlock();
         }
     }
 
     /**
-     * Stops the execution. The {@code pause} parameter can be used to
-     * determine whether the execution has to be paused or stopped altogether
-     * (no further resume allowed in the latter case).
+     * Pauses the query execution. It is important to note that the timer for
+     * the time-based TERMINATE AFTER clause continues to run even when the
+     * query is paused.
      *
-     * @param pause if true, the executor is paused. If false, the executor
-     *              is stopped altogether, preventing any further re-start.
+     * NOTE: this method is not thread-safe and requires explicit
+     * synchronization.
      */
-    private void doStop(boolean pause) {
-        if (!pause && status == STOPPED) {
-            return;
-        } else if (pause && status != RUNNING) {
-            throw new IllegalStateException(
-                    "Cannot pause, SelectExecutor is not running");
+    private void pause() {
+        if (status == STOPPED) {
+            handleError("Cannot pause, executor is not running");
         }
 
-        status = pause ? PAUSED : STOPPED;
+        status = PAUSED;
         sampler.stop();
         if (everyTimer != null) {
             everyTimer.cancel(false);
@@ -303,14 +298,27 @@ public final class SelectExecutor {
             selectFuture.cancel(false);
             selectFuture = null;
         }
-        if (terminateTimer != null) {
-            terminateTimer.cancel(false);
-            terminateTimer = null;
+    }
+
+    /**
+     * NOTE: this method is not thread-safe and requires explicit
+     * synchronization.
+     */
+    private void resume() {
+        if (status != PAUSED) {
+            handleError("Cannot resume, SelectExecutor is not in paused state");
         }
-        if (!pause && executeIfRefresher != null) {
-            executeIfRefresher.stop();
-            executeIfRefresher = null;
+
+        try {
+            sampler.start();
+        } catch (QueryException e) {
+            handleError(
+                    "An error occurred while starting the sampling operation");
         }
+        startEvery(query.getEvery());
+        startTerminateAfter(query.getTerminate());
+
+        status = RUNNING;
     }
 
     /**
