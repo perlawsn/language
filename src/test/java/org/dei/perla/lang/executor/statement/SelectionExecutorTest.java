@@ -5,7 +5,6 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
-import org.dei.perla.lang.executor.statement.SelectExecutor;
 import org.dei.perla.lang.query.statement.SelectionQuery;
 import org.dei.perla.lang.query.parser.Parser;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import static org.junit.Assert.*;
 /**
  * @author Guido Rota 24/04/15.
  */
-public class SelectExecutorTest {
+public class SelectionExecutorTest {
 
     private static final Attribute temp =
             Attribute.create("temperature", DataType.INTEGER);
@@ -68,7 +67,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(10);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -103,7 +102,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(10);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -139,7 +138,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(3);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -170,7 +169,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -202,7 +201,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -242,7 +241,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());
@@ -293,7 +292,7 @@ public class SelectExecutorTest {
 
         LatchingQueryHandler<SelectionQuery, Object[]> handler =
                 new LatchingQueryHandler<>(1);
-        SelectExecutor exec = new SelectExecutor(query, handler, fpc);
+        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
         assertTrue(exec.isRunning());

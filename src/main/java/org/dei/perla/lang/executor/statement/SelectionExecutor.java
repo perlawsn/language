@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 22/04/15.
  */
-public final class SelectExecutor {
+public final class SelectionExecutor {
 
     private static final int STOPPED = 0;
     private static final int READY = 1;
@@ -79,7 +79,7 @@ public final class SelectExecutor {
     // overflows.
     private volatile int recordsProduced = 0;
 
-    public SelectExecutor(SelectionQuery query,
+    public SelectionExecutor(SelectionQuery query,
             QueryHandler<? super SelectionQuery, Object[]> handler,
             Fpc fpc) {
         this.query = query;
