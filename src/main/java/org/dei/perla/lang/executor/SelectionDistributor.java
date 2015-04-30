@@ -3,6 +3,7 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.executor.statement.QueryHandler;
+import org.dei.perla.lang.executor.statement.Refresher;
 import org.dei.perla.lang.executor.statement.SelectionExecutor;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
@@ -22,6 +23,7 @@ public class SelectionDistributor {
     private static final int STOPPED = 2;
 
     private final SelectionQuery query;
+    private final ExecutionConditions ec;
     private final QueryHandler<?super SelectionQuery, Object[]> handler;
     private final Registry registry;
 
@@ -33,9 +35,11 @@ public class SelectionDistributor {
     protected SelectionDistributor(SelectionQuery query,
             QueryHandler<? super SelectionQuery, Object[]> handler,
             Registry registry) {
-        this.registry = registry;
-        this.handler = handler;
         this.query = query;
+        ec = query.getExecutionConditions();
+        this.handler = handler;
+        this.registry = registry;
+
     }
 
     public synchronized void start() {
@@ -45,7 +49,6 @@ public class SelectionDistributor {
         }
         Collection<Fpc> available;
 
-        ExecutionConditions ec = query.getExecutionConditions();
         if (ec.getSpecs().isEmpty()) {
             available = registry.getAll();
         } else {
@@ -53,16 +56,11 @@ public class SelectionDistributor {
                     Collections.emptyList());
         }
 
-        try {
-            for (Fpc fpc : available) {
-                // TODO: filter out those fpcs that cannor run the query
-                SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
-                active.put(fpc, se);
-                se.start();
-            }
-        } catch (QueryException e) {
-            // TODO: make this better
-            throw new RuntimeException("unimplemented");
+        for (Fpc fpc : available) {
+            // TODO: filter out those fpcs that cannor run the query
+            SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
+            active.put(fpc, se);
+            se.start();
         }
 
         status = RUNNING;

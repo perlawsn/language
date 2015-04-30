@@ -45,7 +45,7 @@ public final class SamplerEvent implements Sampler {
     public synchronized void start() {
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
         if (evtTask == null) {
-            handleError("Initialization of REFRESH ON EVENT " +
+            throw new RuntimeException("Initialization of REFRESH ON EVENT " +
                     "sampling failed, cannot retrieve the required events");
         }
         running = true;

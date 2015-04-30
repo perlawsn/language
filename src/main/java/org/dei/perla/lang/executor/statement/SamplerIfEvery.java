@@ -76,7 +76,7 @@ public final class SamplerIfEvery implements Sampler {
     }
 
     @Override
-    public synchronized void start() throws QueryException {
+    public synchronized void start() {
         if (isRunning()) {
             return;
         }
@@ -84,7 +84,7 @@ public final class SamplerIfEvery implements Sampler {
         status = INITIALIZING;
         Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (t == null) {
-            throw new QueryException("Initialization of IF EVERY sampling" +
+            throw new RuntimeException("Initialization of IF EVERY sampling" +
                     " failed, cannot retrieve sample the required attributes");
         }
     }

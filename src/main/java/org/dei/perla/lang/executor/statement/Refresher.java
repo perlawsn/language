@@ -67,7 +67,7 @@ public final class Refresher {
         evtTask = fpc.async(es, true, evtHand);
 
         if (evtTask == null) {
-            handleError("Initialization of REFRESH ON EVENT " +
+            throw new RuntimeException("Initialization of REFRESH ON EVENT " +
                     "sampling failed, cannot retrieve the required events");
         }
     }

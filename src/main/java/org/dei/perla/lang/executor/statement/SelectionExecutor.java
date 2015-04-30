@@ -160,7 +160,7 @@ public final class SelectionExecutor {
         return status == PAUSED;
     }
 
-    public synchronized void start() throws QueryException {
+    public synchronized void start() {
         if (status != READY) {
             throw new IllegalStateException(
                     "Cannot restart, SelectExecutor has been stopped");
@@ -287,12 +287,7 @@ public final class SelectionExecutor {
             handleError("Cannot resume, SelectExecutor is not in paused state");
         }
 
-        try {
-            sampler.start();
-        } catch (QueryException e) {
-            handleError(
-                    "An error occurred while starting the sampling operation");
-        }
+        sampler.start();
         startEvery(query.getEvery());
         startTerminateAfter(query.getTerminate());
 
