@@ -1,5 +1,7 @@
 package org.dei.perla.lang.executor;
 
+import org.dei.perla.lang.executor.statement.QueryHandler;
+
 /**
  * @author Guido Rota 13/04/15.
  */

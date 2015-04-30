@@ -1,5 +1,7 @@
 package org.dei.perla.lang.executor;
 
+import org.dei.perla.lang.executor.statement.QueryHandler;
+
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

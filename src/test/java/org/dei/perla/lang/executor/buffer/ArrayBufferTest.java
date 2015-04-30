@@ -3,13 +3,10 @@ package org.dei.perla.lang.executor.buffer;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.buffer.ArrayBuffer;
-import org.dei.perla.lang.executor.buffer.Buffer;
-import org.dei.perla.lang.executor.buffer.BufferView;
-import org.dei.perla.lang.executor.expression.Comparison;
-import org.dei.perla.lang.executor.expression.Constant;
-import org.dei.perla.lang.executor.expression.Expression;
-import org.dei.perla.lang.executor.expression.Field;
+import org.dei.perla.lang.query.expression.Comparison;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.Field;
 import org.junit.Test;
 
 import java.time.Duration;

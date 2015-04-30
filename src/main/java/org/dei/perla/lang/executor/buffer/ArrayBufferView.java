@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.buffer;
 
-import org.dei.perla.lang.executor.expression.Expression;
-import org.dei.perla.lang.executor.expression.LogicValue;
+import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.LogicValue;
 
 import java.time.Duration;
 import java.time.Instant;
