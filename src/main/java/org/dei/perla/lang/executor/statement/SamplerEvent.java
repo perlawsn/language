@@ -11,8 +11,6 @@ import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SamplingEvent;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 14/04/15.
@@ -27,7 +25,6 @@ public final class SamplerEvent implements Sampler {
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler evtHandler = new EventHandler();
 
-    private final Lock lk = new ReentrantLock();
     private volatile boolean running = false;
 
     private Task evtTask;
@@ -45,43 +42,28 @@ public final class SamplerEvent implements Sampler {
     }
 
     @Override
-    public void start() {
-        lk.lock();
-        try {
-            evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
-            if (evtTask == null) {
-                handleError("Initialization of REFRESH ON EVENT " +
-                        "sampling failed, cannot retrieve the required events");
-            }
-            running = true;
-        } finally {
-            lk.unlock();
+    public synchronized void start() {
+        evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
+        if (evtTask == null) {
+            handleError("Initialization of REFRESH ON EVENT " +
+                    "sampling failed, cannot retrieve the required events");
+        }
+        running = true;
+    }
+
+    @Override
+    public synchronized void stop() {
+        running = false;
+        if (evtTask != null) {
+            Task t = evtTask;
+            evtTask = null;
+            t.stop();
         }
     }
 
     @Override
-    public void stop() {
-        lk.lock();
-        try {
-            running = false;
-            if (evtTask != null) {
-                Task t = evtTask;
-                evtTask = null;
-                t.stop();
-            }
-        } finally {
-            lk.unlock();
-        }
-    }
-
-    @Override
-    public boolean isRunning() {
-        lk.lock();
-        try {
-            return running;
-        } finally {
-            lk.unlock();
-        }
+    public synchronized boolean isRunning() {
+        return running;
     }
 
     /**
@@ -128,15 +110,12 @@ public final class SamplerEvent implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized (SamplerEvent.this) {
                 if (!running) {
                     return;
                 }
 
                 handleError("Unexpected error while sampling", cause);
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -150,13 +129,10 @@ public final class SamplerEvent implements Sampler {
 
         @Override
         public void complete(Task task) {
-            lk.lock();
-            try {
+            synchronized (SamplerEvent.this) {
                 if (running && task == evtTask) {
                     handleError("REFRESH ON EVENT sampling stopped prematurely");
                 }
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -173,15 +149,12 @@ public final class SamplerEvent implements Sampler {
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized (SamplerEvent.this) {
                 if (!running) {
                     return;
                 }
 
                 handleError("Sampling of REFRESH ON EVENT events failed", cause);
-            } finally {
-                lk.unlock();
             }
         }
 

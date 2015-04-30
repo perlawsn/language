@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 24/04/15.
@@ -28,7 +26,6 @@ public final class Refresher {
     private final QueryHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
-    private final Lock lk = new ReentrantLock();
     private volatile boolean running = false;
 
     private final TaskHandler evtHand = new EventHandler();
@@ -43,24 +40,19 @@ public final class Refresher {
         this.fpc = fpc;
     }
 
-    public void start() {
-        lk.lock();
-        try {
-            switch (refresh.getType()) {
-                case TIME:
-                    startTimeRefresh();
-                    break;
-                case EVENT:
-                    startEventRefresh();
-                    break;
-                default:
-                    throw new RuntimeException("Unexpected " + refresh.getType()
-                            + "refresh type");
-            }
-            running = true;
-        } finally {
-            lk.unlock();
+    public synchronized void start() {
+        switch (refresh.getType()) {
+            case TIME:
+                startTimeRefresh();
+                break;
+            case EVENT:
+                startEventRefresh();
+                break;
+            default:
+                throw new RuntimeException("Unexpected " + refresh.getType()
+                        + "refresh type");
         }
+        running = true;
     }
 
     private void startTimeRefresh() {
@@ -80,30 +72,20 @@ public final class Refresher {
         }
     }
 
-    public void stop() {
-        lk.lock();
-        try {
-            running = false;
-            if (evtTask != null) {
-                evtTask.stop();
-                evtTask = null;
-            }
-            if (timer != null) {
-                timer.cancel(false);
-                timer = null;
-            }
-        } finally {
-            lk.unlock();
+    public synchronized void stop() {
+        running = false;
+        if (evtTask != null) {
+            evtTask.stop();
+            evtTask = null;
+        }
+        if (timer != null) {
+            timer.cancel(false);
+            timer = null;
         }
     }
 
-    public boolean isRunning() {
-        lk.lock();
-        try {
-            return running;
-        } finally {
-            lk.unlock();
-        }
+    public synchronized boolean isRunning() {
+        return running;
     }
 
     /**
@@ -139,13 +121,10 @@ public final class Refresher {
 
         @Override
         public void complete(Task task) {
-            lk.lock();
-            try {
+            synchronized(Refresher.this) {
                 if (running && task == evtTask) {
                     handleError("REFRESH ON EVENT sampling stopped prematurely");
                 }
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -162,15 +141,12 @@ public final class Refresher {
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized(Refresher.this) {
                 if (!running) {
                     return;
                 }
 
                 handleError("REFRESH ON EVENT sampling generated an error", cause);
-            } finally {
-                lk.unlock();
             }
         }
 

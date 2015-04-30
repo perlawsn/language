@@ -53,12 +53,17 @@ public class SelectionDistributor {
                     Collections.emptyList());
         }
 
-        available.forEach((fpc) -> {
-            // TODO: filter out those fpcs that cannor run the query
-            SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
-            active.put(fpc, se);
-            se.start();
-        });
+        try {
+            for (Fpc fpc : available) {
+                // TODO: filter out those fpcs that cannor run the query
+                SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
+                active.put(fpc, se);
+                se.start();
+            }
+        } catch (QueryException e) {
+            // TODO: make this better
+            throw new RuntimeException("unimplemented");
+        }
 
         status = RUNNING;
     }

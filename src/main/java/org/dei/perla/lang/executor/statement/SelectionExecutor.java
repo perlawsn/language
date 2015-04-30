@@ -17,8 +17,6 @@ import org.dei.perla.lang.query.statement.WindowSize.WindowType;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 22/04/15.
@@ -57,7 +55,6 @@ public final class SelectionExecutor {
     private ScheduledFuture<?> everyTimer;
     private ScheduledFuture<?> terminateTimer;
 
-    private final Lock lk = new ReentrantLock();
     private volatile int status = READY;
 
     // Number of samples to receive before triggering a selection operation.
@@ -149,13 +146,8 @@ public final class SelectionExecutor {
      *
      * @return true if the executor is running, false otherwise
      */
-    public boolean isRunning() {
-        lk.lock();
-        try {
-            return status >= INITIALIZING;
-        } finally {
-            lk.unlock();
-        }
+    public synchronized boolean isRunning() {
+        return status >= INITIALIZING;
     }
 
     /**
@@ -164,41 +156,31 @@ public final class SelectionExecutor {
      *
      * @return true if the executor is paused, false otherwise
      */
-    protected boolean isPaused() {
-        lk.lock();
-        try {
-            return status == PAUSED;
-        } finally {
-            lk.unlock();
-        }
+    protected synchronized boolean isPaused() {
+        return status == PAUSED;
     }
 
-    public void start() throws QueryException {
-        lk.lock();
-        try {
-            if (status != READY) {
-                throw new IllegalStateException(
-                        "Cannot restart, SelectExecutor has been stopped");
-            }
+    public synchronized void start() throws QueryException {
+        if (status != READY) {
+            throw new IllegalStateException(
+                    "Cannot restart, SelectExecutor has been stopped");
+        }
 
-            startTerminateAfter(query.getTerminate());
+        startTerminateAfter(query.getTerminate());
 
-            ExecutionConditions ec = query.getExecutionConditions();
-            if (ec.getAttributes().isEmpty()) {
-                // Start sampling immediately if the execution condition is
-                // empty or if its value is static.
-                sampler.start();
-                startEvery(query.getEvery());
-                status = RUNNING;
+        ExecutionConditions ec = query.getExecutionConditions();
+        if (ec.getAttributes().isEmpty()) {
+            // Start sampling immediately if the execution condition is
+            // empty or if its value is static.
+            sampler.start();
+            startEvery(query.getEvery());
+            status = RUNNING;
 
-            } else {
-                // Evaluate the execution condition before starting the
-                // main sampling operation
-                status = INITIALIZING;
-                triggerExecuteIfEvaluation();
-            }
-        } finally {
-            lk.unlock();
+        } else {
+            // Evaluate the execution condition before starting the
+            // main sampling operation
+            status = INITIALIZING;
+            triggerExecuteIfEvaluation();
         }
     }
 
@@ -246,33 +228,28 @@ public final class SelectionExecutor {
      * Stops the execution. After this method is called, the {@code
      * SelectExecutor} cannot be re-started again.
      */
-    public void stop() {
-        lk.lock();
-        try {
-            if (status == STOPPED) {
-                return;
-            }
+    public synchronized void stop() {
+        if (status == STOPPED) {
+            return;
+        }
 
-            status = STOPPED;
-            sampler.stop();
-            if (everyTimer != null) {
-                everyTimer.cancel(false);
-                everyTimer = null;
-            }
-            if (selectFuture != null) {
-                selectFuture.cancel(false);
-                selectFuture = null;
-            }
-            if (terminateTimer != null) {
-                terminateTimer.cancel(false);
-                terminateTimer = null;
-            }
-            if (executeIfRefresher != null) {
-                executeIfRefresher.stop();
-                executeIfRefresher = null;
-            }
-        } finally {
-            lk.unlock();
+        status = STOPPED;
+        sampler.stop();
+        if (everyTimer != null) {
+            everyTimer.cancel(false);
+            everyTimer = null;
+        }
+        if (selectFuture != null) {
+            selectFuture.cancel(false);
+            selectFuture = null;
+        }
+        if (terminateTimer != null) {
+            terminateTimer.cancel(false);
+            terminateTimer = null;
+        }
+        if (executeIfRefresher != null) {
+            executeIfRefresher.stop();
+            executeIfRefresher = null;
         }
     }
 
@@ -355,15 +332,12 @@ public final class SelectionExecutor {
 
         @Override
         public void error(Sampling source, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized (SelectionExecutor.this) {
                 if (status < RUNNING) {
                     return;
                 }
 
                 handleError("Error while sampling data", cause);
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -425,16 +399,13 @@ public final class SelectionExecutor {
 
         @Override
         public void error(Refresh source, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized (SelectionExecutor.this) {
                 if (status < RUNNING) {
                     return;
                 }
 
                 handleError("Error while refreshing EXECUTE-IF condition",
                         cause);
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -458,8 +429,7 @@ public final class SelectionExecutor {
 
         @Override
         public void data(Task task, Sample sample) {
-            lk.lock();
-            try {
+            synchronized (SelectionExecutor.this) {
                 if (status == INITIALIZING) {
                     startExecuteIf(query.getExecutionConditions());
                     status = RUNNING;
@@ -473,8 +443,6 @@ public final class SelectionExecutor {
                 } else {
                     pause();
                 }
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -498,16 +466,13 @@ public final class SelectionExecutor {
 
         @Override
         public void error(Task task, Throwable cause) {
-            lk.lock();
-            try {
+            synchronized (SelectionExecutor.this) {
                 if (status < RUNNING) {
                     return;
                 }
 
                 handleError("Error while sampling data to compute" +
                         "EXECUTE-IF clause");
-            } finally {
-                lk.unlock();
             }
         }
 
@@ -528,8 +493,7 @@ public final class SelectionExecutor {
                 BufferView view = buffer.unmodifiableView();
                 List<Object[]> rs = select.select(view);
 
-                lk.lock();
-                try {
+                synchronized (SelectionExecutor.this) {
                     // Notify new records and check termination conditions.
                     // the following operations are performed under lock to
                     // guarantee precise TERMINATE AFTER semantics
@@ -547,8 +511,6 @@ public final class SelectionExecutor {
                     if (triggered.decrementAndGet() == 0) {
                         return;
                     }
-                } finally {
-                    lk.unlock();
                 }
             }
         }
