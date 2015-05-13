@@ -24,7 +24,7 @@ public class SelectionDistributor {
 
     private final SelectionQuery query;
     private final ExecutionConditions ec;
-    private final QueryHandler<?super SelectionQuery, Object[]> handler;
+    private final QueryHandler<? super SelectionQuery, Object[]> handler;
     private final Registry registry;
 
     private int status = READY;
@@ -39,7 +39,6 @@ public class SelectionDistributor {
         ec = query.getExecutionConditions();
         this.handler = handler;
         this.registry = registry;
-
     }
 
     public synchronized void start() {
@@ -47,6 +46,12 @@ public class SelectionDistributor {
             throw new IllegalStateException("Cannot start, " +
                     "SelectionDistributor has already been started");
         }
+
+        distribute();
+        status = RUNNING;
+    }
+
+    private void distribute() {
         Collection<Fpc> available;
 
         if (ec.getSpecs().isEmpty()) {
@@ -57,13 +62,14 @@ public class SelectionDistributor {
         }
 
         for (Fpc fpc : available) {
-            // TODO: filter out those fpcs that cannor run the query
+            if (active.containsKey(fpc)) {
+                continue;
+            }
+
             SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
             active.put(fpc, se);
             se.start();
         }
-
-        status = RUNNING;
     }
 
     public synchronized void stop() {
@@ -90,12 +96,16 @@ public class SelectionDistributor {
 
         @Override
         public void error(Refresh source, Throwable cause) {
-
+            synchronized (SelectionDistributor.this) {
+                distribute();
+            }
         }
 
         @Override
         public void data(Refresh source, Void value) {
-
+            synchronized (SelectionDistributor.this) {
+                distribute();
+            }
         }
 
     }

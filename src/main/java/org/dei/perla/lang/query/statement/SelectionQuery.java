@@ -2,8 +2,8 @@ package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.executor.buffer.BufferView;
+import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public final class SelectionQuery implements Statement {
 
     // List of attributes required to run the data management clauses and the
     // where expression of the sampling clause
-    private final List<Attribute> selAtts;
+    private final List<Attribute> dataAtts;
 
     /**
      *
@@ -45,14 +45,14 @@ public final class SelectionQuery implements Statement {
         this.where = where;
         this.cond = cond;
         this.terminate = terminate;
-        selAtts = Collections.emptyList();
+        dataAtts = Collections.emptyList();
     }
 
-    private SelectionQuery(Select select, List<Attribute> selAtts, WindowSize every,
-            Sampling sampling, Expression where, ExecutionConditions cond,
-            WindowSize terminate) {
+    private SelectionQuery(Select select, List<Attribute> dataAtts,
+            WindowSize every, Sampling sampling, Expression where,
+            ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
-        this.selAtts = Collections.unmodifiableList(selAtts);
+        this.dataAtts = Collections.unmodifiableList(dataAtts);
         this.every = every;
         this.sampling = sampling;
         this.where = where;
@@ -60,8 +60,8 @@ public final class SelectionQuery implements Statement {
         this.terminate = terminate;
     }
 
-    public List<Attribute> getSelectAttributes() {
-        return selAtts;
+    public List<Attribute> getDataAttributes() {
+        return dataAtts;
     }
 
     public Select getSelect() {
@@ -91,9 +91,9 @@ public final class SelectionQuery implements Statement {
     public SelectionQuery bind(Collection<Attribute> atts) throws BindingException {
         Errors err = new Errors();
 
-        List<Attribute> selAtts = new ArrayList<>();
-        Select bselect = select.bind(atts, selAtts, err);
-        Expression bwhere = where.bind(atts, selAtts, err);
+        List<Attribute> dataAtts = new ArrayList<>();
+        Select bselect = select.bind(atts, dataAtts, err);
+        Expression bwhere = where.bind(atts, dataAtts, err);
 
         Sampling bsampling = sampling.bind(atts, err);
         ExecutionConditions bcond = cond.bind(atts, err);
@@ -103,11 +103,11 @@ public final class SelectionQuery implements Statement {
         }
 
         // Add timestamp attribute if not explicitly included in the query
-        if (!selAtts.contains(Attribute.TIMESTAMP)) {
-            selAtts.add(Attribute.TIMESTAMP);
+        if (!dataAtts.contains(Attribute.TIMESTAMP)) {
+            dataAtts.add(Attribute.TIMESTAMP);
         }
 
-        return new SelectionQuery(bselect, selAtts, every, bsampling, bwhere, bcond,
+        return new SelectionQuery(bselect, dataAtts, every, bsampling, bwhere, bcond,
                 terminate);
     }
 

@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.util.List;
 
 /**
+ * SAMPLING IF EVERY clause executor
+ *
  * @author Guido Rota 24/03/15.
  */
 public final class SamplerIfEvery implements Sampler {
@@ -76,17 +78,20 @@ public final class SamplerIfEvery implements Sampler {
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized boolean start() {
         if (isRunning()) {
-            return;
+            throw new IllegalStateException("Cannot start, SamplerIfEvery is " +
+                    "already running");
         }
 
         status = INITIALIZING;
         Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (t == null) {
-            throw new RuntimeException("Initialization of IF EVERY sampling" +
-                    " failed, cannot retrieve sample the required attributes");
+            status = STOPPED;
+            return false;
         }
+
+        return true;
     }
 
     @Override

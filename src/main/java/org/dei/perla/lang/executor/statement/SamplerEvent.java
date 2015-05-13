@@ -13,6 +13,8 @@ import org.dei.perla.lang.query.statement.SamplingEvent;
 import java.util.List;
 
 /**
+ * SAMPLING ON EVENT clause executor
+ *
  * @author Guido Rota 14/04/15.
  */
 public final class SamplerEvent implements Sampler {
@@ -42,13 +44,10 @@ public final class SamplerEvent implements Sampler {
     }
 
     @Override
-    public synchronized void start() {
+    public synchronized boolean start() {
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
-        if (evtTask == null) {
-            throw new RuntimeException("Initialization of REFRESH ON EVENT " +
-                    "sampling failed, cannot retrieve the required events");
-        }
-        running = true;
+        running = evtTask != null;
+        return running;
     }
 
     @Override

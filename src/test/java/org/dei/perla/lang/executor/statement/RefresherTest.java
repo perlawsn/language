@@ -5,7 +5,6 @@ import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
-import org.dei.perla.lang.executor.statement.Refresher;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.junit.Test;
 
@@ -45,16 +44,20 @@ public class RefresherTest {
                 new LatchingQueryHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
-        r.start();
+        boolean started = r.start();
+        assertTrue(started);
         assertTrue(r.isRunning());
         handler.await();
 
         r.stop();
+        assertFalse(r.isRunning());
         int count = handler.getDataCount();
         Thread.sleep(1000);
         assertThat(handler.getDataCount(), equalTo(count));
 
-        r.start();
+        started = r.start();
+        assertTrue(started);
+        assertTrue(r.isRunning());
         Thread.sleep(1000);
         assertThat(handler.getDataCount(), greaterThan(count));
     }
@@ -70,17 +73,22 @@ public class RefresherTest {
                 new LatchingQueryHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
-        r.start();
+        boolean started = r.start();
+        assertTrue(started);
+        assertTrue(r.isRunning());
         fpc.triggerEvent();
         fpc.triggerEvent();
         fpc.triggerEvent();
         handler.await();
 
         r.stop();
+        assertFalse(r.isRunning());
         fpc.triggerEvent();
         assertThat(handler.getDataCount(), equalTo(3));
 
-        r.start();
+        started = r.start();
+        assertTrue(started);
+        assertTrue(r.isRunning());
         fpc.triggerEvent();
         assertThat(handler.getDataCount(), equalTo(4));
     }

@@ -14,7 +14,7 @@ public interface Sampler {
      *
      * @throws QueryException if the sampling operation cannot be started
      */
-    public void start();
+    public boolean start();
 
     /**
      * Stops the sampling operation

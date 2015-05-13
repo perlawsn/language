@@ -15,6 +15,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * REFRESH clause executor
+ *
  * @author Guido Rota 24/04/15.
  */
 public final class Refresher {
@@ -26,7 +28,7 @@ public final class Refresher {
     private final QueryHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
-    private volatile boolean running = false;
+    private boolean running = false;
 
     private final TaskHandler evtHand = new EventHandler();
 
@@ -40,36 +42,34 @@ public final class Refresher {
         this.fpc = fpc;
     }
 
-    public synchronized void start() {
+    public synchronized boolean start() {
         switch (refresh.getType()) {
             case TIME:
-                startTimeRefresh();
-                break;
+                return startTimeRefresh();
             case EVENT:
-                startEventRefresh();
-                break;
+                return startEventRefresh();
             default:
                 throw new RuntimeException("Unexpected " + refresh.getType()
-                        + "refresh type");
+                        + " refresh type");
         }
-        running = true;
     }
 
-    private void startTimeRefresh() {
+    private boolean startTimeRefresh() {
         long period = refresh.getDuration().toMillis();
         timer = scheduler.scheduleAtFixedRate(() -> {
             handler.data(refresh, null);
         }, period, period, TimeUnit.MILLISECONDS);
+
+        running = true;
+        return true;
     }
 
-    private void startEventRefresh() {
+    private boolean startEventRefresh() {
         List<Attribute> es = refresh.getEvents();
         evtTask = fpc.async(es, true, evtHand);
 
-        if (evtTask == null) {
-            throw new RuntimeException("Initialization of REFRESH ON EVENT " +
-                    "sampling failed, cannot retrieve the required events");
-        }
+        running = evtTask != null;
+        return running;
     }
 
     public synchronized void stop() {
@@ -130,13 +130,9 @@ public final class Refresher {
 
         @Override
         public void data(Task task, Sample sample) {
-            // Not locking on purpose. We accept a weaker synchronization
-            // guarantee in exchange for lower data latency
-            if (!running) {
-                return;
+            synchronized(Refresher.this) {
+                handler.data(refresh, null);
             }
-
-            handler.data(refresh, null);
         }
 
         @Override

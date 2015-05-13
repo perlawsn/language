@@ -65,6 +65,7 @@ public final class SelectionExecutor {
     // triggered
     private final AtomicInteger samplesLeft = new AtomicInteger(0);
 
+    // Number of times the data management clause has been triggered
     private final AtomicInteger triggered = new AtomicInteger(0);
 
     // Number of record to generate before terminating the query
@@ -87,9 +88,9 @@ public final class SelectionExecutor {
         this.handler = handler;
 
         // TODO: forecast average buffer length
-        buffer = new ArrayBuffer(query.getSelectAttributes(), 512);
+        buffer = new ArrayBuffer(query.getDataAttributes(), 512);
         sampler = createSampler(query.getSampling(),
-                query.getSelectAttributes());
+                query.getDataAttributes());
 
         // Initialize EVERY data
         WindowSize every = query.getEvery();
@@ -184,6 +185,20 @@ public final class SelectionExecutor {
         }
     }
 
+    /*
+     * Starts the TERMINATE AFTER clause
+     */
+    private void startTerminateAfter(WindowSize terminate) {
+        if (terminate.isZero() ||
+                terminate.getType() == WindowType.SAMPLE) {
+            return;
+        }
+
+        long delayMs = terminate.getDuration().toMillis();
+        terminateTimer = timer.schedule(this::stop, delayMs,
+                TimeUnit.MILLISECONDS);
+    }
+
     private void triggerExecuteIfEvaluation() {
         Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
         if (t == null) {
@@ -207,20 +222,6 @@ public final class SelectionExecutor {
             }
         };
         everyTimer = timer.scheduleWithFixedDelay(task, periodMs, periodMs,
-                TimeUnit.MILLISECONDS);
-    }
-
-    /*
-     * Starts the TERMINATE AFTER clause
-     */
-    private void startTerminateAfter(WindowSize terminate) {
-        if (terminate.isZero() ||
-                terminate.getType() == WindowType.SAMPLE) {
-            return;
-        }
-
-        long delayMs = terminate.getDuration().toMillis();
-        terminateTimer = timer.schedule(this::stop, delayMs,
                 TimeUnit.MILLISECONDS);
     }
 

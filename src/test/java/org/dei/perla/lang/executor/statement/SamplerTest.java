@@ -6,12 +6,10 @@ import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.NoopQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
-import org.dei.perla.lang.executor.statement.SamplerEvent;
-import org.dei.perla.lang.executor.statement.SamplerIfEvery;
+import org.dei.perla.lang.query.parser.Parser;
 import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SamplingEvent;
 import org.dei.perla.lang.query.statement.SamplingIfEvery;
-import org.dei.perla.lang.query.parser.Parser;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -61,7 +59,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -73,7 +72,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(200);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -85,7 +85,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -117,7 +118,9 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
+        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(100);
         assertTrue(fpc.hasPeriod(100));
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -138,11 +141,14 @@ public class SamplerTest {
 
         // Stop sampler
         sampler.stop();
+        assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
 
         // Restart sampler
-        sampler.start();
+        started = sampler.start();
+        assertTrue(started);
+        assertTrue(sampler.isRunning());
         assertTrue(sampler.isRunning());
 
         // Change power level, check if sampling rate lowers
@@ -181,7 +187,8 @@ public class SamplerTest {
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -210,7 +217,8 @@ public class SamplerTest {
         assertThat(fpc.countAsync(), equalTo(0));
 
         // Restart sampler
-        sampler.start();
+        started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
 
         // Trigger event, check if sampling rate changes
@@ -251,7 +259,8 @@ public class SamplerTest {
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopQueryHandler());
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -279,7 +288,8 @@ public class SamplerTest {
                 LatchingQueryHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
@@ -310,7 +320,8 @@ public class SamplerTest {
                 LatchingQueryHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
-        sampler.start();
+        boolean started = sampler.start();
+        assertTrue(started);
         assertTrue(sampler.isRunning());
 
         fpc.triggerError();
