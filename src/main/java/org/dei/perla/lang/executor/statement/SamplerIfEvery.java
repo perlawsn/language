@@ -153,8 +153,16 @@ public final class SamplerIfEvery implements Sampler {
                     return;
                 }
 
-                if (refresher != null && !refresher.isRunning()) {
-                    refresher.start();
+                // Stop here if there's no refresh clause to start or if the
+                // refresh clause executor is already running
+                if (refresher == null || refresher.isRunning()) {
+                    return;
+                }
+
+                boolean started = refresher.start();
+                if (!started) {
+                    handleError("Initialization of SAMPLING REFRESH " +
+                            "clause failed");
                 }
             }
         }

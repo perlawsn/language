@@ -161,7 +161,7 @@ public final class SelectionExecutor {
         return status == PAUSED;
     }
 
-    public synchronized void start() {
+    public synchronized boolean start() {
         if (status != READY) {
             throw new IllegalStateException(
                     "Cannot restart, SelectExecutor has been stopped");
@@ -173,7 +173,11 @@ public final class SelectionExecutor {
         if (ec.getAttributes().isEmpty()) {
             // Start sampling immediately if the execution condition is
             // empty or if its value is static.
-            sampler.start();
+            boolean started = sampler.start();
+            if (started == false) {
+                status = STOPPED;
+                return false;
+            }
             startEvery(query.getEvery());
             status = RUNNING;
 
@@ -183,6 +187,7 @@ public final class SelectionExecutor {
             status = INITIALIZING;
             triggerExecuteIfEvaluation();
         }
+        return true;
     }
 
     /*
@@ -280,6 +285,8 @@ public final class SelectionExecutor {
     }
 
     /**
+     * Resumes execution.
+     *
      * NOTE: this method is not thread-safe and requires explicit
      * synchronization.
      */
@@ -339,6 +346,8 @@ public final class SelectionExecutor {
 
         @Override
         public void data(Sampling source, Object[] sample) {
+            // Avoiding strict synchronization to reduce latency on the
+            // critical data path.
             if (status != RUNNING) {
                 return;
             }
@@ -377,7 +386,7 @@ public final class SelectionExecutor {
             } while(!samplesLeft.compareAndSet(o, n));
 
             if (o - 1 == 0) {
-                if (triggered.incrementAndGet() == 1) {
+                if (triggered.incrementAndGet() == 1 && status == RUNNING) {
                     selectFuture = pool.submit(selectRunnable);
                 }
             }
@@ -427,8 +436,18 @@ public final class SelectionExecutor {
         public void data(Task task, Sample sample) {
             synchronized (SelectionExecutor.this) {
                 if (status == INITIALIZING) {
-                    startExecuteIf(query.getExecutionConditions());
+                    boolean started =
+                            startExecIfRefresh(query.getExecutionConditions());
+                    if (!started) {
+                        handleError("Error initializing EXECUTE IF REFRESH " +
+                                "clause executor");
+                        return;
+                    }
                     status = RUNNING;
+                }
+
+                if (status < RUNNING) {
+                    return;
                 }
 
                 Expression cond = execCond.getCondition();
@@ -443,21 +462,21 @@ public final class SelectionExecutor {
         }
 
         /*
-         * Starts the EXECUTE IF clause
+         * Starts the REFRESH associated with the EXECUTE IF clause
          */
-        private void startExecuteIf(ExecutionConditions ec) {
+        private boolean startExecIfRefresh(ExecutionConditions ec) {
             // Avoid starting the refresher for the EXECUTE IF clause when not
             // necessary, i.e. if the refresh clause is trivially set to never or
             // if the execute if condition is constant and does not require any
             // data from the device in order to be evaluated.
             if (ec.getRefresh() == Refresh.NEVER ||
                     ec.getAttributes().isEmpty()) {
-                return;
+                return true;
             }
 
             executeIfRefresher = new Refresher(ec.getRefresh(),
                     execIfRefHand, fpc);
-            executeIfRefresher.start();
+            return executeIfRefresher.start();
         }
 
         @Override
