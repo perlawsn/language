@@ -321,7 +321,6 @@ public class SelectionExecutorTest {
         fpc.setValues(v);
         fpc.triggerEvent();
         assertTrue(exec.isRunning());
-        asdf
         fpc.awaitPeriodicStopped();
         assertTrue(exec.isPaused());
         assertThat(fpc.countAsync(), equalTo(1));

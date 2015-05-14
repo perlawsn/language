@@ -75,32 +75,29 @@ public class SimulatorFpc implements Fpc {
      * Triggers the production of a new sample on all event tasks
      */
     public void triggerEvent() {
-        lk.lock();
-        try {
-            AsyncUtils.runOnNewThread(() -> {
-                lk.lock();
-                try {
-                    asyncTasks.forEach(AsyncSimTask::trigger);
-                } finally {
-                    lk.unlock();
-                }
-            });
-        } finally {
-            lk.unlock();
-        }
+        AsyncUtils.runOnNewThread(() -> {
+            lk.lock();
+            try {
+                asyncTasks.forEach(AsyncSimTask::trigger);
+            } finally {
+                lk.unlock();
+            }
+        });
     }
 
     /**
      * Triggers the production of an error
      */
     public void triggerError() {
-        lk.lock();
-        try {
-            periodicTasks.forEach(PeriodicSimTask::triggerError);
-            asyncTasks.forEach(AsyncSimTask::triggerError);
-        } finally {
-            lk.unlock();
-        }
+        AsyncUtils.runOnNewThread(() -> {
+            lk.lock();
+            try {
+                periodicTasks.forEach(PeriodicSimTask::triggerError);
+                asyncTasks.forEach(AsyncSimTask::triggerError);
+            } finally {
+                lk.unlock();
+            }
+        });
     }
 
     /**
@@ -278,7 +275,6 @@ public class SimulatorFpc implements Fpc {
             PeriodicSimTask t = new PeriodicSimTask(atts, periodMs, handler);
             periodicTasks.add(t);
             addPeriod(periodMs);
-            t.start();
             cond.signalAll();
             return t;
         } finally {
@@ -292,6 +288,7 @@ public class SimulatorFpc implements Fpc {
         try {
             AsyncSimTask t = new AsyncSimTask(atts, handler);
             asyncTasks.add(t);
+            cond.signalAll();
             return t;
         } finally {
             lk.unlock();
@@ -385,9 +382,6 @@ public class SimulatorFpc implements Fpc {
             super(atts, handler);
             this.periodMs = periodMs;
             generator = new Thread(this::generateValues);
-        }
-
-        protected void start() {
             generator.start();
         }
 
@@ -422,6 +416,7 @@ public class SimulatorFpc implements Fpc {
                 generator.interrupt();
                 periodicTasks.remove(this);
                 removePeriod(periodMs);
+                cond.signalAll();
             } finally {
                 lk.unlock();
             }
@@ -463,6 +458,7 @@ public class SimulatorFpc implements Fpc {
             lk.lock();
             try {
                 asyncTasks.remove(this);
+                cond.signalAll();
                 running = false;
             } finally {
                 lk.unlock();
