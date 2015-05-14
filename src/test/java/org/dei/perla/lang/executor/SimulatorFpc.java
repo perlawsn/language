@@ -7,6 +7,7 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.sample.SamplePipeline;
 import org.dei.perla.core.sample.SamplePipeline.PipelineBuilder;
+import org.dei.perla.core.utils.AsyncUtils;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -127,8 +128,42 @@ public class SimulatorFpc implements Fpc {
     }
 
     /**
+     * Awaits until at least one long-running smapling operation has started.
+     *
+     * @throws InterruptedException
+     */
+    public void awaitStarted() throws InterruptedException {
+        lk.lock();
+        try {
+            while (asyncTasks.isEmpty() && periodicTasks.isEmpty()) {
+                cond.await();
+            }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
+     * Awaits until all long-running sampling operations have stopped.
+     *
+     * @throws InterruptedException
+     */
+    public void awaitStopped() throws InterruptedException {
+        lk.lock();
+        try {
+            while (!asyncTasks.isEmpty() || !periodicTasks.isEmpty()) {
+                cond.await();
+            }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
      * Awaits until a sampling operation with the specified period is run on
      * this FPC.
+     *
+     * @throws InterruptedException
      */
     public void awaitPeriod(long period) throws InterruptedException {
         lk.lock();
@@ -202,7 +237,15 @@ public class SimulatorFpc implements Fpc {
 
     @Override
     public Task get(List<Attribute> atts, boolean strict, TaskHandler handler) {
-        return new GetSimTask(atts, handler);
+        lk.lock();
+        try {
+            // This synchronized block, along with the synchronized sample
+            // creation (see GetSimTask), ensures that the handler is invoked
+            // only after the call to this method terminates
+            return new GetSimTask(atts, handler);
+        } finally {
+            lk.unlock();
+        }
     }
 
     @Override
@@ -212,6 +255,7 @@ public class SimulatorFpc implements Fpc {
             PeriodicSimTask t = new PeriodicSimTask(atts, periodMs, handler);
             periodicTasks.add(t);
             addPeriod(periodMs);
+            t.start();
             cond.signalAll();
             return t;
         } finally {
@@ -277,9 +321,18 @@ public class SimulatorFpc implements Fpc {
 
         protected GetSimTask(List<Attribute> atts, TaskHandler handler) {
             super(atts, handler);
-            Sample r = pipeline.run(newSample());
-            handler.data(this, r);
-            handler.complete(this);
+            AsyncUtils.runOnNewThread(this::createSample);
+        }
+
+        private void createSample() {
+            lk.lock();
+            try {
+                Sample r = pipeline.run(newSample());
+                handler.data(this, r);
+                handler.complete(this);
+            } finally {
+                lk.unlock();
+            }
         }
 
         @Override
@@ -309,6 +362,9 @@ public class SimulatorFpc implements Fpc {
             super(atts, handler);
             this.periodMs = periodMs;
             generator = new Thread(this::generateValues);
+        }
+
+        protected void start() {
             generator.start();
         }
 

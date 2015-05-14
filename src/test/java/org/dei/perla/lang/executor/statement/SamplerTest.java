@@ -60,9 +60,9 @@ public class SamplerTest {
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
         boolean started = sampler.start();
+        fpc.awaitPeriod(100);
         assertTrue(started);
         assertTrue(sampler.isRunning());
-        fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Test with power == 65
@@ -73,9 +73,9 @@ public class SamplerTest {
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
         started = sampler.start();
+        fpc.awaitPeriod(200);
         assertTrue(started);
         assertTrue(sampler.isRunning());
-        fpc.awaitPeriod(200);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Test with power == 10
@@ -86,13 +86,14 @@ public class SamplerTest {
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
         started = sampler.start();
+        fpc.awaitPeriod(1000);
         assertTrue(started);
         assertTrue(sampler.isRunning());
-        fpc.awaitPeriod(1000);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Stop sampler
         sampler.stop();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
@@ -120,8 +121,8 @@ public class SamplerTest {
                 new NoopClauseHandler());
         boolean started = sampler.start();
         assertTrue(started);
-        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(100);
+        assertTrue(sampler.isRunning());
         assertTrue(fpc.hasPeriod(100));
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -141,12 +142,14 @@ public class SamplerTest {
 
         // Stop sampler
         sampler.stop();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
 
         // Restart sampler
         started = sampler.start();
+        fpc.awaitStarted();
         assertTrue(started);
         assertTrue(sampler.isRunning());
         assertTrue(sampler.isRunning());
@@ -189,15 +192,14 @@ public class SamplerTest {
                 new NoopClauseHandler());
         boolean started = sampler.start();
         assertTrue(started);
-        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
+        assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
         assertThat(fpc.countAsync(), equalTo(1));
 
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 35);
         fpc.setValues(vs);
-        assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         fpc.awaitPeriod(500);
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -205,13 +207,13 @@ public class SamplerTest {
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 50);
         fpc.setValues(vs);
-        assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         fpc.awaitPeriod(100);
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Stop sampler
         sampler.stop();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
@@ -219,22 +221,23 @@ public class SamplerTest {
         // Restart sampler
         started = sampler.start();
         assertTrue(started);
+        fpc.awaitStarted();
         assertTrue(sampler.isRunning());
 
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 35);
         fpc.setValues(vs);
-        assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         fpc.awaitPeriod(500);
+        assertThat(fpc.countAsync(), equalTo(1));
         assertThat(fpc.countPeriodic(), equalTo(1));
 
         // Trigger event, check if sampling rate changes
         vs.put(temperature, 50);
         fpc.setValues(vs);
-        assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
         fpc.awaitPeriod(100);
+        assertThat(fpc.countAsync(), equalTo(1));
         assertThat(fpc.countPeriodic(), equalTo(1));
     }
 
@@ -261,12 +264,13 @@ public class SamplerTest {
                 new NoopClauseHandler());
         boolean started = sampler.start();
         assertTrue(started);
-        assertTrue(sampler.isRunning());
         fpc.awaitPeriod(1000);
+        assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
         assertThat(fpc.countAsync(), equalTo(1));
 
         fpc.triggerError();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(0));
         assertThat(fpc.countAsync(), equalTo(0));
@@ -289,6 +293,7 @@ public class SamplerTest {
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
         boolean started = sampler.start();
+        fpc.awaitStarted();
         assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(1));
@@ -300,6 +305,7 @@ public class SamplerTest {
         assertThat(fpc.countAsync(), equalTo(1));
 
         sampler.stop();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(0));
     }
@@ -322,9 +328,11 @@ public class SamplerTest {
                 Collections.emptyList(), fpc, handler);
         boolean started = sampler.start();
         assertTrue(started);
+        fpc.awaitStarted();
         assertTrue(sampler.isRunning());
 
         fpc.triggerError();
+        fpc.awaitStopped();
         assertFalse(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(0));
         assertThat(fpc.countPeriodic(), equalTo(0));
