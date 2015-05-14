@@ -5,6 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.AsyncUtils;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.Refresh;
 
@@ -15,11 +16,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * REFRESH clause executor
+ * REFRESH clause executor. This executor can be stopped and re-started at will.
  *
  * @author Guido Rota 24/04/15.
  */
 public final class Refresher {
+
+    private static final int STOPPED = 0;
+    private static final int RUNNING = 1;
+    private static final int ERROR = 2;
 
     private static final ScheduledExecutorService scheduler =
             Executors.newScheduledThreadPool(12);
@@ -28,7 +33,7 @@ public final class Refresher {
     private final ClauseHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
-    private boolean running = false;
+    private int status = STOPPED;
 
     private final TaskHandler evtHand = new EventHandler();
 
@@ -42,38 +47,69 @@ public final class Refresher {
         this.fpc = fpc;
     }
 
-    public synchronized boolean start() {
+    /**
+     * Starts the execution of the {@link Refresh} clause. Startup errors
+     * will be asynchronously notified through the {@link ClauseHandler}
+     * specified in the constructor after the {@code start()} method is
+     * finished.
+     */
+    public synchronized void start() {
+        if (status != STOPPED) {
+            return;
+        }
+
+        status = RUNNING;
         switch (refresh.getType()) {
             case TIME:
-                return startTimeRefresh();
+                startTimeRefresh();
+                break;
             case EVENT:
-                return startEventRefresh();
+                startEventRefresh();
+                break;
             default:
                 throw new RuntimeException("Unexpected " + refresh.getType()
                         + " refresh type");
         }
     }
 
-    private boolean startTimeRefresh() {
+    /**
+     * Starts a time-based Refresh execution
+     */
+    private void startTimeRefresh() {
         long period = refresh.getDuration().toMillis();
         timer = scheduler.scheduleAtFixedRate(() -> {
             handler.data(refresh, null);
         }, period, period, TimeUnit.MILLISECONDS);
-
-        running = true;
-        return true;
     }
 
-    private boolean startEventRefresh() {
+    /**
+     * Starts an event-based Refresh execution
+     */
+    private void startEventRefresh() {
         List<Attribute> es = refresh.getEvents();
         evtTask = fpc.async(es, true, evtHand);
 
-        running = evtTask != null;
-        return running;
+        if (evtTask == null) {
+            status = ERROR;
+            notifyErrorAsync("Error starting event sampling in REFRESH ON " +
+                    "EVENT clause executor");
+        }
     }
 
+    /**
+     * Stops executing the {@link Refresh} clause. The clause can be resumed
+     * by invoking the {@code start()} method anew.
+     */
     public synchronized void stop() {
-        running = false;
+        if (status != RUNNING) {
+            return;
+        }
+
+        status = STOPPED;
+        stopExecution();
+    }
+
+    private void stopExecution() {
         if (evtTask != null) {
             evtTask.stop();
             evtTask = null;
@@ -85,7 +121,21 @@ public final class Refresher {
     }
 
     public synchronized boolean isRunning() {
-        return running;
+        return status == RUNNING;
+    }
+
+    /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (Refresher.this) {
+                Exception e = new QueryException(msg);
+                handler.error(refresh, e);
+            }
+        });
     }
 
     /**
@@ -95,19 +145,10 @@ public final class Refresher {
      * @param msg error message
      * @param cause cause exception
      */
-    private void handleError(String msg, Throwable cause) {
-        stop();
+    private synchronized void handleError(String msg, Throwable cause) {
+        status = ERROR;
+        stopExecution();
         handler.error(refresh, new QueryException(msg, cause));
-    }
-
-    /**
-     * Simple utility method employed to propagate an error status and stop
-     * the sampler
-     *
-     * @param msg error message
-     */
-    private void handleError(String msg) {
-        handleError(msg, null);
     }
 
 
@@ -122,8 +163,9 @@ public final class Refresher {
         @Override
         public void complete(Task task) {
             synchronized(Refresher.this) {
-                if (running && task == evtTask) {
-                    handleError("REFRESH ON EVENT sampling stopped prematurely");
+                if (status == RUNNING && task == evtTask) {
+                    handleError("REFRESH ON EVENT sampling stopped " +
+                                    "prematurely", null);
                 }
             }
         }
@@ -138,7 +180,7 @@ public final class Refresher {
         @Override
         public void error(Task task, Throwable cause) {
             synchronized(Refresher.this) {
-                if (!running) {
+                if (status != RUNNING) {
                     return;
                 }
 

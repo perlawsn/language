@@ -159,11 +159,7 @@ public final class SamplerIfEvery implements Sampler {
                     return;
                 }
 
-                boolean started = refresher.start();
-                if (!started) {
-                    handleError("Initialization of SAMPLING REFRESH " +
-                            "clause failed");
-                }
+                refresher.start();
             }
         }
 

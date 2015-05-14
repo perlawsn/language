@@ -44,8 +44,7 @@ public class RefresherTest {
                 new LatchingClauseHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
-        boolean started = r.start();
-        assertTrue(started);
+        r.start();
         assertTrue(r.isRunning());
         handler.await();
 
@@ -55,8 +54,7 @@ public class RefresherTest {
         Thread.sleep(1000);
         assertThat(handler.getDataCount(), equalTo(count));
 
-        started = r.start();
-        assertTrue(started);
+        r.start();
         assertTrue(r.isRunning());
         Thread.sleep(1000);
         assertThat(handler.getDataCount(), greaterThan(count));
@@ -73,8 +71,7 @@ public class RefresherTest {
                 new LatchingClauseHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
-        boolean started = r.start();
-        assertTrue(started);
+        r.start();
         fpc.awaitStarted();
         assertTrue(r.isRunning());
         fpc.triggerEvent();
@@ -88,8 +85,7 @@ public class RefresherTest {
         fpc.triggerEvent();
         assertThat(handler.getDataCount(), equalTo(3));
 
-        started = r.start();
-        assertTrue(started);
+        r.start();
         fpc.awaitStarted();
         assertTrue(r.isRunning());
         fpc.triggerEvent();

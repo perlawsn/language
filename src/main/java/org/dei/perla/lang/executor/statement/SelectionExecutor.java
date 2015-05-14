@@ -436,13 +436,7 @@ public final class SelectionExecutor {
         public void data(Task task, Sample sample) {
             synchronized (SelectionExecutor.this) {
                 if (status == INITIALIZING) {
-                    boolean started =
-                            startExecIfRefresh(query.getExecutionConditions());
-                    if (!started) {
-                        handleError("Error initializing EXECUTE IF REFRESH " +
-                                "clause executor");
-                        return;
-                    }
+                    startExecIfRefresh(query.getExecutionConditions());
                     status = RUNNING;
                 }
 
@@ -464,19 +458,19 @@ public final class SelectionExecutor {
         /*
          * Starts the REFRESH associated with the EXECUTE IF clause
          */
-        private boolean startExecIfRefresh(ExecutionConditions ec) {
+        private void startExecIfRefresh(ExecutionConditions ec) {
             // Avoid starting the refresher for the EXECUTE IF clause when not
             // necessary, i.e. if the refresh clause is trivially set to never or
             // if the execute if condition is constant and does not require any
             // data from the device in order to be evaluated.
             if (ec.getRefresh() == Refresh.NEVER ||
                     ec.getAttributes().isEmpty()) {
-                return true;
+                return;
             }
 
             executeIfRefresher = new Refresher(ec.getRefresh(),
                     execIfRefHand, fpc);
-            return executeIfRefresher.start();
+            executeIfRefresher.start();
         }
 
         @Override
