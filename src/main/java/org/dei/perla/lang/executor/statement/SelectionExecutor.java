@@ -161,7 +161,7 @@ public final class SelectionExecutor {
         return status == PAUSED;
     }
 
-    public synchronized boolean start() {
+    public synchronized void start() {
         if (status != READY) {
             throw new IllegalStateException(
                     "Cannot restart, SelectExecutor has been stopped");
@@ -173,11 +173,7 @@ public final class SelectionExecutor {
         if (ec.getAttributes().isEmpty()) {
             // Start sampling immediately if the execution condition is
             // empty or if its value is static.
-            boolean started = sampler.start();
-            if (started == false) {
-                status = STOPPED;
-                return false;
-            }
+            sampler.start();
             startEvery(query.getEvery());
             status = RUNNING;
 
@@ -187,7 +183,6 @@ public final class SelectionExecutor {
             status = INITIALIZING;
             triggerExecuteIfEvaluation();
         }
-        return true;
     }
 
     /*

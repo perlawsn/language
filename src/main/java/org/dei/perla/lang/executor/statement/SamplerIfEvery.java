@@ -5,6 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.AsyncUtils;
 import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.IfEvery;
@@ -16,7 +17,8 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * SAMPLING IF EVERY clause executor
+ * SAMPLING IF EVERY clause executor. This executor can be stopped and
+ * re-started at will.
  *
  * @author Guido Rota 24/03/15.
  */
@@ -27,6 +29,7 @@ public final class SamplerIfEvery implements Sampler {
     private static final int NEW_RATE = 1;
     private static final int SAMPLING = 2;
     private static final int STOPPED = 3;
+    private static final int ERROR = 4;
 
     private final SamplingIfEvery sampling;
     // Attributes required by the data management section of the query
@@ -74,24 +77,22 @@ public final class SamplerIfEvery implements Sampler {
 
     @Override
     public synchronized boolean isRunning() {
-        return status != STOPPED;
+        return status < STOPPED;
     }
 
     @Override
-    public synchronized boolean start() {
+    public synchronized void start() {
         if (isRunning()) {
-            throw new IllegalStateException("Cannot start, SamplerIfEvery is " +
-                    "already running");
+            return;
         }
 
         status = INITIALIZING;
         Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
         if (t == null) {
-            status = STOPPED;
-            return false;
+            status = ERROR;
+            notifyErrorAsync("Error starting event sampling in SAMPLE IF " +
+                    "EVERY clause executor");
         }
-
-        return true;
     }
 
     @Override
@@ -117,6 +118,20 @@ public final class SamplerIfEvery implements Sampler {
     }
 
     /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SamplerIfEvery.this) {
+                Exception e = new QueryException(msg);
+                handler.error(sampling, e);
+            }
+        });
+    }
+
+    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
      *
@@ -126,16 +141,6 @@ public final class SamplerIfEvery implements Sampler {
     private void handleError(String msg, Throwable cause) {
         stop();
         handler.error(sampling, new QueryException(msg, cause));
-    }
-
-    /**
-     * Simple utility method employed to propagate an error status and stop
-     * the sampler
-     *
-     * @param msg error message
-     */
-    private void handleError(String msg) {
-        handleError(msg, null);
     }
 
     /**
@@ -215,7 +220,7 @@ public final class SamplerIfEvery implements Sampler {
                     status = SAMPLING;
 
                 } else if (status == SAMPLING && task == sampTask) {
-                    handleError("Sampling operation stopped prematurely");
+                    handleError("Sampling operation stopped prematurely", null);
                 }
             }
         }
@@ -224,7 +229,7 @@ public final class SamplerIfEvery implements Sampler {
         public void data(Task task, Sample sample) {
             // Not locking on purpose. We accept a weaker synchronization
             // guarantee in exchange for lower data latency.
-            if (status == STOPPED) {
+            if (status >= STOPPED) {
                 return;
             }
 
@@ -271,8 +276,9 @@ public final class SamplerIfEvery implements Sampler {
 
                 Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
                 if (t == null) {
-                    handleError("Initialization of IF EVERY sampling" +
-                            " failed, cannot retrieve sample the required attributes");
+                    handleError("Initialization of IF EVERY sampling failed, " +
+                            "cannot retrieve sample the required attributes",
+                            null);
                 }
             }
         }

@@ -59,9 +59,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        boolean started = sampler.start();
+        sampler.start();
         fpc.awaitPeriod(100);
-        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -72,9 +71,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        started = sampler.start();
+        sampler.start();
         fpc.awaitPeriod(200);
-        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -85,9 +83,8 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        started = sampler.start();
+        sampler.start();
         fpc.awaitPeriod(1000);
-        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
 
@@ -119,8 +116,7 @@ public class SamplerTest {
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        boolean started = sampler.start();
-        assertTrue(started);
+        sampler.start();
         fpc.awaitPeriod(100);
         assertTrue(sampler.isRunning());
         assertTrue(fpc.hasPeriod(100));
@@ -148,9 +144,8 @@ public class SamplerTest {
         assertThat(fpc.countAsync(), equalTo(0));
 
         // Restart sampler
-        started = sampler.start();
+        sampler.start();
         fpc.awaitStarted();
-        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertTrue(sampler.isRunning());
 
@@ -190,8 +185,7 @@ public class SamplerTest {
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        boolean started = sampler.start();
-        assertTrue(started);
+        sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -219,8 +213,7 @@ public class SamplerTest {
         assertThat(fpc.countAsync(), equalTo(0));
 
         // Restart sampler
-        started = sampler.start();
-        assertTrue(started);
+        sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());
 
@@ -262,8 +255,7 @@ public class SamplerTest {
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
                 new NoopClauseHandler());
-        boolean started = sampler.start();
-        assertTrue(started);
+        sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countPeriodic(), equalTo(1));
@@ -292,9 +284,8 @@ public class SamplerTest {
                 LatchingClauseHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
-        boolean started = sampler.start();
+        sampler.start();
         fpc.awaitStarted();
-        assertTrue(started);
         assertTrue(sampler.isRunning());
         assertThat(fpc.countAsync(), equalTo(1));
         fpc.triggerEvent();
@@ -326,8 +317,7 @@ public class SamplerTest {
                 LatchingClauseHandler<>(3);
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
-        boolean started = sampler.start();
-        assertTrue(started);
+        sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());
 

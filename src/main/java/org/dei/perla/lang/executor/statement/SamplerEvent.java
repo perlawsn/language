@@ -5,6 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.AsyncUtils;
 import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.Sampling;
@@ -13,11 +14,16 @@ import org.dei.perla.lang.query.statement.SamplingEvent;
 import java.util.List;
 
 /**
- * SAMPLING ON EVENT clause executor
+ * SAMPLING ON EVENT clause executor. This executor can be stopped and
+ * re-started at will.
  *
  * @author Guido Rota 14/04/15.
  */
 public final class SamplerEvent implements Sampler {
+
+    private static final int STOPPED = 0;
+    private static final int RUNNING = 1;
+    private static final int ERROR = 2;
 
     private final SamplingEvent sampling;
     private final Fpc fpc;
@@ -27,7 +33,7 @@ public final class SamplerEvent implements Sampler {
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler evtHandler = new EventHandler();
 
-    private volatile boolean running = false;
+    private volatile int status = STOPPED;
 
     private Task evtTask;
 
@@ -44,15 +50,38 @@ public final class SamplerEvent implements Sampler {
     }
 
     @Override
-    public synchronized boolean start() {
+    public synchronized void start() {
+        if (status != STOPPED) {
+            return;
+        }
+
         evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
-        running = evtTask != null;
-        return running;
+        if (evtTask != null) {
+            status = ERROR;
+            notifyErrorAsync("Error starting event sampling in SAMPLE ON " +
+                    "EVENT clause executor");
+        }
+
+        status = RUNNING;
     }
 
     @Override
     public synchronized void stop() {
-        running = false;
+        if (status != RUNNING) {
+            return;
+        }
+
+        status = STOPPED;
+        stopEventTask();
+    }
+
+    /**
+     * Stops the execution of the sampling-triggering events.
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
+     */
+    private void stopEventTask() {
         if (evtTask != null) {
             Task t = evtTask;
             evtTask = null;
@@ -62,7 +91,21 @@ public final class SamplerEvent implements Sampler {
 
     @Override
     public synchronized boolean isRunning() {
-        return running;
+        return status == RUNNING;
+    }
+
+    /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SamplerEvent.this) {
+                Exception e = new QueryException(msg);
+                handler.error(sampling, e);
+            }
+        });
     }
 
     /**
@@ -75,16 +118,6 @@ public final class SamplerEvent implements Sampler {
     private void handleError(String msg, Throwable cause) {
         stop();
         handler.error(sampling, new QueryException(msg, cause));
-    }
-
-    /**
-     * Simple utility method employed to propagate an error status and stop
-     * the sampler
-     *
-     * @param msg error message
-     */
-    private void handleError(String msg) {
-        handleError(msg, null);
     }
 
 
@@ -100,7 +133,7 @@ public final class SamplerEvent implements Sampler {
         public void data(Task task, Sample sample) {
             // Not locking on purpose. We accept a weaker synchronization
             // guarantee in exchange for lower data latency
-            if (!running) {
+            if (status != RUNNING) {
                 return;
             }
 
@@ -110,7 +143,7 @@ public final class SamplerEvent implements Sampler {
         @Override
         public void error(Task task, Throwable cause) {
             synchronized (SamplerEvent.this) {
-                if (!running) {
+                if (status != RUNNING) {
                     return;
                 }
 
@@ -129,8 +162,9 @@ public final class SamplerEvent implements Sampler {
         @Override
         public void complete(Task task) {
             synchronized (SamplerEvent.this) {
-                if (running && task == evtTask) {
-                    handleError("REFRESH ON EVENT sampling stopped prematurely");
+                if (status == RUNNING && task == evtTask) {
+                    handleError("REFRESH ON EVENT sampling stopped " +
+                            "prematurely", null);
                 }
             }
         }
@@ -139,7 +173,7 @@ public final class SamplerEvent implements Sampler {
         public void data(Task task, Sample sample) {
             // Not locking on purpose. We accept a weaker synchronization
             // guarantee in exchange for lower data latency
-            if (!running) {
+            if (status != RUNNING) {
                 return;
             }
 
@@ -149,7 +183,7 @@ public final class SamplerEvent implements Sampler {
         @Override
         public void error(Task task, Throwable cause) {
             synchronized (SamplerEvent.this) {
-                if (!running) {
+                if (status != RUNNING) {
                     return;
                 }
 

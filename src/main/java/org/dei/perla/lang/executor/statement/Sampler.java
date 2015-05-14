@@ -10,14 +10,16 @@ import org.dei.perla.lang.executor.QueryException;
 public interface Sampler {
 
     /**
-     * Starts the sampling operation.
-     *
-     * @throws QueryException if the sampling operation cannot be started
+     * Starts the execution of the {@link Sampling} clause. Startup errors
+     * will be asynchronously notified through the {@link ClauseHandler}
+     * specified in the constructor after the {@code start()} method is
+     * finished.
      */
-    public boolean start();
+    public void start();
 
     /**
-     * Stops the sampling operation
+     * Stops executing the {@link Sampling} clause. The clause can be resumed
+     * by invoking the {@code start()} method anew.
      */
     public void stop();
 

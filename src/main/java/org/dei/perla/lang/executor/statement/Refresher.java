@@ -109,6 +109,12 @@ public final class Refresher {
         stopExecution();
     }
 
+    /**
+     * Stops the execution of the {@link Refresh} tasks and timers.
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
+     */
     private void stopExecution() {
         if (evtTask != null) {
             evtTask.stop();
@@ -120,6 +126,11 @@ public final class Refresher {
         }
     }
 
+    /**
+     * Indicates if the {@link Refresh} clause executor is running or not
+     *
+     * @return true if the executor is running, false otherwise
+     */
     public synchronized boolean isRunning() {
         return status == RUNNING;
     }
