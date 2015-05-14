@@ -98,6 +98,16 @@ public final class SamplerIfEvery implements Sampler {
     @Override
     public synchronized void stop() {
         status = STOPPED;
+        stopExecution();
+    }
+
+    /**
+     * Stops the execution of the sampling tasks.
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
+     */
+    public void stopExecution() {
         rate = Duration.ZERO;
 
         if (ifeTask != null) {
@@ -139,7 +149,8 @@ public final class SamplerIfEvery implements Sampler {
      * @param cause cause exception
      */
     private void handleError(String msg, Throwable cause) {
-        stop();
+        status = ERROR;
+        stopExecution();
         handler.error(sampling, new QueryException(msg, cause));
     }
 
@@ -181,7 +192,9 @@ public final class SamplerIfEvery implements Sampler {
                     rate = d;
                     status = NEW_RATE;
                     sampTask.stop();
-                    // The new sampling rate will be set in the SamplingHandler
+                    // The new sampling rate will be set in the
+                    // SamplingHandler.complete method
+
                 } else if (status == INITIALIZING) {
                     Duration d = ife.run(sample.values());
                     rate = d;
@@ -204,6 +217,7 @@ public final class SamplerIfEvery implements Sampler {
         }
 
     }
+
 
     /**
      * TaskHandler employed to sample the SELECT attributes

@@ -75,29 +75,25 @@ public class SimulatorFpc implements Fpc {
      * Triggers the production of a new sample on all event tasks
      */
     public void triggerEvent() {
-        AsyncUtils.runOnNewThread(() -> {
-            lk.lock();
-            try {
-                asyncTasks.forEach(AsyncSimTask::trigger);
-            } finally {
-                lk.unlock();
-            }
-        });
+        lk.lock();
+        try {
+            asyncTasks.forEach(AsyncSimTask::trigger);
+        } finally {
+            lk.unlock();
+        }
     }
 
     /**
      * Triggers the production of an error
      */
     public void triggerError() {
-        AsyncUtils.runOnNewThread(() -> {
-            lk.lock();
-            try {
-                periodicTasks.forEach(PeriodicSimTask::triggerError);
-                asyncTasks.forEach(AsyncSimTask::triggerError);
-            } finally {
-                lk.unlock();
-            }
-        });
+        lk.lock();
+        try {
+            periodicTasks.forEach(PeriodicSimTask::triggerError);
+            asyncTasks.forEach(AsyncSimTask::triggerError);
+        } finally {
+            lk.unlock();
+        }
     }
 
     /**

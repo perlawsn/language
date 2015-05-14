@@ -5,6 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.utils.AsyncUtils;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
@@ -23,11 +24,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SelectionExecutor {
 
-    private static final int STOPPED = 0;
-    private static final int READY = 1;
-    private static final int INITIALIZING = 2;
-    private static final int RUNNING = 3;
-    private static final int PAUSED = 4;
+    private static final int ERROR = 0;
+    private static final int STOPPED = 1;
+    private static final int READY = 2;
+    private static final int INITIALIZING = 3;
+    private static final int RUNNING = 4;
+    private static final int PAUSED = 5;
 
     private static final ExecutorService pool =
             Executors.newCachedThreadPool();
@@ -171,17 +173,22 @@ public final class SelectionExecutor {
 
         ExecutionConditions ec = query.getExecutionConditions();
         if (ec.getAttributes().isEmpty()) {
+            status = RUNNING;
+            startEvery(query.getEvery());
             // Start sampling immediately if the execution condition is
             // empty or if its value is static.
             sampler.start();
-            startEvery(query.getEvery());
-            status = RUNNING;
 
         } else {
             // Evaluate the execution condition before starting the
             // main sampling operation
             status = INITIALIZING;
-            triggerExecuteIfEvaluation();
+            Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+            if (t == null) {
+                status = ERROR;
+                notifyErrorAsync("Cannot start sampling task to retrieve data " +
+                        "required to evaluate the EXECUTE-IF clause");
+            }
         }
     }
 
@@ -197,14 +204,6 @@ public final class SelectionExecutor {
         long delayMs = terminate.getDuration().toMillis();
         terminateTimer = timer.schedule(this::stop, delayMs,
                 TimeUnit.MILLISECONDS);
-    }
-
-    private void triggerExecuteIfEvaluation() {
-        Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
-        if (t == null) {
-            handleError("Cannot start sampling task to retrieve data " +
-                    "required to evaluate the EXECUTE-IF clause");
-        }
     }
 
     /*
@@ -235,6 +234,16 @@ public final class SelectionExecutor {
         }
 
         status = STOPPED;
+        stopExecution();
+    }
+
+    /**
+     * Stops the execution of the selection query
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
+     */
+    private void stopExecution() {
         sampler.stop();
         if (everyTimer != null) {
             everyTimer.cancel(false);
@@ -298,6 +307,20 @@ public final class SelectionExecutor {
     }
 
     /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SelectionExecutor.this) {
+                Exception e = new QueryException(msg);
+                handler.error(query, e);
+            }
+        });
+    }
+
+    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
      *
@@ -305,7 +328,8 @@ public final class SelectionExecutor {
      * @param cause cause exception
      */
     private void handleError(String msg, Throwable cause) {
-        stop();
+        status = ERROR;
+        stopExecution();
         handler.error(query, new QueryException(msg, cause));
     }
 
@@ -411,7 +435,13 @@ public final class SelectionExecutor {
 
         @Override
         public void data(Refresh source, Void value) {
-            triggerExecuteIfEvaluation();
+            synchronized (SelectionExecutor.this) {
+                Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+                if (t == null) {
+                    handleError("Cannot start sampling task to retrieve data " +
+                            "required to evaluate the EXECUTE-IF clause");
+                }
+            }
         }
 
     }

@@ -116,7 +116,8 @@ public final class SamplerEvent implements Sampler {
      * @param cause cause exception
      */
     private void handleError(String msg, Throwable cause) {
-        stop();
+        status = ERROR;
+        stopEventTask();
         handler.error(sampling, new QueryException(msg, cause));
     }
 
