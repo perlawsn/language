@@ -75,6 +75,7 @@ public class RefresherTest {
         assertFalse(r.isRunning());
         boolean started = r.start();
         assertTrue(started);
+        fpc.awaitStarted();
         assertTrue(r.isRunning());
         fpc.triggerEvent();
         fpc.triggerEvent();
@@ -82,14 +83,17 @@ public class RefresherTest {
         handler.await();
 
         r.stop();
+        fpc.awaitStopped();
         assertFalse(r.isRunning());
         fpc.triggerEvent();
         assertThat(handler.getDataCount(), equalTo(3));
 
         started = r.start();
         assertTrue(started);
+        fpc.awaitStarted();
         assertTrue(r.isRunning());
         fpc.triggerEvent();
+        handler.awaitCount(4);
         assertThat(handler.getDataCount(), equalTo(4));
     }
 

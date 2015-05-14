@@ -77,7 +77,14 @@ public class SimulatorFpc implements Fpc {
     public void triggerEvent() {
         lk.lock();
         try {
-            asyncTasks.forEach(AsyncSimTask::trigger);
+            AsyncUtils.runOnNewThread(() -> {
+                lk.lock();
+                try {
+                    asyncTasks.forEach(AsyncSimTask::trigger);
+                } finally {
+                    lk.unlock();
+                }
+            });
         } finally {
             lk.unlock();
         }
@@ -152,6 +159,22 @@ public class SimulatorFpc implements Fpc {
         lk.lock();
         try {
             while (!asyncTasks.isEmpty() || !periodicTasks.isEmpty()) {
+                cond.await();
+            }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
+     * Awaits until all periodic sampling operations have stopped.
+     *
+     * @throws InterruptedException
+     */
+    public void awaitPeriodicStopped() throws InterruptedException {
+        lk.lock();
+        try {
+            while (!periodicTasks.isEmpty()) {
                 cond.await();
             }
         } finally {

@@ -27,7 +27,21 @@ public class LatchingClauseHandler<E, T>
     public void await() throws InterruptedException {
         lk.lock();
         try {
-            while(waitCount != 0) {
+            while (waitCount > 0) {
+                cond.await();
+            }
+            if (error != null) {
+                throw new RuntimeException(error);
+            }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    public void awaitCount(int count) throws InterruptedException {
+        lk.lock();
+        try {
+            while (dataCount < count) {
                 cond.await();
             }
             if (error != null) {
@@ -55,14 +69,8 @@ public class LatchingClauseHandler<E, T>
         lk.lock();
         try {
             dataCount++;
-            if (waitCount == 0) {
-                return;
-            }
-
             waitCount--;
-            if (waitCount == 0) {
-                cond.signalAll();
-            }
+            cond.signalAll();
         } finally {
             lk.unlock();
         }

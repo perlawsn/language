@@ -68,12 +68,14 @@ public class SelectionExecutorTest {
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
+        fpc.awaitStarted();
         assertTrue(exec.isRunning());
         handler.await();
 
         // Test stop
         assertTrue(exec.isRunning());
         exec.stop();
+        fpc.awaitStopped();
         int count = handler.getDataCount();
         assertFalse(exec.isRunning());
         Thread.sleep(300);
@@ -103,12 +105,14 @@ public class SelectionExecutorTest {
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
+        fpc.awaitStarted();
         assertTrue(exec.isRunning());
         handler.await();
 
         // Test stop
         assertTrue(exec.isRunning());
         exec.stop();
+        fpc.awaitStopped();
         int count = handler.getDataCount();
         assertFalse(exec.isRunning());
         Thread.sleep(300);
@@ -139,6 +143,7 @@ public class SelectionExecutorTest {
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
+        fpc.awaitStarted();
         assertTrue(exec.isRunning());
         handler.await();
 
@@ -170,6 +175,7 @@ public class SelectionExecutorTest {
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
+        fpc.awaitStarted();
         assertTrue(exec.isRunning());
         Thread.sleep(400);
 
@@ -202,6 +208,7 @@ public class SelectionExecutorTest {
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
         exec.start();
+        fpc.awaitStarted();
         assertTrue(exec.isRunning());
 
         Thread.sleep(100);
@@ -260,6 +267,7 @@ public class SelectionExecutorTest {
         fpc.setValues(v);
         Thread.sleep(200);
         assertTrue(exec.isRunning());
+        fpc.awaitStopped();
         assertTrue(exec.isPaused());
         int count = handler.getDataCount();
         Thread.sleep(200);
@@ -313,7 +321,10 @@ public class SelectionExecutorTest {
         fpc.setValues(v);
         fpc.triggerEvent();
         assertTrue(exec.isRunning());
+        asdf
+        fpc.awaitPeriodicStopped();
         assertTrue(exec.isPaused());
+        assertThat(fpc.countAsync(), equalTo(1));
         int count = handler.getDataCount();
         Thread.sleep(200);
         assertThat(handler.getDataCount(), equalTo(count));
