@@ -3,7 +3,7 @@ package org.dei.perla.lang.executor.statement;
 /**
  * @author Guido Rota 10/04/15.
  */
-public interface QueryHandler<E, T> {
+public interface ClauseHandler<E, T> {
 
     public void error(E source, Throwable cause);
 

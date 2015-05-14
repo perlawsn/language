@@ -39,7 +39,7 @@ public final class SelectionExecutor {
     private final ExecutionConditions execCond;
     private final Expression where;
 
-    private final QueryHandler<? super SelectionQuery, Object[]> handler;
+    private final StatementHandler<? super SelectionQuery> handler;
     private final Fpc fpc;
 
     private final Buffer buffer;
@@ -78,7 +78,7 @@ public final class SelectionExecutor {
     private volatile int recordsProduced = 0;
 
     public SelectionExecutor(SelectionQuery query,
-            QueryHandler<? super SelectionQuery, Object[]> handler,
+            StatementHandler<? super SelectionQuery> handler,
             Fpc fpc) {
         this.query = query;
         select = query.getSelect();
@@ -331,7 +331,7 @@ public final class SelectionExecutor {
      * @author Guido Rota 22/04/2015
      */
     private final class SamplerHandler
-            implements QueryHandler<Sampling, Object[]> {
+            implements ClauseHandler<Sampling, Object[]> {
 
         @Override
         public void error(Sampling source, Throwable cause) {
@@ -400,7 +400,7 @@ public final class SelectionExecutor {
      *
      * @author Guido Rota 23/04/2015
      */
-    private class ExecIfRefreshHandler implements QueryHandler<Refresh, Void> {
+    private class ExecIfRefreshHandler implements ClauseHandler<Refresh, Void> {
 
         @Override
         public void error(Refresh source, Throwable cause) {

@@ -25,7 +25,7 @@ public final class Refresher {
             Executors.newScheduledThreadPool(12);
 
     private final Refresh refresh;
-    private final QueryHandler<? super Refresh, Void> handler;
+    private final ClauseHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
     private boolean running = false;
@@ -36,7 +36,7 @@ public final class Refresher {
     private ScheduledFuture<?> timer;
 
     public Refresher(Refresh refresh,
-            QueryHandler<? super Refresh, Void> handler, Fpc fpc) {
+            ClauseHandler<? super Refresh, Void> handler, Fpc fpc) {
         this.refresh = refresh;
         this.handler = handler;
         this.fpc = fpc;

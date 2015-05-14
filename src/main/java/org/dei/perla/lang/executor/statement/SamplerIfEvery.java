@@ -32,12 +32,12 @@ public final class SamplerIfEvery implements Sampler {
     // Attributes required by the data management section of the query
     private final List<Attribute> atts;
     private final Fpc fpc;
-    private final QueryHandler<? super Sampling, Object[]> handler;
+    private final ClauseHandler<? super Sampling, Object[]> handler;
     private final IfEvery ife;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler ifeHandler = new IfEveryHandler();
-    private final QueryHandler<Refresh, Void> refHandler = new RefreshHandler();
+    private final ClauseHandler<Refresh, Void> refHandler = new RefreshHandler();
 
     private volatile int status = STOPPED;
 
@@ -53,7 +53,7 @@ public final class SamplerIfEvery implements Sampler {
     private Task evtTask = null;
 
     protected SamplerIfEvery(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
-            QueryHandler<? super Sampling, Object[]> handler)
+            ClauseHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");
@@ -253,7 +253,7 @@ public final class SamplerIfEvery implements Sampler {
      *
      * @author Guido Rota 24/04/2015
      */
-    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+    private class RefreshHandler implements ClauseHandler<Refresh, Void> {
 
         @Override
         public void error(Refresh source, Throwable cause) {

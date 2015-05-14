@@ -2,16 +2,14 @@ package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
-import org.dei.perla.lang.executor.statement.QueryHandler;
-import org.dei.perla.lang.executor.statement.Refresher;
+import org.dei.perla.lang.executor.statement.ClauseHandler;
 import org.dei.perla.lang.executor.statement.SelectionExecutor;
+import org.dei.perla.lang.executor.statement.StatementHandler;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SelectionQuery;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Guido Rota 30/04/15.
@@ -24,7 +22,7 @@ public class SelectionDistributor {
 
     private final SelectionQuery query;
     private final ExecutionConditions ec;
-    private final QueryHandler<? super SelectionQuery, Object[]> handler;
+    private final StatementHandler<? super SelectionQuery> handler;
     private final Registry registry;
 
     private int status = READY;
@@ -33,7 +31,7 @@ public class SelectionDistributor {
     private final List<Fpc> ignore = new ArrayList<>();
 
     protected SelectionDistributor(SelectionQuery query,
-            QueryHandler<? super SelectionQuery, Object[]> handler,
+            StatementHandler<? super SelectionQuery> handler,
             Registry registry) {
         this.query = query;
         ec = query.getExecutionConditions();
@@ -92,7 +90,7 @@ public class SelectionDistributor {
      *
      * @author Guido Rota 29/04/2013
      */
-    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+    private class RefreshHandler implements ClauseHandler<Refresh, Void> {
 
         @Override
         public void error(Refresh source, Throwable cause) {

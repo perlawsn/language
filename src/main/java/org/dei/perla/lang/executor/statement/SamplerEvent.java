@@ -22,7 +22,7 @@ public final class SamplerEvent implements Sampler {
     private final SamplingEvent sampling;
     private final Fpc fpc;
     private final List<Attribute> atts;
-    private final QueryHandler<? super Sampling, Object[]> handler;
+    private final ClauseHandler<? super Sampling, Object[]> handler;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler evtHandler = new EventHandler();
@@ -32,7 +32,7 @@ public final class SamplerEvent implements Sampler {
     private Task evtTask;
 
     protected SamplerEvent(SamplingEvent sampling, List<Attribute> atts, Fpc fpc,
-            QueryHandler<? super Sampling, Object[]> handler)
+            ClauseHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "Sampling clause is not complete.");

@@ -3,7 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.lang.executor.LatchingQueryHandler;
+import org.dei.perla.lang.executor.LatchingClauseHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.junit.Test;
@@ -40,8 +40,8 @@ public class RefresherTest {
         Refresh refresh = new Refresh(Duration.ofMillis(300));
         assertTrue(refresh.isComplete());
 
-        LatchingQueryHandler<Refresh, Void> handler =
-                new LatchingQueryHandler<>(3);
+        LatchingClauseHandler<Refresh, Void> handler =
+                new LatchingClauseHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
         boolean started = r.start();
@@ -69,8 +69,8 @@ public class RefresherTest {
         refresh = refresh.bind(values.keySet());
         assertTrue(refresh.isComplete());
 
-        LatchingQueryHandler<Refresh, Void> handler =
-                new LatchingQueryHandler<>(3);
+        LatchingClauseHandler<Refresh, Void> handler =
+                new LatchingClauseHandler<>(3);
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
         boolean started = r.start();
