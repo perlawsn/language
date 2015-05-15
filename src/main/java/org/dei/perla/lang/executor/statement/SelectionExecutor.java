@@ -256,6 +256,11 @@ public final class SelectionExecutor {
 
         status = STOPPED;
         stopExecution();
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SelectionExecutor.this) {
+                handler.complete(query);
+            }
+        });
     }
 
     /**

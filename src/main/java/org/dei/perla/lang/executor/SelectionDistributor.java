@@ -4,6 +4,7 @@ import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.executor.statement.QueryHandler;
 import org.dei.perla.lang.executor.statement.SelectionExecutor;
+import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SelectionQuery;
@@ -26,8 +27,10 @@ public class SelectionDistributor {
 
     private int status = READY;
 
-    private final Map<Fpc, SelectionExecutor> active = new HashMap<>();
-    private final List<Fpc> ignore = new ArrayList<>();
+    private final Map<SelectionQuery, SelectionExecutor> active =
+            new HashMap<>();
+
+    private final Set<Fpc> managed = new HashSet<>();
 
     protected SelectionDistributor(SelectionQuery query,
             QueryHandler<? super SelectionQuery, Object[]> handler,
@@ -59,13 +62,19 @@ public class SelectionDistributor {
         }
 
         for (Fpc fpc : available) {
-            if (active.containsKey(fpc)) {
+            if (managed.contains(fpc)) {
                 continue;
             }
 
-            SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
-            active.put(fpc, se);
-            se.start();
+            try {
+                SelectionQuery q = query.bind(fpc.getAttributes());
+                SelectionExecutor se = new SelectionExecutor(q, handler, fpc);
+                active.put(query, se);
+                se.start();
+                managed.add(fpc);
+            } catch (BindingException e) {
+                // TODO: Ignore silently? do something else??
+            }
         }
     }
 
@@ -97,7 +106,7 @@ public class SelectionDistributor {
         @Override
         public void error(Refresh source, Throwable cause) {
             synchronized (SelectionDistributor.this) {
-                distribute();
+                // TODO: manage error
             }
         }
 

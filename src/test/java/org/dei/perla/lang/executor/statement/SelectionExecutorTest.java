@@ -145,8 +145,8 @@ public class SelectionExecutorTest {
         exec.start();
         fpc.awaitStarted();
         assertTrue(exec.isRunning());
-        handler.awaitCount(3);
 
+        handler.awaitComplete();
         assertFalse(exec.isRunning());
         assertThat(handler.getDataCount(), equalTo(3));
     }
@@ -177,8 +177,8 @@ public class SelectionExecutorTest {
         exec.start();
         fpc.awaitStarted();
         assertTrue(exec.isRunning());
-        Thread.sleep(400);
 
+        handler.awaitComplete();
         assertFalse(exec.isRunning());
         assertThat(handler.getDataCount(), greaterThanOrEqualTo(8));
     }
