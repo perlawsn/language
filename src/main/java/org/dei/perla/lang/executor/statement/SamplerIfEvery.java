@@ -59,7 +59,7 @@ public final class SamplerIfEvery implements Sampler {
             ClauseHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
-                "Sampling clause is not complete.");
+                "SAMPLING IF EVERY clause is not complete.");
 
         this.sampling = sampling;
         this.atts = atts;
@@ -87,12 +87,35 @@ public final class SamplerIfEvery implements Sampler {
         }
 
         status = INITIALIZING;
-        Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+        List<Attribute> as = sampling.getIfEveryAttributes();
+        Task t = fpc.get(as, true, ifeHandler);
         if (t == null) {
             status = ERROR;
-            notifyErrorAsync("Error starting event sampling in SAMPLE IF " +
-                    "EVERY clause executor");
+            notifyErrorAsync(samplingErrorString(as));
         }
+    }
+
+    /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SamplerIfEvery.this) {
+                Exception e = new QueryException(msg);
+                handler.error(sampling, e);
+            }
+        });
+    }
+
+    private String samplingErrorString(List<Attribute> atts) {
+        StringBuilder bld =
+                new StringBuilder("Error starting SAMPLING IF EVERY executor: ");
+        bld.append("cannot retrieve attributes ");
+        atts.forEach(e -> bld.append(e).append(" "));
+        bld.append("from FPC ").append(fpc.getId());
+        return bld.toString();
     }
 
     @Override
@@ -128,22 +151,11 @@ public final class SamplerIfEvery implements Sampler {
     }
 
     /**
-     * Simple utility method employed to asynchronously propagate an error
-     *
-     * @param msg error message
-     */
-    private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
-            synchronized (SamplerIfEvery.this) {
-                Exception e = new QueryException(msg);
-                handler.error(sampling, e);
-            }
-        });
-    }
-
-    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
      *
      * @param msg error message
      * @param cause cause exception
@@ -234,7 +246,8 @@ public final class SamplerIfEvery implements Sampler {
                     status = SAMPLING;
 
                 } else if (status == SAMPLING && task == sampTask) {
-                    handleError("Sampling operation stopped prematurely", null);
+                    handleError("Sampling operation stopped prematurely in " +
+                            "SAMPLING IF EVERY executor", null);
                 }
             }
         }
@@ -257,7 +270,8 @@ public final class SamplerIfEvery implements Sampler {
                     return;
                 }
 
-                handleError("Unexpected error while sampling", cause);
+                handleError("Unexpected sampling error in SAMPLER IF EVERY " +
+                        "clause executor", cause);
             }
         }
 
@@ -288,11 +302,10 @@ public final class SamplerIfEvery implements Sampler {
                     return;
                 }
 
-                Task t = fpc.get(sampling.getIfEveryAttributes(), true, ifeHandler);
+                List<Attribute> as = sampling.getIfEveryAttributes();
+                Task t = fpc.get(as, true, ifeHandler);
                 if (t == null) {
-                    handleError("Initialization of IF EVERY sampling failed, " +
-                            "cannot retrieve sample the required attributes",
-                            null);
+                    handleError(samplingErrorString(as), null);
                 }
             }
         }

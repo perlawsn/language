@@ -41,7 +41,7 @@ public final class SamplerEvent implements Sampler {
             ClauseHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
-                "Sampling clause is not complete.");
+                "SAMPLING ON EVENT clause is not complete.");
 
         this.sampling = sampling;
         this.fpc = fpc;
@@ -55,14 +55,38 @@ public final class SamplerEvent implements Sampler {
             return;
         }
 
-        evtTask = fpc.async(sampling.getEvents(), false, evtHandler);
-        if (evtTask != null) {
+        List<Attribute> es = sampling.getEvents();
+        evtTask = fpc.async(es, false, evtHandler);
+        if (evtTask == null) {
             status = ERROR;
-            notifyErrorAsync("Error starting event sampling in SAMPLE ON " +
-                    "EVENT clause executor");
+            notifyErrorAsync(createStartupError(es));
+            return;
         }
 
         status = RUNNING;
+    }
+
+    /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (SamplerEvent.this) {
+                Exception e = new QueryException(msg);
+                handler.error(sampling, e);
+            }
+        });
+    }
+
+    private String createStartupError(List<Attribute> events) {
+        StringBuilder bld =
+                new StringBuilder("Error starting SAMPLING ON EVENT executor: ");
+        bld.append("cannot retrieve events ");
+        events.forEach(e -> bld.append(e).append(" "));
+        bld.append("from FPC ").append(fpc.getId());
+        return bld.toString();
     }
 
     @Override
@@ -76,7 +100,7 @@ public final class SamplerEvent implements Sampler {
     }
 
     /**
-     * Stops the execution of the sampling-triggering events.
+     * Stop sampling the triggering events.
      *
      * NOTE: This method is not thread safe, and should therefore only be
      * invoked with proper synchronization.
@@ -95,22 +119,11 @@ public final class SamplerEvent implements Sampler {
     }
 
     /**
-     * Simple utility method employed to asynchronously propagate an error
-     *
-     * @param msg error message
-     */
-    private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
-            synchronized (SamplerEvent.this) {
-                Exception e = new QueryException(msg);
-                handler.error(sampling, e);
-            }
-        });
-    }
-
-    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
      *
      * @param msg error message
      * @param cause cause exception
@@ -165,20 +178,20 @@ public final class SamplerEvent implements Sampler {
             synchronized (SamplerEvent.this) {
                 if (status == RUNNING && task == evtTask) {
                     handleError("REFRESH ON EVENT sampling stopped " +
-                            "prematurely", null);
+                            "prematurely in SAMPLING ON EVENT claus", null);
                 }
             }
         }
 
         @Override
         public void data(Task task, Sample sample) {
-            // Not locking on purpose. We accept a weaker synchronization
-            // guarantee in exchange for lower data latency
-            if (status != RUNNING) {
-                return;
-            }
+            synchronized (SamplerEvent.this) {
+                if (status != RUNNING) {
+                    return;
+                }
 
-            fpc.get(atts, false, sampHandler);
+                fpc.get(atts, false, sampHandler);
+            }
         }
 
         @Override

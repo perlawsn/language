@@ -6,6 +6,7 @@ import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.AsyncUtils;
+import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.Refresh;
 
@@ -42,6 +43,9 @@ public final class Refresher {
 
     public Refresher(Refresh refresh,
             ClauseHandler<? super Refresh, Void> handler, Fpc fpc) {
+        Conditions.checkIllegalArgument(refresh.isComplete(),
+                "REFRESH clause is not complete.");
+
         this.refresh = refresh;
         this.handler = handler;
         this.fpc = fpc;
@@ -51,7 +55,7 @@ public final class Refresher {
      * Starts the execution of the {@link Refresh} clause. Startup errors
      * will be asynchronously notified through the {@link ClauseHandler}
      * specified in the constructor after the {@code start()} method is
-     * finished.
+     * over.
      */
     public synchronized void start() {
         if (status != STOPPED) {
@@ -61,10 +65,10 @@ public final class Refresher {
         status = RUNNING;
         switch (refresh.getType()) {
             case TIME:
-                startTimeRefresh();
+                startTimed();
                 break;
             case EVENT:
-                startEventRefresh();
+                startEvent();
                 break;
             default:
                 throw new RuntimeException("Unexpected " + refresh.getType()
@@ -73,9 +77,9 @@ public final class Refresher {
     }
 
     /**
-     * Starts a time-based Refresh execution
+     * Starts the execution of a time-based Refresh clause
      */
-    private void startTimeRefresh() {
+    private void startTimed() {
         long period = refresh.getDuration().toMillis();
         timer = scheduler.scheduleAtFixedRate(() -> {
             handler.data(refresh, null);
@@ -83,17 +87,39 @@ public final class Refresher {
     }
 
     /**
-     * Starts an event-based Refresh execution
+     * Starts the execution of an event-based Refresh clause
      */
-    private void startEventRefresh() {
+    private void startEvent() {
         List<Attribute> es = refresh.getEvents();
         evtTask = fpc.async(es, true, evtHand);
 
         if (evtTask == null) {
             status = ERROR;
-            notifyErrorAsync("Error starting event sampling in REFRESH ON " +
-                    "EVENT clause executor");
+            notifyErrorAsync(createStartupError(es));
         }
+    }
+
+    /**
+     * Simple utility method employed to asynchronously propagate an error
+     *
+     * @param msg error message
+     */
+    private void notifyErrorAsync(String msg) {
+        AsyncUtils.runOnNewThread(() -> {
+            synchronized (Refresher.this) {
+                Exception e = new QueryException(msg);
+                handler.error(refresh, e);
+            }
+        });
+    }
+
+    private String createStartupError(List<Attribute> events) {
+        StringBuilder bld =
+                new StringBuilder("Error starting REFRESH ON EVENT executor: ");
+        bld.append("cannot retrieve events ");
+        events.forEach(e -> bld.append(e).append(" "));
+        bld.append("from FPC ").append(fpc.getId());
+        return bld.toString();
     }
 
     /**
@@ -136,22 +162,11 @@ public final class Refresher {
     }
 
     /**
-     * Simple utility method employed to asynchronously propagate an error
-     *
-     * @param msg error message
-     */
-    private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
-            synchronized (Refresher.this) {
-                Exception e = new QueryException(msg);
-                handler.error(refresh, e);
-            }
-        });
-    }
-
-    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
      *
      * @param msg error message
      * @param cause cause exception
