@@ -145,7 +145,9 @@ public final class SelectionExecutor {
      *
      * <p>It is important to note that the executor may be running even if no
      * new output records are produced. This may happen when the execution
-     * condition turns false during query execution.
+     * condition turns false during query execution. Under such conditions
+     * both the {@code isRunning()} and {@code isPaused()} methods will
+     * return true.
      *
      * @return true if the executor is running, false otherwise
      */
@@ -163,10 +165,20 @@ public final class SelectionExecutor {
         return status == PAUSED;
     }
 
+    /**
+     * Starts the execution of the {@link SelectionQuery}. Startup errors
+     * will be asynchronously notified through the {@link ClauseHandler}
+     * specified in the constructor after the {@code start()} method is
+     * over.
+     */
     public synchronized void start() {
         if (status != READY) {
             throw new IllegalStateException(
-                    "Cannot restart, SelectExecutor has been stopped");
+                    "Cannot start, SelectExecutor has already been run");
+        }
+
+        if (isRunning()) {
+            return;
         }
 
         startTerminateAfter(query.getTerminate());
@@ -183,13 +195,22 @@ public final class SelectionExecutor {
             // Evaluate the execution condition before starting the
             // main sampling operation
             status = INITIALIZING;
-            Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+            List<Attribute> as = execCond.getAttributes();
+            Task t = fpc.get(as, true, execIfTaskHand);
             if (t == null) {
                 status = ERROR;
-                notifyErrorAsync("Cannot start sampling task to retrieve data " +
-                        "required to evaluate the EXECUTE-IF clause");
+                notifyErrorAsync(executeIfStartErrorString(as));
             }
         }
+    }
+
+    private String executeIfStartErrorString(List<Attribute> atts) {
+        StringBuilder bld =
+                new StringBuilder("Error starting EXECUTE-IF sampling: ");
+        bld.append("cannot retrieve attributes ");
+        atts.forEach(e -> bld.append(e).append(" "));
+        bld.append("from FPC ").append(fpc.getId());
+        return bld.toString();
     }
 
     /*
@@ -225,7 +246,7 @@ public final class SelectionExecutor {
     }
 
     /**
-     * Stops the execution. After this method is called, the {@code
+     * Stops the executor. After this method is called, the {@code
      * SelectExecutor} cannot be re-started again.
      */
     public synchronized void stop() {
@@ -324,6 +345,9 @@ public final class SelectionExecutor {
      * Simple utility method employed to propagate an error status and stop
      * the sampler
      *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
+     *
      * @param msg error message
      * @param cause cause exception
      */
@@ -336,6 +360,9 @@ public final class SelectionExecutor {
     /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
+     *
+     * NOTE: This method is not thread safe, and should therefore only be
+     * invoked with proper synchronization.
      *
      * @param msg error message
      */
@@ -381,23 +408,26 @@ public final class SelectionExecutor {
             buffer.add(sample);
 
             if (sampleCount != 0) {
-                // Update trigger information and start data management thread
-                sampleTrigger();
+                // Update trigger information and start data management
+                // thread (only when the query specifies a sample-based every
+                // clause (i.e., sampleCount != 0)
+                updateSampleCount();
             }
         }
 
-        private void sampleTrigger() {
+        /**
+         * Updates the number of samples received and checks if the data
+         * management section is to be triggered
+         */
+        private void updateSampleCount() {
             int o, n;
             do {
                 o = samplesLeft.intValue();
-                if (o - 1 == 0) {
+                if (o == 1) {
+                    // Reset the counter, since the number of samples
+                    // required to trigger a data management execution has
+                    // been reached.
                     n = sampleCount;
-
-                } else if (o == Integer.MIN_VALUE) {
-                    // The speed of the sampling operation is excessively
-                    // faster than the speed of the data management cycle.
-                    // This if branch avoids integer underflow
-                    n = o;
 
                 } else {
                     n = o - 1;
@@ -408,6 +438,33 @@ public final class SelectionExecutor {
                 if (triggered.incrementAndGet() == 1 && status == RUNNING) {
                     selectFuture = pool.submit(selectRunnable);
                 }
+            }
+        }
+
+        /**
+         * Triggers the data management section
+         */
+        private void dataManagementTrigger() {
+            int o, n;
+            do {
+                o = triggered.intValue();
+                if (o == Integer.MAX_VALUE) {
+                    // This branch avoids integer overflow in those
+                    // (supposedly rare) cases where the sampling period is
+                    // excessively faster than the average execution time of
+                    // the data management clause
+                    n = o;
+
+                } else {
+                    n = o + 1;
+                }
+            } while(!triggered.compareAndSet(o, n));
+
+            // The data management thread is started only if such thread is
+            // not already executing (i.e., if it's still executing since the
+            // last time it has been triggered
+            if (n == 1 && status == RUNNING) {
+                selectFuture = pool.submit(selectRunnable);
             }
         }
 
@@ -428,18 +485,18 @@ public final class SelectionExecutor {
                     return;
                 }
 
-                handleError("Error while refreshing EXECUTE-IF condition",
-                        cause);
+                handleError("Error while refreshing the EXECUTE-IF " +
+                        "condition", cause);
             }
         }
 
         @Override
         public void data(Refresh source, Void value) {
             synchronized (SelectionExecutor.this) {
-                Task t = fpc.get(execCond.getAttributes(), true, execIfTaskHand);
+                List<Attribute> as = execCond.getAttributes();
+                Task t = fpc.get(as, true, execIfTaskHand);
                 if (t == null) {
-                    handleError("Cannot start sampling task to retrieve data " +
-                            "required to evaluate the EXECUTE-IF clause");
+                    handleError(executeIfStartErrorString(as));
                 }
             }
         }
@@ -505,8 +562,8 @@ public final class SelectionExecutor {
                     return;
                 }
 
-                handleError("Error while sampling data to compute" +
-                        "EXECUTE-IF clause");
+                handleError("Error while sampling the attributes required to " +
+                        "evaluate the EXECUTE-IF condition", cause);
             }
         }
 
