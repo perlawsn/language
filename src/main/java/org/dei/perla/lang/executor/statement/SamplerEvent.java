@@ -14,8 +14,12 @@ import org.dei.perla.lang.query.statement.SamplingEvent;
 import java.util.List;
 
 /**
- * SAMPLING ON EVENT clause executor. This executor can be stopped and
- * re-started at will.
+ * SAMPLING ON EVENT clause executor.
+ *
+ * <p>
+ * This executor can be stopped and re-started at will. due to this
+ * characteristic, the {@link QueryHandler.complete()} method will never be
+ * invoked.
  *
  * @author Guido Rota 14/04/15.
  */
@@ -28,7 +32,7 @@ public final class SamplerEvent implements Sampler {
     private final SamplingEvent sampling;
     private final Fpc fpc;
     private final List<Attribute> atts;
-    private final ClauseHandler<? super Sampling, Object[]> handler;
+    private final QueryHandler<? super Sampling, Object[]> handler;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler evtHandler = new EventHandler();
@@ -38,7 +42,7 @@ public final class SamplerEvent implements Sampler {
     private Task evtTask;
 
     protected SamplerEvent(SamplingEvent sampling, List<Attribute> atts, Fpc fpc,
-            ClauseHandler<? super Sampling, Object[]> handler)
+            QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "SAMPLING ON EVENT clause is not complete.");

@@ -2,9 +2,8 @@ package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
-import org.dei.perla.lang.executor.statement.ClauseHandler;
+import org.dei.perla.lang.executor.statement.QueryHandler;
 import org.dei.perla.lang.executor.statement.SelectionExecutor;
-import org.dei.perla.lang.executor.statement.StatementHandler;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SelectionQuery;
@@ -22,7 +21,7 @@ public class SelectionDistributor {
 
     private final SelectionQuery query;
     private final ExecutionConditions ec;
-    private final StatementHandler<? super SelectionQuery> handler;
+    private final QueryHandler<? super SelectionQuery, Object[]> handler;
     private final Registry registry;
 
     private int status = READY;
@@ -31,7 +30,7 @@ public class SelectionDistributor {
     private final List<Fpc> ignore = new ArrayList<>();
 
     protected SelectionDistributor(SelectionQuery query,
-            StatementHandler<? super SelectionQuery> handler,
+            QueryHandler<? super SelectionQuery, Object[]> handler,
             Registry registry) {
         this.query = query;
         ec = query.getExecutionConditions();
@@ -90,7 +89,10 @@ public class SelectionDistributor {
      *
      * @author Guido Rota 29/04/2013
      */
-    private class RefreshHandler implements ClauseHandler<Refresh, Void> {
+    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+
+        @Override
+        public void complete(Refresh source) { }
 
         @Override
         public void error(Refresh source, Throwable cause) {

@@ -3,8 +3,8 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.executor.LatchingClauseHandler;
-import org.dei.perla.lang.executor.NoopClauseHandler;
+import org.dei.perla.lang.executor.LatchingQueryHandler;
+import org.dei.perla.lang.executor.NoopQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.parser.Parser;
 import org.dei.perla.lang.query.statement.Sampling;
@@ -58,7 +58,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(100);
         assertTrue(sampler.isRunning());
@@ -70,7 +70,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(200);
         assertTrue(sampler.isRunning());
@@ -82,7 +82,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
@@ -115,7 +115,7 @@ public class SamplerTest {
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(100);
         assertTrue(sampler.isRunning());
@@ -184,7 +184,7 @@ public class SamplerTest {
         vs.put(temperature, 25);
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
@@ -254,7 +254,7 @@ public class SamplerTest {
         vs.put(temperature, 25);
         fpc.setValues(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopClauseHandler());
+                new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
@@ -280,8 +280,8 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        LatchingClauseHandler<Sampling, Object[]> handler = new
-                LatchingClauseHandler<>(3);
+        LatchingQueryHandler<Sampling, Object[]> handler = new
+                LatchingQueryHandler<>();
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
         sampler.start();
@@ -313,8 +313,8 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         samp = samp.bind(fpc.getAttributes(), err);
         assertTrue(err.isEmpty());
-        LatchingClauseHandler<Sampling, Object[]> handler = new
-                LatchingClauseHandler<>(3);
+        LatchingQueryHandler<Sampling, Object[]> handler = new
+                LatchingQueryHandler<>();
         SamplerEvent sampler = new SamplerEvent(samp,
                 Collections.emptyList(), fpc, handler);
         sampler.start();

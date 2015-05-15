@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.ClauseHandler;
+import org.dei.perla.lang.executor.statement.QueryHandler;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -9,25 +9,20 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author Guido Rota 13/04/15.
  */
-public class LatchingClauseHandler<E, T>
-        implements ClauseHandler<E, T> {
+public class LatchingQueryHandler<E, T>
+        implements QueryHandler<E, T> {
 
-    private int waitCount;
     private Throwable error;
-
+    private boolean complete = false;
     private int dataCount = 0;
 
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
 
-    public LatchingClauseHandler(int count) {
-        this.waitCount = count;
-    }
-
-    public void await() throws InterruptedException {
+    public void awaitCount(int count) throws InterruptedException {
         lk.lock();
         try {
-            while (waitCount > 0) {
+            while (dataCount < count && error == null) {
                 cond.await();
             }
             if (error != null) {
@@ -38,10 +33,10 @@ public class LatchingClauseHandler<E, T>
         }
     }
 
-    public void awaitCount(int count) throws InterruptedException {
+    public void awaitComplete() throws InterruptedException {
         lk.lock();
         try {
-            while (dataCount < count) {
+            while (!complete && error == null) {
                 cond.await();
             }
             if (error != null) {
@@ -53,10 +48,20 @@ public class LatchingClauseHandler<E, T>
     }
 
     @Override
+    public void complete(E source) {
+        lk.lock();
+        try {
+            complete = true;
+            cond.signalAll();
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    @Override
     public void error(E source, Throwable error) {
         lk.lock();
         try {
-            waitCount = 0;
             this.error = error;
             cond.signalAll();
         } finally {
@@ -69,7 +74,6 @@ public class LatchingClauseHandler<E, T>
         lk.lock();
         try {
             dataCount++;
-            waitCount--;
             cond.signalAll();
         } finally {
             lk.unlock();

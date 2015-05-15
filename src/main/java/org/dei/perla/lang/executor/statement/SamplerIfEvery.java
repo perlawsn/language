@@ -17,8 +17,12 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * SAMPLING IF EVERY clause executor. This executor can be stopped and
- * re-started at will.
+ * SAMPLING IF EVERY clause executor.
+ *
+ * <p>
+ * This executor can be stopped and re-started at will; due to this
+ * characteristic, the {@link QueryHandler.complete()} method will never be
+ * invoked.
  *
  * @author Guido Rota 24/03/15.
  */
@@ -35,12 +39,12 @@ public final class SamplerIfEvery implements Sampler {
     // Attributes required by the data management section of the query
     private final List<Attribute> atts;
     private final Fpc fpc;
-    private final ClauseHandler<? super Sampling, Object[]> handler;
+    private final QueryHandler<? super Sampling, Object[]> handler;
     private final IfEvery ife;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler ifeHandler = new IfEveryHandler();
-    private final ClauseHandler<Refresh, Void> refHandler = new RefreshHandler();
+    private final QueryHandler<Refresh, Void> refHandler = new RefreshHandler();
 
     private volatile int status = STOPPED;
 
@@ -56,7 +60,7 @@ public final class SamplerIfEvery implements Sampler {
     private Task evtTask = null;
 
     protected SamplerIfEvery(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
-            ClauseHandler<? super Sampling, Object[]> handler)
+            QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         Conditions.checkIllegalArgument(sampling.isComplete(),
                 "SAMPLING IF EVERY clause is not complete.");
@@ -282,7 +286,10 @@ public final class SamplerIfEvery implements Sampler {
      *
      * @author Guido Rota 24/04/2015
      */
-    private class RefreshHandler implements ClauseHandler<Refresh, Void> {
+    private class RefreshHandler implements QueryHandler<Refresh, Void> {
+
+        @Override
+        public void complete(Refresh source) { }
 
         @Override
         public void error(Refresh source, Throwable cause) {

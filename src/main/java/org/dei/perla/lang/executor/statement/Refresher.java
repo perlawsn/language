@@ -17,7 +17,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * REFRESH clause executor. This executor can be stopped and re-started at will.
+ * REFRESH clause executor.
+ *
+ * This executor can be stopped and re-started at will; due to this
+ * characteristic, the {@link QueryHandler.complete()} method will never be
+ * invoked.
  *
  * @author Guido Rota 24/04/15.
  */
@@ -31,7 +35,7 @@ public final class Refresher {
             Executors.newScheduledThreadPool(12);
 
     private final Refresh refresh;
-    private final ClauseHandler<? super Refresh, Void> handler;
+    private final QueryHandler<? super Refresh, Void> handler;
     private final Fpc fpc;
 
     private int status = STOPPED;
@@ -42,7 +46,7 @@ public final class Refresher {
     private ScheduledFuture<?> timer;
 
     public Refresher(Refresh refresh,
-            ClauseHandler<? super Refresh, Void> handler, Fpc fpc) {
+            QueryHandler<? super Refresh, Void> handler, Fpc fpc) {
         Conditions.checkIllegalArgument(refresh.isComplete(),
                 "REFRESH clause is not complete.");
 
@@ -53,7 +57,7 @@ public final class Refresher {
 
     /**
      * Starts the execution of the {@link Refresh} clause. Startup errors
-     * will be asynchronously notified through the {@link ClauseHandler}
+     * will be asynchronously notified through the {@link QueryHandler}
      * specified in the constructor after the {@code start()} method is
      * over.
      */

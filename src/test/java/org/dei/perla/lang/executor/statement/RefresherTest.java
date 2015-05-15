@@ -3,7 +3,7 @@ package org.dei.perla.lang.executor.statement;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.lang.executor.LatchingClauseHandler;
+import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.junit.Test;
@@ -40,13 +40,13 @@ public class RefresherTest {
         Refresh refresh = new Refresh(Duration.ofMillis(300));
         assertTrue(refresh.isComplete());
 
-        LatchingClauseHandler<Refresh, Void> handler =
-                new LatchingClauseHandler<>(3);
+        LatchingQueryHandler<Refresh, Void> handler =
+                new LatchingQueryHandler<>();
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
         r.start();
         assertTrue(r.isRunning());
-        handler.await();
+        handler.awaitCount(3);
 
         r.stop();
         assertFalse(r.isRunning());
@@ -67,8 +67,8 @@ public class RefresherTest {
         refresh = refresh.bind(values.keySet());
         assertTrue(refresh.isComplete());
 
-        LatchingClauseHandler<Refresh, Void> handler =
-                new LatchingClauseHandler<>(3);
+        LatchingQueryHandler<Refresh, Void> handler =
+                new LatchingQueryHandler<>();
         Refresher r = new Refresher(refresh, handler, fpc);
         assertFalse(r.isRunning());
         r.start();
@@ -77,7 +77,7 @@ public class RefresherTest {
         fpc.triggerEvent();
         fpc.triggerEvent();
         fpc.triggerEvent();
-        handler.await();
+        handler.awaitCount(3);
 
         r.stop();
         fpc.awaitStopped();

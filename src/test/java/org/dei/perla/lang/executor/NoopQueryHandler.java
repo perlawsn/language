@@ -1,12 +1,15 @@
 package org.dei.perla.lang.executor;
 
-import org.dei.perla.lang.executor.statement.ClauseHandler;
+import org.dei.perla.lang.executor.statement.QueryHandler;
 
 /**
  * @author Guido Rota 13/04/15.
  */
-public class NoopClauseHandler
-        implements ClauseHandler<Object, Object[]> {
+public class NoopQueryHandler
+        implements QueryHandler<Object, Object[]> {
+
+    @Override
+    public void complete(Object source) { }
 
     @Override
     public void error(Object source, Throwable error) { }

@@ -41,7 +41,7 @@ public final class SelectionExecutor {
     private final ExecutionConditions execCond;
     private final Expression where;
 
-    private final StatementHandler<? super SelectionQuery> handler;
+    private final QueryHandler<? super SelectionQuery, Object[]> handler;
     private final Fpc fpc;
 
     private final Buffer buffer;
@@ -80,7 +80,7 @@ public final class SelectionExecutor {
     private volatile int recordsProduced = 0;
 
     public SelectionExecutor(SelectionQuery query,
-            StatementHandler<? super SelectionQuery> handler,
+            QueryHandler<? super SelectionQuery, Object[]> handler,
             Fpc fpc) {
         this.query = query;
         select = query.getSelect();
@@ -167,7 +167,7 @@ public final class SelectionExecutor {
 
     /**
      * Starts the execution of the {@link SelectionQuery}. Startup errors
-     * will be asynchronously notified through the {@link ClauseHandler}
+     * will be asynchronously notified through the {@link QueryHandler}
      * specified in the constructor after the {@code start()} method is
      * over.
      */
@@ -377,7 +377,10 @@ public final class SelectionExecutor {
      * @author Guido Rota 22/04/2015
      */
     private final class SamplerHandler
-            implements ClauseHandler<Sampling, Object[]> {
+            implements QueryHandler<Sampling, Object[]> {
+
+        @Override
+        public void complete(Sampling source) { }
 
         @Override
         public void error(Sampling source, Throwable cause) {
@@ -476,7 +479,10 @@ public final class SelectionExecutor {
      *
      * @author Guido Rota 23/04/2015
      */
-    private class ExecIfRefreshHandler implements ClauseHandler<Refresh, Void> {
+    private class ExecIfRefreshHandler implements QueryHandler<Refresh, Void> {
+
+        @Override
+        public void complete(Refresh source) { }
 
         @Override
         public void error(Refresh source, Throwable cause) {

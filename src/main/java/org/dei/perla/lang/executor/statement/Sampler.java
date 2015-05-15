@@ -1,7 +1,5 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.lang.executor.QueryException;
-
 /**
  * A simple marker interface for the Sampler executor
  *
@@ -11,7 +9,7 @@ public interface Sampler {
 
     /**
      * Starts the execution of the {@link Sampling} clause. Startup errors
-     * will be asynchronously notified through the {@link ClauseHandler}
+     * will be asynchronously notified through the {@link QueryHandler}
      * specified in the constructor after the {@code start()} method is
      * over.
      */
