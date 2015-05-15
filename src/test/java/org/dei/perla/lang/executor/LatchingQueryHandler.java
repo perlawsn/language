@@ -13,7 +13,6 @@ public class LatchingQueryHandler<E, T>
         implements QueryHandler<E, T> {
 
     private Throwable error;
-    private boolean complete = false;
     private int dataCount = 0;
 
     private final Lock lk = new ReentrantLock();
@@ -28,31 +27,6 @@ public class LatchingQueryHandler<E, T>
             if (error != null) {
                 throw new RuntimeException(error);
             }
-        } finally {
-            lk.unlock();
-        }
-    }
-
-    public void awaitComplete() throws InterruptedException {
-        lk.lock();
-        try {
-            while (!complete && error == null) {
-                cond.await();
-            }
-            if (error != null) {
-                throw new RuntimeException(error);
-            }
-        } finally {
-            lk.unlock();
-        }
-    }
-
-    @Override
-    public void complete(E source) {
-        lk.lock();
-        try {
-            complete = true;
-            cond.signalAll();
         } finally {
             lk.unlock();
         }

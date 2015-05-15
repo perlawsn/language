@@ -9,9 +9,6 @@ public class NoopQueryHandler
         implements QueryHandler<Object, Object[]> {
 
     @Override
-    public void complete(Object source) { }
-
-    @Override
     public void error(Object source, Throwable error) { }
 
     @Override

@@ -17,9 +17,7 @@ import java.util.List;
  * SAMPLING ON EVENT clause executor.
  *
  * <p>
- * This executor can be stopped and re-started at will. due to this
- * characteristic, the {@link QueryHandler.complete()} method will never be
- * invoked.
+ * This executor can be stopped and re-started at will.
  *
  * @author Guido Rota 14/04/15.
  */

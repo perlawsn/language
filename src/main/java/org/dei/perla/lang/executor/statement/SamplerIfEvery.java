@@ -20,9 +20,7 @@ import java.util.List;
  * SAMPLING IF EVERY clause executor.
  *
  * <p>
- * This executor can be stopped and re-started at will; due to this
- * characteristic, the {@link QueryHandler.complete()} method will never be
- * invoked.
+ * This executor can be stopped and re-started at will.
  *
  * @author Guido Rota 24/03/15.
  */
@@ -287,9 +285,6 @@ public final class SamplerIfEvery implements Sampler {
      * @author Guido Rota 24/04/2015
      */
     private class RefreshHandler implements QueryHandler<Refresh, Void> {
-
-        @Override
-        public void complete(Refresh source) { }
 
         @Override
         public void error(Refresh source, Throwable cause) {

@@ -1,5 +1,6 @@
 package org.dei.perla.lang.executor;
 
+import org.apache.log4j.Logger;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.executor.statement.QueryHandler;
@@ -12,29 +13,32 @@ import org.dei.perla.lang.query.statement.SelectionQuery;
 import java.util.*;
 
 /**
+ * Distributes a {@link SelectionQuery} among the available FPCs and tracks
+ * its progresses.
+ *
  * @author Guido Rota 30/04/15.
  */
 public class SelectionDistributor {
 
-    private static final int READY = 0;
+    private static final int NEW = 0;
     private static final int RUNNING = 1;
     private static final int STOPPED = 2;
 
+    private final String name;
     private final SelectionQuery query;
     private final ExecutionConditions ec;
     private final QueryHandler<? super SelectionQuery, Object[]> handler;
     private final Registry registry;
 
-    private int status = READY;
+    private volatile int status = NEW;
 
-    private final Map<SelectionQuery, SelectionExecutor> active =
-            new HashMap<>();
-
+    private final List<SelectionExecutor> execs = new ArrayList<>();
     private final Set<Fpc> managed = new HashSet<>();
 
-    protected SelectionDistributor(SelectionQuery query,
+    protected SelectionDistributor(String name, SelectionQuery query,
             QueryHandler<? super SelectionQuery, Object[]> handler,
             Registry registry) {
+        this.name = name;
         this.query = query;
         ec = query.getExecutionConditions();
         this.handler = handler;
@@ -42,7 +46,7 @@ public class SelectionDistributor {
     }
 
     public synchronized void start() {
-        if (status != READY) {
+        if (status != NEW) {
             throw new IllegalStateException("Cannot start, " +
                     "SelectionDistributor has already been started");
         }
@@ -52,16 +56,16 @@ public class SelectionDistributor {
     }
 
     private void distribute() {
-        Collection<Fpc> available;
+        Collection<Fpc> fpcs;
 
         if (ec.getSpecs().isEmpty()) {
-            available = registry.getAll();
+            fpcs = registry.getAll();
         } else {
-            available = registry.get(ec.getSpecs(),
+            fpcs = registry.get(ec.getSpecs(),
                     Collections.emptyList());
         }
 
-        for (Fpc fpc : available) {
+        for (Fpc fpc : fpcs) {
             if (managed.contains(fpc)) {
                 continue;
             }
@@ -69,7 +73,7 @@ public class SelectionDistributor {
             try {
                 SelectionQuery q = query.bind(fpc.getAttributes());
                 SelectionExecutor se = new SelectionExecutor(q, handler, fpc);
-                active.put(query, se);
+                execs.add(se);
                 se.start();
                 managed.add(fpc);
             } catch (BindingException e) {
@@ -83,7 +87,7 @@ public class SelectionDistributor {
             return;
         }
 
-        active.forEach((f, e) -> e.stop());
+        execs.forEach(SelectionExecutor::stop);
         status = STOPPED;
     }
 
@@ -96,17 +100,17 @@ public class SelectionDistributor {
      * Handler for the EXECUTE IF refresh condition. When triggered, the
      * registry is queried to check if the query can be started on new FPCs
      *
-     * @author Guido Rota 29/04/2013
+     * @author Guido Rota 29/04/2015
      */
     private class RefreshHandler implements QueryHandler<Refresh, Void> {
 
         @Override
-        public void complete(Refresh source) { }
-
-        @Override
         public void error(Refresh source, Throwable cause) {
             synchronized (SelectionDistributor.this) {
-                // TODO: manage error
+                stop();
+                Exception e = new QueryException("Error while evaluating " +
+                        "REFRESH clause in EXECUTE IF condition", cause);
+                handler.error(query, e);
             }
         }
 

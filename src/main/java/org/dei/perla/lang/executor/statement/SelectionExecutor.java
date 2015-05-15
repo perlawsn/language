@@ -256,11 +256,6 @@ public final class SelectionExecutor {
 
         status = STOPPED;
         stopExecution();
-        AsyncUtils.runOnNewThread(() -> {
-            synchronized (SelectionExecutor.this) {
-                handler.complete(query);
-            }
-        });
     }
 
     /**
@@ -385,9 +380,6 @@ public final class SelectionExecutor {
             implements QueryHandler<Sampling, Object[]> {
 
         @Override
-        public void complete(Sampling source) { }
-
-        @Override
         public void error(Sampling source, Throwable cause) {
             synchronized (SelectionExecutor.this) {
                 if (status < RUNNING) {
@@ -485,9 +477,6 @@ public final class SelectionExecutor {
      * @author Guido Rota 23/04/2015
      */
     private class ExecIfRefreshHandler implements QueryHandler<Refresh, Void> {
-
-        @Override
-        public void complete(Refresh source) { }
 
         @Override
         public void error(Refresh source, Throwable cause) {

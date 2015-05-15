@@ -5,8 +5,6 @@ package org.dei.perla.lang.executor.statement;
  */
 public interface QueryHandler<E, T> {
 
-    public void complete(E source);
-
     public void error(E source, Throwable cause);
 
     public void data(E source, T value);
