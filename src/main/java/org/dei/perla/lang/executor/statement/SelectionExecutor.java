@@ -336,7 +336,7 @@ public final class SelectionExecutor {
      * @param msg error message
      */
     private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
+        AsyncUtils.runInNewThread(() -> {
             synchronized (SelectionExecutor.this) {
                 Exception e = new QueryException(msg);
                 handler.error(query, e);

@@ -107,7 +107,7 @@ public final class Refresher {
      * @param msg error message
      */
     private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
+        AsyncUtils.runInNewThread(() -> {
             synchronized (Refresher.this) {
                 Exception e = new QueryException(msg);
                 handler.error(refresh, e);

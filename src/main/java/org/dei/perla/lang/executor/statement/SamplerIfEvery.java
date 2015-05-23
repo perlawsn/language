@@ -103,7 +103,7 @@ public final class SamplerIfEvery implements Sampler {
      * @param msg error message
      */
     private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
+        AsyncUtils.runInNewThread(() -> {
             synchronized (SamplerIfEvery.this) {
                 Exception e = new QueryException(msg);
                 handler.error(sampling, e);

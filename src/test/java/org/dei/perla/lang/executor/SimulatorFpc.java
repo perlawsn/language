@@ -337,7 +337,7 @@ public class SimulatorFpc implements Fpc {
 
         protected GetSimTask(List<Attribute> atts, TaskHandler handler) {
             super(atts, handler);
-            AsyncUtils.runOnNewThread(this::createSample);
+            AsyncUtils.runInNewThread(this::createSample);
         }
 
         private void createSample() {

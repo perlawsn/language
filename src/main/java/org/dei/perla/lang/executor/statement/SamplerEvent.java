@@ -74,7 +74,7 @@ public final class SamplerEvent implements Sampler {
      * @param msg error message
      */
     private void notifyErrorAsync(String msg) {
-        AsyncUtils.runOnNewThread(() -> {
+        AsyncUtils.runInNewThread(() -> {
             synchronized (SamplerEvent.this) {
                 Exception e = new QueryException(msg);
                 handler.error(sampling, e);
