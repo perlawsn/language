@@ -42,24 +42,24 @@ PARSER_BEGIN(Parser)
     import org.dei.perla.core.registry.TypeClass;
     import org.dei.perla.core.registry.DataTemplate;
 
-	public final class Parser {
+    public final class Parser {
 
         private static final Object[] EMPTY_DEFAULT = new Object[0];
 
         private static final String ERROR_STRING = "Error near element %s" +
-        		"(line %s, column %s): ";
+                "(line %s, column %s): ";
 
         private static void addError(String msg, Token t, Errors err) {
-        	err.addError(ERROR_STRING + msg, t.image, t.beginLine,
-        			t.beginColumn);
+            err.addError(ERROR_STRING + msg, t.image, t.beginLine,
+                    t.beginColumn);
         }
 
         private static Errors inContext(Errors err, Token t) {
-        	return err.inContext(ERROR_STRING, t.image, t.beginLine,
-        			t.beginColumn);
+            return err.inContext(ERROR_STRING, t.image, t.beginLine,
+                    t.beginColumn);
         }
 
-	}
+    }
 
 PARSER_END(Parser)
 
@@ -68,13 +68,13 @@ PARSER_END(Parser)
  */
 SKIP :
 {
- 	" "
+    " "
     |
-	"\r"
+    "\r"
     |
-	"\t"
+    "\t"
     |
-	"\n"
+    "\n"
 }
 
 /*
@@ -82,17 +82,17 @@ SKIP :
  */
 MORE:
 {
-	"/*" : COMMENT
+    "/*" : COMMENT
 }
 
 <COMMENT> MORE:
 {
-	<~[]>
+    <~[]>
 }
 
 <COMMENT> SKIP:
 {
-	"*/" : DEFAULT
+    "*/" : DEFAULT
 }
 
 /*
@@ -100,9 +100,9 @@ MORE:
  */
 TOKEN :
 {
-	< KEYWORD_CREATE:   "CREATE" >
+    < KEYWORD_CREATE:   "CREATE" >
     |
-	< KEYWORD_AS:       "AS"     >
+    < KEYWORD_AS:       "AS"     >
 }
 
 /*
@@ -110,9 +110,9 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_INSERT:   "INSERT" >
+    < KEYWORD_INSERT:   "INSERT" >
     |
-	< KEYWORD_INTO:     "INTO" >
+    < KEYWORD_INTO:     "INTO" >
 }
 
 /*
@@ -120,9 +120,9 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_EVERY:        "EVERY"        >
-	|
-	< KEYWORD_IN:           "IN"           >
+    < KEYWORD_EVERY:        "EVERY"        >
+    |
+    < KEYWORD_IN:           "IN"           >
 }
 
 /*
@@ -130,10 +130,10 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_SELECT:    "SELECT"   >
+    < KEYWORD_SELECT:    "SELECT"   >
     |
-	// Virtual record field created by the GROUP BY clause
-	<KEYWORD_GROUPTS:    "GROUP_TS" >
+    // Virtual record field created by the GROUP BY clause
+    <KEYWORD_GROUPTS:    "GROUP_TS" >
 }
 
 /*
@@ -141,7 +141,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_WHERE:     "WHERE" >
+    < KEYWORD_WHERE:     "WHERE" >
 }
 
 /*
@@ -149,13 +149,13 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_GROUP:     "GROUP"  >
+    < KEYWORD_GROUP:     "GROUP"  >
     |
-	< KEYWORD_BY:        "BY"     >
+    < KEYWORD_BY:        "BY"     >
     |
     // Keyword employed to define the number of groups created by a timestamp
     // aggregation
-	< KEYWORD_GROUPS:    "GROUPS" >
+    < KEYWORD_GROUPS:    "GROUPS" >
 }
 
 /*
@@ -163,7 +163,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_HAVING:    "HAVING" >
+    < KEYWORD_HAVING:    "HAVING" >
 }
 
 /*
@@ -171,9 +171,9 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_UP:        "UP" >
+    < KEYWORD_UP:        "UP" >
     |
-	< KEYWORD_TO:        "TO" >
+    < KEYWORD_TO:        "TO" >
 }
 
 /*
@@ -181,17 +181,17 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_ON:        "ON"        >
+    < KEYWORD_ON:        "ON"        >
     |
-	< KEYWORD_EMPTY:     "EMPTY"     >
+    < KEYWORD_EMPTY:     "EMPTY"     >
     |
-	< KEYWORD_SELECTION: "SELECTION" >
+    < KEYWORD_SELECTION: "SELECTION" >
     |
 //	< KEYWORD_INSERT:    "INSERT"    >
 //  |
-	< KEYWORD_NOTHING:   "NOTHING"   >
+    < KEYWORD_NOTHING:   "NOTHING"   >
     |
-	< KEYWORD_DEFAULT:   "DEFAULT"   >
+    < KEYWORD_DEFAULT:   "DEFAULT"   >
 }
 
 /*
@@ -199,17 +199,17 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_SAMPLING:  "SAMPLING" >
+    < KEYWORD_SAMPLING:  "SAMPLING" >
     |
 //	< KEYWORD_ON:        "ON"       >
 //  |
-	< KEYWORD_EVENT:     "EVENT"    >
+    < KEYWORD_EVENT:     "EVENT"    >
     |
 //	< KEYWORD_IF:        "IF"       >
 //  |
 //	< KEYWORD_EVERY:     "EVERY"    >
 //  |
-	< KEYWORD_ELSE:      "ELSE"     >
+    < KEYWORD_ELSE:      "ELSE"     >
 }
 
 /*
@@ -219,17 +219,17 @@ TOKEN :
 {
 //	< KEYWORD_ON:          "ON"          >
 //  |
-	< KEYWORD_UNSUPPORTED: "UNSUPPORTED" >
+    < KEYWORD_UNSUPPORTED: "UNSUPPORTED" >
     |
-	< KEYWORD_SAMPLE:      "SAMPLE"      >
+    < KEYWORD_SAMPLE:      "SAMPLE"      >
     |
-	< KEYWORD_RATE:        "RATE"        >
+    < KEYWORD_RATE:        "RATE"        >
     |
-	< KEYWORD_DO:          "DO"          >
+    < KEYWORD_DO:          "DO"          >
     |
-	< KEYWORD_SLOW:        "SLOW"        >
+    < KEYWORD_SLOW:        "SLOW"        >
     |
-	< KEYWORD_DOWN:        "DOWN"        >
+    < KEYWORD_DOWN:        "DOWN"        >
 }
 
 /*
@@ -237,11 +237,11 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_REFRESH:   "REFRESH" >
+    < KEYWORD_REFRESH:   "REFRESH" >
     |
 //	< KEYWORD_EVERY:     "EVERY"   >
 //  |
-	< KEYWORD_NEVER:     "NEVER"   >
+    < KEYWORD_NEVER:     "NEVER"   >
 }
 
 /*
@@ -249,19 +249,19 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_EXECUTE:        "EXECUTE"   >
+    < KEYWORD_EXECUTE:        "EXECUTE"   >
     |
-	< KEYWORD_IF:             "IF"        >
+    < KEYWORD_IF:             "IF"        >
 //  |
 //  < KEYWORD_ON:			  "ON"        >
-	|
-	< KEYWORD_NODES:          "NODES"     >
-	|
-	< KEYWORD_WITH:           "WITH"      >
-	|
-	< KEYWORD_WITHOUT:        "WITHOUT"   >
-	|
-	< KEYWORD_ALL:            "ALL"       >
+    |
+    < KEYWORD_NODES:          "NODES"     >
+    |
+    < KEYWORD_WITH:           "WITH"      >
+    |
+    < KEYWORD_WITHOUT:        "WITHOUT"   >
+    |
+    < KEYWORD_ALL:            "ALL"       >
 }
 
 /*
@@ -269,11 +269,11 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_TERMINATE:  "TERMINATE"  >
+    < KEYWORD_TERMINATE:  "TERMINATE"  >
     |
-	< KEYWORD_AFTER:      "AFTER"      >
+    < KEYWORD_AFTER:      "AFTER"      >
     |
-	< KEYWORD_SELECTIONS: "SELECTIONS" >
+    < KEYWORD_SELECTIONS: "SELECTIONS" >
 }
 
 /*
@@ -281,7 +281,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_FROM:      "FROM" >
+    < KEYWORD_FROM:      "FROM" >
 //  |
 //	< KEYWORD_AS:        "AS"   >
 }
@@ -291,7 +291,7 @@ TOKEN :
  */
 TOKEN :
 {
-  	< KEYWORD_SET:    "SET"  >
+    < KEYWORD_SET:    "SET"  >
 //  |
 //  < KEYWORD_ON: "ON"    >
 }
@@ -301,7 +301,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_STREAM:   "STREAM"   >
+    < KEYWORD_STREAM:   "STREAM"   >
 }
 
 /*
@@ -309,15 +309,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< KEYWORD_SAMPLES:  "SAMPLES"  >
+    < KEYWORD_SAMPLES:  "SAMPLES"  >
     |
-	< KEYWORD_ONE:      "ONE"      >
+    < KEYWORD_ONE:      "ONE"      >
     |
-	< KEYWORD_IS:       "IS" >
+    < KEYWORD_IS:       "IS" >
     |
-	< KEYWORD_BETWEEN:  "BETWEEN"  >
+    < KEYWORD_BETWEEN:  "BETWEEN"  >
     |
-	< KEYWORD_LIKE:     "LIKE"     >
+    < KEYWORD_LIKE:     "LIKE"     >
 }
 
 /*
@@ -325,15 +325,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< OPERATOR_MULTIPLY: "*" >
+    < OPERATOR_MULTIPLY: "*" >
     |
-	< OPERATOR_DIVIDE:   "/" >
-	|
-	<OPERATOR_MODULO:    "%" >
+    < OPERATOR_DIVIDE:   "/" >
     |
-	< OPERATOR_PLUS:     "+" >
+    <OPERATOR_MODULO:    "%" >
     |
-	< OPERATOR_MINUS:    "-" >
+    < OPERATOR_PLUS:     "+" >
+    |
+    < OPERATOR_MINUS:    "-" >
 }
 
 /*
@@ -341,11 +341,11 @@ TOKEN :
  */
 TOKEN :
 {
-	< OPERATOR_NOT:     "NOT" >
+    < OPERATOR_NOT:     "NOT" >
     |
-	< OPERATOR_XOR:     "XOR" >
+    < OPERATOR_XOR:     "XOR" >
     |
-	< OPERATOR_AND:     "AND" >
+    < OPERATOR_AND:     "AND" >
     |
     < OPERATOR_OR:      "OR"  >
 }
@@ -355,17 +355,17 @@ TOKEN :
  */
 TOKEN :
 {
-	< OPERATOR_BITWISE_NOT: "~" >
+    < OPERATOR_BITWISE_NOT: "~" >
     |
-	< OPERATOR_BITWISE_LSH: "<<" >
+    < OPERATOR_BITWISE_LSH: "<<" >
     |
-	< OPERATOR_BITWISE_RSH: ">>" >
+    < OPERATOR_BITWISE_RSH: ">>" >
     |
     < OPERATOR_BITWISE_XOR: "^" >
     |
-	< OPERATOR_BITWISE_AND: "&" >
+    < OPERATOR_BITWISE_AND: "&" >
     |
-	< OPERATOR_BITWISE_OR:  "|"  >
+    < OPERATOR_BITWISE_OR:  "|"  >
 }
 
 /*
@@ -373,17 +373,17 @@ TOKEN :
  */
 TOKEN :
 {
-	< OPERATOR_GREATER:       ">"  >
+    < OPERATOR_GREATER:       ">"  >
     |
-	< OPERATOR_LESS:          "<"  >
+    < OPERATOR_LESS:          "<"  >
     |
-	< OPERATOR_GREATER_EQUAL: ">=" >
+    < OPERATOR_GREATER_EQUAL: ">=" >
     |
-	< OPERATOR_LESS_EQUAL:    "<=" >
+    < OPERATOR_LESS_EQUAL:    "<=" >
     |
-	< OPERATOR_EQUAL:         "="  >
+    < OPERATOR_EQUAL:         "="  >
     |
-	< OPERATOR_NOT_EQUAL:     "<>" | "!=" >
+    < OPERATOR_NOT_EQUAL:     "<>" | "!=" >
 }
 
 /*
@@ -391,15 +391,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< FUNCTION_COUNT:     "COUNT"     >
+    < FUNCTION_COUNT:     "COUNT"     >
     |
-	< FUNCTION_AVG:       "AVG"       >
+    < FUNCTION_AVG:       "AVG"       >
     |
-	< FUNCTION_MAX:       "MAX"       >
+    < FUNCTION_MAX:       "MAX"       >
     |
-	< FUNCTION_MIN:       "MIN"       >
+    < FUNCTION_MIN:       "MIN"       >
     |
-	< FUNCTION_SUM:       "SUM"       >
+    < FUNCTION_SUM:       "SUM"       >
 }
 
 /*
@@ -407,15 +407,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< TIMEUNIT_S:  "seconds"      | "s"  >
+    < TIMEUNIT_S:  "seconds"      | "s"  >
     |
-	< TIMEUNIT_M:  "minutes"      | "m"  >
+    < TIMEUNIT_M:  "minutes"      | "m"  >
     |
-	< TIMEUNIT_H:  "hours"        | "h"  >
+    < TIMEUNIT_H:  "hours"        | "h"  >
     |
-	< TIMEUNIT_MS: "milliseconds" | "millis" | "ms" >
+    < TIMEUNIT_MS: "milliseconds" | "millis" | "ms" >
     |
-	< TIMEUNIT_D:  "days"         | "d"  >
+    < TIMEUNIT_D:  "days"         | "d"  >
 }
 
 /*
@@ -423,17 +423,17 @@ TOKEN :
  */
 TOKEN :
 {
-	< TYPE_ID:             "ID"        >
+    < TYPE_ID:             "ID"        >
     |
-	< TYPE_TIMESTAMP:      "TIMESTAMP" >
+    < TYPE_TIMESTAMP:      "TIMESTAMP" >
     |
-	< TYPE_BOOLEAN:        "BOOLEAN"   >
+    < TYPE_BOOLEAN:        "BOOLEAN"   >
     |
-	< TYPE_INTEGER:        "INTEGER"   >
+    < TYPE_INTEGER:        "INTEGER"   >
     |
-	< TYPE_FLOAT:          "FLOAT"     >
+    < TYPE_FLOAT:          "FLOAT"     >
     |
-	< TYPE_STRING:         "STRING"    >
+    < TYPE_STRING:         "STRING"    >
 }
 
 /*
@@ -441,7 +441,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< TYPE_ANY: "ANY" >
+    < TYPE_ANY: "ANY" >
 }
 
 /*
@@ -454,7 +454,7 @@ TOKEN :
  */
 TOKEN :
 {
-	< CONSTANT_NULL:     "NULL" >
+    < CONSTANT_NULL:     "NULL" >
 }
 
 /*
@@ -462,11 +462,11 @@ TOKEN :
  */
 TOKEN :
 {
-	< CONSTANT_BOOLEAN_TRUE:    "TRUE"    >
+    < CONSTANT_BOOLEAN_TRUE:    "TRUE"    >
     |
-	< CONSTANT_BOOLEAN_FALSE:   "FALSE"   >
+    < CONSTANT_BOOLEAN_FALSE:   "FALSE"   >
     |
-	< CONSTANT_BOOLEAN_UNKNOWN: "UNKNOWN" >
+    < CONSTANT_BOOLEAN_UNKNOWN: "UNKNOWN" >
 }
 
 /*
@@ -474,13 +474,13 @@ TOKEN :
  */
 TOKEN :
 {
-	<CONSTANT_INTEGER_10: ( <DIGIT> )+ >
-	|
-	<CONSTANT_INTEGER_16: ( <HEXADECIMAL> ) >
+    <CONSTANT_INTEGER_10: ( <DIGIT> )+ >
     |
-	<CONSTANT_FLOAT:
+    <CONSTANT_INTEGER_16: ( <HEXADECIMAL> ) >
+    |
+    <CONSTANT_FLOAT:
         ( <CONSTANT_INTEGER_10> )? "." <CONSTANT_INTEGER_10>
-	>
+    >
 }
 
 /*
@@ -490,29 +490,29 @@ TOKEN :
  */
 TOKEN :
 {
-	< CONSTANT_SINGLE_QUOTED_STRING_START: "'"  > : NON_SINGLE_QUOTED_STRING
+    < CONSTANT_SINGLE_QUOTED_STRING_START: "'"  > : NON_SINGLE_QUOTED_STRING
     |
-	< CONSTANT_DOUBLE_QUOTED_STRING_START: "\"" > : NON_DOUBLE_QUOTED_STRING
+    < CONSTANT_DOUBLE_QUOTED_STRING_START: "\"" > : NON_DOUBLE_QUOTED_STRING
 }
 
 <NON_SINGLE_QUOTED_STRING> TOKEN :
 {
-	< CONSTANT_SINGLE_QUOTED_STRING_VALUE: (~["'"] | "'" "'")* > : NON_SINGLE_QUOTED_STRING_END
+    < CONSTANT_SINGLE_QUOTED_STRING_VALUE: (~["'"] | "'" "'")* > : NON_SINGLE_QUOTED_STRING_END
 }
 
 <NON_DOUBLE_QUOTED_STRING> TOKEN :
 {
-	< CONSTANT_DOUBLE_QUOTED_STRING_VALUE: (~["\""] | "\"" "\"")* > : NON_DOUBLE_QUOTED_STRING_END
+    < CONSTANT_DOUBLE_QUOTED_STRING_VALUE: (~["\""] | "\"" "\"")* > : NON_DOUBLE_QUOTED_STRING_END
 }
 
 <NON_SINGLE_QUOTED_STRING_END> TOKEN :
 {
-	< CONSTANT_SINGLE_QUOTED_STRING_END:  "'" > : DEFAULT
+    < CONSTANT_SINGLE_QUOTED_STRING_END:  "'" > : DEFAULT
 }
 
 <NON_DOUBLE_QUOTED_STRING_END> TOKEN :
 {
-	< CONSTANT_DOUBLE_QUOTED_STRING_END: "\"" > : DEFAULT
+    < CONSTANT_DOUBLE_QUOTED_STRING_END: "\"" > : DEFAULT
 }
 
 /*
@@ -520,15 +520,15 @@ TOKEN :
  */
 TOKEN :
 {
-	< #DIGIT:      ["0" - "9"]               >
+    < #DIGIT:      ["0" - "9"]               >
     |
-	< #LITERAL:    ["a" - "z", "A" - "Z"] >
+    < #LITERAL:    ["a" - "z", "A" - "Z"] >
     |
-	< #UNDERSCORE: "_"                       >
+    < #UNDERSCORE: "_"                       >
     |
-	< #HEXADECIMAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+    < #HEXADECIMAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
     |
-	< IDENTIFIER: ( <LITERAL> | <UNDERSCORE>) ( <DIGIT> | <LITERAL> | <UNDERSCORE> )* >
+    < IDENTIFIER: ( <LITERAL> | <UNDERSCORE>) ( <DIGIT> | <LITERAL> | <UNDERSCORE> )* >
 }
 
 /*
@@ -541,15 +541,15 @@ List<Statement> StatementSequence(Errors err) :
     Statement s;
 }
 {
-	s = Statement(err)
-	{ sl.add(s); }
-	(
-		";"
-		s = Statement(err)
-		{ sl.add(s); }
-	)*
-	<EOF>
-	{ return sl; }
+    s = Statement(err)
+    { sl.add(s); }
+    (
+        ";"
+        s = Statement(err)
+        { sl.add(s); }
+    )*
+    <EOF>
+    { return sl; }
 }
 
 Statement Statement(Errors err):
@@ -572,74 +572,77 @@ Statement SetParametersStament(Errors err):
 {
     <KEYWORD_SET>
     SetParameterList(err)
-  	(
+    (
         ","
-  		SetParameterList(err)
-  	)*
+        SetParameterList(err)
+    )*
     <KEYWORD_ON>
-	(
+    (
         <IDENTIFIER>
-	    |
-	    ConstantInteger()
-	    |
-	    ConstantString()
-	)
-	(
-	    ","
-	    (
-		    <IDENTIFIER>
-			|
-			ConstantInteger()
-			|
-			ConstantString()
-		)
-	)*
-	{ return null; }
+        |
+        ConstantInteger()
+        |
+        ConstantString()
+    )
+    (
+        ","
+        (
+            <IDENTIFIER>
+            |
+            ConstantInteger()
+            |
+            ConstantString()
+        )
+    )*
+    { return null; }
 }
 
 void SetParameterList(Errors err):
 {}
 {
-	Identifier()
-	"="
-	Expression(ExpressionType.CONSTANT, err, null)
+    Identifier()
+    "="
+    Expression(ExpressionType.CONSTANT, err, null)
 }
 
 Statement CreationStatement(Errors err) :
-{}
 {
-	<KEYWORD_CREATE>
-	<KEYWORD_STREAM>
-	Identifier() // StreamName
-	FieldDefinitionList(err)
-	[
-	    <KEYWORD_AS>
-	    SelectionStatement(err)
-	]
-	{ return null; }
+    String tableName;
+    SelectionQuery sel;
+}
+{
+    <KEYWORD_CREATE>
+    <KEYWORD_STREAM>
+    tableName = Identifier() // Stream name
+    FieldDefinitionList(err)
+    [
+        <KEYWORD_AS>
+        sel = SelectionStatement(err)
+    ]
+    { return null; }
 }
 
 void FieldDefinitionList(Errors err) :
 {}
 {
-	"("
-	FieldDefinition(err)
-	(
-		","
-		FieldDefinition(err)
-	)*
-	")"
+    "("
+    FieldDefinition(err)
+    (
+        ","
+        FieldDefinition(err)
+    )*
+    ")"
 }
 
 void FieldDefinition(Errors err) :
 {}
 {
-	Identifier() // Data structure field
-	Type()
-	[
-		<KEYWORD_DEFAULT>
-		Expression(ExpressionType.CONSTANT, err, null)
-	]
+    Identifier() // Data structure field
+    Type()
+    [
+        <KEYWORD_DEFAULT>
+        Expression(ExpressionType.CONSTANT, err, null)
+    ]
 }
 
 Statement InsertionStatement(Errors err) :
@@ -647,15 +650,15 @@ Statement InsertionStatement(Errors err) :
     SelectionQuery sel;
 }
 {
-	<KEYWORD_INSERT>
-	<KEYWORD_INTO>
-	<KEYWORD_STREAM>
-	Identifier() // StreamName
-	[
-	    FieldList()
-	]
-	sel = SelectionStatement(err)
-	{ return null; }
+    <KEYWORD_INSERT>
+    <KEYWORD_INTO>
+    <KEYWORD_STREAM>
+    Identifier() // Stream name
+    [
+        FieldList()
+    ]
+    sel = SelectionStatement(err)
+    { return null; }
 }
 
 List<String> FieldList() :
@@ -664,24 +667,24 @@ List<String> FieldList() :
     String s;
 }
 {
-	"("
-	s = Identifier() // DataStructureField
-	{ sl.add(s); }
-	(
-		","
-		s = Identifier() // DataStructureField
-		{ sl.add(s); }
-	)*
-	")"
-	{ return sl; }
+    "("
+    s = Identifier() // DataStructureField
+    { sl.add(s); }
+    (
+        ","
+        s = Identifier() // DataStructureField
+        { sl.add(s); }
+    )*
+    ")"
+    { return sl; }
 }
 
 SelectionQuery SelectionStatement(Errors err) :
 {
-	// All attribute identifiers are incrementally stored inside this
-	// structure, that is later employed by the EXECUTE IF clause when the
-	// user requires all attributes referenced in the query
-	Set<String> ids = new TreeSet<String>();
+    // All attribute identifiers are incrementally stored inside this
+    // structure, that is later employed by the EXECUTE IF clause when the
+    // user requires all attributes referenced in the query
+    Set<String> ids = new TreeSet<String>();
 
     WindowSize every;
     List<FieldSelection> fsl;
@@ -699,46 +702,46 @@ SelectionQuery SelectionStatement(Errors err) :
     every = EveryClause(err)
     <KEYWORD_SELECT>
     fsl = FieldSelectionList(err, ids)
-	[
-		gby = GroupByClause()
-	]
-	[
-		having = HavingClause(err, ids)
-	]
-	[
-		upto = UpToClause(err)
-	]
-	[
-		oes = OnEmptySelectionClause()
-	]
-	{
-	    List<Expression> fields = new ArrayList<Expression>();
-	    Object[] def = new Object[fsl.size()];
-	    int i = 0;
-	    for (FieldSelection fs : fsl) {
-	        fields.add(fs.getField());
-	        def[i++] = fs.getDefault();
-	    }
-	    if (oes == OnEmptySelection.INSERT_NOTHING) {
-	        def = EMPTY_DEFAULT;
-	    }
-	    sel = new Select(fields, upto, gby, having, def);
-	}
-	sampling = SamplingClause(err, ids)
-	[
-		// This optional where clause filters the sampled values before adding
-		// them to the local buffer
-	    <KEYWORD_WHERE>
-	    // No aggregates allowed
-	    where = Expression(ExpressionType.SIMPLE, err, ids)
-	]
-	[
-		ec = ExecutionConditionsClause(err, ids)
-	]
-	[
-		terminate = TerminateAfterClause(err)
-	]
-	{ return new SelectionQuery(sel, every, sampling, where, ec, terminate); }
+    [
+        gby = GroupByClause()
+    ]
+    [
+        having = HavingClause(err, ids)
+    ]
+    [
+        upto = UpToClause(err)
+    ]
+    [
+        oes = OnEmptySelectionClause()
+    ]
+    {
+        List<Expression> fields = new ArrayList<Expression>();
+        Object[] def = new Object[fsl.size()];
+        int i = 0;
+        for (FieldSelection fs : fsl) {
+            fields.add(fs.getField());
+            def[i++] = fs.getDefault();
+        }
+        if (oes == OnEmptySelection.INSERT_NOTHING) {
+            def = EMPTY_DEFAULT;
+        }
+        sel = new Select(fields, upto, gby, having, def);
+    }
+    sampling = SamplingClause(err, ids)
+    [
+        // This optional where clause filters the sampled values before adding
+        // them to the local buffer
+        <KEYWORD_WHERE>
+        // No aggregates allowed
+        where = Expression(ExpressionType.SIMPLE, err, ids)
+    ]
+    [
+        ec = ExecutionConditionsClause(err, ids)
+    ]
+    [
+        terminate = TerminateAfterClause(err)
+    ]
+    { return new SelectionQuery(sel, every, sampling, where, ec, terminate); }
 }
 
 WindowSize EveryClause(Errors err) :
@@ -746,9 +749,9 @@ WindowSize EveryClause(Errors err) :
     WindowSize ws;
 }
 {
-	<KEYWORD_EVERY>
-	ws = WindowSize(err)
-	{ return ws; }
+    <KEYWORD_EVERY>
+    ws = WindowSize(err)
+    { return ws; }
 }
 
 List<FieldSelection> FieldSelectionList(Errors err, Set<String> ids) :
@@ -757,14 +760,14 @@ List<FieldSelection> FieldSelectionList(Errors err, Set<String> ids) :
     FieldSelection fs;
 }
 {
-	fs = FieldSelection(err, ids)
-	{ fsl.add(fs); }
-	(
-		","
-		fs = FieldSelection(err, ids)
-		{ fsl.add(fs); }
-	)*
-	{ return fsl; }
+    fs = FieldSelection(err, ids)
+    { fsl.add(fs); }
+    (
+        ","
+        fs = FieldSelection(err, ids)
+        { fsl.add(fs); }
+    )*
+    { return fsl; }
 }
 
 FieldSelection FieldSelection(Errors err, Set<String> ids) :
@@ -773,16 +776,16 @@ FieldSelection FieldSelection(Errors err, Set<String> ids) :
     Object def = null;
 }
 {
-	field = Expression(ExpressionType.AGGREGATE, err, ids)
-	[
-		<KEYWORD_DEFAULT>
-		(
+    field = Expression(ExpressionType.AGGREGATE, err, ids)
+    [
+        <KEYWORD_DEFAULT>
+        (
             def = Expression(ExpressionType.SIMPLE, err, ids)
             |
             <CONSTANT_NULL>
-		)
-	]
-	{ return new FieldSelection(field, def); }
+        )
+    ]
+    { return new FieldSelection(field, def); }
 }
 
 GroupBy GroupByClause() :
@@ -790,10 +793,10 @@ GroupBy GroupByClause() :
     GroupBy g;
 }
 {
-	<KEYWORD_GROUP>
-	<KEYWORD_BY>
-	g = FieldGroupingByList()
-	{ return g; }
+    <KEYWORD_GROUP>
+    <KEYWORD_BY>
+    g = FieldGroupingByList()
+    { return g; }
 }
 
 GroupBy FieldGroupingByList() :
@@ -803,23 +806,23 @@ GroupBy FieldGroupingByList() :
     List<Field> fs = new ArrayList<Field>();
 }
 {
-	(
-		f = FieldGroupingBy()
-		{ fs.add(f); }
-		|
-		gts = FieldGroupingByTs()
-	)
-	(
-		","
-		f = FieldGroupingBy()
-		{ fs.add(f); }
-	)*
-	{
-	    if (gts == null) {
-	        return new GroupBy(fs);
-	    }
-	    return new GroupBy(gts.getDuration(), gts.getCount(), fs);
-	}
+    (
+        f = FieldGroupingBy()
+        { fs.add(f); }
+        |
+        gts = FieldGroupingByTs()
+    )
+    (
+        ","
+        f = FieldGroupingBy()
+        { fs.add(f); }
+    )*
+    {
+        if (gts == null) {
+            return new GroupBy(fs);
+        }
+        return new GroupBy(gts.getDuration(), gts.getCount(), fs);
+    }
 }
 
 Field FieldGroupingBy() :
@@ -827,8 +830,8 @@ Field FieldGroupingBy() :
     String f;
 }
 {
-	f = Identifier() // FPC attribute
-	{ return new Field(f); }
+    f = Identifier() // FPC attribute
+    { return new Field(f); }
 }
 
 GroupByTS FieldGroupingByTs() :
@@ -837,14 +840,14 @@ GroupByTS FieldGroupingByTs() :
     int count;
 }
 {
-	<TYPE_TIMESTAMP>
-	"("
-	d = Duration()
-	","
-	count = ConstantInteger()
-	<KEYWORD_GROUPS>
-	")"
-	{ return new GroupByTS(d, count); }
+    <TYPE_TIMESTAMP>
+    "("
+    d = Duration()
+    ","
+    count = ConstantInteger()
+    <KEYWORD_GROUPS>
+    ")"
+    { return new GroupByTS(d, count); }
 }
 
 Expression HavingClause(Errors err, Set<String> ids) :
@@ -852,9 +855,9 @@ Expression HavingClause(Errors err, Set<String> ids) :
     Expression e;
 }
 {
-	<KEYWORD_HAVING>
-	e = Expression(ExpressionType.AGGREGATE, err, ids)
-	{ return e; }
+    <KEYWORD_HAVING>
+    e = Expression(ExpressionType.AGGREGATE, err, ids)
+    { return e; }
 }
 
 WindowSize UpToClause(Errors err) :
@@ -862,53 +865,53 @@ WindowSize UpToClause(Errors err) :
     WindowSize ws;
 }
 {
-	<KEYWORD_UP>
-	<KEYWORD_TO>
-	ws = WindowSize(err)
-	{ return ws; }
+    <KEYWORD_UP>
+    <KEYWORD_TO>
+    ws = WindowSize(err)
+    { return ws; }
 }
 
 OnEmptySelection OnEmptySelectionClause() :
 {}
 {
-	<KEYWORD_ON>
-	<KEYWORD_EMPTY>
-	<KEYWORD_SELECTION>
-	<KEYWORD_INSERT>
-	(
-		<KEYWORD_NOTHING>
-		{ return OnEmptySelection.INSERT_NOTHING; }
-		|
-	 	<KEYWORD_DEFAULT>
-	 	{ return OnEmptySelection.INSERT_DEFAULT; }
-	)
+    <KEYWORD_ON>
+    <KEYWORD_EMPTY>
+    <KEYWORD_SELECTION>
+    <KEYWORD_INSERT>
+    (
+        <KEYWORD_NOTHING>
+        { return OnEmptySelection.INSERT_NOTHING; }
+        |
+        <KEYWORD_DEFAULT>
+        { return OnEmptySelection.INSERT_DEFAULT; }
+    )
 }
 
 Sampling SamplingClause(Errors err, Set<String> ids) :
 {
-	Set<String> events;
+    Set<String> events;
 
-	IfEvery ife;
-	RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
-	Refresh refresh = Refresh.NEVER;
+    IfEvery ife;
+    RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
+    Refresh refresh = Refresh.NEVER;
 }
 {
-	<KEYWORD_SAMPLING>
-	(
-		events = OnEventClause()
-		{ return new SamplingEvent(events); }
-		|
-		(
-			ife = IfEveryClause(err, ids)
-			[
-				policy = OnUnsupportedSRClause()
-			]
-			[
-				refresh = RefreshClause()
-			]
-			{ return new SamplingIfEvery(ife, policy, refresh); }
-		)
-	)
+    <KEYWORD_SAMPLING>
+    (
+        events = OnEventClause()
+        { return new SamplingEvent(events); }
+        |
+        (
+            ife = IfEveryClause(err, ids)
+            [
+                policy = OnUnsupportedSRClause()
+            ]
+            [
+                refresh = RefreshClause()
+            ]
+            { return new SamplingIfEvery(ife, policy, refresh); }
+        )
+    )
 }
 
 Set<String> OnEventClause() :
@@ -917,18 +920,18 @@ Set<String> OnEventClause() :
     String e;
 }
 {
-	<KEYWORD_ON>
-	<KEYWORD_EVENT>
-	(
-	    e = Identifier() //FPC Event
-	    { evs.add(e); }
-	    (
-	        ","
-	        e = Identifier() // FPC Event
-	        { evs.add(e); }
-	    )*
+    <KEYWORD_ON>
+    <KEYWORD_EVENT>
+    (
+        e = Identifier() //FPC Event
+        { evs.add(e); }
+        (
+            ","
+            e = Identifier() // FPC Event
+            { evs.add(e); }
+        )*
     )
-	{ return evs; }
+    { return evs; }
 }
 
 IfEvery IfEveryClause(Errors err, Set<String> ids) :
@@ -941,50 +944,50 @@ IfEvery IfEveryClause(Errors err, Set<String> ids) :
     Expression value;
     TemporalUnit unit;
 
-	Errors subErr;
+    Errors subErr;
 }
 {
-	(
-		(
-		    <KEYWORD_IF>
-		    cond = Expression(ExpressionType.SIMPLE, err, ids)
-		    <KEYWORD_EVERY>
-		    every = EveryDuration(err, ids)
-		    {
-		    	subErr = inContext(err, token);
-		        if (ife == null) {
-		            ife = IfEvery.create(cond, every.getValue(),
-		                every.getUnit(), subErr);
-		            prev = ife;
-		        } else {
+    (
+        (
+            <KEYWORD_IF>
+            cond = Expression(ExpressionType.SIMPLE, err, ids)
+            <KEYWORD_EVERY>
+            every = EveryDuration(err, ids)
+            {
+                subErr = inContext(err, token);
+                if (ife == null) {
+                    ife = IfEvery.create(cond, every.getValue(),
+                        every.getUnit(), subErr);
+                    prev = ife;
+                } else {
                     prev = IfEvery.create(prev, cond, every.getValue(),
                         every.getUnit(), subErr);
-		        }
-		    }
-		)+
-		(
-			<KEYWORD_ELSE>
-			<KEYWORD_EVERY>
-			every = EveryDuration(err, ids)
-			{
-				subErr = inContext(err, token);
-			    prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
-			        every.getUnit(), subErr);
-			}
-		)
-		{ return ife; }
-	)
-	|
-	(
-	    <KEYWORD_EVERY>
-	    every = EveryDuration(err, ids)
-	    {
-	    	subErr = inContext(err, token);
-	        ife = IfEvery.create(Constant.TRUE, every.getValue(),
-	            every.getUnit(), subErr);
-	    }
-	)
-	{ return ife; }
+                }
+            }
+        )+
+        (
+            <KEYWORD_ELSE>
+            <KEYWORD_EVERY>
+            every = EveryDuration(err, ids)
+            {
+                subErr = inContext(err, token);
+                prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
+                    every.getUnit(), subErr);
+            }
+        )
+        { return ife; }
+    )
+    |
+    (
+        <KEYWORD_EVERY>
+        every = EveryDuration(err, ids)
+        {
+            subErr = inContext(err, token);
+            ife = IfEvery.create(Constant.TRUE, every.getValue(),
+                every.getUnit(), subErr);
+        }
+    )
+    { return ife; }
 }
 
 Every EveryDuration(Errors err, Set<String> ids) :
@@ -1003,20 +1006,20 @@ Every EveryDuration(Errors err, Set<String> ids) :
 RatePolicy OnUnsupportedSRClause() :
 {}
 {
-	<KEYWORD_ON>
-	<KEYWORD_UNSUPPORTED>
-	<KEYWORD_SAMPLE>
-	<KEYWORD_RATE>
-	(
-		<KEYWORD_DO>
-		<OPERATOR_NOT>
-		<KEYWORD_SAMPLE>
-		{ return RatePolicy.DO_NOT_SAMPLE; }
+    <KEYWORD_ON>
+    <KEYWORD_UNSUPPORTED>
+    <KEYWORD_SAMPLE>
+    <KEYWORD_RATE>
+    (
+        <KEYWORD_DO>
+        <OPERATOR_NOT>
+        <KEYWORD_SAMPLE>
+        { return RatePolicy.DO_NOT_SAMPLE; }
         |
-		<KEYWORD_SLOW>
-		<KEYWORD_DOWN>
-		{ return RatePolicy.SLOW_DOWN; }
-	)
+        <KEYWORD_SLOW>
+        <KEYWORD_DOWN>
+        { return RatePolicy.SLOW_DOWN; }
+    )
 }
 
 Refresh RefreshClause() :
@@ -1025,18 +1028,18 @@ Refresh RefreshClause() :
     Duration d;
 }
 {
-	<KEYWORD_REFRESH>
-	(
+    <KEYWORD_REFRESH>
+    (
         es = OnEventClause()
         { return new Refresh(es); }
-		|
+        |
         <KEYWORD_EVERY>
         d = Duration()
         { return new Refresh(d); }
-		|
+        |
         <KEYWORD_NEVER>
         { return Refresh.NEVER; }
-	)
+    )
 }
 
 ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
@@ -1046,23 +1049,23 @@ ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
     Refresh r = Refresh.NEVER;
 }
 {
-	<KEYWORD_EXECUTE>
-	[
+    <KEYWORD_EXECUTE>
+    [
         <KEYWORD_IF>
         cond = Expression(ExpressionType.SIMPLE, err, ids)
-	]
-	[
-		specs = NodeSpecifications(ids)
     ]
-	[
-		r = RefreshClause()
-	]
-	{ return ExecutionConditions.create(cond, specs, r, err); }
+    [
+        specs = NodeSpecifications(ids)
+    ]
+    [
+        r = RefreshClause()
+    ]
+    { return ExecutionConditions.create(cond, specs, r, err); }
 }
 
 List<DataTemplate> NodeSpecifications(Set<String> ids) :
 {
-	List<DataTemplate> specs;
+    List<DataTemplate> specs;
 }
 {
     <KEYWORD_ON>
@@ -1084,32 +1087,32 @@ List<DataTemplate> NodeSpecifications(Set<String> ids) :
 
 List<DataTemplate> SpecificationList() :
 {
-	List<DataTemplate> ts = new ArrayList<DataTemplate>();
-	DataTemplate t;
+    List<DataTemplate> ts = new ArrayList<DataTemplate>();
+    DataTemplate t;
 }
 {
-	t = Specification()
-	{ ts.add(t); }
-	(
-		","
-		t = Specification()
+    t = Specification()
+    { ts.add(t); }
+    (
+        ","
+        t = Specification()
         { ts.add(t); }
-	)*
-	{ return ts; }
+    )*
+    { return ts; }
 }
 
 DataTemplate Specification() :
 {
-	String id;
-	TypeClass tc = TypeClass.ANY;
+    String id;
+    TypeClass tc = TypeClass.ANY;
 }
 {
-	id = Identifier()
-	[
+    id = Identifier()
+    [
         ":"
         tc = TypeClass()
     ]
-	{ return DataTemplate.create(id, tc); }
+    { return DataTemplate.create(id, tc); }
 }
 
 WindowSize TerminateAfterClause(Errors err) :
@@ -1118,16 +1121,16 @@ WindowSize TerminateAfterClause(Errors err) :
     int count;
 }
 {
-	<KEYWORD_TERMINATE>
-	<KEYWORD_AFTER>
-	(
-		LOOKAHEAD(2)
-		d = Duration()
-		{ return new WindowSize(d); }
-		|
-		count = SelectionsNumber(err)
-		{ return new WindowSize(count); }
-	)
+    <KEYWORD_TERMINATE>
+    <KEYWORD_AFTER>
+    (
+        LOOKAHEAD(2)
+        d = Duration()
+        { return new WindowSize(d); }
+        |
+        count = SelectionsNumber(err)
+        { return new WindowSize(count); }
+    )
 }
 
 /*
@@ -1136,23 +1139,23 @@ WindowSize TerminateAfterClause(Errors err) :
 Sign Sign() :
 {}
 {
-	<OPERATOR_PLUS>
-	{ return Sign.PLUS; }
-	|
-	<OPERATOR_MINUS>
-	{ return Sign.MINUS; }
+    <OPERATOR_PLUS>
+    { return Sign.PLUS; }
+    |
+    <OPERATOR_MINUS>
+    { return Sign.MINUS; }
 }
 
 LogicValue ConstantBoolean() :
 {}
 {
-	(
-		<CONSTANT_BOOLEAN_TRUE>
-		{ return LogicValue.TRUE; }
-		|
-		<CONSTANT_BOOLEAN_FALSE>
-		{ return LogicValue.FALSE; }
-	)
+    (
+        <CONSTANT_BOOLEAN_TRUE>
+        { return LogicValue.TRUE; }
+        |
+        <CONSTANT_BOOLEAN_FALSE>
+        { return LogicValue.FALSE; }
+    )
 }
 
 float ConstantFloat() :
@@ -1160,10 +1163,10 @@ float ConstantFloat() :
     Token value;
 }
 {
-	(
-		value = <CONSTANT_FLOAT>
-	)
-	{ return Float.parseFloat(value.image); }
+    (
+        value = <CONSTANT_FLOAT>
+    )
+    { return Float.parseFloat(value.image); }
 }
 
 int ConstantInteger() :
@@ -1171,11 +1174,11 @@ int ConstantInteger() :
     Token value;
 }
 {
-	value = <CONSTANT_INTEGER_10>
-	{ return Integer.parseInt(value.image); }
-	|
-	value = <CONSTANT_INTEGER_16>
-	{ return Integer.parseInt(value.image.substring(2), 16); }
+    value = <CONSTANT_INTEGER_10>
+    { return Integer.parseInt(value.image); }
+    |
+    value = <CONSTANT_INTEGER_16>
+    { return Integer.parseInt(value.image.substring(2), 16); }
 }
 
 String ConstantString() :
@@ -1183,20 +1186,20 @@ String ConstantString() :
     Token value;
 }
 {
-	(
-		(
-		<CONSTANT_SINGLE_QUOTED_STRING_START>
-		value = <CONSTANT_SINGLE_QUOTED_STRING_VALUE>
-		<CONSTANT_SINGLE_QUOTED_STRING_END>
-		)
-		|
-		(
-		<CONSTANT_DOUBLE_QUOTED_STRING_START>
-		value = <CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
-		<CONSTANT_DOUBLE_QUOTED_STRING_END>
-		)
-	)
-	{ return value.image; }
+    (
+        (
+        <CONSTANT_SINGLE_QUOTED_STRING_START>
+        value = <CONSTANT_SINGLE_QUOTED_STRING_VALUE>
+        <CONSTANT_SINGLE_QUOTED_STRING_END>
+        )
+        |
+        (
+        <CONSTANT_DOUBLE_QUOTED_STRING_START>
+        value = <CONSTANT_DOUBLE_QUOTED_STRING_VALUE>
+        <CONSTANT_DOUBLE_QUOTED_STRING_END>
+        )
+    )
+    { return value.image; }
 }
 
 Expression Constant() :
@@ -1204,128 +1207,128 @@ Expression Constant() :
     Object value;
 }
 {
-	(
-		value = ConstantBoolean()
-		{ return Constant.create(value, DataType.BOOLEAN); }
-		|
-		value = ConstantString()
-		{ return Constant.create(value, DataType.STRING); }
-		|
-		LOOKAHEAD(1)
-		value = ConstantInteger()
-		{ return Constant.create(value, DataType.INTEGER); }
-		|
-		value = ConstantFloat()
-		{ return Constant.create(value, DataType.FLOAT); }
-	)
+    (
+        value = ConstantBoolean()
+        { return Constant.create(value, DataType.BOOLEAN); }
+        |
+        value = ConstantString()
+        { return Constant.create(value, DataType.STRING); }
+        |
+        LOOKAHEAD(1)
+        value = ConstantInteger()
+        { return Constant.create(value, DataType.INTEGER); }
+        |
+        value = ConstantFloat()
+        { return Constant.create(value, DataType.FLOAT); }
+    )
 }
 
 ComparisonOperation ComparisonOperation() :
 {}
 {
-	<OPERATOR_GREATER>
-	{ return ComparisonOperation.GT; }
-	|
-	<OPERATOR_LESS>
-	{ return ComparisonOperation.LT; }
-	|
-	<OPERATOR_GREATER_EQUAL>
-	{ return ComparisonOperation.GE; }
-	|
-	<OPERATOR_LESS_EQUAL>
-	{ return ComparisonOperation.LE; }
-	|
-	<OPERATOR_EQUAL>
-	{ return ComparisonOperation.EQ; }
-	|
-	<OPERATOR_NOT_EQUAL>
-	{ return ComparisonOperation.NE; }
+    <OPERATOR_GREATER>
+    { return ComparisonOperation.GT; }
+    |
+    <OPERATOR_LESS>
+    { return ComparisonOperation.LT; }
+    |
+    <OPERATOR_GREATER_EQUAL>
+    { return ComparisonOperation.GE; }
+    |
+    <OPERATOR_LESS_EQUAL>
+    { return ComparisonOperation.LE; }
+    |
+    <OPERATOR_EQUAL>
+    { return ComparisonOperation.EQ; }
+    |
+    <OPERATOR_NOT_EQUAL>
+    { return ComparisonOperation.NE; }
 }
 
 DataType Type() :
 {}
 {
-	(
-	<TYPE_ID>
-	{ return DataType.ID; }
-	|
-	<TYPE_TIMESTAMP>
-	{ return DataType.TIMESTAMP; }
-	|
-	<TYPE_BOOLEAN>
-	{ return DataType.BOOLEAN; }
-	|
-	<TYPE_INTEGER>
-	{ return DataType.INTEGER; }
-	|
-	<TYPE_FLOAT>
-	{ return DataType.FLOAT; }
-	|
-	<TYPE_STRING>
-	{ return DataType.STRING; }
-	)
+    (
+    <TYPE_ID>
+    { return DataType.ID; }
+    |
+    <TYPE_TIMESTAMP>
+    { return DataType.TIMESTAMP; }
+    |
+    <TYPE_BOOLEAN>
+    { return DataType.BOOLEAN; }
+    |
+    <TYPE_INTEGER>
+    { return DataType.INTEGER; }
+    |
+    <TYPE_FLOAT>
+    { return DataType.FLOAT; }
+    |
+    <TYPE_STRING>
+    { return DataType.STRING; }
+    )
 }
 
 TypeClass TypeClass() :
 {}
 {
-	(
-	<TYPE_ID>
-	{ return TypeClass.ID; }
-	|
-	<TYPE_TIMESTAMP>
-	{ return TypeClass.TIMESTAMP; }
-	|
-	<TYPE_BOOLEAN>
-	{ return TypeClass.BOOLEAN; }
-	|
-	<TYPE_INTEGER>
-	{ return TypeClass.INTEGER; }
-	|
-	<TYPE_FLOAT>
-	{ return TypeClass.FLOAT; }
-	|
-	<TYPE_STRING>
-	{ return TypeClass.STRING; }
-	|
-	<TYPE_ANY>
-	{ return TypeClass.ANY; }
-	)
+    (
+    <TYPE_ID>
+    { return TypeClass.ID; }
+    |
+    <TYPE_TIMESTAMP>
+    { return TypeClass.TIMESTAMP; }
+    |
+    <TYPE_BOOLEAN>
+    { return TypeClass.BOOLEAN; }
+    |
+    <TYPE_INTEGER>
+    { return TypeClass.INTEGER; }
+    |
+    <TYPE_FLOAT>
+    { return TypeClass.FLOAT; }
+    |
+    <TYPE_STRING>
+    { return TypeClass.STRING; }
+    |
+    <TYPE_ANY>
+    { return TypeClass.ANY; }
+    )
 }
 
 TemporalUnit TimeUnit() :
 {}
 {
-	<TIMEUNIT_S>
-	{ return ChronoUnit.SECONDS; }
-	|
-	<TIMEUNIT_M>
-	{ return ChronoUnit.MINUTES; }
-	|
-	<TIMEUNIT_H>
-	{ return ChronoUnit.HOURS; }
-	|
-	<TIMEUNIT_MS>
-	{ return ChronoUnit.MILLIS; }
-	|
-	<TIMEUNIT_D>
-	{ return ChronoUnit.DAYS; }
+    <TIMEUNIT_S>
+    { return ChronoUnit.SECONDS; }
+    |
+    <TIMEUNIT_M>
+    { return ChronoUnit.MINUTES; }
+    |
+    <TIMEUNIT_H>
+    { return ChronoUnit.HOURS; }
+    |
+    <TIMEUNIT_MS>
+    { return ChronoUnit.MILLIS; }
+    |
+    <TIMEUNIT_D>
+    { return ChronoUnit.DAYS; }
 }
 
 AggregateOperation AggregateOperation() :
 {}
 {
-	<FUNCTION_AVG>
-	{ return AggregateOperation.AVG; }
-	|
-	<FUNCTION_MIN>
-	{ return AggregateOperation.MIN; }
-	|
-	<FUNCTION_MAX>
-	{ return AggregateOperation.MAX; }
-	|
-	<FUNCTION_SUM>
-	{ return AggregateOperation.SUM; }
+    <FUNCTION_AVG>
+    { return AggregateOperation.AVG; }
+    |
+    <FUNCTION_MIN>
+    { return AggregateOperation.MIN; }
+    |
+    <FUNCTION_MAX>
+    { return AggregateOperation.MAX; }
+    |
+    <FUNCTION_SUM>
+    { return AggregateOperation.SUM; }
 }
 
 Duration Duration() :
@@ -1334,8 +1337,8 @@ Duration Duration() :
     int value;
 }
 {
-	value = ConstantInteger()
-	tu = TimeUnit()
+    value = ConstantInteger()
+    tu = TimeUnit()
     { return Duration.of(value, tu); }
 }
 
@@ -1344,18 +1347,18 @@ int SamplesNumber() :
     int samples;
 }
 {
-	(
-		(
-			samples = ConstantInteger()
-			<KEYWORD_SAMPLES>
-			{ return samples; }
-		)
-		|
-		(
-			<KEYWORD_ONE>
-			{ return 1; }
-		)
-	)
+    (
+        (
+            samples = ConstantInteger()
+            <KEYWORD_SAMPLES>
+            { return samples; }
+        )
+        |
+        (
+            <KEYWORD_ONE>
+            { return 1; }
+        )
+    )
 }
 
 int SelectionsNumber(Errors err) :
@@ -1365,17 +1368,17 @@ int SelectionsNumber(Errors err) :
     int value;
 }
 {
-	(
-		value = ConstantInteger()
-		{ t = token; }
-		<KEYWORD_SELECTIONS>
-		{
-		    if (value == 0) {
-		        addError("Number of selections must be greater than zero", t, err);
-		    }
-		    return value;
-		}
-	)
+    (
+        value = ConstantInteger()
+        { t = token; }
+        <KEYWORD_SELECTIONS>
+        {
+            if (value == 0) {
+                addError("Number of selections must be greater than zero", t, err);
+            }
+            return value;
+        }
+    )
 }
 
 WindowSize WindowSize(Errors err) :
@@ -1387,25 +1390,25 @@ WindowSize WindowSize(Errors err) :
 }
 {
     (
-	    LOOKAHEAD(2)
-	    d = Duration()
-	    {
-	        t = token;
-	        ws = new WindowSize(d);
-	    }
-	    |
+        LOOKAHEAD(2)
+        d = Duration()
+        {
+            t = token;
+            ws = new WindowSize(d);
+        }
+        |
         samples = SamplesNumber()
         {
             t = token;
             ws = new WindowSize(samples);
         }
-	)
-	{
-	    if (ws.isZero()) {
-	        addError("Empty window size", t, err);
-	    }
-	    return ws;
-	}
+    )
+    {
+        if (ws.isZero()) {
+            addError("Empty window size", t, err);
+        }
+        return ws;
+    }
 }
 
 String Identifier() :
@@ -1413,8 +1416,8 @@ String Identifier() :
     Token value;
 }
 {
-	value = <IDENTIFIER>
-	{ return value.image; }
+    value = <IDENTIFIER>
+    { return value.image; }
 }
 
 /*
@@ -1428,14 +1431,14 @@ Expression Expression(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BooleanTerm(type, err, ids)
-	(
-		<OPERATOR_OR>
-		{ subErr = inContext(err, token); }
-		e2 = BooleanTerm(type, err, ids)
-		{ e1 = Bool.createOR(e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = BooleanTerm(type, err, ids)
+    (
+        <OPERATOR_OR>
+        { subErr = inContext(err, token); }
+        e2 = BooleanTerm(type, err, ids)
+        { e1 = Bool.createOR(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
@@ -1446,14 +1449,14 @@ Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BooleanFactor(type, err, ids)
-	(
-		<OPERATOR_AND>
+    e1 = BooleanFactor(type, err, ids)
+    (
+        <OPERATOR_AND>
         { subErr = inContext(err, token); }
-		e2 = BooleanFactor(type, err, ids)
-		{ e1 = Bool.createAND(e1, e2, subErr); }
-	)*
-	{ return e1; }
+        e2 = BooleanFactor(type, err, ids)
+        { e1 = Bool.createAND(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
@@ -1464,14 +1467,14 @@ Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BooleanNegation(type, err, ids)
-	(
-		<OPERATOR_XOR>
+    e1 = BooleanNegation(type, err, ids)
+    (
+        <OPERATOR_XOR>
         { subErr = inContext(err, token); }
-		e2 = BooleanNegation(type, err, ids)
-		{ e1 = Bool.createXOR(e1, e2, subErr); }
-	)*
-	{ return e1; }
+        e2 = BooleanNegation(type, err, ids)
+        { e1 = Bool.createXOR(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
@@ -1482,20 +1485,20 @@ Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr = null;
 }
 {
-	(
-		<OPERATOR_NOT>
-		{
-			subErr = inContext(err, token);
-			invert = !invert;
-		}
-	)*
-	e = BooleanPredicate(type, err, ids)
-	{
-	    if (invert) {
-	        e = Bool.createNOT(e, subErr);
-	    }
-	    return e;
-	}
+    (
+        <OPERATOR_NOT>
+        {
+            subErr = inContext(err, token);
+            invert = !invert;
+        }
+    )*
+    e = BooleanPredicate(type, err, ids)
+    {
+        if (invert) {
+            e = Bool.createNOT(e, subErr);
+        }
+        return e;
+    }
 }
 
 Expression BooleanPredicate(ExpressionType type, Errors err, Set<String> ids) :
@@ -1611,14 +1614,14 @@ Expression BitwiseExpression(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BitwiseTerm(type, err, ids)
-	(
-		<OPERATOR_BITWISE_OR>
-		{ subErr = inContext(err, token); }
-		e2 = BitwiseTerm(type, err, ids)
-		{ e1 = Bitwise.createOR(e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = BitwiseTerm(type, err, ids)
+    (
+        <OPERATOR_BITWISE_OR>
+        { subErr = inContext(err, token); }
+        e2 = BitwiseTerm(type, err, ids)
+        { e1 = Bitwise.createOR(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
@@ -1629,14 +1632,14 @@ Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BitwiseFactor(type, err, ids)
-	(
-		<OPERATOR_BITWISE_AND>
-		{ subErr = inContext(err, token); }
-		e2 = BitwiseFactor(type, err, ids)
-		{ e1 = Bitwise.createAND(e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = BitwiseFactor(type, err, ids)
+    (
+        <OPERATOR_BITWISE_AND>
+        { subErr = inContext(err, token); }
+        e2 = BitwiseFactor(type, err, ids)
+        { e1 = Bitwise.createAND(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
@@ -1647,14 +1650,14 @@ Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BitwiseShift(type, err, ids)
-	(
-		<OPERATOR_BITWISE_XOR>
-		{ subErr = inContext(err, token); }
-		e2 = BitwiseShift(type, err, ids)
-		{ e1 = Bitwise.createXOR(e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = BitwiseShift(type, err, ids)
+    (
+        <OPERATOR_BITWISE_XOR>
+        { subErr = inContext(err, token); }
+        e2 = BitwiseShift(type, err, ids)
+        { e1 = Bitwise.createXOR(e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
@@ -1666,25 +1669,25 @@ Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = BitwiseNegation(type, err, ids)
-	(
-		(
-			<OPERATOR_BITWISE_LSH>
-			{
-				op = BitwiseOperation.LSH;
-				subErr = inContext(err, token);
-			}
-			|
-			<OPERATOR_BITWISE_RSH>
-			{
-				op = BitwiseOperation.RSH;
-				subErr = inContext(err, token);
-			}
-		)
-		e2 = BitwiseNegation(type, err, ids)
-		{ e1 = Bitwise.create(op, e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = BitwiseNegation(type, err, ids)
+    (
+        (
+            <OPERATOR_BITWISE_LSH>
+            {
+                op = BitwiseOperation.LSH;
+                subErr = inContext(err, token);
+            }
+            |
+            <OPERATOR_BITWISE_RSH>
+            {
+                op = BitwiseOperation.RSH;
+                subErr = inContext(err, token);
+            }
+        )
+        e2 = BitwiseNegation(type, err, ids)
+        { e1 = Bitwise.create(op, e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression BitwiseNegation(ExpressionType type, Errors err, Set<String> ids) :
@@ -1695,20 +1698,20 @@ Expression BitwiseNegation(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr = null;
 }
 {
-	(
-		<OPERATOR_BITWISE_NOT>
-		{
-			subErr = inContext(err, token);
-			not = !not;
-		}
-	)*
-	e = ArithmeticExpression(type, err, ids)
-	{
-	    if (not) {
-	        e = Bitwise.createNOT(e, subErr);
-	    }
-	    return e;
-	}
+    (
+        <OPERATOR_BITWISE_NOT>
+        {
+            subErr = inContext(err, token);
+            not = !not;
+        }
+    )*
+    e = ArithmeticExpression(type, err, ids)
+    {
+        if (not) {
+            e = Bitwise.createNOT(e, subErr);
+        }
+        return e;
+    }
 }
 
 Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids) :
@@ -1720,25 +1723,25 @@ Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids
     Errors subErr;
 }
 {
-	e1 = ArithmeticTerm(type, err, ids)
-	(
-		(
-			<OPERATOR_PLUS>
-			{
-				op = ArithmeticOperation.ADDITION;
-				subErr = inContext(err, token);
-			}
-			|
-			<OPERATOR_MINUS>
-			{
-				op = ArithmeticOperation.SUBTRACTION;
-				subErr = inContext(err, token);
-			}
-		)
-		e2 = ArithmeticTerm(type, err, ids)
-		{ e1 = Arithmetic.create(op, e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = ArithmeticTerm(type, err, ids)
+    (
+        (
+            <OPERATOR_PLUS>
+            {
+                op = ArithmeticOperation.ADDITION;
+                subErr = inContext(err, token);
+            }
+            |
+            <OPERATOR_MINUS>
+            {
+                op = ArithmeticOperation.SUBTRACTION;
+                subErr = inContext(err, token);
+            }
+        )
+        e2 = ArithmeticTerm(type, err, ids)
+        { e1 = Arithmetic.create(op, e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
@@ -1750,31 +1753,31 @@ Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e1 = ArithmeticFactor(type, err, ids)
-	(
-		(
-			<OPERATOR_MULTIPLY>
-			{
-				op = ArithmeticOperation.PRODUCT;
-				subErr = inContext(err, token);
-			}
-			|
-			<OPERATOR_DIVIDE>
-			{
-				op = ArithmeticOperation.DIVISION;
-				subErr = inContext(err, token);
-			}
-			|
-			<OPERATOR_MODULO>
-			{
-				op = ArithmeticOperation.MODULO;
-				subErr = inContext(err, token);
-			}
-		)
-		e2 = ArithmeticFactor(type, err, ids)
-		{ e1 = Arithmetic.create(op, e1, e2, subErr); }
-	)*
-	{ return e1; }
+    e1 = ArithmeticFactor(type, err, ids)
+    (
+        (
+            <OPERATOR_MULTIPLY>
+            {
+                op = ArithmeticOperation.PRODUCT;
+                subErr = inContext(err, token);
+            }
+            |
+            <OPERATOR_DIVIDE>
+            {
+                op = ArithmeticOperation.DIVISION;
+                subErr = inContext(err, token);
+            }
+            |
+            <OPERATOR_MODULO>
+            {
+                op = ArithmeticOperation.MODULO;
+                subErr = inContext(err, token);
+            }
+        )
+        e2 = ArithmeticFactor(type, err, ids)
+        { e1 = Arithmetic.create(op, e1, e2, subErr); }
+    )*
+    { return e1; }
 }
 
 Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
@@ -1785,17 +1788,17 @@ Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr = null;
 }
 {
-	[
-		s = Sign()
-		{ subErr = inContext(err, token); }
-	]
-	e = PrimaryExpression(type, err, ids)
-	{
-	    if (s == Sign.MINUS) {
-	        e = Arithmetic.createInverse(e, subErr);
-	    }
-	    return e;
-	}
+    [
+        s = Sign()
+        { subErr = inContext(err, token); }
+    ]
+    e = PrimaryExpression(type, err, ids)
+    {
+        if (s == Sign.MINUS) {
+            e = Arithmetic.createInverse(e, subErr);
+        }
+        return e;
+    }
 }
 
 Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
@@ -1806,20 +1809,20 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
     Errors subErr;
 }
 {
-	e = Constant()
-	{ return e; }
-	|
-	(
-		"("
+    e = Constant()
+    { return e; }
+    |
+    (
+        "("
         e = Expression(type, err, ids)
         { return e; }
-    	")"
-	)
-	|
+        ")"
+    )
+    |
     <KEYWORD_GROUPTS>
     {
         if (type != ExpressionType.AGGREGATE) {
-        	String msg = "aggregation not allowed";
+            String msg = "aggregation not allowed";
             addError(msg, token, err);
             return Constant.NULL;
         }
@@ -1830,7 +1833,7 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
     e = Aggregate(err, ids)
     {
         if (type != ExpressionType.AGGREGATE) {
-        	String msg = "aggregation not allowed";
+            String msg = "aggregation not allowed";
             addError(msg, token, err);
             return Constant.NULL;
         }
@@ -1839,15 +1842,15 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
     |
     id = Identifier() // FPC attribute
     {
-    	if (type == ExpressionType.CONSTANT) {
-    		String msg = "attributes not allowed in constant expression";
-    		addError(msg, token, err);
-    		return Constant.NULL;
-    	}
-    	// Track all attribute identifier. They will later be referenced if
-    	// the query contains a EXECUTE ON NODES WITH ALL clause
-    	ids.add(id);
-    	return new Field(id);
+        if (type == ExpressionType.CONSTANT) {
+            String msg = "attributes not allowed in constant expression";
+            addError(msg, token, err);
+            return Constant.NULL;
+        }
+        // Track all attribute identifier. They will later be referenced if
+        // the query contains a EXECUTE ON NODES WITH ALL clause
+        ids.add(id);
+        return new Field(id);
     }
 }
 
@@ -1866,8 +1869,8 @@ Expression Aggregate(Errors err, Set<String> ids) :
         (
             <FUNCTION_COUNT>
             {
-            	op = AggregateOperation.COUNT;
-            	subErr = inContext(err, token);
+                op = AggregateOperation.COUNT;
+                subErr = inContext(err, token);
             }
             "("
             "*"
