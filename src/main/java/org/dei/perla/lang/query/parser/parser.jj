@@ -36,6 +36,7 @@ PARSER_BEGIN(Parser)
 
     import org.dei.perla.lang.query.expression.*;
     import org.dei.perla.lang.query.statement.*;
+    import org.dei.perla.lang.persistence.*;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -607,14 +608,15 @@ void SetParameterList(Errors err):
 
 Statement CreationStatement(Errors err) :
 {
-    String tableName;
+    String name;
     SelectionQuery sel;
+    List<FieldDefinition> fields;
 }
 {
     <KEYWORD_CREATE>
     <KEYWORD_STREAM>
-    tableName = Identifier() // Stream name
-    FieldDefinitionList(err)
+    name = Identifier() // Stream name
+    fields = FieldDefinitionList(err)
     [
         <KEYWORD_AS>
         sel = SelectionStatement(err)
@@ -622,27 +624,45 @@ Statement CreationStatement(Errors err) :
     { return null; }
 }
 
-void FieldDefinitionList(Errors err) :
-{}
+List<FieldDefinition> FieldDefinitionList(Errors err) :
+{
+    List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+    FieldDefinition f;
+}
 {
     "("
-    FieldDefinition(err)
+    f = FieldDefinition(err)
+    { fields.add(f); }
     (
         ","
-        FieldDefinition(err)
+        f = FieldDefinition(err)
+        { fields.add(f); }
     )*
     ")"
+    { return fields; }
 }
 
-void FieldDefinition(Errors err) :
-{}
+FieldDefinition FieldDefinition(Errors err) :
 {
-    Identifier() // Data structure field
-    Type()
+    String name;
+    DataType type;
+    Expression e;
+    Errors defErr;
+    Object def = null;
+}
+{
+    name = Identifier() // Data structure field
+    type = Type()
     [
         <KEYWORD_DEFAULT>
-        Expression(ExpressionType.CONSTANT, err, null)
-    ]
+        e = Expression(ExpressionType.CONSTANT, err, null)
+        {
+            defErr = err.inContext("Illegal default value for field '" +
+                name + "' of type '" + type + "'.");
+            def = ExpressionUtils.evaluateConstant(e, type, defErr);
+        }
+]
+    { return new FieldDefinition(name, type, def); }
 }
 
 Statement InsertionStatement(Errors err) :

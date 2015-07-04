@@ -1,7 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.ExpressionUtils;
 
 import java.time.Duration;
 import java.util.*;
@@ -80,7 +80,7 @@ public final class Refresh {
 
         List<Attribute> events = new ArrayList<>();
         for (String e : names) {
-            Attribute a = Expression.getById(e, atts);
+            Attribute a = ExpressionUtils.getById(e, atts);
             if (a == null) {
                 continue;
             }

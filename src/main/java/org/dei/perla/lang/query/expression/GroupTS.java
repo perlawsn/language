@@ -35,12 +35,12 @@ public class GroupTS extends Expression {
     @Override
     public Expression bind(Collection<Attribute> atts,
             List<Attribute> bound, Errors err) {
-        int i = Expression.indexOf(id, bound);
+        int i = ExpressionUtils.indexOf(id, bound);
         if (i != -1) {
             return new ConcreteGroupTS(i);
         }
 
-        Attribute a = Expression.getById(id, atts);
+        Attribute a = ExpressionUtils.getById(id, atts);
         if (a == null) {
             return this;
         }
