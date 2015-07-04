@@ -616,7 +616,7 @@ Statement CreationStatement(Errors err) :
     <KEYWORD_CREATE>
     <KEYWORD_STREAM>
     name = Identifier() // Stream name
-    fields = FieldDefinitionList(err)
+    fields = FieldDefinitionList(err.inContext("Stream '" + name + "'"))
     [
         <KEYWORD_AS>
         sel = SelectionStatement(err)
@@ -628,15 +628,28 @@ List<FieldDefinition> FieldDefinitionList(Errors err) :
 {
     List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
     FieldDefinition f;
+
+    Set<String> names = new TreeSet<String>();
 }
 {
     "("
     f = FieldDefinition(err)
-    { fields.add(f); }
+    {
+        names.add(f.getName());
+        fields.add(f);
+    }
     (
         ","
         f = FieldDefinition(err)
-        { fields.add(f); }
+        {
+            String n = f.getName();
+            if (names.contains(n)) {
+                err.addError("Duplicate field name '" + n + "'");
+            } else {
+                names.add(n);
+            }
+            fields.add(f);
+        }
     )*
     ")"
     { return fields; }

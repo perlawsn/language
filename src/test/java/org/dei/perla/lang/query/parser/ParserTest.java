@@ -5,6 +5,7 @@ import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.persistence.FieldDefinition;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.*;
 import org.dei.perla.lang.query.statement.Refresh.RefreshType;
@@ -19,6 +20,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -1478,6 +1480,64 @@ public class ParserTest {
         assertThat(cond.getRefresh(), equalTo(Refresh.NEVER));
         assertThat(cond.getCondition(), equalTo(Constant.TRUE));
         assertTrue(cond.getSpecs().isEmpty());
+    }
+
+    @Test
+    public void testFieldDefinition() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "has_run boolean"
+        ));
+        FieldDefinition f = p.FieldDefinition(err);
+        assertTrue(err.isEmpty());
+        assertThat(f, notNullValue());
+        assertThat(f.getName(), equalTo("has_run"));
+        assertThat(f.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(f.getDefaultValue(), nullValue());
+
+        p.ReInit(new StringReader(
+                "temperature integer default 5 + 4"
+        ));
+        f = p.FieldDefinition(err);
+        assertTrue(err.isEmpty());
+        assertThat(f, notNullValue());
+        assertThat(f.getName(), equalTo("temperature"));
+        assertThat(f.getType(), equalTo(DataType.INTEGER));
+        assertThat(f.getDefaultValue(), equalTo(9));
+    }
+
+    @Test
+    public void testFieldDefinitionList() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+                "(test1 integer, test2 float, test3 boolean default true)"
+        ));
+        List<FieldDefinition> fields = p.FieldDefinitionList(err);
+        assertTrue(err.isEmpty());
+        assertThat(fields.size(), equalTo(3));
+
+        FieldDefinition f = fields.get(0);
+        assertThat(f.getName(), equalTo("test1"));
+        assertThat(f.getType(), equalTo(DataType.INTEGER));
+        assertThat(f.getDefaultValue(), nullValue());
+
+        f = fields.get(1);
+        assertThat(f.getName(), equalTo("test2"));
+        assertThat(f.getType(), equalTo(DataType.FLOAT));
+        assertThat(f.getDefaultValue(), nullValue());
+
+        f = fields.get(2);
+        assertThat(f.getName(), equalTo("test3"));
+        assertThat(f.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(f.getDefaultValue(), equalTo(LogicValue.TRUE));
+
+        p.ReInit(new StringReader(
+                "(test1 integer, test2 float, test1 boolean)"
+        ));
+        fields = p.FieldDefinitionList(err);
+        assertFalse(err.isEmpty());
     }
 
 }
