@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Guido Rota 04/03/15.
  */
-public final class SelectionQuery implements Statement {
+public final class SelectionStatement implements Statement {
 
     private final Select select;
     private final WindowSize every;
@@ -37,7 +37,7 @@ public final class SelectionQuery implements Statement {
      * @param terminate terminate condition. A WindowSize.ZERO value
      *                  indicates that the query never terminates.
      */
-    public SelectionQuery(Select select, WindowSize every, Sampling sampling,
+    public SelectionStatement(Select select, WindowSize every, Sampling sampling,
             Expression where, ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
         this.every = every;
@@ -48,7 +48,7 @@ public final class SelectionQuery implements Statement {
         dataAtts = Collections.emptyList();
     }
 
-    private SelectionQuery(Select select, List<Attribute> dataAtts,
+    private SelectionStatement(Select select, List<Attribute> dataAtts,
             WindowSize every, Sampling sampling, Expression where,
             ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
@@ -88,7 +88,7 @@ public final class SelectionQuery implements Statement {
         return terminate;
     }
 
-    public SelectionQuery bind(Collection<Attribute> atts) throws BindingException {
+    public SelectionStatement bind(Collection<Attribute> atts) throws BindingException {
         Errors err = new Errors();
 
         List<Attribute> dataAtts = new ArrayList<>();
@@ -107,7 +107,7 @@ public final class SelectionQuery implements Statement {
             dataAtts.add(Attribute.TIMESTAMP);
         }
 
-        return new SelectionQuery(bselect, dataAtts, every, bsampling, bwhere, bcond,
+        return new SelectionStatement(bselect, dataAtts, every, bsampling, bwhere, bcond,
                 terminate);
     }
 

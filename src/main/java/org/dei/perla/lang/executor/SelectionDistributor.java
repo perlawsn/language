@@ -1,6 +1,5 @@
 package org.dei.perla.lang.executor;
 
-import org.apache.log4j.Logger;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.executor.statement.QueryHandler;
@@ -8,12 +7,12 @@ import org.dei.perla.lang.executor.statement.SelectionExecutor;
 import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
-import org.dei.perla.lang.query.statement.SelectionQuery;
+import org.dei.perla.lang.query.statement.SelectionStatement;
 
 import java.util.*;
 
 /**
- * Distributes a {@link SelectionQuery} among the available FPCs and tracks
+ * Distributes a {@link SelectionStatement} among the available FPCs and tracks
  * its progresses.
  *
  * @author Guido Rota 30/04/15.
@@ -25,9 +24,9 @@ public class SelectionDistributor {
     private static final int STOPPED = 2;
 
     private final String name;
-    private final SelectionQuery query;
+    private final SelectionStatement query;
     private final ExecutionConditions ec;
-    private final QueryHandler<? super SelectionQuery, Object[]> handler;
+    private final QueryHandler<? super SelectionStatement, Object[]> handler;
     private final Registry registry;
 
     private volatile int status = NEW;
@@ -35,8 +34,8 @@ public class SelectionDistributor {
     private final List<SelectionExecutor> execs = new ArrayList<>();
     private final Set<Fpc> managed = new HashSet<>();
 
-    protected SelectionDistributor(String name, SelectionQuery query,
-            QueryHandler<? super SelectionQuery, Object[]> handler,
+    protected SelectionDistributor(String name, SelectionStatement query,
+            QueryHandler<? super SelectionStatement, Object[]> handler,
             Registry registry) {
         this.name = name;
         this.query = query;
@@ -71,7 +70,7 @@ public class SelectionDistributor {
             }
 
             try {
-                SelectionQuery q = query.bind(fpc.getAttributes());
+                SelectionStatement q = query.bind(fpc.getAttributes());
                 SelectionExecutor se = new SelectionExecutor(q, handler, fpc);
                 execs.add(se);
                 se.start();

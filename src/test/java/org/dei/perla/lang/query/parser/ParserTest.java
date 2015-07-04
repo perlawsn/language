@@ -1425,7 +1425,7 @@ public class ParserTest {
                         "terminate after 60 days"
 
         ));
-        SelectionQuery q = p.SelectionStatement(err);
+        SelectionStatement q = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
 
         Select sel = q.getSelect();
@@ -1463,7 +1463,7 @@ public class ParserTest {
                         "select room, temperature " +
                         "sampling every 20 minutes"
         ));
-        SelectionQuery q = p.SelectionStatement(err);
+        SelectionStatement q = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
 
         Select sel = q.getSelect();

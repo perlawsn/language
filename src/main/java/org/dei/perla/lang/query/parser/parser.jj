@@ -606,11 +606,12 @@ void SetParameterList(Errors err):
     Expression(ExpressionType.CONSTANT, err, null)
 }
 
-Statement CreationStatement(Errors err) :
+CreationStatement CreationStatement(Errors err) :
 {
     String name;
-    SelectionQuery sel;
     List<FieldDefinition> fields;
+    StreamDefinition stream;
+    SelectionStatement sel = null;
 }
 {
     <KEYWORD_CREATE>
@@ -621,7 +622,10 @@ Statement CreationStatement(Errors err) :
         <KEYWORD_AS>
         sel = SelectionStatement(err)
     ]
-    { return null; }
+    {
+        stream = new StreamDefinition(name, fields);
+        return new CreationStatement(stream, sel);
+    }
 }
 
 List<FieldDefinition> FieldDefinitionList(Errors err) :
@@ -680,7 +684,7 @@ FieldDefinition FieldDefinition(Errors err) :
 
 Statement InsertionStatement(Errors err) :
 {
-    SelectionQuery sel;
+    SelectionStatement sel;
 }
 {
     <KEYWORD_INSERT>
@@ -712,7 +716,7 @@ List<String> FieldList() :
     { return sl; }
 }
 
-SelectionQuery SelectionStatement(Errors err) :
+SelectionStatement SelectionStatement(Errors err) :
 {
     // All attribute identifiers are incrementally stored inside this
     // structure, that is later employed by the EXECUTE IF clause when the
@@ -774,7 +778,10 @@ SelectionQuery SelectionStatement(Errors err) :
     [
         terminate = TerminateAfterClause(err)
     ]
-    { return new SelectionQuery(sel, every, sampling, where, ec, terminate); }
+    {
+        return new SelectionStatement(sel, every, sampling,
+                    where, ec, terminate);
+    }
 }
 
 WindowSize EveryClause(Errors err) :

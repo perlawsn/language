@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Guido Rota 27/04/15.
  */
-public class SelectionQueryTest {
+public class SelectionStatementTest {
 
     private static final Attribute tempAtt =
             Attribute.create("temperature", DataType.INTEGER);
@@ -55,7 +55,7 @@ public class SelectionQueryTest {
         events.add("alarm");
         Sampling samp = new SamplingEvent(events);
 
-        SelectionQuery query = new SelectionQuery(sel, WindowSize.ONE, samp,
+        SelectionStatement query = new SelectionStatement(sel, WindowSize.ONE, samp,
                 Constant.TRUE, ExecutionConditions.ALL_NODES, WindowSize.ZERO);
 
         assertThat(query.getSelect(), equalTo(sel));

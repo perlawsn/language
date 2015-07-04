@@ -6,7 +6,7 @@ import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.parser.Parser;
-import org.dei.perla.lang.query.statement.SelectionQuery;
+import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -56,14 +56,14 @@ public class SelectionExecutorTest {
                         "sampling every 30 milliseconds "
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -93,14 +93,14 @@ public class SelectionExecutorTest {
                         "sampling every 30 milliseconds "
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -131,14 +131,14 @@ public class SelectionExecutorTest {
                         "terminate after 3 selections"
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -163,14 +163,14 @@ public class SelectionExecutorTest {
                         "terminate after 300 milliseconds"
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -196,14 +196,14 @@ public class SelectionExecutorTest {
                         "terminate after 1 selections"
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -237,14 +237,14 @@ public class SelectionExecutorTest {
                         "refresh every 100 milliseconds"
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());
@@ -289,14 +289,14 @@ public class SelectionExecutorTest {
                         "refresh on event alarm"
         ));
 
-        SelectionQuery query = p.SelectionStatement(err);
+        SelectionStatement query = p.SelectionStatement(err);
         assertTrue(err.isEmpty());
         query = query.bind(atts);
         assertTrue(query.getWhere().isComplete());
         assertTrue(query.getExecutionConditions().isComplete());
         assertTrue(query.getSelect().isComplete());
 
-        LatchingQueryHandler<SelectionQuery, Object[]> handler =
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
                 new LatchingQueryHandler<>();
         SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
         assertFalse(exec.isRunning());

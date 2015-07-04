@@ -37,12 +37,12 @@ public final class SelectionExecutor {
     private static final ScheduledExecutorService timer =
             Executors.newSingleThreadScheduledExecutor();
 
-    private final SelectionQuery query;
+    private final SelectionStatement query;
     private final Select select;
     private final ExecutionConditions execCond;
     private final Expression where;
 
-    private final QueryHandler<? super SelectionQuery, Object[]> handler;
+    private final QueryHandler<? super SelectionStatement, Object[]> handler;
     private final Fpc fpc;
 
     private final Buffer buffer;
@@ -80,8 +80,8 @@ public final class SelectionExecutor {
     // overflows.
     private volatile int recordsProduced = 0;
 
-    public SelectionExecutor(SelectionQuery query,
-            QueryHandler<? super SelectionQuery, Object[]> handler,
+    public SelectionExecutor(SelectionStatement query,
+            QueryHandler<? super SelectionStatement, Object[]> handler,
             Fpc fpc) {
         this.query = query;
         select = query.getSelect();
@@ -169,7 +169,7 @@ public final class SelectionExecutor {
     }
 
     /**
-     * Starts the execution of the {@link SelectionQuery}. Startup errors
+     * Starts the execution of the {@link SelectionStatement}. Startup errors
      * will be asynchronously notified through the {@link QueryHandler}
      * specified in the constructor after the {@code start()} method is
      * over.
