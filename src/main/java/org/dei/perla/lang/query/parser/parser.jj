@@ -672,48 +672,59 @@ FieldDefinition FieldDefinition(Errors err) :
     type = Type()
     [
         <KEYWORD_DEFAULT>
-        e = Expression(ExpressionType.CONSTANT, err, null)
-        {
-            defErr = err.inContext("Illegal default value for field '" +
-                name + "' of type '" + type + "'.");
-            def = ExpressionUtils.evaluateConstant(e, type, defErr);
-        }
-]
+        (
+            e = Expression(ExpressionType.CONSTANT, err, null)
+            {
+                defErr = err.inContext("Illegal default value for field '" +
+                    name + "' of type '" + type + "'.");
+                def = ExpressionUtils.evaluateConstant(e, type, defErr);
+            }
+            |
+            <CONSTANT_NULL>
+        )
+    ]
     { return new FieldDefinition(name, type, def); }
 }
 
-Statement InsertionStatement(Errors err) :
+InsertionStatement InsertionStatement(Errors err) :
 {
+    String stream;
+    List<String> fl = new ArrayList<String>();
     SelectionStatement sel;
 }
 {
     <KEYWORD_INSERT>
     <KEYWORD_INTO>
     <KEYWORD_STREAM>
-    Identifier() // Stream name
+    stream = Identifier() // Stream name
     [
-        FieldList()
+        fl = FieldList(err)
     ]
     sel = SelectionStatement(err)
-    { return null; }
+    { return new InsertionStatement(stream, fl, sel); }
 }
 
-List<String> FieldList() :
+List<String> FieldList(Errors err) :
 {
-    List<String> sl = new ArrayList<String>();
+    List<String> fl = new ArrayList<String>();
     String s;
 }
 {
     "("
     s = Identifier() // DataStructureField
-    { sl.add(s); }
+    { fl.add(s); }
     (
         ","
         s = Identifier() // DataStructureField
-        { sl.add(s); }
+        {
+            if (fl.contains(s)) {
+                err.addError("Duplicate field name '" + s + "'");
+            }
+            fl.add(s);
+        }
     )*
     ")"
-    { return sl; }
+    { return fl; }
 }
 
 SelectionStatement SelectionStatement(Errors err) :

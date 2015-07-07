@@ -1,10 +1,12 @@
 package org.dei.perla.lang.persistence.memory;
 
+import org.dei.perla.lang.persistence.FieldDefinition;
 import org.dei.perla.lang.persistence.StreamDefinition;
 import org.dei.perla.lang.persistence.StreamDriver;
 import org.dei.perla.lang.persistence.StreamException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +40,12 @@ public class MemoryStreamDriver implements StreamDriver {
         }
 
         return s;
+    }
+
+    @Override
+    public MemoryStream open(String id, List<FieldDefinition> f) {
+        // TODO: Implement
+        throw new RuntimeException("unimplemented");
     }
 
 }

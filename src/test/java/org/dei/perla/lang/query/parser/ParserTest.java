@@ -6,6 +6,7 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.persistence.FieldDefinition;
+import org.dei.perla.lang.persistence.StreamDefinition;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.*;
 import org.dei.perla.lang.query.statement.Refresh.RefreshType;
@@ -18,9 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
@@ -1538,6 +1537,77 @@ public class ParserTest {
         ));
         fields = p.FieldDefinitionList(err);
         assertFalse(err.isEmpty());
+    }
+
+    @Test
+    public void testCreationStatement() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+           "CREATE STREAM test_stream (field1 integer default 10, field2 " +
+                   "float, field3 string default null)"
+        ));
+        CreationStatement c = p.CreationStatement(err);
+        assertTrue(err.isEmpty());
+        StreamDefinition sd = c.getStreamDefinition();
+        assertThat(sd, notNullValue());
+        assertThat(sd.getId(), equalTo("test_stream"));
+
+        FieldDefinition f = sd.getFields().get(0);
+        assertThat(f.getName(), equalTo("field1"));
+        assertThat(f.getType(), equalTo(DataType.INTEGER));
+        assertThat(f.getDefaultValue(), equalTo(10));
+
+        f = sd.getFields().get(1);
+        assertThat(f.getName(), equalTo("field2"));
+        assertThat(f.getType(), equalTo(DataType.FLOAT));
+        assertThat(f.getDefaultValue(), nullValue());
+
+        f = sd.getFields().get(2);
+        assertThat(f.getName(), equalTo("field3"));
+        assertThat(f.getType(), equalTo(DataType.STRING));
+        assertThat(f.getDefaultValue(), nullValue());
+
+        assertThat(c.getSelectionStatement(), nullValue());
+
+        p.ReInit(new StringReader(
+                "create stream TEST_STREAM (field1 integer, field2 float) " +
+                        "as every one select temperature, hum " +
+                        "sampling every 10 seconds"
+        ));
+        c = p.CreationStatement(err);
+        assertTrue(err.isEmpty());
+        assertThat(c.getSelectionStatement(), notNullValue());
+    }
+
+    @Test
+    public void testInsertionStatement() throws Exception {
+        Errors err = new Errors();
+
+        Parser p = new Parser(new StringReader(
+           "insert into stream test_stream " +
+                   "every one select temperature " +
+                   "sampling every 10 minutes"
+        ));
+        InsertionStatement ins = p.InsertionStatement(err);
+        assertTrue(err.isEmpty());
+        assertThat(ins.getStream(), equalTo("test_stream"));
+        assertThat(ins.getSelectionStatement(), notNullValue());
+        assertTrue(ins.getFields().isEmpty());
+
+        p.ReInit(new StringReader(
+                "insert into stream test_stream " +
+                        "(field1, field2) " +
+                        "every one select temperature " +
+                        "sampling every 10 minutes"
+        ));
+        ins = p.InsertionStatement(err);
+        assertTrue(err.isEmpty());
+        assertThat(ins.getStream(), equalTo("test_stream"));
+        assertThat(ins.getSelectionStatement(), notNullValue());
+        assertThat(ins.getFields().size(), equalTo(2));
+        assertThat(ins.getFields().get(0), equalTo("field1"));
+        assertThat(ins.getFields().get(1), equalTo("field2"));
     }
 
 }

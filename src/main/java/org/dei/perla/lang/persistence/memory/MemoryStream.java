@@ -18,12 +18,11 @@ public class MemoryStream implements Stream {
 
     private final String id;
     private final List<FieldDefinition> fields;
-    private final List<Object[]> records;
+    private final List<Object[]> records = new ArrayList<>();
 
     protected MemoryStream(StreamDefinition def) {
         id = def.getId();
         fields = def.getFields();
-        records = Collections.synchronizedList(new ArrayList<>());
     }
 
     @Override
@@ -37,7 +36,14 @@ public class MemoryStream implements Stream {
     }
 
     @Override
-    public void add(Object[] record) throws StreamException {
+    public synchronized void add(Object[] record) throws StreamException {
+        if (record == null) {
+            throw new StreamException("Cannot add null record");
+        }
+        if (record.length != fields.size()) {
+            throw new StreamException("Record size mismatch");
+        }
+
         records.add(record);
     }
 
