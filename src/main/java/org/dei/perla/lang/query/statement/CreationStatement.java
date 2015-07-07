@@ -5,7 +5,7 @@ import org.dei.perla.lang.persistence.StreamDefinition;
 /**
  * @author Guido Rota 04/07/15.
  */
-public class CreationStatement implements Statement {
+public final class CreationStatement implements Statement {
 
     private final StreamDefinition stream;
     private final SelectionStatement sel;

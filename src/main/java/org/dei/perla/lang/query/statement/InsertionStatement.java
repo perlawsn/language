@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author Guido Rota 07/07/15.
  */
-public class InsertionStatement implements Statement {
+public final class InsertionStatement implements Statement {
 
     private final String stream;
     private final List<String> fields;

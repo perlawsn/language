@@ -536,23 +536,6 @@ TOKEN :
  * PRODUCTIONS
  */
 
-List<Statement> StatementSequence(Errors err) :
-{
-    List<Statement> sl = new ArrayList<Statement>();
-    Statement s;
-}
-{
-    s = Statement(err)
-    { sl.add(s); }
-    (
-        ";"
-        s = Statement(err)
-        { sl.add(s); }
-    )*
-    <EOF>
-    { return sl; }
-}
-
 Statement Statement(Errors err):
 {
     Statement s;
@@ -568,42 +551,47 @@ Statement Statement(Errors err):
     { return s; }
 }
 
-Statement SetParametersStament(Errors err):
-{}
+SetStatement SetParametersStament(Errors err):
+{
+    int id;
+    Set<Integer> ids = new TreeSet<Integer>();
+    SetParameter p;
+    List<SetParameter> params = new ArrayList<SetParameter>();
+}
 {
     <KEYWORD_SET>
-    SetParameterList(err)
+    p = SetParameter(err)
+    { params.add(p); }
     (
         ","
-        SetParameterList(err)
+        p = SetParameter(err)
+        { params.add(p); }
     )*
     <KEYWORD_ON>
     (
-        <IDENTIFIER>
-        |
-        ConstantInteger()
-        |
-        ConstantString()
+        id = ConstantInteger()
+        { ids.add(id); }
     )
     (
         ","
         (
-            <IDENTIFIER>
-            |
-            ConstantInteger()
-            |
-            ConstantString()
+            id = ConstantInteger()
+            { ids.add(id); }
         )
     )*
     { return null; }
 }
 
-void SetParameterList(Errors err):
-{}
+SetParameter SetParameter(Errors err):
 {
-    Identifier()
+    String id;
+    Expression e;
+}
+{
+    id = Identifier()
     "="
-    Expression(ExpressionType.CONSTANT, err, null)
+    e = Expression(ExpressionType.CONSTANT, err, null)
+    { return new SetParameter(id, e); }
 }
 
 CreationStatement CreationStatement(Errors err) :
