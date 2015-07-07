@@ -9,6 +9,4 @@ public interface StreamDriver {
 
     public Stream open(String id) throws StreamException;
 
-    public void delete(String id) throws StreamException;
-
 }

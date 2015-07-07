@@ -7,4 +7,20 @@ public class StreamException extends Exception {
 
     private static final long serialVersionUID = 7107909547236537441L;
 
+    public StreamException() {
+        super();
+    }
+
+    public StreamException(String msg) {
+        super(msg);
+    }
+
+    public StreamException(Throwable cause) {
+        super(cause);
+    }
+
+    public StreamException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
 }
