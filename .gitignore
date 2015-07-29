@@ -32,3 +32,12 @@ hs_err_pid*
 .idea/
 *.iml
 target/
+
+# Javacc
+src/main/java/org/dei/perla/lang/query/parser/ParseException.java
+src/main/java/org/dei/perla/lang/query/parser/Parser.java
+src/main/java/org/dei/perla/lang/query/parser/ParserConstants.java
+src/main/java/org/dei/perla/lang/query/parser/ParserTokenManager.java
+src/main/java/org/dei/perla/lang/query/parser/SimpleCharStream.java
+src/main/java/org/dei/perla/lang/query/parser/Token.java
+src/main/java/org/dei/perla/lang/query/parser/TokenMgrError.java
