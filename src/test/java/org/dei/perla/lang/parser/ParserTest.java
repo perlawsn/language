@@ -1,4 +1,4 @@
-package org.dei.perla.lang.query.parser;
+package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.DataTemplate;

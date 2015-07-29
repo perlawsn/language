@@ -5,7 +5,7 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
-import org.dei.perla.lang.query.parser.Parser;
+import org.dei.perla.lang.parser.Parser;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.junit.Test;
 

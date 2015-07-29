@@ -1,4 +1,4 @@
-package org.dei.perla.lang.query.parser;
+package org.dei.perla.lang.parser;
 
 /**
  * A simple enum employed to distinguish between different types of

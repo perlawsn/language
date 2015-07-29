@@ -3,8 +3,8 @@ package org.dei.perla.lang;
 import org.dei.perla.core.PerLaSystem;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.QueryException;
-import org.dei.perla.lang.query.parser.ParseException;
-import org.dei.perla.lang.query.parser.Parser;
+import org.dei.perla.lang.parser.ParseException;
+import org.dei.perla.lang.parser.Parser;
 import org.dei.perla.lang.query.statement.*;
 
 import java.io.StringReader;

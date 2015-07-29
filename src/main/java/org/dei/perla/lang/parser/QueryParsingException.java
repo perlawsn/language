@@ -1,4 +1,4 @@
-package org.dei.perla.lang.query.parser;
+package org.dei.perla.lang.parser;
 
 /**
  * @author Guido Rota 17/04/15.

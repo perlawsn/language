@@ -23,7 +23,7 @@ options
 
 PARSER_BEGIN(Parser)
 
-    package org.dei.perla.lang.query.parser;
+    package org.dei.perla.lang.parser;
 
     import java.time.temporal.TemporalUnit;
     import java.time.temporal.ChronoUnit;
