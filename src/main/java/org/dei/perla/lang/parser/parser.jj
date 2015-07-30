@@ -21,7 +21,7 @@ options
     STATIC = false;
 }
 
-PARSER_BEGIN(Parser)
+PARSER_BEGIN(ParserAST)
 
     package org.dei.perla.lang.parser;
 
@@ -41,7 +41,7 @@ PARSER_BEGIN(Parser)
     import org.dei.perla.core.registry.TypeClass;
     import org.dei.perla.core.registry.DataTemplate;
 
-    public final class Parser {
+    public final class ParserAST {
 
         private static final Object[] EMPTY_DEFAULT = new Object[0];
 
@@ -60,7 +60,7 @@ PARSER_BEGIN(Parser)
 
     }
 
-PARSER_END(Parser)
+PARSER_END(ParserAST)
 
 /*
  * SEPARATORS

@@ -35,9 +35,9 @@ target/
 
 # JavaCC
 src/main/java/org/dei/perla/lang/parser/ParseException.java
-src/main/java/org/dei/perla/lang/parser/Parser.java
-src/main/java/org/dei/perla/lang/parser/ParserConstants.java
-src/main/java/org/dei/perla/lang/parser/ParserTokenManager.java
+src/main/java/org/dei/perla/lang/parser/ParserAST.java
+src/main/java/org/dei/perla/lang/parser/ParserASTConstants.java
+src/main/java/org/dei/perla/lang/parser/ParserASTTokenManager.java
 src/main/java/org/dei/perla/lang/parser/SimpleCharStream.java
 src/main/java/org/dei/perla/lang/parser/Token.java
 src/main/java/org/dei/perla/lang/parser/TokenMgrError.java
