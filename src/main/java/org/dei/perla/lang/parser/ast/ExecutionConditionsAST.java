@@ -1,10 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.DataTemplate;
 import org.dei.perla.lang.parser.Token;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Guido Rota 30/07/15.
@@ -12,14 +8,14 @@ import java.util.List;
 public final class ExecutionConditionsAST extends NodeAST {
 
     private final ExpressionAST cond;
-    private final List<DataTemplate> specs;
+    private final NodeSpecificationsAST specs;
     private final RefreshAST refresh;
 
     public ExecutionConditionsAST(Token token, ExpressionAST cond,
-            List<DataTemplate> specs, RefreshAST refresh) {
+            NodeSpecificationsAST specs, RefreshAST refresh) {
         super(token);
         this.cond = cond;
-        this.specs = Collections.unmodifiableList(specs);
+        this.specs = specs;
         this.refresh = refresh;
     }
 
@@ -27,7 +23,7 @@ public final class ExecutionConditionsAST extends NodeAST {
         return cond;
     }
 
-    public List<DataTemplate> getSpecifications() {
+    public NodeSpecificationsAST getSpecifications() {
         return specs;
     }
 

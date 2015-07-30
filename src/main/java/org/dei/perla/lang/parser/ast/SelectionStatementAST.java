@@ -20,6 +20,8 @@ public final class SelectionStatementAST extends StatementAST {
     private final OnEmptySelection oes;
     private final SamplingAST sampling;
     private final ExpressionAST where;
+    private final ExecutionConditionsAST execCond;
+    private final TerminateAfterAST terminate;
 
     public SelectionStatementAST(Token t,
             WindowSize every,
@@ -29,7 +31,9 @@ public final class SelectionStatementAST extends StatementAST {
             WindowSize upto,
             OnEmptySelection oes,
             SamplingAST sampling,
-            ExpressionAST where) {
+            ExpressionAST where,
+            ExecutionConditionsAST execCond,
+            TerminateAfterAST terminate) {
         super(t);
         this.every = every;
         this.fields = Collections.unmodifiableList(fields);
@@ -39,6 +43,8 @@ public final class SelectionStatementAST extends StatementAST {
         this.oes = oes;
         this.sampling = sampling;
         this.where = where;
+        this.execCond = execCond;
+        this.terminate = terminate;
     }
 
     public WindowSize getEvery() {
@@ -71,6 +77,14 @@ public final class SelectionStatementAST extends StatementAST {
 
     public ExpressionAST getWhere() {
         return where;
+    }
+
+    public ExecutionConditionsAST getExecutionConditions() {
+        return execCond;
+    }
+
+    public TerminateAfterAST getTerminateAfter() {
+        return terminate;
     }
 
 }

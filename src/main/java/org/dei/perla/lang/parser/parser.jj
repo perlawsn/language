@@ -720,11 +720,14 @@ SelectionStatementAST SelectionStatement() :
     SamplingAST sampling;
     Select sel;
     ExpressionAST where = ConstantAST.TRUE;
-    ExecutionConditions ec = ExecutionConditions.ALL_NODES;
+    ExecutionConditionsAST ec = null;
     TerminateAfterAST terminate = null;
+
+    Token t;
 }
 {
     every = EveryClause()
+    { t = token; }
     <KEYWORD_SELECT>
     fsl = FieldSelectionList()
     [
@@ -747,14 +750,14 @@ SelectionStatementAST SelectionStatement() :
         where = Expression()
     ]
     [
-        ec = ExecutionConditionsClause(err, ids)
+        ec = ExecutionConditionsClause()
     ]
     [
         terminate = TerminateAfterClause()
     ]
     {
-        return new SelectionStatementAST(t, sel, every, sampling,
-                    where, ec, terminate);
+        return new SelectionStatementAST(t, every, fsl, gby, having, upto,
+                        oes, sampling, where, ec, terminate);
     }
 }
 
@@ -1016,7 +1019,7 @@ RefreshAST RefreshClause() :
 ExecutionConditionsAST ExecutionConditionsClause() :
 {
     ExpressionAST cond = ConstantAST.TRUE;
-    List<DataTemplate> specs = Collections.emptyList();
+    NodeSpecificationsAST specs = null;
     RefreshAST r = RefreshAST.NEVER;
 
     Token t;
@@ -1028,7 +1031,7 @@ ExecutionConditionsAST ExecutionConditionsClause() :
         cond = Expression()
     ]
     [
-        specs = NodeSpecifications(ids)
+        specs = NodeSpecifications()
     ]
     [
         r = RefreshClause()
@@ -1036,24 +1039,21 @@ ExecutionConditionsAST ExecutionConditionsClause() :
     { return new ExecutionConditionsAST(t, cond, specs, r); }
 }
 
-List<DataTemplate> NodeSpecifications(Set<String> ids) :
+NodeSpecificationsAST NodeSpecifications() :
 {
     List<DataTemplate> specs;
+
+    Token t;
 }
 {
-    <KEYWORD_REQUIRE>
+    t = <KEYWORD_REQUIRE>
     (
         specs = SpecificationList()
+        { return new NodeSpecificationsAST(t, specs); }
         |
         <KEYWORD_ALL>
-        {
-            specs = new ArrayList<DataTemplate>();
-            for (String id : ids) {
-                specs.add(DataTemplate.create(id, TypeClass.ANY));
-            }
-        }
+        { return NodeSpecificationsAST.ALL; }
     )
-    { return specs; }
 }
 
 List<DataTemplate> SpecificationList() :
