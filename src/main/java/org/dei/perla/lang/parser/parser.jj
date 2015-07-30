@@ -28,7 +28,6 @@ PARSER_BEGIN(Parser)
     import java.time.temporal.TemporalUnit;
     import java.time.temporal.ChronoUnit;
     import java.time.Duration;
-    import java.util.Collections;
     import java.util.List;
     import java.util.ArrayList;
 
@@ -36,7 +35,6 @@ PARSER_BEGIN(Parser)
 
     import org.dei.perla.lang.query.expression.*;
     import org.dei.perla.lang.query.statement.*;
-    import org.dei.perla.lang.persistence.*;
 
     import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
@@ -530,35 +528,37 @@ TOKEN :
  * PRODUCTIONS
  */
 
-Statement Statement(Errors err):
+StatementAST Statement():
 {
-    Statement s;
+    StatementAST s;
 }
 {
     (
-    s = SetParametersStament(err)
+    s = SetParametersStament()
     |
-    s = CreationStatement(err)
+    s = CreationStatement()
     |
-    s = InsertionStatement(err)
+    s = InsertionStatement()
     )
     { return s; }
 }
 
-SetStatement SetParametersStament(Errors err):
+SetStatementAST SetParametersStament():
 {
     int id;
-    Set<Integer> ids = new TreeSet<Integer>();
-    SetParameter p;
-    List<SetParameter> params = new ArrayList<SetParameter>();
+    SetParameterAST p;
+    List<SetParameterAST> params = new ArrayList<SetParameterAST>();
+    List<Integer> ids = new ArrayList<Integer>();
+
+    Token t;
 }
 {
-    <KEYWORD_SET>
-    p = SetParameter(err)
+    t = <KEYWORD_SET>
+    p = SetParameter()
     { params.add(p); }
     (
         ","
-        p = SetParameter(err)
+        p = SetParameter()
         { params.add(p); }
     )*
     <KEYWORD_ON>
@@ -573,19 +573,22 @@ SetStatement SetParametersStament(Errors err):
             { ids.add(id); }
         )
     )*
-    { return null; }
+    { return new SetStatementAST(t, params, ids); }
 }
 
-SetParameter SetParameter(Errors err):
+SetParameterAST SetParameter():
 {
     String id;
-    Expression e;
+    ExpressionAST e;
+
+    Token t;
 }
 {
     id = Identifier()
+    { t = token; }
     "="
-    e = Expression(ExpressionType.CONSTANT, err, null)
-    { return new SetParameter(id, e); }
+    e = Expression()
+    { return new SetParameterAST(t, id, e); }
 }
 
 CreationStatementAST CreationStatement() :

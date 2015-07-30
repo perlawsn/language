@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Guido Rota 30/07/15.
  */
-public final class CreationStatementAST extends NodeAST {
+public final class CreationStatementAST extends StatementAST {
 
     private final String stream;
     private final List<FieldDefinitionAST> fields;
