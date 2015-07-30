@@ -34,6 +34,8 @@ PARSER_BEGIN(Parser)
     import java.util.Set;
     import java.util.TreeSet;
 
+    import org.dei.perla.lang.parser.ast.*;
+
     import org.dei.perla.lang.query.expression.*;
     import org.dei.perla.lang.query.statement.*;
     import org.dei.perla.lang.persistence.*;
@@ -789,7 +791,7 @@ WindowSize EveryClause(Errors err) :
 }
 {
     <KEYWORD_EVERY>
-    ws = WindowSize(err)
+    ws = WindowSize()
     { return ws; }
 }
 
@@ -906,7 +908,7 @@ WindowSize UpToClause(Errors err) :
 {
     <KEYWORD_UP>
     <KEYWORD_TO>
-    ws = WindowSize(err)
+    ws = WindowSize()
     { return ws; }
 }
 
@@ -1241,24 +1243,24 @@ String ConstantString() :
     { return value.image; }
 }
 
-Expression Constant() :
+ExpressionAST Constant() :
 {
     Object value;
 }
 {
     (
         value = ConstantBoolean()
-        { return Constant.create(value, DataType.BOOLEAN); }
+        { return new ConstantAST(token, DataType.BOOLEAN, value); }
         |
         value = ConstantString()
-        { return Constant.create(value, DataType.STRING); }
+        { return new ConstantAST(token, DataType.STRING, value); }
         |
         LOOKAHEAD(1)
         value = ConstantInteger()
-        { return Constant.create(value, DataType.INTEGER); }
+        { return new ConstantAST(token, DataType.INTEGER, value); }
         |
         value = ConstantFloat()
-        { return Constant.create(value, DataType.FLOAT); }
+        { return new ConstantAST(token, DataType.FLOAT, value); }
     )
 }
 
@@ -1420,7 +1422,7 @@ int SelectionsNumber(Errors err) :
     )
 }
 
-WindowSize WindowSize(Errors err) :
+WindowSize WindowSize() :
 {
     Token t;
     Duration d;
@@ -1442,12 +1444,7 @@ WindowSize WindowSize(Errors err) :
             ws = new WindowSize(samples);
         }
     )
-    {
-        if (ws.isZero()) {
-            addError("Empty window size", t, err);
-        }
-        return ws;
-    }
+    { return ws; }
 }
 
 String Identifier() :
@@ -1462,390 +1459,356 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-Expression Expression(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST Expression() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BooleanTerm(type, err, ids)
+    e1 = BooleanTerm()
     (
-        <OPERATOR_OR>
-        { subErr = inContext(err, token); }
-        e2 = BooleanTerm(type, err, ids)
-        { e1 = Bool.createOR(e1, e2, subErr); }
+        t = <OPERATOR_OR>
+        e2 = BooleanTerm()
+        { e1 = new BoolAST(t, BoolOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BooleanTerm(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BooleanTerm() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BooleanFactor(type, err, ids)
+    e1 = BooleanFactor()
     (
-        <OPERATOR_AND>
-        { subErr = inContext(err, token); }
-        e2 = BooleanFactor(type, err, ids)
-        { e1 = Bool.createAND(e1, e2, subErr); }
+        t = <OPERATOR_AND>
+        e2 = BooleanFactor()
+        { e1 = new BoolAST(t, BoolOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BooleanFactor(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BooleanFactor() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BooleanNegation(type, err, ids)
+    e1 = BooleanNegation()
     (
-        <OPERATOR_XOR>
-        { subErr = inContext(err, token); }
-        e2 = BooleanNegation(type, err, ids)
-        { e1 = Bool.createXOR(e1, e2, subErr); }
+        t = <OPERATOR_XOR>
+        e2 = BooleanNegation()
+        { e1 = new BoolAST(t, BoolOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BooleanNegation(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BooleanNegation() :
 {
-    Expression e;
+    ExpressionAST e;
     boolean invert = false;
 
-    Errors subErr = null;
+    Token t = null;
 }
 {
     (
-        <OPERATOR_NOT>
+        t = <OPERATOR_NOT>
         {
-            subErr = inContext(err, token);
             invert = !invert;
         }
     )*
-    e = BooleanPredicate(type, err, ids)
+    e = BooleanPredicate()
     {
         if (invert) {
-            e = Bool.createNOT(e, subErr);
+            e = new BoolNotAST(t, e);
         }
         return e;
     }
 }
 
-Expression BooleanPredicate(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BooleanPredicate() :
 {
-    Expression e;
+    ExpressionAST e;
 }
 {
-    e = Comparison(type, err, ids)
+    e = Comparison()
     [
-        e = Is(e, err)
+        e = Is(e)
         |
-        e = Like(e, err)
+        e = Like(e)
         |
-        e = Between(e, type, err, ids)
+        e = Between(e)
     ]
     { return e; }
 }
 
-Expression Is(Expression e, Errors err) :
+ExpressionAST Is(ExpressionAST e) :
 {
     boolean invert = false;
-    Expression is;
+    ExpressionAST is;
 
-    Errors subErr;
+    Token t;
 }
 {
-    <KEYWORD_IS>
-    { subErr = inContext(err, token); }
+    t = <KEYWORD_IS>
     [
         <OPERATOR_NOT>
         { invert = true; }
     ]
     (
         <CONSTANT_BOOLEAN_TRUE>
-        { is = Is.create(e, LogicValue.TRUE, subErr); }
+        { is = new IsAST(t, e, LogicValue.TRUE); }
         |
         <CONSTANT_BOOLEAN_FALSE>
-        { is = Is.create(e, LogicValue.FALSE, subErr); }
+        { is = new IsAST(t, e, LogicValue.FALSE); }
         |
         <CONSTANT_BOOLEAN_UNKNOWN>
-        { is = Is.create(e, LogicValue.UNKNOWN, subErr); }
+        { is = new IsAST(t, e, LogicValue.UNKNOWN); }
         |
         <CONSTANT_NULL>
-        { is = IsNull.create(e); }
+        { is = new IsNullAST(t, e); }
     )
     {
         if (invert) {
-            is = Bool.createNOT(is, subErr);
+            is = new BoolNotAST(t, e);
         }
         return is;
     }
 }
 
-Expression Like(Expression e, Errors err) :
+ExpressionAST Like(ExpressionAST e) :
 {
     String pattern;
     Expression like;
 
-    Errors subErr;
+    Token t;
 }
 {
-    <KEYWORD_LIKE>
-    { subErr = inContext(err, token); }
+    t = <KEYWORD_LIKE>
     pattern = ConstantString()
-    { return Like.create(e, pattern, subErr); }
+    { return new LikeAST(t, e, pattern); }
 }
 
-Expression Between(Expression e, ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST Between(ExpressionAST e) :
 {
-    Expression b;
-    Expression min;
-    Expression max;
+    ExpressionAST b;
+    ExpressionAST min;
+    ExpressionAST max;
 
-    Errors subErr;
+    Token t;
 }
 {
-    <KEYWORD_BETWEEN>
-    { subErr = inContext(err, token); }
-    min = BitwiseExpression(type, err, ids)
+    t = <KEYWORD_BETWEEN>
+    min = BitwiseExpression()
     <OPERATOR_AND>
-    max = BitwiseExpression(type, err, ids)
+    max = BitwiseExpression()
     {
-        return Between.create(e, min, max, subErr);
+        return new BetweenAST(t, e, min, max);
     }
 }
 
-Expression Comparison(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST Comparison() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
     ComparisonOperation op;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BitwiseExpression(type, err, ids)
-    { subErr = inContext(err, token); }
+    e1 = BitwiseExpression()
     [
         op = ComparisonOperation()
-        e2 = BitwiseExpression(type, err, ids)
+        { t = token; }
+        e2 = BitwiseExpression()
         {
-            e1 = Comparison.create(op, e1, e2, subErr);
+            e1 = new ComparisonAST(t, op, e1, e2);
         }
     ]
     { return e1; }
 }
 
-Expression BitwiseExpression(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BitwiseExpression() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BitwiseTerm(type, err, ids)
+    e1 = BitwiseTerm()
     (
-        <OPERATOR_BITWISE_OR>
-        { subErr = inContext(err, token); }
-        e2 = BitwiseTerm(type, err, ids)
-        { e1 = Bitwise.createOR(e1, e2, subErr); }
+        t = <OPERATOR_BITWISE_OR>
+        e2 = BitwiseTerm()
+        { e1 = new BitwiseAST(t, BitwiseOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BitwiseTerm(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BitwiseTerm() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BitwiseFactor(type, err, ids)
+    e1 = BitwiseFactor()
     (
-        <OPERATOR_BITWISE_AND>
-        { subErr = inContext(err, token); }
-        e2 = BitwiseFactor(type, err, ids)
-        { e1 = Bitwise.createAND(e1, e2, subErr); }
+        t = <OPERATOR_BITWISE_AND>
+        e2 = BitwiseFactor()
+        { e1 = new BitwiseAST(t, BitwiseOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BitwiseFactor(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BitwiseFactor() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BitwiseShift(type, err, ids)
+    e1 = BitwiseShift()
     (
-        <OPERATOR_BITWISE_XOR>
-        { subErr = inContext(err, token); }
-        e2 = BitwiseShift(type, err, ids)
-        { e1 = Bitwise.createXOR(e1, e2, subErr); }
+        t = <OPERATOR_BITWISE_XOR>
+        e2 = BitwiseShift()
+        { e1 = new BitwiseAST(t, BitwiseOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BitwiseShift(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BitwiseShift() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
     BitwiseOperation op;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = BitwiseNegation(type, err, ids)
+    e1 = BitwiseNegation()
     (
         (
-            <OPERATOR_BITWISE_LSH>
-            {
-                op = BitwiseOperation.LSH;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_BITWISE_LSH>
+            { op = BitwiseOperation.LSH; }
             |
-            <OPERATOR_BITWISE_RSH>
-            {
-                op = BitwiseOperation.RSH;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_BITWISE_RSH>
+            { op = BitwiseOperation.RSH; }
         )
-        e2 = BitwiseNegation(type, err, ids)
-        { e1 = Bitwise.create(op, e1, e2, subErr); }
+        e2 = BitwiseNegation()
+        { e1 = new BitwiseAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression BitwiseNegation(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST BitwiseNegation() :
 {
-    Expression e;
+    ExpressionAST e;
     boolean not = false;
 
-    Errors subErr = null;
+    Token t = null;
 }
 {
     (
-        <OPERATOR_BITWISE_NOT>
-        {
-            subErr = inContext(err, token);
-            not = !not;
-        }
+        t = <OPERATOR_BITWISE_NOT>
+        { not = !not; }
     )*
-    e = ArithmeticExpression(type, err, ids)
+    e = ArithmeticExpression()
     {
         if (not) {
-            e = Bitwise.createNOT(e, subErr);
+            e = new BitwiseNotAST(t, e);
         }
         return e;
     }
 }
 
-Expression ArithmeticExpression(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST ArithmeticExpression() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
     ArithmeticOperation op;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = ArithmeticTerm(type, err, ids)
+    e1 = ArithmeticTerm()
     (
         (
-            <OPERATOR_PLUS>
-            {
-                op = ArithmeticOperation.ADDITION;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_PLUS>
+            { op = ArithmeticOperation.ADDITION; }
             |
-            <OPERATOR_MINUS>
-            {
-                op = ArithmeticOperation.SUBTRACTION;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_MINUS>
+            { op = ArithmeticOperation.SUBTRACTION; }
         )
-        e2 = ArithmeticTerm(type, err, ids)
-        { e1 = Arithmetic.create(op, e1, e2, subErr); }
+        e2 = ArithmeticTerm()
+        { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression ArithmeticTerm(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST ArithmeticTerm() :
 {
-    Expression e1;
-    Expression e2;
+    ExpressionAST e1;
+    ExpressionAST e2;
     ArithmeticOperation op;
 
-    Errors subErr;
+    Token t;
 }
 {
-    e1 = ArithmeticFactor(type, err, ids)
+    e1 = ArithmeticFactor()
     (
         (
-            <OPERATOR_MULTIPLY>
-            {
-                op = ArithmeticOperation.PRODUCT;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_MULTIPLY>
+            { op = ArithmeticOperation.PRODUCT; }
             |
-            <OPERATOR_DIVIDE>
-            {
-                op = ArithmeticOperation.DIVISION;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_DIVIDE>
+            { op = ArithmeticOperation.DIVISION; }
             |
-            <OPERATOR_MODULO>
-            {
-                op = ArithmeticOperation.MODULO;
-                subErr = inContext(err, token);
-            }
+            t = <OPERATOR_MODULO>
+            { op = ArithmeticOperation.MODULO; }
         )
-        e2 = ArithmeticFactor(type, err, ids)
-        { e1 = Arithmetic.create(op, e1, e2, subErr); }
+        e2 = ArithmeticFactor()
+        { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-Expression ArithmeticFactor(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST ArithmeticFactor() :
 {
-    Expression e;
+    ExpressionAST e;
     Sign s = Sign.PLUS;
 
-    Errors subErr = null;
+    Token t = null;
 }
 {
     [
         s = Sign()
-        { subErr = inContext(err, token); }
+        { t = token; }
     ]
-    e = PrimaryExpression(type, err, ids)
+    e = PrimaryExpression()
     {
         if (s == Sign.MINUS) {
-            e = Arithmetic.createInverse(e, subErr);
+            e = new ArithmeticInverseAST(t, e);
         }
         return e;
     }
 }
 
-Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
+ExpressionAST PrimaryExpression() :
 {
     String id;
-    Expression e;
+    ExpressionAST e;
 
-    Errors subErr;
+    Token t = null;
 }
 {
     e = Constant()
@@ -1853,89 +1816,63 @@ Expression PrimaryExpression(ExpressionType type, Errors err, Set<String> ids) :
     |
     (
         "("
-        e = Expression(type, err, ids)
+        e = Expression()
         { return e; }
         ")"
     )
     |
-    <KEYWORD_GROUPTS>
-    {
-        if (type != ExpressionType.AGGREGATE) {
-            String msg = "aggregation not allowed";
-            addError(msg, token, err);
-            return Constant.NULL;
-        }
-        ids.add("timestamp");
-        return new GroupTS();
-    }
+    t = <KEYWORD_GROUPTS>
+    { return new GroupTSAST(t); }
     |
-    e = Aggregate(err, ids)
-    {
-        if (type != ExpressionType.AGGREGATE) {
-            String msg = "aggregation not allowed";
-            addError(msg, token, err);
-            return Constant.NULL;
-        }
-        return e;
-    }
+    e = Aggregate()
+    { return e; }
     |
     id = Identifier() // FPC attribute
-    {
-        if (type == ExpressionType.CONSTANT) {
-            String msg = "attributes not allowed in constant expression";
-            addError(msg, token, err);
-            return Constant.NULL;
-        }
-        // Track all attribute identifier. They will later be referenced if
-        // the query contains a EXECUTE ON NODES WITH ALL clause
-        ids.add(id);
-        return new Field(id);
-    }
+    { return new FieldAST(token, id); }
 }
 
-Expression Aggregate(Errors err, Set<String> ids) :
+ExpressionAST Aggregate() :
 {
     AggregateOperation op;
-    Expression exp = null;
+    ExpressionAST operand = ConstantAST.NULL;
     WindowSize ws;
-    Expression filter = Constant.TRUE;
-    Expression e;
+    ExpressionAST filter = ConstantAST.TRUE;
+    ExpressionAST e;
 
-    Errors subErr;
+    Token t;
 }
 {
     (
         (
-            <FUNCTION_COUNT>
+            t = <FUNCTION_COUNT>
             {
                 op = AggregateOperation.COUNT;
-                subErr = inContext(err, token);
             }
             "("
             "*"
             ","
-            ws = WindowSize(err)
+            ws = WindowSize()
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, err, ids)
+                filter = Expression()
             ]
             ")"
         )
         |
         (
             op = AggregateOperation()
-            { subErr = inContext(err, token); }
+            { t = token; }
             "("
-            exp = Expression(ExpressionType.SIMPLE, err, ids)
+            operand = Expression()
             ","
-            ws = WindowSize(err)
+            ws = WindowSize()
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, err, ids)
+                filter = Expression()
             ]
             ")"
         )
     )
-    { return Aggregate.create(op, exp, ws, filter, err); }
+    { return new AggregateAST(t, op, operand, ws, filter); }
 }
 
