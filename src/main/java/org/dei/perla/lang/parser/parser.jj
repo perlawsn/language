@@ -588,105 +588,90 @@ SetParameter SetParameter(Errors err):
     { return new SetParameter(id, e); }
 }
 
-CreationStatement CreationStatement(Errors err) :
+CreationStatementAST CreationStatement() :
 {
-    String name;
-    List<FieldDefinition> fields;
-    StreamDefinition stream;
-    SelectionStatement sel = null;
+    String stream;
+    List<FieldDefinitionAST> fields;
+    SelectionStatementAST sel = null;
+
+    Token t;
 }
 {
-    <KEYWORD_CREATE>
+    t = <KEYWORD_CREATE>
     <KEYWORD_STREAM>
-    name = Identifier() // Stream name
-    fields = FieldDefinitionList(err.inContext("Stream '" + name + "'"))
+    stream = Identifier() // Stream name
+    fields = FieldDefinitionList()
     [
         <KEYWORD_AS>
-        sel = SelectionStatement(err)
+        sel = SelectionStatement()
     ]
     {
-        stream = new StreamDefinition(name, fields);
-        return new CreationStatement(stream, sel);
+        return new CreationStatementAST(t, stream, fields, sel);
     }
 }
 
-List<FieldDefinition> FieldDefinitionList(Errors err) :
+List<FieldDefinitionAST> FieldDefinitionList() :
 {
-    List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
-    FieldDefinition f;
-
-    Set<String> names = new TreeSet<String>();
+    List<FieldDefinitionAST> fields = new ArrayList<FieldDefinitionAST>();
+    FieldDefinitionAST f;
 }
 {
     "("
-    f = FieldDefinition(err)
-    {
-        names.add(f.getName());
-        fields.add(f);
-    }
+    f = FieldDefinition()
+    { fields.add(f); }
     (
         ","
-        f = FieldDefinition(err)
-        {
-            String n = f.getName();
-            if (names.contains(n)) {
-                err.addError("Duplicate field name '" + n + "'");
-            } else {
-                names.add(n);
-            }
-            fields.add(f);
-        }
+        f = FieldDefinition()
+        { fields.add(f); }
     )*
     ")"
     { return fields; }
 }
 
-FieldDefinition FieldDefinition(Errors err) :
+FieldDefinitionAST FieldDefinition() :
 {
     String name;
     DataType type;
-    Expression e;
-    Errors defErr;
-    Object def = null;
+    ExpressionAST def = ConstantAST.NULL;
+
+    Token t;
 }
 {
     name = Identifier() // Data structure field
+    { t = token; }
     type = Type()
     [
         <KEYWORD_DEFAULT>
         (
-            e = Expression(ExpressionType.CONSTANT, err, null)
-            {
-                defErr = err.inContext("Illegal default value for field '" +
-                    name + "' of type '" + type + "'.");
-                def = ExpressionUtils.evaluateConstant(e, type, defErr);
-            }
+            def = Expression()
             |
             <CONSTANT_NULL>
         )
     ]
-    { return new FieldDefinition(name, type, def); }
+    { return new FieldDefinitionAST(t, name, type, def); }
 }
 
-InsertionStatement InsertionStatement(Errors err) :
+InsertionStatementAST InsertionStatement() :
 {
     String stream;
     List<String> fl = new ArrayList<String>();
-    SelectionStatement sel;
+    SelectionStatementAST sel;
+
+    Token t;
 }
 {
-    <KEYWORD_INSERT>
+    t = <KEYWORD_INSERT>
     <KEYWORD_INTO>
     <KEYWORD_STREAM>
     stream = Identifier() // Stream name
     [
-        fl = FieldList(err)
+        fl = FieldList()
     ]
-    sel = SelectionStatement(err)
-    { return new InsertionStatement(stream, fl, sel); }
+    sel = SelectionStatement()
+    { return new InsertionStatementAST(t, stream, fl, sel); }
 }
 
-List<String> FieldList(Errors err) :
+List<String> FieldList() :
 {
     List<String> fl = new ArrayList<String>();
     String s;
@@ -698,12 +683,7 @@ List<String> FieldList(Errors err) :
     (
         ","
         s = Identifier() // DataStructureField
-        {
-            if (fl.contains(s)) {
-                err.addError("Duplicate field name '" + s + "'");
-            }
-            fl.add(s);
-        }
+        { fl.add(s); }
     )*
     ")"
     { return fl; }
