@@ -2,7 +2,6 @@ package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.lang.query.statement.Refresh.RefreshType;
 import org.junit.Test;
 
 import java.time.Duration;

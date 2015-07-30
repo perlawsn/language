@@ -25,18 +25,8 @@ public class Executor {
     public StatementTask execute(String query, StatementHandler h)
             throws QueryException {
         Errors err = new Errors();
-        Parser p = new Parser(new StringReader(query));
 
-        Statement s;
-        try {
-            s = p.Statement(err);
-            if (!err.isEmpty()) {
-                throw new QueryException(err.asString("Error parsing query"));
-            }
-        } catch(ParseException e) {
-            throw new QueryException("Error while parsing query '" +
-                    query + "'", e);
-        }
+        Statement s = null;
 
         if (s instanceof SelectionStatement) {
             SelectionStatement sel = (SelectionStatement) s;
