@@ -31,8 +31,6 @@ PARSER_BEGIN(Parser)
     import java.util.Collections;
     import java.util.List;
     import java.util.ArrayList;
-    import java.util.Set;
-    import java.util.TreeSet;
 
     import org.dei.perla.lang.parser.ast.*;
 
@@ -255,14 +253,8 @@ TOKEN :
     < KEYWORD_EXECUTE:        "EXECUTE"   >
     |
     < KEYWORD_IF:             "IF"        >
-//  |
-//  < KEYWORD_ON:			  "ON"        >
     |
-    < KEYWORD_NODES:          "NODES"     >
-    |
-    < KEYWORD_WITH:           "WITH"      >
-    |
-    < KEYWORD_WITHOUT:        "WITHOUT"   >
+    < KEYWORD_REQUIRE:        "REQUIRE"   >
     |
     < KEYWORD_ALL:            "ALL"       >
 }
@@ -785,7 +777,7 @@ SelectionStatement SelectionStatement(Errors err) :
     }
 }
 
-WindowSize EveryClause(Errors err) :
+WindowSize EveryClause() :
 {
     WindowSize ws;
 }
@@ -795,38 +787,41 @@ WindowSize EveryClause(Errors err) :
     { return ws; }
 }
 
-List<FieldSelection> FieldSelectionList(Errors err, Set<String> ids) :
+List<FieldSelectionAST> FieldSelectionList() :
 {
-    List<FieldSelection> fsl = new ArrayList<FieldSelection>();
-    FieldSelection fs;
+    List<FieldSelectionAST> fsl = new ArrayList<FieldSelectionAST>();
+    FieldSelectionAST fs;
 }
 {
-    fs = FieldSelection(err, ids)
+    fs = FieldSelection()
     { fsl.add(fs); }
     (
         ","
-        fs = FieldSelection(err, ids)
+        fs = FieldSelection()
         { fsl.add(fs); }
     )*
     { return fsl; }
 }
 
-FieldSelection FieldSelection(Errors err, Set<String> ids) :
+FieldSelectionAST FieldSelection() :
 {
-    Expression field;
-    Object def = null;
+    ExpressionAST field;
+    ExpressionAST def = ConstantAST.NULL;
+
+    Token t;
 }
 {
-    field = Expression(ExpressionType.AGGREGATE, err, ids)
+    field = Expression()
+    { t = token; }
     [
         <KEYWORD_DEFAULT>
         (
-            def = Expression(ExpressionType.SIMPLE, err, ids)
+            def = Expression()
             |
             <CONSTANT_NULL>
         )
     ]
-    { return new FieldSelection(field, def); }
+    { return new FieldSelectionAST(t, field, def); }
 }
 
 GroupBy GroupByClause() :
@@ -891,14 +886,16 @@ GroupByTS FieldGroupingByTs() :
     { return new GroupByTS(d, count); }
 }
 
-Expression HavingClause(Errors err, Set<String> ids) :
+HavingAST HavingClause() :
 {
-    Expression e;
+    ExpressionAST e;
+
+    Token t;
 }
 {
-    <KEYWORD_HAVING>
-    e = Expression(ExpressionType.AGGREGATE, err, ids)
-    { return e; }
+    t = <KEYWORD_HAVING>
+    e = Expression()
+    { return new HavingAST(t, e); }
 }
 
 WindowSize UpToClause(Errors err) :
@@ -928,36 +925,38 @@ OnEmptySelection OnEmptySelectionClause() :
     )
 }
 
-Sampling SamplingClause(Errors err, Set<String> ids) :
+SamplingAST SamplingClause() :
 {
-    Set<String> events;
+    List<String> events;
 
-    IfEvery ife;
+    List<IfEveryAST> ife;
     RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
-    Refresh refresh = Refresh.NEVER;
+    RefreshAST refresh = RefreshAST.NEVER;
+
+    Token t;
 }
 {
-    <KEYWORD_SAMPLING>
+    t = <KEYWORD_SAMPLING>
     (
         events = OnEventClause()
-        { return new SamplingEvent(events); }
+        { return new SamplingEventAST(t, events); }
         |
         (
-            ife = IfEveryClause(err, ids)
+            ife = IfEveryClause()
             [
                 policy = OnUnsupportedSRClause()
             ]
             [
                 refresh = RefreshClause()
             ]
-            { return new SamplingIfEvery(ife, policy, refresh); }
+            { return new SamplingIfEveryAST(t, ife, policy, refresh); }
         )
     )
 }
 
-Set<String> OnEventClause() :
+List<String> OnEventClause() :
 {
-    Set<String> evs = new TreeSet<String>();
+    List<String> evs = new ArrayList<String>();
     String e;
 }
 {
@@ -975,72 +974,60 @@ Set<String> OnEventClause() :
     { return evs; }
 }
 
-IfEvery IfEveryClause(Errors err, Set<String> ids) :
+List<IfEveryAST> IfEveryClause() :
 {
-    IfEvery ife = null;
-    IfEvery prev = null;
+    List<IfEveryAST> ifeList = new ArrayList<IfEveryAST>();
+    IfEveryAST ife;
+    EveryAST every;
+    ExpressionAST cond;
 
-    Every every;
-    Expression cond;
-    Expression value;
-    TemporalUnit unit;
-
-    Errors subErr;
+    Token t;
 }
 {
     (
         (
-            <KEYWORD_IF>
-            cond = Expression(ExpressionType.SIMPLE, err, ids)
-            <KEYWORD_EVERY>
-            every = EveryDuration(err, ids)
+            t = <KEYWORD_IF>
+            cond = Expression()
+            every = EveryDuration()
             {
-                subErr = inContext(err, token);
-                if (ife == null) {
-                    ife = IfEvery.create(cond, every.getValue(),
-                        every.getUnit(), subErr);
-                    prev = ife;
-                } else {
-                    prev = IfEvery.create(prev, cond, every.getValue(),
-                        every.getUnit(), subErr);
-                }
+                ife = new IfEveryAST(t, cond, every);
+                ifeList.add(ife);
             }
         )+
         (
-            <KEYWORD_ELSE>
-            <KEYWORD_EVERY>
-            every = EveryDuration(err, ids)
+            t = <KEYWORD_ELSE>
+            every = EveryDuration()
             {
-                subErr = inContext(err, token);
-                prev = IfEvery.create(prev, Constant.TRUE, every.getValue(),
-                    every.getUnit(), subErr);
+                ife = new IfEveryAST(t, ConstantAST.TRUE, every);
+                ifeList.add(ife);
             }
         )
-        { return ife; }
+        { return ifeList; }
     )
     |
     (
-        <KEYWORD_EVERY>
-        every = EveryDuration(err, ids)
+        every = EveryDuration()
         {
-            subErr = inContext(err, token);
-            ife = IfEvery.create(Constant.TRUE, every.getValue(),
-                every.getUnit(), subErr);
+            ife = new IfEveryAST(token, ConstantAST.TRUE, every);
+            ifeList.add(ife);
         }
     )
-    { return ife; }
+    { return ifeList; }
 }
 
-Every EveryDuration(Errors err, Set<String> ids) :
+EveryAST EveryDuration() :
 {
-    Expression value;
+    ExpressionAST value;
     TemporalUnit unit;
+
+    Token t;
 }
 {
-    value = Expression(ExpressionType.SIMPLE, err, ids)
+    t = <KEYWORD_EVERY>
+    value = Expression()
     unit = TimeUnit()
     {
-        return new Every(value, unit);
+        return new EveryAST(t, value, unit);
     }
 }
 
@@ -1063,37 +1050,41 @@ RatePolicy OnUnsupportedSRClause() :
     )
 }
 
-Refresh RefreshClause() :
+RefreshAST RefreshClause() :
 {
-    Set<String> es;
+    List<String> es;
     Duration d;
+
+    Token t;
 }
 {
-    <KEYWORD_REFRESH>
+    t = <KEYWORD_REFRESH>
     (
         es = OnEventClause()
-        { return new Refresh(es); }
+        { return new RefreshAST(t, es); }
         |
         <KEYWORD_EVERY>
         d = Duration()
-        { return new Refresh(d); }
+        { return new RefreshAST(t, d); }
         |
         <KEYWORD_NEVER>
-        { return Refresh.NEVER; }
+        { return RefreshAST.NEVER; }
     )
 }
 
-ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
+ExecutionConditionsAST ExecutionConditionsClause() :
 {
-    Expression cond = Constant.TRUE;
+    ExpressionAST cond = ConstantAST.TRUE;
     List<DataTemplate> specs = Collections.emptyList();
-    Refresh r = Refresh.NEVER;
+    RefreshAST r = RefreshAST.NEVER;
+
+    Token t;
 }
 {
-    <KEYWORD_EXECUTE>
+    t = <KEYWORD_EXECUTE>
     [
         <KEYWORD_IF>
-        cond = Expression(ExpressionType.SIMPLE, err, ids)
+        cond = Expression()
     ]
     [
         specs = NodeSpecifications(ids)
@@ -1101,7 +1092,7 @@ ExecutionConditions ExecutionConditionsClause(Errors err, Set<String> ids) :
     [
         r = RefreshClause()
     ]
-    { return ExecutionConditions.create(cond, specs, r, err); }
+    { return new ExecutionConditionsAST(t, cond, specs, r); }
 }
 
 List<DataTemplate> NodeSpecifications(Set<String> ids) :
@@ -1109,9 +1100,7 @@ List<DataTemplate> NodeSpecifications(Set<String> ids) :
     List<DataTemplate> specs;
 }
 {
-    <KEYWORD_ON>
-    <KEYWORD_NODES>
-    <KEYWORD_WITH>
+    <KEYWORD_REQUIRE>
     (
         specs = SpecificationList()
         |

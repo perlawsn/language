@@ -51,7 +51,7 @@ public final class ExecutionConditions {
             err.addError("Execution condition must be of type BOOLEAN");
         }
 
-        if (cond != null && cond instanceof Constant &&
+        if (cond instanceof Constant &&
                 ((LogicValue) cond.run(null, null)).toBoolean() == false) {
             err.addError("Execution condition always evaluates to false");
             return null;

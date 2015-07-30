@@ -94,13 +94,4 @@ public final class Refresh {
         return new Refresh(names, events);
     }
 
-    /**
-     * @author Guido Rota 30/03/2015
-     */
-    public static enum RefreshType {
-        EVENT,
-        TIME,
-        NEVER
-    }
-
 }
