@@ -709,70 +709,51 @@ List<String> FieldList(Errors err) :
     { return fl; }
 }
 
-SelectionStatement SelectionStatement(Errors err) :
+SelectionStatementAST SelectionStatement() :
 {
-    // All attribute identifiers are incrementally stored inside this
-    // structure, that is later employed by the EXECUTE IF clause when the
-    // user requires all attributes referenced in the query
-    Set<String> ids = new TreeSet<String>();
-
     WindowSize every;
-    List<FieldSelection> fsl;
-    GroupBy gby = GroupBy.NONE;
-    Expression having = Constant.TRUE;
+    List<FieldSelectionAST> fsl;
+    GroupByAST gby = null;
+    HavingAST having = null;
     WindowSize upto = WindowSize.ONE;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
-    Sampling sampling;
+    SamplingAST sampling;
     Select sel;
-    Expression where = Constant.TRUE;
+    ExpressionAST where = ConstantAST.TRUE;
     ExecutionConditions ec = ExecutionConditions.ALL_NODES;
-    WindowSize terminate = WindowSize.ZERO;
+    TerminateAfterAST terminate = null;
 }
 {
-    every = EveryClause(err)
+    every = EveryClause()
     <KEYWORD_SELECT>
-    fsl = FieldSelectionList(err, ids)
+    fsl = FieldSelectionList()
     [
         gby = GroupByClause()
     ]
     [
-        having = HavingClause(err, ids)
+        having = HavingClause()
     ]
     [
-        upto = UpToClause(err)
+        upto = UpToClause()
     ]
     [
         oes = OnEmptySelectionClause()
     ]
-    {
-        List<Expression> fields = new ArrayList<Expression>();
-        Object[] def = new Object[fsl.size()];
-        int i = 0;
-        for (FieldSelection fs : fsl) {
-            fields.add(fs.getField());
-            def[i++] = fs.getDefault();
-        }
-        if (oes == OnEmptySelection.INSERT_NOTHING) {
-            def = EMPTY_DEFAULT;
-        }
-        sel = new Select(fields, upto, gby, having, def);
-    }
-    sampling = SamplingClause(err, ids)
+    sampling = SamplingClause()
     [
         // This optional where clause filters the sampled values before adding
         // them to the local buffer
         <KEYWORD_WHERE>
-        // No aggregates allowed
-        where = Expression(ExpressionType.SIMPLE, err, ids)
+        where = Expression()
     ]
     [
         ec = ExecutionConditionsClause(err, ids)
     ]
     [
-        terminate = TerminateAfterClause(err)
+        terminate = TerminateAfterClause()
     ]
     {
-        return new SelectionStatement(sel, every, sampling,
+        return new SelectionStatementAST(t, sel, every, sampling,
                     where, ec, terminate);
     }
 }
@@ -824,66 +805,26 @@ FieldSelectionAST FieldSelection() :
     { return new FieldSelectionAST(t, field, def); }
 }
 
-GroupBy GroupByClause() :
+GroupByAST GroupByClause() :
 {
-    GroupBy g;
-}
-{
-    <KEYWORD_GROUP>
-    <KEYWORD_BY>
-    g = FieldGroupingByList()
-    { return g; }
-}
+    String f;
+    List<String> fs = new ArrayList<String>();
 
-GroupBy FieldGroupingByList() :
-{
-    GroupByTS gts = null;
-    Field f;
-    List<Field> fs = new ArrayList<Field>();
+    Token t;
 }
 {
+    t = <KEYWORD_GROUP>
+    <KEYWORD_BY>
     (
-        f = FieldGroupingBy()
+        f = Identifier()
         { fs.add(f); }
-        |
-        gts = FieldGroupingByTs()
     )
     (
         ","
-        f = FieldGroupingBy()
+        f = Identifier()
         { fs.add(f); }
     )*
-    {
-        if (gts == null) {
-            return new GroupBy(fs);
-        }
-        return new GroupBy(gts.getDuration(), gts.getCount(), fs);
-    }
-}
-
-Field FieldGroupingBy() :
-{
-    String f;
-}
-{
-    f = Identifier() // FPC attribute
-    { return new Field(f); }
-}
-
-GroupByTS FieldGroupingByTs() :
-{
-    Duration d;
-    int count;
-}
-{
-    <TYPE_TIMESTAMP>
-    "("
-    d = Duration()
-    ","
-    count = ConstantInteger()
-    <KEYWORD_GROUPS>
-    ")"
-    { return new GroupByTS(d, count); }
+    { return new GroupByAST(t, fs); }
 }
 
 HavingAST HavingClause() :
@@ -898,7 +839,7 @@ HavingAST HavingClause() :
     { return new HavingAST(t, e); }
 }
 
-WindowSize UpToClause(Errors err) :
+WindowSize UpToClause() :
 {
     WindowSize ws;
 }
@@ -1145,22 +1086,26 @@ DataTemplate Specification() :
     { return DataTemplate.create(id, tc); }
 }
 
-WindowSize TerminateAfterClause(Errors err) :
+TerminateAfterAST TerminateAfterClause() :
 {
     Duration d;
     int count;
+    WindowSize w;
+
+    Token t;
 }
 {
-    <KEYWORD_TERMINATE>
+    t = <KEYWORD_TERMINATE>
     <KEYWORD_AFTER>
     (
         LOOKAHEAD(2)
         d = Duration()
-        { return new WindowSize(d); }
+        { w = new WindowSize(d); }
         |
-        count = SelectionsNumber(err)
-        { return new WindowSize(count); }
+        count = SelectionsNumber()
+        { w = new WindowSize(count); }
     )
+    { return new TerminateAfterAST(t, w); }
 }
 
 /*
@@ -1391,7 +1336,7 @@ int SamplesNumber() :
     )
 }
 
-int SelectionsNumber(Errors err) :
+int SelectionsNumber() :
 {
 
     Token t;
@@ -1402,12 +1347,7 @@ int SelectionsNumber(Errors err) :
         value = ConstantInteger()
         { t = token; }
         <KEYWORD_SELECTIONS>
-        {
-            if (value == 0) {
-                addError("Number of selections must be greater than zero", t, err);
-            }
-            return value;
-        }
+        { return value; }
     )
 }
 

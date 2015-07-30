@@ -5,10 +5,10 @@ import org.dei.perla.lang.parser.Token;
 /**
  * @author Guido Rota 30/07/15.
  */
-public final class SelectionAST extends NodeAST {
+public abstract class StatementAST extends NodeAST {
 
-    public SelectionAST(Token t) {
-        super(t);
+    public StatementAST(Token token) {
+        super(token);
     }
 
 }
