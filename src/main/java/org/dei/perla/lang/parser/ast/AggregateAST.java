@@ -1,6 +1,8 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParseContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.AggregateOperation;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -37,6 +39,11 @@ public final class AggregateAST extends ExpressionAST {
 
     public ExpressionAST getFilter() {
         return filter;
+    }
+
+    @Override
+    public boolean inferType(TypeVariable type, ParseContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

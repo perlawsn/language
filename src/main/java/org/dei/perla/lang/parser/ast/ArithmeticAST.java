@@ -1,6 +1,8 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParseContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.ArithmeticOperation;
 
 /**
@@ -18,6 +20,11 @@ public final class ArithmeticAST extends BinaryExpressionAST {
 
     public ArithmeticOperation getOperation() {
         return op;
+    }
+
+    @Override
+    public boolean inferType(TypeVariable type, ParseContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

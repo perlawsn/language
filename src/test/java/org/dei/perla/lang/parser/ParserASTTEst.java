@@ -1,5 +1,8 @@
 package org.dei.perla.lang.parser;
 
+import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.lang.parser.ast.ConstantAST;
 import org.dei.perla.lang.query.expression.AggregateOperation;
 import org.dei.perla.lang.query.expression.ComparisonOperation;
 import org.dei.perla.lang.query.expression.LogicValue;
@@ -76,7 +79,25 @@ public class ParserASTTEst {
 
     @Test
     public void testConstant() throws Exception {
-        throw new RuntimeException("waiting for new type system");
+        ParserAST p = getParser("34");
+        ConstantAST c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getValue(), equalTo(34));
+
+        p = getParser("3.1415");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.FLOAT));
+        assertThat(c.getValue(), equalTo(3.1415f));
+
+        p = getParser("'test'");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.STRING));
+        assertThat(c.getValue(), equalTo("test"));
+
+        p = getParser("TRUE");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
     @Test
@@ -112,12 +133,60 @@ public class ParserASTTEst {
 
     @Test
     public void testDataType() throws Exception {
-        throw new RuntimeException("waiting for new type system");
+        ParserAST p = getParser("integer");
+        DataType t = p.Type();
+        assertThat(t, equalTo(DataType.INTEGER));
+
+        p = getParser("float");
+        t = p.Type();
+        assertThat(t, equalTo(DataType.FLOAT));
+
+        p = getParser("boolean");
+        t = p.Type();
+        assertThat(t, equalTo(DataType.BOOLEAN));
+
+        p = getParser("string");
+        t = p.Type();
+        assertThat(t, equalTo(DataType.STRING));
+
+        p = getParser("timestamp");
+        t = p.Type();
+        assertThat(t, equalTo(DataType.TIMESTAMP));
+
+        p = getParser("id");
+        t = p.Type();
+        assertThat(t, equalTo(DataType.ID));
     }
 
     @Test
     public void testTypeClass() throws Exception {
-        throw new RuntimeException("waiting for new type system");
+        ParserAST p = getParser("integer");
+        TypeClass t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.INTEGER));
+
+        p = getParser("float");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.FLOAT));
+
+        p = getParser("boolean");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.BOOLEAN));
+
+        p = getParser("string");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.STRING));
+
+        p = getParser("timestamp");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.TIMESTAMP));
+
+        p = getParser("id");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.ID));
+
+        p = getParser("any");
+        t = p.TypeClass();
+        assertThat(t, equalTo(TypeClass.ANY));
     }
 
     @Test

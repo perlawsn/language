@@ -1160,24 +1160,24 @@ String ConstantString() :
     { return value.image; }
 }
 
-ExpressionAST Constant() :
+ConstantAST Constant() :
 {
     Object value;
 }
 {
     (
         value = ConstantBoolean()
-        { return new ConstantAST(token, DataType.BOOLEAN, value); }
+        { return new ConstantAST(token, TypeClass.BOOLEAN, value); }
         |
         value = ConstantString()
-        { return new ConstantAST(token, DataType.STRING, value); }
+        { return new ConstantAST(token, TypeClass.STRING, value); }
         |
         LOOKAHEAD(1)
         value = ConstantInteger()
-        { return new ConstantAST(token, DataType.INTEGER, value); }
+        { return new ConstantAST(token, TypeClass.INTEGER, value); }
         |
         value = ConstantFloat()
-        { return new ConstantAST(token, DataType.FLOAT, value); }
+        { return new ConstantAST(token, TypeClass.FLOAT, value); }
     )
 }
 
