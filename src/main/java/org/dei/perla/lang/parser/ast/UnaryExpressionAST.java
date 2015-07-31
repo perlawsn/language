@@ -7,7 +7,7 @@ import org.dei.perla.lang.parser.Token;
  */
 public abstract class UnaryExpressionAST extends ExpressionAST {
 
-    private final ExpressionAST operand;
+    protected final ExpressionAST operand;
 
     public UnaryExpressionAST(Token token, ExpressionAST operand) {
         super(token);

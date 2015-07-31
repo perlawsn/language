@@ -8,8 +8,8 @@ import org.dei.perla.lang.parser.Token;
 
 public abstract class BinaryExpressionAST extends ExpressionAST {
 
-    private final ExpressionAST left;
-    private final ExpressionAST right;
+    protected final ExpressionAST left;
+    protected final ExpressionAST right;
 
     public BinaryExpressionAST(Token token, ExpressionAST left,
             ExpressionAST right) {
