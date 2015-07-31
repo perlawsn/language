@@ -12,14 +12,20 @@ import org.dei.perla.lang.query.expression.LogicValue;
 public final class ConstantAST extends ExpressionAST {
 
     public static final ConstantAST TRUE =
-            new ConstantAST(null, TypeClass.BOOLEAN, LogicValue.TRUE);
+            new ConstantAST(TypeClass.BOOLEAN, LogicValue.TRUE);
     public static final ConstantAST FALSE =
-            new ConstantAST(null, TypeClass.BOOLEAN, LogicValue.FALSE);
+            new ConstantAST(TypeClass.BOOLEAN, LogicValue.FALSE);
     public static final ConstantAST NULL =
-            new ConstantAST(null, TypeClass.ANY, null);
+            new ConstantAST(TypeClass.ANY, null);
 
     private final TypeClass type;
     private final Object value;
+
+    protected ConstantAST(TypeClass type, Object value) {
+        super();
+        this.type = type;
+        this.value = value;
+    }
 
     public ConstantAST(Token token, TypeClass type, Object value) {
         super(token);
