@@ -1321,14 +1321,11 @@ int SamplesNumber() :
 
 int SelectionsNumber() :
 {
-
-    Token t;
     int value;
 }
 {
     (
         value = ConstantInteger()
-        { t = token; }
         <KEYWORD_SELECTIONS>
         { return value; }
     )

@@ -91,11 +91,9 @@ public final class WindowSize {
     /**
      * @author Guido Rota 30/03/2014
      */
-    public static enum WindowType {
-
+    public enum WindowType {
         TIME,
         SAMPLE
-
     }
 
 }
