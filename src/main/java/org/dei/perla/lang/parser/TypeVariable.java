@@ -18,26 +18,44 @@ public final class TypeVariable {
     }
 
     public boolean restrict(TypeClass other) {
-        if (type == other) {
-            return true;
+        TypeClass t = strictest(type, other);
+        if (t == null) {
+            return false;
         }
 
-        TypeClass t1 = type;
-        TypeClass t2 = other;
-        if (type.ordinal() > other.ordinal()) {
-            t1 = other;
-            t2 = type;
+        type = t;
+        return true;
+    }
+
+    public static boolean merge(TypeVariable t1, TypeVariable t2) {
+        TypeClass t = strictest(t1.type, t2.type);
+        if (t == null) {
+            return false;
+        }
+
+        t1.type = t;
+        t2.type = t;
+        return true;
+    }
+
+    private static TypeClass strictest(TypeClass t1, TypeClass t2) {
+        if (t1 == t2) {
+            return t1;
+        }
+
+        if (t1.ordinal() > t2.ordinal()) {
+            TypeClass tmp = t1;
+            t1 = t2;
+            t2 = tmp;
         }
 
         if (t1 == TypeClass.ANY) {
-            type = t2;
-            return true;
+            return t2;
         } else if (t1 == TypeClass.NUMERIC &&
                 (t2 == TypeClass.INTEGER || t2 == TypeClass.FLOAT)) {
-            type = t2;
-            return true;
+            return t2;
         } else {
-            return false;
+            return null;
         }
     }
 

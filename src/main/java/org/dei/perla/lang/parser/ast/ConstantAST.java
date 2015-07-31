@@ -16,7 +16,7 @@ public final class ConstantAST extends ExpressionAST {
     public static final ConstantAST FALSE =
             new ConstantAST(null, TypeClass.BOOLEAN, LogicValue.FALSE);
     public static final ConstantAST NULL =
-            new ConstantAST(null, null, null);
+            new ConstantAST(null, TypeClass.ANY, null);
 
     private final TypeClass type;
     private final Object value;
@@ -37,7 +37,7 @@ public final class ConstantAST extends ExpressionAST {
 
     @Override
     public boolean inferType(TypeVariable type, ParseContext ctx) {
-        throw new RuntimeException("unimplemented");
+        return type.restrict(this.type);
     }
 
 }

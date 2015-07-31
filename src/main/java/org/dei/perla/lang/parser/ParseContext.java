@@ -1,6 +1,10 @@
 package org.dei.perla.lang.parser;
 
+import org.dei.perla.core.utils.Errors;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,14 +12,26 @@ import java.util.Map;
  */
 public final class ParseContext {
 
-    private final Map<String, TypeVariable> fieldTypes = new HashMap<>();
+    private final Errors err = new Errors();
 
-    private void setFieldType(String id, TypeVariable type) {
-        fieldTypes.put(id, type);
-    }
+    private final Map<String, List<TypeVariable>> fieldTypes = new HashMap<>();
 
-    private TypeVariable getFieldType(String id) {
-        return fieldTypes.get(id);
+    public boolean setFieldType(String id, TypeVariable type) {
+        List<TypeVariable> tl = fieldTypes.get(id);
+        if (tl == null) {
+            tl = new ArrayList<>();
+            tl.add(type);
+            fieldTypes.put(id, tl);
+            return true;
+        }
+
+        for (TypeVariable t : tl) {
+            if (!TypeVariable.merge(t, type)) {
+                throw new RuntimeException("missing error management");
+            }
+        }
+        tl.add(type);
+        return true;
     }
 
 }

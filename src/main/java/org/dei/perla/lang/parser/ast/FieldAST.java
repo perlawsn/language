@@ -22,7 +22,7 @@ public final class FieldAST extends ExpressionAST {
 
     @Override
     public boolean inferType(TypeVariable type, ParseContext ctx) {
-        throw new RuntimeException("unimplemented");
+        return ctx.setFieldType(identifier, type);
     }
 
 }
