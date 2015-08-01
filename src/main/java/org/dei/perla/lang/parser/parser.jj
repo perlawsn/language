@@ -130,9 +130,6 @@ TOKEN :
 TOKEN :
 {
     < KEYWORD_SELECT:    "SELECT"   >
-    |
-    // Virtual record field created by the GROUP BY clause
-    <KEYWORD_GROUPTS:    "GROUP_TS" >
 }
 
 /*
@@ -1728,9 +1725,6 @@ ExpressionAST PrimaryExpression() :
         { return e; }
         ")"
     )
-    |
-    t = <KEYWORD_GROUPTS>
-    { return new GroupTSAST(t); }
     |
     e = Aggregate()
     { return e; }
