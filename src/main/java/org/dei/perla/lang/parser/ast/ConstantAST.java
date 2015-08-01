@@ -23,7 +23,7 @@ public final class ConstantAST extends ExpressionAST {
     private final TypeClass type;
     private final Object value;
 
-    protected ConstantAST(TypeClass type, Object value) {
+    public ConstantAST(TypeClass type, Object value) {
         super();
         this.type = type;
         this.value = value;
@@ -46,6 +46,16 @@ public final class ConstantAST extends ExpressionAST {
     @Override
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
         return bound.restrict(this.type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ConstantAST)) {
+            return false;
+        }
+
+        ConstantAST oc = (ConstantAST) o;
+        return oc.type == type && oc.value.equals(value);
     }
 
 }

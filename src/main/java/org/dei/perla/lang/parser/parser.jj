@@ -1486,7 +1486,7 @@ ExpressionAST Is(ExpressionAST e) :
     )
     {
         if (invert) {
-            is = new BoolNotAST(t, e);
+            is = new BoolNotAST(t, is);
         }
         return is;
     }

@@ -21,15 +21,15 @@ public final class BetweenAST extends ExpressionAST {
         this.max = max;
     }
 
-    private ExpressionAST getOperand() {
+    public ExpressionAST getOperand() {
         return operand;
     }
 
-    private ExpressionAST getMin() {
+    public ExpressionAST getMin() {
         return min;
     }
 
-    private ExpressionAST getMax() {
+    public ExpressionAST getMax() {
         return max;
     }
 

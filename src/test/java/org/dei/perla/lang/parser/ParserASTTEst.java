@@ -2,11 +2,8 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
-import org.dei.perla.lang.parser.ast.ConstantAST;
-import org.dei.perla.lang.query.expression.AggregateOperation;
-import org.dei.perla.lang.query.expression.ComparisonOperation;
-import org.dei.perla.lang.query.expression.LogicValue;
+import org.dei.perla.lang.parser.ast.*;
+import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
 import org.dei.perla.lang.query.statement.WindowSize.WindowType;
 import org.junit.Test;
@@ -296,6 +293,249 @@ public class ParserASTTEst {
     ///////////////////////////////////////////////
     // Expressions
     ///////////////////////////////////////////////
+
+    @Test
+    public void testBoolean() throws Exception {
+        ParserAST p = getParser("true or false");
+        BoolAST b = (BoolAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BoolOperation.OR));
+        assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
+        assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("true and false");
+        b = (BoolAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BoolOperation.AND));
+        assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
+        assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("true xor false");
+        b = (BoolAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BoolOperation.XOR));
+        assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
+        assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("not true");
+        BoolNotAST not = (BoolNotAST) p.Expression();
+        assertThat(not.getOperand(), equalTo(ConstantAST.TRUE));
+    }
+
+    @Test
+    public void testIs() throws Exception {
+        ParserAST p = getParser("true is unknown");
+        IsAST is = (IsAST) p.Expression();
+        assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
+        assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
+
+        p = getParser("true is not unknown");
+        BoolNotAST b = (BoolNotAST) p.Expression();
+        is = (IsAST) ((BoolNotAST) b).getOperand();
+        assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
+        assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
+    }
+
+    @Test
+    public void testIsNull() throws Exception {
+        ParserAST p = getParser("true is null");
+        IsNullAST is = (IsNullAST) p.Expression();
+        assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
+
+        p = getParser("true is not null");
+        BoolNotAST b = (BoolNotAST) p.Expression();
+        is = (IsNullAST) b.getOperand();
+        assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
+    }
+
+    @Test
+    public void testLike() throws Exception {
+        ParserAST p = getParser("'test' like 'te?t'");
+        LikeAST l = (LikeAST) p.Expression();
+        assertThat(l.getOperand(),
+                equalTo(new ConstantAST(TypeClass.STRING, "test")));
+        assertThat(l.getPattern(), equalTo("te?t"));
+    }
+
+    @Test
+    public void testBetween() throws Exception {
+        ParserAST p = getParser("5 between 12 and 32");
+        BetweenAST b = (BetweenAST) p.Expression();
+        assertThat(b.getOperand(), equalTo(
+                new ConstantAST(TypeClass.INTEGER, 5)));
+        assertThat(b.getMin(), equalTo(
+                new ConstantAST(TypeClass.INTEGER, 12)));
+        assertThat(b.getMax(), equalTo(
+                new ConstantAST(TypeClass.INTEGER, 32)));
+    }
+
+    @Test
+    public void testComparison() throws Exception {
+        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 5);
+        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+
+        ParserAST p = getParser("5 = 12");
+        ComparisonAST c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.EQ));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 != 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.NE));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 <> 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.NE));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 > 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.GT));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 >= 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.GE));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 < 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.LT));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+
+        p = getParser("5 <= 12");
+        c = (ComparisonAST) p.Expression();
+        assertThat(c.getOperation(), equalTo(ComparisonOperation.LE));
+        assertThat(c.getLeftOperand(), equalTo(op1));
+        assertThat(c.getRightOperand(), equalTo(op2));
+    }
+
+    @Test
+    public void testBitwise() throws Exception {
+        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 43);
+        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+
+        ParserAST p = getParser("43 | 12");
+        BitwiseAST b = (BitwiseAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BitwiseOperation.OR));
+        assertThat(b.getLeftOperand(), equalTo(op1));
+        assertThat(b.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 & 12");
+        b = (BitwiseAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BitwiseOperation.AND));
+        assertThat(b.getLeftOperand(), equalTo(op1));
+        assertThat(b.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 ^ 12");
+        b = (BitwiseAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BitwiseOperation.XOR));
+        assertThat(b.getLeftOperand(), equalTo(op1));
+        assertThat(b.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 >> 12");
+        b = (BitwiseAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BitwiseOperation.RSH));
+        assertThat(b.getLeftOperand(), equalTo(op1));
+        assertThat(b.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 << 12");
+        b = (BitwiseAST) p.Expression();
+        assertThat(b.getOperation(), equalTo(BitwiseOperation.LSH));
+        assertThat(b.getLeftOperand(), equalTo(op1));
+        assertThat(b.getRightOperand(), equalTo(op2));
+
+        p = getParser("~43");
+        BitwiseNotAST bn = (BitwiseNotAST) p.Expression();
+        assertThat(bn.getOperand(), equalTo(op1));
+    }
+
+    @Test
+    public void testArithmetic() throws Exception {
+        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 43);
+        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+
+        ParserAST p = getParser("43 + 12");
+        ArithmeticAST a = (ArithmeticAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(ArithmeticOperation.ADDITION));
+        assertThat(a.getLeftOperand(), equalTo(op1));
+        assertThat(a.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 - 12");
+        a = (ArithmeticAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(ArithmeticOperation.SUBTRACTION));
+        assertThat(a.getLeftOperand(), equalTo(op1));
+        assertThat(a.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 * 12");
+        a = (ArithmeticAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(ArithmeticOperation.PRODUCT));
+        assertThat(a.getLeftOperand(), equalTo(op1));
+        assertThat(a.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 / 12");
+        a = (ArithmeticAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(ArithmeticOperation.DIVISION));
+        assertThat(a.getLeftOperand(), equalTo(op1));
+        assertThat(a.getRightOperand(), equalTo(op2));
+
+        p = getParser("43 % 12");
+        a = (ArithmeticAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(ArithmeticOperation.MODULO));
+        assertThat(a.getLeftOperand(), equalTo(op1));
+        assertThat(a.getRightOperand(), equalTo(op2));
+
+        p = getParser("-43");
+        ArithmeticInverseAST inv = (ArithmeticInverseAST) p.Expression();
+        assertThat(inv.getOperand(), equalTo(op1));
+    }
+
+    @Test
+    public void testAggregate() throws Exception {
+        WindowSize ws = new WindowSize(Duration.ofSeconds(3));
+
+        ParserAST p = getParser("count(*, 3 seconds, false)");
+        AggregateAST a = (AggregateAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(AggregateOperation.COUNT));
+        assertThat(a.getWindowSize(), equalTo(ws));
+        assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("sum(temperature, 3 seconds, false)");
+        a = (AggregateAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
+        AttributeReferenceAST att = (AttributeReferenceAST) a.getOperand();
+        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getWindowSize(), equalTo(ws));
+        assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("max(temperature, 3 seconds, false)");
+        a = (AggregateAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(AggregateOperation.MAX));
+        att = (AttributeReferenceAST) a.getOperand();
+        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getWindowSize(), equalTo(ws));
+        assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("min(temperature, 3 seconds, false)");
+        a = (AggregateAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(AggregateOperation.MIN));
+        att = (AttributeReferenceAST) a.getOperand();
+        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getWindowSize(), equalTo(ws));
+        assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
+
+        p = getParser("avg(temperature, 3 seconds, false)");
+        a = (AggregateAST) p.Expression();
+        assertThat(a.getOperation(), equalTo(AggregateOperation.AVG));
+        att = (AttributeReferenceAST) a.getOperand();
+        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getWindowSize(), equalTo(ws));
+        assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
+    }
 
     @Test
     public void testConstantAST() throws Exception {
