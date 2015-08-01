@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 import org.dei.perla.lang.parser.ast.ConstantAST;
 import org.dei.perla.lang.query.expression.AggregateOperation;
 import org.dei.perla.lang.query.expression.ComparisonOperation;
@@ -26,6 +27,10 @@ public class ParserASTTEst {
     private static ParserAST getParser(String s) {
         return new ParserAST(new StringReader(s));
     }
+
+    ///////////////////////////////////////////////
+    // MISC
+    ///////////////////////////////////////////////
 
     @Test
     public void testSign() throws Exception {
@@ -75,29 +80,6 @@ public class ParserASTTEst {
         ParserAST p = getParser("3");
         int i = p.ConstantInteger();
         assertThat(i, equalTo(3));
-    }
-
-    @Test
-    public void testConstantAST() throws Exception {
-        ParserAST p = getParser("34");
-        ConstantAST c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.INTEGER));
-        assertThat(c.getValue(), equalTo(34));
-
-        p = getParser("3.1415");
-        c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.FLOAT));
-        assertThat(c.getValue(), equalTo(3.1415f));
-
-        p = getParser("'test'");
-        c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.STRING));
-        assertThat(c.getValue(), equalTo("test"));
-
-        p = getParser("TRUE");
-        c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.BOOLEAN));
-        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
     @Test
@@ -309,6 +291,46 @@ public class ParserASTTEst {
         p = getParser(t2);
         s = p.Identifier();
         assertThat(s, equalTo(t2));
+    }
+
+    ///////////////////////////////////////////////
+    // Expressions
+    ///////////////////////////////////////////////
+
+    @Test
+    public void testConstantAST() throws Exception {
+        ParserAST p = getParser("34");
+        ConstantAST c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getValue(), equalTo(34));
+
+        p = getParser("3.1415");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.FLOAT));
+        assertThat(c.getValue(), equalTo(3.1415f));
+
+        p = getParser("'test'");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.STRING));
+        assertThat(c.getValue(), equalTo("test"));
+
+        p = getParser("TRUE");
+        c = p.Constant();
+        assertThat(c.getType(), equalTo(TypeClass.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+    }
+
+    @Test
+    public void testAttributeReferenceAST() throws Exception {
+        ParserAST p = getParser("temperature");
+        AttributeReferenceAST a = p.AttributeReference();
+        assertThat(a.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getType().getTypeClass(), equalTo(TypeClass.ANY));
+
+        p = getParser("temperature: float");
+        a = p.AttributeReference();
+        assertThat(a.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getType().getTypeClass(), equalTo(TypeClass.FLOAT));
     }
 
 }

@@ -11,6 +11,12 @@ public abstract class BinaryExpressionAST extends ExpressionAST {
     protected final ExpressionAST left;
     protected final ExpressionAST right;
 
+    public BinaryExpressionAST(ExpressionAST left, ExpressionAST right) {
+        super();
+        this.left = left;
+        this.right = right;
+    }
+
     public BinaryExpressionAST(Token token, ExpressionAST left,
             ExpressionAST right) {
         super(token);
