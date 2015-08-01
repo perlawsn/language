@@ -78,7 +78,7 @@ public class ParserASTTEst {
     }
 
     @Test
-    public void testConstant() throws Exception {
+    public void testConstantAST() throws Exception {
         ParserAST p = getParser("34");
         ConstantAST c = p.Constant();
         assertThat(c.getType(), equalTo(TypeClass.INTEGER));

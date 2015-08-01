@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.lang.parser.ParseContext;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 
@@ -12,7 +12,7 @@ import org.dei.perla.lang.parser.TypeVariable;
  */
 public abstract class ExpressionAST extends NodeAST {
 
-    protected ExpressionAST() {
+    public ExpressionAST() {
         super();
     }
 
@@ -23,14 +23,14 @@ public abstract class ExpressionAST extends NodeAST {
     /**
      * Traverses the expression tree to infer the data type of the fields.
      * Type errors and inconsistencies are reported through the {@link Errors}
-     * object in the {@link ParseContext}.
+     * object in the {@link ParserContext}.
      *
-     * @param type type constraint, designates the desired type (or type
+     * @param bound type constraint, designates the desired type (or type
      *             class) of the expression being analyzed. This information is
      *             used by the inference algorithm to perform the type analysis.
      * @param ctx context object used to store intermediate results and errors
      * @return true if no type errors were found, false otherwise.
      */
-    public abstract boolean inferType(TypeVariable type, ParseContext ctx);
+    public abstract boolean inferType(TypeVariable bound, ParserContext ctx);
 
 }

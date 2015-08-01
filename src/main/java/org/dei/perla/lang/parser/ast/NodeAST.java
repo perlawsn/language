@@ -17,7 +17,7 @@ public abstract class NodeAST {
      * Empty constructor, employed in test cases and private internal
      * constructor (see {@link ConstantAST} for a usage example).
      */
-    protected NodeAST() {
+    public NodeAST() {
         column = -1;
         line = -1;
     }
@@ -31,6 +31,17 @@ public abstract class NodeAST {
     public NodeAST(Token token) {
         this.column = token.beginColumn;
         this.line = token.beginLine;
+    }
+
+    /**
+     * Returns a textual representation of the position of this AST node
+     * inside the original source code.
+     *
+     * @return textual representation of the node position inside the source
+     * code
+     */
+    public String getPosition() {
+        return "column " + column + ", line " + line;
     }
 
 }

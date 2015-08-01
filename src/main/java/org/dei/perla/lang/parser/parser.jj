@@ -1714,7 +1714,6 @@ ExpressionAST ArithmeticFactor() :
 
 ExpressionAST PrimaryExpression() :
 {
-    String id;
     ExpressionAST e;
 
     Token t = null;
@@ -1736,8 +1735,25 @@ ExpressionAST PrimaryExpression() :
     e = Aggregate()
     { return e; }
     |
-    id = Identifier() // FPC attribute
-    { return new FieldAST(token, id); }
+    e = AttributeReference()
+    { return e; }
+}
+
+AttributeReferenceAST AttributeReference() :
+{
+    String id;
+    TypeClass type = TypeClass.ANY;
+
+    Token t;
+}
+{
+    id = Identifier()
+    { t = token; }
+    [
+        ":"
+        type = TypeClass()
+    ]
+    { return new AttributeReferenceAST(token, id, type); }
 }
 
 ExpressionAST Aggregate() :

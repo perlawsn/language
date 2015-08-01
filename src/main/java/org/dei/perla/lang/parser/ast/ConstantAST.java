@@ -1,12 +1,14 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.lang.parser.ParseContext;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.LogicValue;
 
 /**
+ * A constant value in the Abstract Syntax Tree.
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class ConstantAST extends ExpressionAST {
@@ -42,8 +44,8 @@ public final class ConstantAST extends ExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable type, ParseContext ctx) {
-        return type.restrict(this.type);
+    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+        return bound.restrict(this.type);
     }
 
 }

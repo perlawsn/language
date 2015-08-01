@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.lang.parser.ParseContext;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.LogicValue;
@@ -22,7 +22,7 @@ public final class IsAST extends UnaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable type, ParseContext ctx) {
+    public boolean inferType(TypeVariable bound, ParserContext ctx) {
         throw new RuntimeException("unimplemented");
     }
 

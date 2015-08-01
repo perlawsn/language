@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.lang.parser.ParseContext;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.BitwiseOperation;
@@ -25,12 +25,12 @@ public final class BitwiseAST extends BinaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable type, ParseContext ctx) {
-        if (!type.restrict(TypeClass.BOOLEAN)) {
+    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+        if (!bound.restrict(TypeClass.BOOLEAN)) {
             throw new RuntimeException("add error");
         }
 
-        return left.inferType(type, ctx) & right.inferType(type, ctx);
+        return left.inferType(bound, ctx) & right.inferType(bound, ctx);
     }
 
 }
