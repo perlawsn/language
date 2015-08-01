@@ -422,31 +422,4 @@ public class MiscTest {
         assertThat(incomplete.run(null, null), nullValue());
     }
 
-    @Test
-    public void groupTSTest() {
-        Errors err = new Errors();
-        List<Attribute> ra = Arrays.asList(new Attribute[]{
-                Attribute.TIMESTAMP,
-                intAtt
-        });
-        Buffer b = new ArrayBuffer(atts, 1);
-        b.add(new Object[]{Instant.now(), 1});
-        b.add(new Object[]{Instant.now(), 2});
-        BufferView view = b.unmodifiableView();
-
-        Expression gts = new GroupTS();
-        assertFalse(gts.isComplete());
-        assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
-        assertThat(gts.run(null, null), nullValue());
-
-        List<Attribute> bound = new ArrayList<>();
-        gts = gts.bind(atts, bound, err);
-        assertTrue(err.isEmpty());
-        assertThat(bound.size(), equalTo(1));
-        assertTrue(bound.contains(Attribute.TIMESTAMP));
-        assertTrue(gts.isComplete());
-        assertThat(gts.getType(), equalTo(DataType.TIMESTAMP));
-        assertThat(gts.run(null, view), equalTo(view.get(0)[0]));
-    }
-
 }

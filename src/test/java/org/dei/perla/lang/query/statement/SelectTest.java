@@ -351,24 +351,4 @@ public class SelectTest {
         assertThat(r[1], equalTo(def[1]));
     }
 
-    @Test
-    public void groupByTimestamp() throws InterruptedException {
-        Errors err = new Errors();
-        List<Expression> fields = new ArrayList<>();
-        fields.add(tsExpr);
-        fields.add(new GroupTS());
-        fields.add(intExpr);
-
-        GroupBy group = new GroupBy(Duration.ofSeconds(1), 3);
-        Select sel = new Select(fields, WindowSize.ONE, group,
-                Constant.TRUE, new Object[0]);
-        assertFalse(sel.isComplete());
-        sel = sel.bind(atts, atts, err);
-        assertTrue(err.isEmpty());
-        assertTrue(sel.isComplete());
-        List<Object[]> samples = sel.select(view);
-
-        assertThat(samples.size(), equalTo(3));
-    }
-
 }
