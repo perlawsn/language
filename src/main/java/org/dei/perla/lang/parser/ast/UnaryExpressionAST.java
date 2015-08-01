@@ -9,6 +9,10 @@ public abstract class UnaryExpressionAST extends ExpressionAST {
 
     protected final ExpressionAST operand;
 
+    public UnaryExpressionAST(ExpressionAST operand) {
+        this.operand = operand;
+    }
+
     public UnaryExpressionAST(Token token, ExpressionAST operand) {
         super(token);
         this.operand = operand;

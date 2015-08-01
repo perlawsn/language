@@ -8,11 +8,20 @@ import org.dei.perla.lang.query.expression.BitwiseOperation;
 
 
 /**
+ * A bitwise operation with 2 operands. The bitwise complement operation is
+ * represented in the Abstract Syntax Tree using the {@link BitwiseNotAST} class.
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class BitwiseAST extends BinaryExpressionAST {
 
     private final BitwiseOperation op;
+
+    public BitwiseAST(BitwiseOperation op, ExpressionAST left,
+            ExpressionAST right) {
+        super(left, right);
+        this.op = op;
+    }
 
     public BitwiseAST(Token token, BitwiseOperation op,
             ExpressionAST left, ExpressionAST right) {
@@ -26,11 +35,15 @@ public final class BitwiseAST extends BinaryExpressionAST {
 
     @Override
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
-        if (!bound.restrict(TypeClass.BOOLEAN)) {
-            throw new RuntimeException("add error");
+        boolean res = bound.restrict(TypeClass.INTEGER);
+        if (!res) {
+            String msg = typeErrorString(op.name(), getPosition(),
+                    bound.getTypeClass(), TypeClass.INTEGER);
+            ctx.addError(msg);
+            return false;
         }
 
-        return left.inferType(bound, ctx) & right.inferType(bound, ctx);
+        return left.inferType(bound, ctx) && right.inferType(bound, ctx);
     }
 
 }
