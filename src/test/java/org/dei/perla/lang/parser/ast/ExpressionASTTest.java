@@ -395,4 +395,21 @@ public class ExpressionASTTest {
         assertFalse(a.inferType(v, ctx));
     }
 
+    @Test
+    public void testInference() {
+        ExpressionAST op1 = new ConstantAST(TypeClass.INTEGER, "3");
+        ExpressionAST op2 = new AttributeReferenceAST("integer", TypeClass.ANY);
+        ExpressionAST e =
+                new ArithmeticAST(ArithmeticOperation.ADDITION, op1, op2);
+
+        ParserContext ctx = new ParserContext();
+        TypeVariable v = new TypeVariable(TypeClass.ANY);
+        assertTrue(e.inferType(v, ctx));
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(v.getTypeClass(), equalTo(TypeClass.INTEGER));
+
+        Map<String, TypeClass> tm = ctx.getAttributeTypes();
+        assertThat(tm.get("integer"), equalTo(TypeClass.INTEGER));
+    }
+
 }
