@@ -23,6 +23,15 @@ public abstract class ExpressionAST extends NodeAST {
         super(token);
     }
 
+    /**
+     * Sets the {@link TypeVariable} associated with this expression node. It
+     * is the implementation's responsibility to check that the {@link
+     * TypeClass} associated with the type variable is consistend with the
+     * output type of the operation.
+     *
+     * @param type type variable linked to this node
+     * @throws IllegalStateException if the method is called more than once
+     */
     protected void setType(TypeVariable type) {
         if (this.type != null) {
             throw new IllegalStateException("Type has already been set");
@@ -30,6 +39,12 @@ public abstract class ExpressionAST extends NodeAST {
         this.type = type;
     }
 
+    /**
+     * Returns the output type of the expression node
+     *
+     * @return output type of the expression node
+     * @throws IllegalStateException if no type variable is set
+     */
     public TypeClass getTypeClass() {
         if (type == null) {
             throw new IllegalStateException("Cannot return, no type set");

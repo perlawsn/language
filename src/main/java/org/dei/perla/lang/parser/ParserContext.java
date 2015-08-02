@@ -50,14 +50,13 @@ public final class ParserContext {
         }
 
         boolean clean = true;
-        TypeVariable curr = att.getTypeVariable();
-        for (AttributeReferenceAST t : usages) {
-            TypeVariable prev = t.getTypeVariable();
-            if (!TypeVariable.merge(curr, prev)) {
+        for (AttributeReferenceAST ot : usages) {
+            if (!att.mergeTypes(ot)) {
                 String msg = "Incompatible type for attribute '" + id + "': " +
                         "usage at " + att.getPosition() + " of type '" +
-                        curr + "' is not compatible with previous usage of " +
-                        "type '" + prev + "'.";
+                        att.getTypeClass() + "' is not compatible with " +
+                        "previous usage of type '" + ot.getTypeClass()  + "' " +
+                        "at " + ot.getPosition() + ".";
                 err.addError(msg);
                 clean = false;
             }

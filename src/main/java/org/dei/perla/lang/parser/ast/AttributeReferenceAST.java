@@ -42,8 +42,20 @@ public final class AttributeReferenceAST extends ExpressionAST {
         return type.getTypeClass();
     }
 
-    public TypeVariable getTypeVariable() {
-        return type;
+    /**
+     * Merges the type of this attribute reference with the type of another
+     * attribute reference. This method is intended to be used by the {@link
+     * ParserContext} during the type inference process.
+     *
+     * @param other object to merge with
+     * @return true if the merge was successful, false if the type of the
+     * other {@code AttributeReferenceAST} is not compatible with this
+     * reference's type.
+     */
+    public boolean mergeTypes(AttributeReferenceAST other) {
+        TypeVariable t1 = type;
+        TypeVariable t2 = other.type;
+        return TypeVariable.merge(t1, t2);
     }
 
     @Override
