@@ -541,22 +541,22 @@ public class ParserASTTEst {
     public void testConstantAST() throws Exception {
         ParserAST p = getParser("34");
         ConstantAST c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(c.getValue(), equalTo(34));
 
         p = getParser("3.1415");
         c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.FLOAT));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.FLOAT));
         assertThat(c.getValue(), equalTo(3.1415f));
 
         p = getParser("'test'");
         c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.STRING));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.STRING));
         assertThat(c.getValue(), equalTo("test"));
 
         p = getParser("TRUE");
         c = p.Constant();
-        assertThat(c.getType(), equalTo(TypeClass.BOOLEAN));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
@@ -565,12 +565,12 @@ public class ParserASTTEst {
         ParserAST p = getParser("temperature");
         AttributeReferenceAST a = p.AttributeReference();
         assertThat(a.getIdentifier(), equalTo("temperature"));
-        assertThat(a.getType().getTypeClass(), equalTo(TypeClass.ANY));
+        assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
 
         p = getParser("temperature: float");
         a = p.AttributeReference();
         assertThat(a.getIdentifier(), equalTo("temperature"));
-        assertThat(a.getType().getTypeClass(), equalTo(TypeClass.FLOAT));
+        assertThat(a.getTypeClass(), equalTo(TypeClass.FLOAT));
     }
 
 }

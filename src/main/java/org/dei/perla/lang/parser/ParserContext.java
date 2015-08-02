@@ -4,7 +4,10 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -47,9 +50,9 @@ public final class ParserContext {
         }
 
         boolean clean = true;
-        TypeVariable curr = att.getType();
+        TypeVariable curr = att.getTypeVariable();
         for (AttributeReferenceAST t : usages) {
-            TypeVariable prev = t.getType();
+            TypeVariable prev = t.getTypeVariable();
             if (!TypeVariable.merge(curr, prev)) {
                 String msg = "Incompatible type for attribute '" + id + "': " +
                         "usage at " + att.getPosition() + " of type '" +
@@ -75,7 +78,7 @@ public final class ParserContext {
             // All the FieldAST inside the field's list are guaranteed
             // to be of the same TypeClass if no type errors were found.
             // Hence, we can just retrieve the first one.
-            fm.put(id, fl.get(0).getType().getTypeClass());
+            fm.put(id, fl.get(0).getTypeClass());
         }
         return fm;
     }

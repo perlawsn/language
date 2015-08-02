@@ -31,7 +31,18 @@ public final class AttributeReferenceAST extends ExpressionAST {
         return id;
     }
 
-    public TypeVariable getType() {
+    @Override
+    protected void setType(TypeVariable type) {
+        throw new IllegalStateException(
+                "Cannot set type to AttributeReferenceAST node");
+    }
+
+    @Override
+    public TypeClass getTypeClass() {
+        return type.getTypeClass();
+    }
+
+    public TypeVariable getTypeVariable() {
         return type;
     }
 

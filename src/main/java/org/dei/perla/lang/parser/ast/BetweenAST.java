@@ -53,6 +53,7 @@ public final class BetweenAST extends ExpressionAST {
             ctx.addError(msg);
             return false;
         }
+        setType(bound);
 
         TypeVariable newBound = new TypeVariable(TypeClass.ANY);
         res = operand.inferType(newBound, ctx) && min.inferType(newBound, ctx)

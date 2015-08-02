@@ -30,15 +30,16 @@ public final class LikeAST extends UnaryExpressionAST {
 
     @Override
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.STRING);
+        boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("LIKE", getPosition(),
-                    bound.getTypeClass(), TypeClass.STRING);
+                    bound.getTypeClass(), TypeClass.BOOLEAN);
             ctx.addError(msg);
             return false;
         }
-
-        return operand.inferType(bound, ctx);
+        setType(bound);
+        TypeVariable newBound = new TypeVariable(TypeClass.STRING);
+        return operand.inferType(newBound, ctx);
     }
 
 }

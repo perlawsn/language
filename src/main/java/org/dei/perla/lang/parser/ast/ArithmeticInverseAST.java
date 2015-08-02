@@ -29,7 +29,7 @@ public final class ArithmeticInverseAST extends UnaryExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         return operand.inferType(bound, ctx);
     }
 

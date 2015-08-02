@@ -38,7 +38,7 @@ public final class IsAST extends UnaryExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         return operand.inferType(bound, ctx);
     }
 

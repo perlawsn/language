@@ -35,7 +35,13 @@ public final class ConstantAST extends ExpressionAST {
         this.value = value;
     }
 
-    public TypeClass getType() {
+    @Override
+    protected void setType(TypeVariable type) {
+        throw new IllegalStateException("Cannot set type to ConstantAST node");
+    }
+
+    @Override
+    public TypeClass getTypeClass() {
         return type;
     }
 

@@ -1,13 +1,14 @@
 package org.dei.perla.lang.parser;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
-
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 import org.junit.Test;
 
 import java.util.Map;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 01/08/15.
@@ -42,28 +43,28 @@ public class ParseContextTest {
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getType().getTypeClass(), equalTo(TypeClass.ANY));
+        assertThat(ar0.getTypeClass(), equalTo(TypeClass.ANY));
 
         res = ctx.addAttributeReference(ar1);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getType().getTypeClass(), equalTo(TypeClass.NUMERIC));
-        assertThat(ar1.getType().getTypeClass(), equalTo(TypeClass.NUMERIC));
+        assertThat(ar0.getTypeClass(), equalTo(TypeClass.NUMERIC));
+        assertThat(ar1.getTypeClass(), equalTo(TypeClass.NUMERIC));
 
         res = ctx.addAttributeReference(ar2);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar1.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar2.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar0.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar1.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar2.getTypeClass(), equalTo(TypeClass.INTEGER));
 
         res = ctx.addAttributeReference(ar3);
         assertFalse(res);
         assertThat(ctx.getErrorCount(), greaterThan(0));
-        assertThat(ar0.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar1.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar2.getType().getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar3.getType().getTypeClass(), equalTo(TypeClass.FLOAT));
+        assertThat(ar0.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar1.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar2.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar3.getTypeClass(), equalTo(TypeClass.FLOAT));
     }
 
     @Test

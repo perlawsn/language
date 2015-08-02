@@ -13,12 +13,28 @@ import org.dei.perla.lang.parser.TypeVariable;
  */
 public abstract class ExpressionAST extends NodeAST {
 
+    private TypeVariable type;
+
     public ExpressionAST() {
         super();
     }
 
     public ExpressionAST(Token token) {
         super(token);
+    }
+
+    protected void setType(TypeVariable type) {
+        if (this.type != null) {
+            throw new IllegalStateException("Type has already been set");
+        }
+        this.type = type;
+    }
+
+    public TypeClass getTypeClass() {
+        if (type == null) {
+            throw new IllegalStateException("Cannot return, no type set");
+        }
+        return type.getTypeClass();
     }
 
     /**

@@ -40,7 +40,7 @@ public final class BoolAST extends BinaryExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         return left.inferType(bound, ctx) && right.inferType(bound, ctx);
     }
 

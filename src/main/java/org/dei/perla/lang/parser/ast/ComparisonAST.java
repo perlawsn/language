@@ -40,7 +40,7 @@ public final class ComparisonAST extends BinaryExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         TypeVariable newBound = new TypeVariable(TypeClass.ANY);
         return left.inferType(newBound, ctx) && right.inferType(newBound, ctx);
     }

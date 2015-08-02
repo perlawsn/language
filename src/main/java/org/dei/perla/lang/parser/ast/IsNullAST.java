@@ -29,7 +29,7 @@ public final class IsNullAST extends UnaryExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         return operand.inferType(new TypeVariable(TypeClass.ANY), ctx);
     }
 

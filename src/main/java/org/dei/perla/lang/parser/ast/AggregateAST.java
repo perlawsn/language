@@ -66,7 +66,7 @@ public final class AggregateAST extends ExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         res = operand.inferType(bound, ctx);
         TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
         return res && filter.inferType(filterBound, ctx);
@@ -80,7 +80,7 @@ public final class AggregateAST extends ExpressionAST {
             ctx.addError(msg);
             return false;
         }
-
+        setType(bound);
         TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
         return filter.inferType(filterBound, ctx);
     }
