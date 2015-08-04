@@ -55,25 +55,25 @@ public final class ArithmeticAST extends BinaryExpressionAST {
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
         Expression leftExp = left.compile(ctx, atts);
         Expression rightExp = right.compile(ctx, atts);
-        DataType resType = getTypeClass().toDataType();
+        DataType opType = getTypeClass().toDataType();
 
         if (leftExp instanceof Constant && rightExp instanceof Constant) {
             Object o1 = ((Constant) leftExp).getValue();
             Object o2 = ((Constant) rightExp).getValue();
             Object value;
-            if (resType == DataType.INTEGER) {
+            if (opType == DataType.INTEGER) {
                 value = Arithmetic.computeInteger(op, o1, o2);
-            } else if (resType == DataType.FLOAT) {
+            } else if (opType == DataType.FLOAT) {
                 value = Arithmetic.computeFloat(op, o1, o2);
             } else {
                 throw new IllegalStateException("Illegal result type " +
-                        resType + " found while copiling ArithmeticAST to " +
+                        opType + " found while copiling ArithmeticAST to " +
                         "concrete Arithmetic expression node");
             }
-            return Constant.create(value, resType);
+            return Constant.create(value, opType);
         }
 
-        return new Arithmetic(op, leftExp, rightExp, resType);
+        return new Arithmetic(op, leftExp, rightExp, opType);
     }
 
 }

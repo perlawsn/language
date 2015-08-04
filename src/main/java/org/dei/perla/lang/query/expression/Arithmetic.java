@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 
 /**
@@ -30,16 +29,6 @@ public final class Arithmetic extends Expression {
         this.e1 = e1;
         this.e2 = e2;
         this.type = type;
-    }
-
-    /**
-     * Creates an arithmetic expression that inverts the sign of its operand.
-     * @param e operand
-     * @param err error tracking object
-     * @return an arithmetic expression that inverts the sign of its operand.
-     */
-    public static Expression createInverse(Expression e, Errors err) {
-        return Inverse.create(e, err);
     }
 
     public ArithmeticOperation getOperation() {

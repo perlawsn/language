@@ -42,14 +42,14 @@ public final class InverseAST extends UnaryExpressionAST {
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
         Expression opExp = operand.compile(ctx, atts);
-        DataType resType = getTypeClass().toDataType();
+        DataType opType = getTypeClass().toDataType();
 
         if (opExp instanceof Constant) {
             Object o = ((Constant) opExp).getValue();
-            return Constant.create(Inverse.compute(resType, o), resType);
+            return Constant.create(Inverse.compute(opType, o), opType);
         }
 
-        return new Inverse(opExp);
+        return new Inverse(opExp, opType);
     }
 
 }

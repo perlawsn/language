@@ -11,23 +11,25 @@ import org.dei.perla.lang.executor.buffer.BufferView;
 public final class Inverse extends Expression {
 
     private final Expression e;
+    private final DataType type;
 
     /**
      * Arithmetic sign inversion expression node constructor
      */
-    public Inverse(Expression e) {
+    public Inverse(Expression e, DataType type) {
         this.e = e;
+        this.type = type;
     }
 
     @Override
     public DataType getType() {
-        return e.getType();
+        return type;
     }
 
     @Override
     public Object run(Object[] sample, BufferView buffer) {
         Object o = e.run(sample, buffer);
-        return compute(e.getType(), o);
+        return compute(type, o);
     }
 
     public static Object compute(DataType type, Object o) {
