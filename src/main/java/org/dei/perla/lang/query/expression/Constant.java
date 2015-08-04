@@ -1,15 +1,11 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
- * A class representing an expression that returns a constant value
+ * A class representing an expression returning a constant value
+ *
  * @author Guido Rota 23/02/15.
  */
 public final class Constant extends Expression {
@@ -37,35 +33,19 @@ public final class Constant extends Expression {
     private final Object value;
     private final DataType type;
 
-    /**
-     * Private constructor, new {@code Constant} instances must be
-     * created using the static {@code create} method.
-     */
-    private Constant(Object value, DataType type) {
-        this.value = value;
-        this.type = type;
-    }
-
-    /**
-     * Creates a new {@code Constant} expression.
-     *
-     * @param value value of the constant
-     * @param type data type of the constant
-     * @return new constant expression
-     */
-    public static Expression create(Object value, DataType type) {
+    public static Constant create(Object value, DataType type) {
         if (value == null) {
-            return NULL;
+            return Constant.NULL;
         }
 
         if (type == DataType.BOOLEAN) {
             switch ((LogicValue) value) {
                 case TRUE:
-                    return TRUE;
+                    return Constant.TRUE;
                 case FALSE:
-                    return FALSE;
+                    return Constant.FALSE;
                 case UNKNOWN:
-                    return UNKNOWN;
+                    return Constant.UNKNOWN;
                 default:
                     throw new RuntimeException("unknown logic value " + value);
             }
@@ -74,15 +54,24 @@ public final class Constant extends Expression {
         if (type == DataType.INTEGER) {
             switch ((Integer) value) {
                 case 0:
-                    return INTEGER_0;
+                    return Constant.INTEGER_0;
                 case 1:
-                    return INTEGER_1;
+                    return Constant.INTEGER_1;
                 case 2:
-                    return INTEGER_2;
+                    return Constant.INTEGER_2;
             }
         }
 
         return new Constant(value, type);
+    }
+
+    /**
+     * Private Constant constructor. To create new Constant objects, use the
+     * static create method instead.
+     */
+    private Constant(Object value, DataType type) {
+        this.value = value;
+        this.type = type;
     }
 
     public Object getValue() {
@@ -92,17 +81,6 @@ public final class Constant extends Expression {
     @Override
     public DataType getType() {
         return type;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return true;
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        return this;
     }
 
     @Override

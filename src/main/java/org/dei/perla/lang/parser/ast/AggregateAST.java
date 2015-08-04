@@ -4,8 +4,10 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
-import org.dei.perla.lang.query.expression.AggregateOperation;
+import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
+
+import java.util.Map;
 
 /**
  * Aggregate Abstract Syntax Tree node
@@ -83,6 +85,30 @@ public final class AggregateAST extends ExpressionAST {
         setType(bound);
         TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
         return filter.inferType(filterBound, ctx);
+    }
+
+    @Override
+    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        Expression opExp = null;
+        if (operand != null) {
+            opExp = operand.compile(ctx, atts);
+        }
+        Expression filExp = filter.compile(ctx, atts);
+
+        switch (op) {
+            case AVG:
+                return new AvgAggregate(opExp, window, filExp);
+            case MIN:
+                return new MinAggregate(opExp, window, filExp);
+            case MAX:
+                return new MaxAggregate(opExp, window, filExp);
+            case SUM:
+                return new SumAggregate(opExp, window, filExp);
+            case COUNT:
+                return new CountAggregate(window, filExp);
+            default:
+                throw new RuntimeException("unknown aggregate " + op);
+        }
     }
 
 }

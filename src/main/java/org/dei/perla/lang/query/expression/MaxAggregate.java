@@ -1,14 +1,9 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * An {@code Expression} for determining the maximum value in a buffer.
@@ -18,48 +13,10 @@ import java.util.List;
 public final class MaxAggregate extends Aggregate {
 
     /**
-     * Private constructor, new {@code MaxAggregate} instances must be created
-     * using the static {@code create} method.
+     * Maximum aggregate expression node constructor
      */
-    private MaxAggregate(Expression e, WindowSize ws, Expression filter) {
+    public MaxAggregate(Expression e, WindowSize ws, Expression filter) {
         super(e, ws, filter);
-    }
-
-    /**
-     * Creates a new {@code MaxAggregate} expression node.
-     *
-     * @param e value
-     * @param ws portion of buffer to aggregate
-     * @param filter filtering expression to determine which samples must be
-     *               aggregated
-     * @param err error tracking object
-     * @return new {@code MaxAggregate} instance
-     */
-    public static Expression create(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        DataType t = e.getType();
-        if (t != null && t != DataType.INTEGER &&
-                t != DataType.FLOAT && t != DataType.TIMESTAMP) {
-            err.addError("Incompatible operand type: only float, integer and " +
-                    "timestampjexpressions are allowed in max aggregations");
-            return Constant.NULL;
-        }
-
-        if (filter.getType() != null &&
-                filter.getType() != DataType.BOOLEAN) {
-            err.addError("Aggregation filter must be of type boolean");
-            return Constant.NULL;
-        }
-
-        return new MaxAggregate(e, ws, filter);
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
-        Expression bf = filter.bind(atts, bound, err);
-        return create(be, ws, bf, err);
     }
 
     @Override

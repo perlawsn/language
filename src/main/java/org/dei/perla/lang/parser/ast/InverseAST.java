@@ -7,47 +7,49 @@ import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.IsNull;
-import org.dei.perla.lang.query.expression.LogicValue;
+import org.dei.perla.lang.query.expression.Inverse;
 
 import java.util.Map;
 
 /**
- * IS NULL Abstract Syntax Tree node
+ * Arithmetic inverse Abstract Syntax Tree node
  *
  * @author Guido Rota 30/07/15.
  */
-public final class IsNullAST extends UnaryExpressionAST {
+public final class InverseAST extends UnaryExpressionAST {
 
-    public IsNullAST(ExpressionAST operand) {
+    public InverseAST(ExpressionAST operand) {
         super(operand);
     }
 
-    public IsNullAST(Token token, ExpressionAST operand) {
+    public InverseAST(Token token, ExpressionAST operand) {
         super(token, operand);
     }
 
     @Override
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.BOOLEAN);
+        boolean res = bound.restrict(TypeClass.NUMERIC);
         if (!res) {
-            String msg = typeErrorString("IS NULL", getPosition(),
-                    bound.getTypeClass(), TypeClass.BOOLEAN);
+            String msg = typeErrorString("-", getPosition(),
+                    bound.getTypeClass(), TypeClass.NUMERIC);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
-        return operand.inferType(new TypeVariable(TypeClass.ANY), ctx);
+        return operand.inferType(bound, ctx);
     }
 
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
-        Expression e = operand.compile(null, atts);
-        if (e instanceof Constant) {
-            LogicValue l = IsNull.compute(((Constant) e).getValue());
-            return Constant.create(l, DataType.BOOLEAN);
+        Expression opExp = operand.compile(ctx, atts);
+        DataType resType = getTypeClass().toDataType();
+
+        if (opExp instanceof Constant) {
+            Object o = ((Constant) opExp).getValue();
+            return Constant.create(Inverse.compute(resType, o), resType);
         }
-        return new IsNull(e);
+
+        return new Inverse(opExp);
     }
 
 }

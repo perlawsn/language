@@ -4,6 +4,11 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.Field;
+
+import java.util.Map;
 
 /**
  * A reference to an {@link Fpc} attribute.
@@ -73,6 +78,25 @@ public final class AttributeReferenceAST extends ExpressionAST {
         }
 
         return res && ctx.addAttributeReference(this);
+    }
+
+    @Override
+    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        TypeClass tc = type.getTypeClass();
+        if (!tc.isConcrete()) {
+            String msg = "Cannot compile, attribute '" + id + "' at " +
+                    getPosition() + " of type class " + tc + " cannot map " +
+                    "to a concrete PerLa data type";
+            ctx.addError(msg);
+            return Constant.NULL;
+        }
+
+        Integer idx = atts.get(id);
+        if (idx == null) {
+            idx = atts.size();
+            atts.put(id, idx);
+        }
+        return new Field(id, tc.toDataType(), idx);
     }
 
 }

@@ -1,10 +1,16 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.Comparison;
 import org.dei.perla.lang.query.expression.ComparisonOperation;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
+
+import java.util.Map;
 
 /**
  * Comparison Abstract Syntax Tree node
@@ -43,6 +49,21 @@ public final class ComparisonAST extends BinaryExpressionAST {
         setType(bound);
         TypeVariable newBound = new TypeVariable(TypeClass.ANY);
         return left.inferType(newBound, ctx) && right.inferType(newBound, ctx);
+    }
+
+    @Override
+    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        Expression leftExp = left.compile(ctx, atts);
+        Expression rightExp = right.compile(ctx, atts);
+
+        if (leftExp instanceof Constant && rightExp instanceof Constant) {
+            Object o1 = ((Constant) leftExp).getValue();
+            Object o2 = ((Constant) rightExp).getValue();
+            Object value = Comparison.compute(op, o1, o2);
+            return Constant.create(value, DataType.BOOLEAN);
+        }
+
+        return new Comparison(op, leftExp, rightExp);
     }
 
 }

@@ -4,6 +4,9 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.Expression;
+
+import java.util.Map;
 
 /**
  * A generic expression node of the Abstract Syntax Tree. All concrete
@@ -79,10 +82,12 @@ public abstract class ExpressionAST extends NodeAST {
      */
     protected String typeErrorString(String operator, String position,
             TypeClass expected, TypeClass found) {
-        String msg = "Incompatible types: operator " + operator + " of" +
-                " type '" + found + "' found at " + position  + "where an " +
+        return "Incompatible types: operator " + operator + " of type '" +
+                found + "' found at " + position  + "where an " +
                 "operation of type '" + expected + "' was required.";
-        return msg;
     }
+
+    public abstract Expression compile(ParserContext ctx,
+            Map<String, Integer> atts);
 
 }

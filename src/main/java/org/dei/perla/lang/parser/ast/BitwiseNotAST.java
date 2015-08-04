@@ -1,9 +1,15 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.BitwiseNot;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
+
+import java.util.Map;
 
 /**
  * Bitwise complement Abstract Syntax Tree node
@@ -31,6 +37,18 @@ public final class BitwiseNotAST extends UnaryExpressionAST {
         }
         setType(bound);
         return operand.inferType(bound, ctx);
+    }
+
+    @Override
+    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        Expression opExp = operand.compile(ctx, atts);
+
+        if (opExp instanceof Constant) {
+            Object o = ((Constant) opExp).getValue();
+            return Constant.create(o, DataType.INTEGER);
+        }
+
+        return new BitwiseNot(opExp);
     }
 
 }

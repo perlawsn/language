@@ -315,7 +315,7 @@ public class ParserASTTEst {
         assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
 
         p = getParser("not true");
-        BoolNotAST not = (BoolNotAST) p.Expression();
+        NotAST not = (NotAST) p.Expression();
         assertThat(not.getOperand(), equalTo(ConstantAST.TRUE));
     }
 
@@ -327,8 +327,8 @@ public class ParserASTTEst {
         assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
 
         p = getParser("true is not unknown");
-        BoolNotAST b = (BoolNotAST) p.Expression();
-        is = (IsAST) ((BoolNotAST) b).getOperand();
+        NotAST b = (NotAST) p.Expression();
+        is = (IsAST) ((NotAST) b).getOperand();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
         assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
     }
@@ -340,7 +340,7 @@ public class ParserASTTEst {
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
 
         p = getParser("true is not null");
-        BoolNotAST b = (BoolNotAST) p.Expression();
+        NotAST b = (NotAST) p.Expression();
         is = (IsNullAST) b.getOperand();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
     }
@@ -350,7 +350,7 @@ public class ParserASTTEst {
         ParserAST p = getParser("'test' like 'te?t'");
         LikeAST l = (LikeAST) p.Expression();
         assertThat(l.getOperand(),
-                equalTo(new ConstantAST(TypeClass.STRING, "test")));
+                equalTo(new ConstantAST("test", TypeClass.STRING)));
         assertThat(l.getPattern(), equalTo("te?t"));
     }
 
@@ -359,17 +359,17 @@ public class ParserASTTEst {
         ParserAST p = getParser("5 between 12 and 32");
         BetweenAST b = (BetweenAST) p.Expression();
         assertThat(b.getOperand(), equalTo(
-                new ConstantAST(TypeClass.INTEGER, 5)));
+                new ConstantAST(5, TypeClass.INTEGER)));
         assertThat(b.getMin(), equalTo(
-                new ConstantAST(TypeClass.INTEGER, 12)));
+                new ConstantAST(12, TypeClass.INTEGER)));
         assertThat(b.getMax(), equalTo(
-                new ConstantAST(TypeClass.INTEGER, 32)));
+                new ConstantAST(32, TypeClass.INTEGER)));
     }
 
     @Test
     public void testComparison() throws Exception {
-        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 5);
-        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+        ConstantAST op1 = new ConstantAST(5, TypeClass.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
 
         ParserAST p = getParser("5 = 12");
         ComparisonAST c = (ComparisonAST) p.Expression();
@@ -416,8 +416,8 @@ public class ParserASTTEst {
 
     @Test
     public void testBitwise() throws Exception {
-        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 43);
-        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+        ConstantAST op1 = new ConstantAST(43, TypeClass.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
 
         ParserAST p = getParser("43 | 12");
         BitwiseAST b = (BitwiseAST) p.Expression();
@@ -456,8 +456,8 @@ public class ParserASTTEst {
 
     @Test
     public void testArithmetic() throws Exception {
-        ConstantAST op1 = new ConstantAST(TypeClass.INTEGER, 43);
-        ConstantAST op2 = new ConstantAST(TypeClass.INTEGER, 12);
+        ConstantAST op1 = new ConstantAST(43, TypeClass.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
 
         ParserAST p = getParser("43 + 12");
         ArithmeticAST a = (ArithmeticAST) p.Expression();
@@ -490,7 +490,7 @@ public class ParserASTTEst {
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("-43");
-        ArithmeticInverseAST inv = (ArithmeticInverseAST) p.Expression();
+        InverseAST inv = (InverseAST) p.Expression();
         assertThat(inv.getOperand(), equalTo(op1));
     }
 

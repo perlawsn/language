@@ -1,12 +1,7 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * An expression for evaluating if a value is null.
@@ -18,10 +13,9 @@ public final class IsNull extends Expression {
     private final Expression e;
 
     /**
-     * Private constructor, new {@code Inverse} instances must be
-     * created using the static {@code create} method.
+     * Creates a new IsNull expression node
      */
-    private IsNull(Expression e) {
+    public IsNull(Expression e) {
         this.e = e;
     }
 
@@ -48,20 +42,12 @@ public final class IsNull extends Expression {
     }
 
     @Override
-    public boolean isComplete() {
-        return e.isComplete();
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
-        return create(be);
-    }
-
-    @Override
     public Object run(Object[] sample, BufferView buffer) {
         Object o = e.run(sample, buffer);
+        return compute(o);
+    }
+
+    public static LogicValue compute(Object o) {
         if (o == null) {
             return LogicValue.TRUE;
         } else {

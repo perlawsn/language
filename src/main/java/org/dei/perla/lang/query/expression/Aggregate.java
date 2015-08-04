@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -44,49 +43,6 @@ public abstract class Aggregate extends Expression {
         this.type = type;
     }
 
-    public static Expression create(AggregateOperation op, Expression e,
-            WindowSize ws, Expression filter, Errors err) {
-        switch (op) {
-            case AVG:
-                return AvgAggregate.create(e, ws, filter, err);
-            case MIN:
-                return MinAggregate.create(e, ws, filter, err);
-            case MAX:
-                return MaxAggregate.create(e, ws, filter, err);
-            case SUM:
-                return SumAggregate.create(e, ws, filter, err);
-            case COUNT:
-                return CountAggregate.create(ws, filter, err);
-            default:
-                throw new RuntimeException("unknown aggregate " + op);
-        }
-    }
-
-    public static Expression createAvg(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        return AvgAggregate.create(e, ws, filter, err);
-    }
-
-    public static Expression createMin(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        return MinAggregate.create(e, ws, filter, err);
-    }
-
-    public static Expression createMax(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        return MaxAggregate.create(e, ws, filter, err);
-    }
-
-    public static Expression createSum(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        return SumAggregate.create(e, ws, filter, err);
-    }
-
-    public static Expression createCount(WindowSize ws,
-            Expression filter, Errors err) {
-        return CountAggregate.create(ws, filter, err);
-    }
-
     public Expression getOperand() {
         return e;
     }
@@ -102,11 +58,6 @@ public abstract class Aggregate extends Expression {
     @Override
     public final DataType getType() {
         return type;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return e.isComplete() && filter.isComplete();
     }
 
     @Override

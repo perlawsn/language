@@ -30,7 +30,7 @@ public class ExpressionASTTest {
 
     @Test
     public void testConstantAST() {
-        ConstantAST c = new ConstantAST(TypeClass.INTEGER, 10);
+        ConstantAST c = new ConstantAST(10, TypeClass.INTEGER);
         assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(c.getValue(), equalTo(10));
 
@@ -61,7 +61,7 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testConstantASTSetType() {
-        ConstantAST c = new ConstantAST(TypeClass.STRING, "test");
+        ConstantAST c = new ConstantAST("test", TypeClass.STRING);
         c.setType(new TypeVariable(TypeClass.ANY));
     }
 
@@ -147,38 +147,38 @@ public class ExpressionASTTest {
     @Test
     public void testBooleanNot() {
         MockExpressionAST op = new MockExpressionAST(TypeClass.BOOLEAN);
-        BoolNotAST b = new BoolNotAST(op);
+        NotAST b = new NotAST(op);
         assertThat(b.getOperand(), equalTo(op));
 
         ParserContext ctx = new ParserContext();
         TypeVariable v = new TypeVariable(TypeClass.BOOLEAN);
-        b = new BoolNotAST(boolExp);
+        b = new NotAST(boolExp);
         assertTrue(b.inferType(v, ctx));
         assertThat(b.getTypeClass(), equalTo(TypeClass.BOOLEAN));
 
-        b = new BoolNotAST(intExp);
+        b = new NotAST(intExp);
         assertFalse(b.inferType(v, ctx));
         assertThat(b.getTypeClass(), equalTo(TypeClass.BOOLEAN));
 
         v = new TypeVariable(TypeClass.ANY);
-        b = new BoolNotAST(boolExp);
+        b = new NotAST(boolExp);
         assertTrue(b.inferType(v, ctx));
         assertThat(b.getTypeClass(), equalTo(TypeClass.BOOLEAN));
 
         v = new TypeVariable(TypeClass.NUMERIC);
-        b = new BoolNotAST(boolExp);
+        b = new NotAST(boolExp);
         assertFalse(b.inferType(v, ctx));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testBooleanNotNoType() {
-        BoolNotAST b = new BoolNotAST(boolExp);
+        NotAST b = new NotAST(boolExp);
         b.getTypeClass();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testBooleanNotDoubleTypeSet() {
-        BoolNotAST b = new BoolNotAST(boolExp);
+        NotAST b = new NotAST(boolExp);
         ParserContext ctx = new ParserContext();
         TypeVariable v = new TypeVariable(TypeClass.ANY);
         b.inferType(v, ctx);
@@ -438,40 +438,40 @@ public class ExpressionASTTest {
     @Test
     public void testArithmeticInverse() {
         MockExpressionAST op = new MockExpressionAST(TypeClass.INTEGER);
-        ArithmeticInverseAST a = new ArithmeticInverseAST(op);
+        InverseAST a = new InverseAST(op);
         assertThat(a.getOperand(), equalTo(op));
 
         ParserContext ctx = new ParserContext();
         TypeVariable v = new TypeVariable(TypeClass.NUMERIC);
-        a = new ArithmeticInverseAST(intExp);
+        a = new InverseAST(intExp);
         assertTrue(a.inferType(v, ctx));
         assertThat(v.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getTypeClass(), equalTo(TypeClass.INTEGER));
 
         v = new TypeVariable(TypeClass.NUMERIC);
-        a = new ArithmeticInverseAST(floatExp);
+        a = new InverseAST(floatExp);
         assertTrue(a.inferType(v, ctx));
         assertThat(v.getTypeClass(), equalTo(TypeClass.FLOAT));
         assertThat(a.getTypeClass(), equalTo(TypeClass.FLOAT));
 
         v = new TypeVariable(TypeClass.INTEGER);
-        a = new ArithmeticInverseAST(stringExp);
+        a = new InverseAST(stringExp);
         assertFalse(a.inferType(v, ctx));
 
         v = new TypeVariable(TypeClass.ID);
-        a = new ArithmeticInverseAST(floatExp);
+        a = new InverseAST(floatExp);
         assertFalse(a.inferType(v, ctx));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testArithmeticInverseNoType() {
-        ArithmeticInverseAST a = new ArithmeticInverseAST(intExp);
+        InverseAST a = new InverseAST(intExp);
         a.getTypeClass();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testArithmeticInverseDoubleTypeSet() {
-        ArithmeticInverseAST a = new ArithmeticInverseAST(intExp);
+        InverseAST a = new InverseAST(intExp);
         ParserContext ctx = new ParserContext();
         TypeVariable v = new TypeVariable(TypeClass.ANY);
         a.inferType(v, ctx);
@@ -664,7 +664,7 @@ public class ExpressionASTTest {
 
     @Test
     public void testInference() {
-        ExpressionAST op1 = new ConstantAST(TypeClass.INTEGER, "3");
+        ExpressionAST op1 = new ConstantAST("3", TypeClass.INTEGER);
         ExpressionAST op2 = new AttributeReferenceAST("integer", TypeClass.ANY);
         ExpressionAST e =
                 new ArithmeticAST(ArithmeticOperation.ADDITION, op1, op2);

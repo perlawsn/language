@@ -1,13 +1,8 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * An {@code Expression} for computing averages.
@@ -17,47 +12,10 @@ import java.util.List;
 public final class AvgAggregate extends Aggregate {
 
     /**
-     * Private constructor, new {@code AvgAggregate} instances must be created
-     * using the static {@code create} method.
+     * Average aggretate expression node constructor
      */
-    private AvgAggregate(Expression e, WindowSize ws, Expression filter) {
+    public AvgAggregate(Expression e, WindowSize ws, Expression filter) {
         super(e, ws, filter, DataType.FLOAT);
-    }
-
-    /**
-     * Creates a new {@code AvgAggregate} expression node.
-     *
-     * @param e expression to average
-     * @param ws portion of buffer to aggregate
-     * @param filter filtering expression to determine which samples must be
-     *               aggregated
-     * @param err error tracking object
-     * @return new {@code AvgAggregate} instance
-     */
-    public static Expression create(Expression e, WindowSize ws,
-            Expression filter, Errors err) {
-        DataType t = e.getType();
-        if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
-            err.addError("Incompatible operand type:  only float and integer " +
-                    "expressions are allowed in average aggregations");
-            return Constant.NULL;
-        }
-
-        if (filter.getType() != null &&
-                filter.getType() != DataType.BOOLEAN) {
-            err.addError("Aggregation filter must be of type boolean");
-            return Constant.NULL;
-        }
-
-        return new AvgAggregate(e, ws, filter);
-    }
-
-    @Override
-    public Expression bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        Expression be = e.bind(atts, bound, err);
-        Expression bf = filter.bind(atts, bound, err);
-        return create(be, ws, bf, err);
     }
 
     @Override
