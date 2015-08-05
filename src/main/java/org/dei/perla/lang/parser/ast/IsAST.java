@@ -31,7 +31,7 @@ public final class IsAST extends UnaryExpressionAST {
         this.value = value;
     }
 
-    public LogicValue getValue() {
+    public LogicValue getLogicValue() {
         return value;
     }
 

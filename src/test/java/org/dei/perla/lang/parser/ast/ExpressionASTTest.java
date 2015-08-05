@@ -215,7 +215,7 @@ public class ExpressionASTTest {
     }
 
     @Test
-    public void testBooleanBinaryCompilation() {
+    public void testBooleanBinaryCompile() {
         ParserContext ctx = new ParserContext();
         Map<String, Integer> atts = new HashMap<>();
 
@@ -227,6 +227,20 @@ public class ExpressionASTTest {
 
         ba = new BoolAST(BoolOperation.OR, ConstantAST.TRUE, ConstantAST.FALSE);
         Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ba = new BoolAST(BoolOperation.AND, ConstantAST.TRUE,
+                ConstantAST.FALSE);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ba = new BoolAST(BoolOperation.XOR, ConstantAST.TRUE,
+                ConstantAST.FALSE);
+        c = (Constant) ba.compile(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -292,6 +306,12 @@ public class ExpressionASTTest {
         Constant c = (Constant) na.compile(ctx, atts);
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        na = new NotAST(ConstantAST.FALSE);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        c = (Constant) na.compile(ctx, atts);
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -335,6 +355,51 @@ public class ExpressionASTTest {
 
         b = new BitwiseAST(BitwiseOperation.AND, intExp, stringExp);
         assertFalse(b.inferType(v, ctx));
+    }
+
+    @Test
+    public void testBitwiseBinaryCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        BitwiseAST ba = new BitwiseAST(BitwiseOperation.OR, intAtt, intAtt);
+        Bitwise b = (Bitwise) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(b.getOperation(), equalTo(ba.getOperation()));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
+
+        ConstantAST c1 = new ConstantAST(32423, TypeClass.INTEGER);
+        ConstantAST c2 = new ConstantAST(2, TypeClass.INTEGER);
+
+        ba = new BitwiseAST(BitwiseOperation.OR, c1, c2);
+        Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(32423 | 2));
+
+        ba = new BitwiseAST(BitwiseOperation.AND, c1, c2);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(32423 & 2));
+
+        ba = new BitwiseAST(BitwiseOperation.XOR, c1, c2);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(32423 ^ 2));
+
+        ba = new BitwiseAST(BitwiseOperation.LSH, c1, c2);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(32423 << 2));
+
+        ba = new BitwiseAST(BitwiseOperation.RSH, c1, c2);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(32423 >> 2));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -382,6 +447,23 @@ public class ExpressionASTTest {
         assertThat(b.getTypeClass(), equalTo(TypeClass.INTEGER));
     }
 
+    @Test
+    public void testBitwiseNotCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        BitwiseNotAST ba = new BitwiseNotAST(intAtt);
+        BitwiseNot b = (BitwiseNot) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
+
+        ba = new BitwiseNotAST(new ConstantAST(10, TypeClass.INTEGER));
+        Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(~10));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testBitwiseNotNoType() {
         BitwiseNotAST b = new BitwiseNotAST(intExp);
@@ -402,7 +484,7 @@ public class ExpressionASTTest {
         MockExpressionAST op = new MockExpressionAST(TypeClass.BOOLEAN);
         IsAST is = new IsAST(op, LogicValue.UNKNOWN);
         assertThat(is.getOperand(), equalTo(op));
-        assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
+        assertThat(is.getLogicValue(), equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
@@ -425,6 +507,75 @@ public class ExpressionASTTest {
         is = new IsAST(boolExp, LogicValue.TRUE);
         assertTrue(is.inferType(v, ctx));
         assertThat(is.getTypeClass(), equalTo(TypeClass.BOOLEAN));
+    }
+
+    @Test
+    public void testIsCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        IsAST ia = new IsAST(intAtt, LogicValue.TRUE);
+        Is i = (Is) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(i.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(i.getLogicValue(), equalTo(ia.getLogicValue()));
+
+        ia = new IsAST(ConstantAST.TRUE, LogicValue.TRUE);
+        Constant c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ia = new IsAST(ConstantAST.FALSE, LogicValue.TRUE);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
+                LogicValue.TRUE);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(ConstantAST.TRUE, LogicValue.FALSE);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(ConstantAST.FALSE, LogicValue.FALSE);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
+                LogicValue.FALSE);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(ConstantAST.TRUE, LogicValue.UNKNOWN);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(ConstantAST.FALSE, LogicValue.UNKNOWN);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
+                LogicValue.UNKNOWN);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
     @Test(expected = IllegalStateException.class)

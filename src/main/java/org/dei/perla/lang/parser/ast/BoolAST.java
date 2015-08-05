@@ -53,7 +53,7 @@ public final class BoolAST extends BinaryExpressionAST {
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
         Expression leftExp = left.compile(ctx, atts);
-        Expression rightExp = left.compile(ctx, atts);
+        Expression rightExp = right.compile(ctx, atts);
 
         if (leftExp instanceof Constant && rightExp instanceof Constant) {
             Object o1 = ((Constant) leftExp).getValue();

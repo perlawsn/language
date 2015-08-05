@@ -68,6 +68,9 @@ public abstract class ExpressionAST extends NodeAST {
      */
     public abstract boolean inferType(TypeVariable bound, ParserContext ctx);
 
+    public abstract Expression compile(ParserContext ctx,
+            Map<String, Integer> atts);
+
     /**
      * Returns a string message that can be used to report the occurrence of
      * a type error.
@@ -86,8 +89,5 @@ public abstract class ExpressionAST extends NodeAST {
                 found + "' found at " + position  + "where an " +
                 "operation of type '" + expected + "' was required.";
     }
-
-    public abstract Expression compile(ParserContext ctx,
-            Map<String, Integer> atts);
 
 }

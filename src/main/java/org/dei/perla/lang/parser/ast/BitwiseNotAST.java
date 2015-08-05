@@ -44,8 +44,8 @@ public final class BitwiseNotAST extends UnaryExpressionAST {
         Expression opExp = operand.compile(ctx, atts);
 
         if (opExp instanceof Constant) {
-            Object o = ((Constant) opExp).getValue();
-            return Constant.create(o, DataType.INTEGER);
+            Integer i = (Integer) ((Constant) opExp).getValue();
+            return Constant.create(~i, DataType.INTEGER);
         }
 
         return new BitwiseNot(opExp);

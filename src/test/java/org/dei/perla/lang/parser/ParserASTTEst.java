@@ -324,13 +324,13 @@ public class ParserASTTEst {
         ParserAST p = getParser("true is unknown");
         IsAST is = (IsAST) p.Expression();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
-        assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
+        assertThat(is.getLogicValue(), equalTo(LogicValue.UNKNOWN));
 
         p = getParser("true is not unknown");
         NotAST b = (NotAST) p.Expression();
         is = (IsAST) ((NotAST) b).getOperand();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
-        assertThat(is.getValue(), equalTo(LogicValue.UNKNOWN));
+        assertThat(is.getLogicValue(), equalTo(LogicValue.UNKNOWN));
     }
 
     @Test
