@@ -5,7 +5,7 @@ import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
 /**
- * An {@code Expression} for computing averages.
+ * An {@code Expression} for computing averages. Ignores NULL values.
  *
  * @author Guido Rota 27/02/15.
  */

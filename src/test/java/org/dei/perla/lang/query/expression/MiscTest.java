@@ -16,15 +16,10 @@ public class MiscTest {
     @Test
     public void castFloat() {
         Expression cInt = Constant.create(1, DataType.INTEGER);
-        Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
 
         Expression e = new CastFloat(cInt);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(null, null), equalTo(1f));
-
-        e = new CastFloat(cFloat);
-        assertThat(e.getType(), equalTo(DataType.FLOAT));
-        assertThat(e.run(null, null), equalTo(1.2f));
     }
 
     @Test
@@ -35,14 +30,9 @@ public class MiscTest {
 
     @Test
     public void castInteger() {
-        Expression cInt = Constant.create(1, DataType.INTEGER);
         Expression cFloat = Constant.create(1.2f, DataType.FLOAT);
 
-        Expression e = new CastInteger(cInt);
-        assertThat(e.getType(), equalTo(DataType.INTEGER));
-        assertThat(e.run(null, null), equalTo(1));
-
-        e = new CastInteger(cFloat);
+        Expression e = new CastInteger(cFloat);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(null, null), equalTo(1));
     }

@@ -48,7 +48,7 @@ public class BitwiseTest {
         Expression e = new Bitwise(BitwiseOperation.OR, e1, e2);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
-        assertThat(res, equalTo(12 & 5639));
+        assertThat(res, equalTo(12 | 5639));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class BitwiseTest {
         Expression e = new Bitwise(BitwiseOperation.RSH, e1, e2);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         Object res = e.run(null, null);
-        assertThat(res, equalTo(7382 << 8));
+        assertThat(res, equalTo(7382 >> 8));
     }
 
     @Test

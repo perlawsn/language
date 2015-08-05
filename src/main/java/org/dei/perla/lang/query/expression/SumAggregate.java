@@ -4,7 +4,8 @@ import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
 /**
- * An {@code Expression} for determining the sum of the values in a buffer
+ * An {@code Expression} for determining the sum of the values in a buffer.
+ * Ignores NULL values.
  *
  * @author Guido Rota 27/02/15.
  */

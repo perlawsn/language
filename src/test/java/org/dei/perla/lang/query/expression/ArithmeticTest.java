@@ -73,7 +73,7 @@ public class ArithmeticTest {
         Expression e = new Arithmetic(ArithmeticOperation.SUBTRACTION,
                 e1, e2, DataType.FLOAT);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        assertThat(e.run(null, null), equalTo(4.4f - 1.5f));
+        assertThat(e.run(null, null), equalTo(1.5f - 4.4f));
     }
 
     @Test
@@ -157,7 +157,7 @@ public class ArithmeticTest {
         Expression e = new Arithmetic(ArithmeticOperation.DIVISION,
                 e1, e2, DataType.FLOAT);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
-        assertThat(e.run(null, null), equalTo(4.4f / 1.5f));
+        assertThat(e.run(null, null), equalTo(1.5f / 4.4f));
     }
 
     @Test
@@ -220,7 +220,7 @@ public class ArithmeticTest {
 
         op = Constant.create(1.4f, DataType.FLOAT);
         e = new Inverse(op, DataType.FLOAT);
-        assertThat(e.getType(), equalTo(DataType.INTEGER));
+        assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(null, null), equalTo(-1.4f));
     }
 

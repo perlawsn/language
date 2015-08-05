@@ -6,7 +6,8 @@ import org.dei.perla.lang.query.statement.WindowSize;
 import java.time.Instant;
 
 /**
- * An {@code Expression} for determining the minimum value in a buffer.
+ * An {@code Expression} for determining the minimum value in a buffer. NULL
+ * values are ignored, and returns NULL if all buffer values are NULL.
  *
  * @author Guido Rota 27/02/15.
  */
@@ -25,50 +26,35 @@ public final class MinAggregate extends Aggregate {
             return null;
         }
 
-        BooleanAccumulator found = new BooleanAccumulator(false);
         switch (type) {
             case INTEGER:
-                IntAccumulator mini = new IntAccumulator(Integer.MAX_VALUE);
+                IntAccumulator mini = new IntAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Integer vi = (Integer) e.run(r, b);
-                    if (vi != null && mini.value > vi) {
-                        found.value = true;
+                    if (vi != null && (mini.value == null || mini.value > vi)) {
                         mini.value = vi;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return mini.value;
-                }
+                return mini.value;
             case FLOAT:
-                FloatAccumulator minf = new FloatAccumulator(Float.MAX_VALUE);
+                FloatAccumulator minf = new FloatAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Float vf = (Float) e.run(r, b);
-                    if (vf != null && minf.value > vf) {
-                        found.value = true;
+                    if (vf != null && (minf.value == null || minf.value > vf)) {
                         minf.value = vf;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return minf.value;
-                }
+                return minf.value;
             case TIMESTAMP:
-                InstantAccumulator mint = new InstantAccumulator(Instant.MAX);
+                InstantAccumulator mint = new InstantAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Instant vt = (Instant) e.run(r, b);
-                    if (vt != null && mint.value.compareTo(vt) > 0) {
-                        found.value = true;
+                    if (vt != null && (mint.value == null ||
+                            mint.value.compareTo(vt) > 0)) {
                         mint.value = vt;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return mint.value;
-                }
+                return mint.value;
             default:
                 throw new RuntimeException(
                         "min aggregation not defined for type " + type);

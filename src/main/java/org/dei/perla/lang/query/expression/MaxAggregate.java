@@ -6,7 +6,8 @@ import org.dei.perla.lang.query.statement.WindowSize;
 import java.time.Instant;
 
 /**
- * An {@code Expression} for determining the maximum value in a buffer.
+ * An {@code Expression} for determining the maximum value in a buffer. NULL
+ * values are ignored, and returns NULL if all buffer values are NULL.
  *
  * @author Guido Rota 27/02/15.
  */
@@ -25,50 +26,35 @@ public final class MaxAggregate extends Aggregate {
             return null;
         }
 
-        BooleanAccumulator found = new BooleanAccumulator(false);
         switch (type) {
             case INTEGER:
-                IntAccumulator maxi = new IntAccumulator(Integer.MIN_VALUE);
+                IntAccumulator maxi = new IntAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Integer vi = (Integer) e.run(r, b);
-                    if (vi != null && maxi.value < vi) {
-                        found.value = true;
+                    if (vi != null && (maxi.value == null || maxi.value < vi)) {
                         maxi.value = vi;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return maxi.value;
-                }
+                return maxi.value;
             case FLOAT:
-                FloatAccumulator maxf = new FloatAccumulator(Float.MIN_VALUE);
+                FloatAccumulator maxf = new FloatAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Float vf = (Float) e.run(r, b);
-                    if (vf != null && maxf.value < vf) {
-                        found.value = true;
+                    if (vf != null && (maxf.value == null || maxf.value < vf)) {
                         maxf.value = vf;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return maxf.value;
-                }
+                return maxf.value;
             case TIMESTAMP:
-                InstantAccumulator maxt = new InstantAccumulator(Instant.MIN);
+                InstantAccumulator maxt = new InstantAccumulator(null);
                 buffer.forEach((r, b) -> {
                     Instant vt = (Instant) e.run(r, b);
-                    if (vt != null && maxt.value.compareTo(vt) < 0) {
-                        found.value = true;
+                    if (vt != null && (maxt.value == null ||
+                            maxt.value.compareTo(vt) < 0)) {
                         maxt.value = vt;
                     }
                 }, filter);
-                if (!found.value) {
-                    return null;
-                } else {
-                    return maxt.value;
-                }
+                return maxt.value;
             default:
                 throw new RuntimeException(
                         "max aggregation not defined for type " + type);

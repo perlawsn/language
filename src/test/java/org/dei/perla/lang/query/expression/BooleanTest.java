@@ -64,7 +64,7 @@ public class BooleanTest {
 
         e = new Bool(BoolOperation.AND, falseExp, nullExp);
         res = (LogicValue) e.run(null, null);
-        assertThat(res, equalTo(LogicValue.UNKNOWN));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Bool(BoolOperation.AND, nullExp, trueExp);
         res = (LogicValue) e.run(null, null);
@@ -72,7 +72,7 @@ public class BooleanTest {
 
         e = new Bool(BoolOperation.AND, nullExp, falseExp);
         res = (LogicValue) e.run(null, null);
-        assertThat(res, equalTo(LogicValue.UNKNOWN));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Bool(BoolOperation.AND, nullExp, nullExp);
         res = (LogicValue) e.run(null, null);
@@ -102,7 +102,7 @@ public class BooleanTest {
     public void testORUnknown() {
         Expression e = new Bool(BoolOperation.OR, trueExp, nullExp);
         LogicValue res = (LogicValue) e.run(null, null);
-        assertThat(res, equalTo(LogicValue.UNKNOWN));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Bool(BoolOperation.OR, falseExp, nullExp);
         res = (LogicValue) e.run(null, null);
@@ -110,7 +110,7 @@ public class BooleanTest {
 
         e = new Bool(BoolOperation.OR, nullExp, trueExp);
         res = (LogicValue) e.run(null, null);
-        assertThat(res, equalTo(LogicValue.UNKNOWN));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Bool(BoolOperation.OR, nullExp, falseExp);
         res = (LogicValue) e.run(null, null);

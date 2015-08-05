@@ -29,38 +29,39 @@ public class AggregateTest {
     private static Attribute floatAtt =
             Attribute.create("float", DataType.FLOAT);
 
-    private static final List<Attribute> atts;
-    static {
-        atts = Arrays.asList(new Attribute[]{
-                Attribute.TIMESTAMP,
-                intAtt,
-                stringAtt,
-                floatAtt
-        });
-    }
-
-    private static final Expression tsExpr =
-            new Field("integer", DataType.INTEGER, 0);
     private static final Expression intExpr =
+            new Field("integer", DataType.INTEGER, 0);
+    private static final Expression stringExpr =
             new Field("string", DataType.STRING, 1);
     private static final Expression floatExpr =
             new Field("float", DataType.FLOAT, 2);
 
     private static BufferView view;
+    private static BufferView nullView;
 
     @BeforeClass
     public static void setupBuffer() {
         List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
                 intAtt,
+                stringAtt,
+                floatAtt,
                 Attribute.TIMESTAMP
         });
-        Buffer b = new ArrayBuffer(bufAtts, 512);
+        Buffer b = new ArrayBuffer(bufAtts, 10);
         b.add(new Object[]{0, "test", 0.0f, Instant.now()});
         b.add(new Object[]{1, "test", 1.1f, Instant.now()});
         b.add(new Object[]{2, "test", 2.2f, Instant.now()});
         b.add(new Object[]{3, "test", 3.3f, Instant.now()});
         b.add(new Object[]{4, "test", 4.4f, Instant.now()});
         view = b.unmodifiableView();
+
+        b = new ArrayBuffer(bufAtts, 10);
+        b.add(new Object[]{null, null, null, Instant.now()});
+        b.add(new Object[]{1, "test", 1.1f, Instant.now()});
+        b.add(new Object[]{2, "test", 2.2f, Instant.now()});
+        b.add(new Object[]{3, "test", 3.3f, Instant.now()});
+        b.add(new Object[]{null, null, null, Instant.now()});
+        nullView = b.unmodifiableView();
     }
 
     @Test
@@ -92,29 +93,34 @@ public class AggregateTest {
         res = e.run(null, view);
         assertThat(res, equalTo(9.9f));
 
-        Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
+        Expression filter = new Comparison(ComparisonOperation.GT, floatExpr,
                 Constant.create(3.3f, DataType.FLOAT));
-        e = new SumAggregate(intExpr, new WindowSize(3), filter);
+        e = new SumAggregate(floatExpr, new WindowSize(3), filter);
         res = e.run(null, view);
         assertThat(res, equalTo(4.4f));
     }
 
     @Test
     public void testSumNull() {
+        WindowSize ws = new WindowSize(5);
         Expression nuli = Constant.NULL;
         Expression nulb = Constant.NULL;
 
-        Expression e = new SumAggregate(nuli, new WindowSize(3), Constant.TRUE);
+        Expression e = new SumAggregate(nuli, ws, Constant.TRUE);
         Object res = e.run(null, view);
         assertThat(res, equalTo(0));
 
-        e = new SumAggregate(intExpr, new WindowSize(3), nulb);
+        e = new SumAggregate(intExpr, ws, nulb);
         res = e.run(null, view);
         assertThat(res, equalTo(0));
 
-        e = new SumAggregate(nuli, new WindowSize(3), nulb);
+        e = new SumAggregate(nuli, ws, nulb);
         res = e.run(null, view);
         assertThat(res, equalTo(0));
+
+        e = new SumAggregate(intExpr, ws, Constant.TRUE);
+        res = e.run(null, nullView);
+        assertThat(res, equalTo(1 + 2 + 3));
     }
 
     @Test
@@ -122,17 +128,17 @@ public class AggregateTest {
         Expression e = new AvgAggregate(intExpr,
                 new WindowSize(5), Constant.TRUE);
         Object res = e.run(null, view);
-        assertThat(res, equalTo((0 + 1 + 2 + 3 + 4) / 5));
+        assertThat(res, equalTo((0 + 1 + 2 + 3 + 4) / 5.0f));
 
         e = new AvgAggregate(intExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo((0 + 1 + 2) / 3));
+        assertThat(res, equalTo((2 + 3 + 4) / 3.0f));
 
         Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
                 Constant.create(3, DataType.INTEGER));
         e = new AvgAggregate(intExpr, new WindowSize(3), filter);
         res = e.run(null, view);
-        assertThat(res, equalTo(4));
+        assertThat(res, equalTo(4.0f));
     }
 
     @Test
@@ -144,31 +150,36 @@ public class AggregateTest {
 
         e = new AvgAggregate(floatExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo((0.0f + 1.1f + 2.2f) / 3));
+        assertThat(res, equalTo((2.2f + 3.3f + 4.4f) / 3));
 
-        Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
+        Expression filter = new Comparison(ComparisonOperation.GT, floatExpr,
                 Constant.create(3.3f, DataType.FLOAT));
-        e = new AvgAggregate(intExpr, new WindowSize(3), filter);
+        e = new AvgAggregate(floatExpr, new WindowSize(3), filter);
         res = e.run(null, view);
         assertThat(res, equalTo(4.4f));
     }
 
     @Test
     public void testAvgNull() {
+        WindowSize ws = new WindowSize(5);
         Expression nuli = Constant.NULL;
         Expression nulb = Constant.NULL;
 
-        Expression e = new AvgAggregate(nuli, new WindowSize(3), Constant.TRUE);
+        Expression e = new AvgAggregate(nuli, ws, Constant.TRUE);
         Object res = e.run(null, view);
         assertThat(res, equalTo(0));
 
-        e = new AvgAggregate(intExpr, new WindowSize(3), nulb);
+        e = new AvgAggregate(intExpr, ws, nulb);
         res = e.run(null, view);
         assertThat(res, equalTo(0));
 
-        e = new AvgAggregate(nuli, new WindowSize(3), nulb);
+        e = new AvgAggregate(nuli, ws, nulb);
         res = e.run(null, view);
         assertThat(res, equalTo(0));
+
+        e = new AvgAggregate(intExpr, ws, Constant.TRUE);
+        res = e.run(null, nullView);
+        assertThat(res, equalTo((1 + 2 + 3)/3.0f));
     }
 
     @Test
@@ -180,7 +191,7 @@ public class AggregateTest {
 
         e = new MinAggregate(intExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(2));
 
         Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
                 Constant.create(3, DataType.INTEGER));
@@ -198,31 +209,36 @@ public class AggregateTest {
 
         e = new MinAggregate(floatExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo(0.0f));
+        assertThat(res, equalTo(2.2f));
 
-        Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
+        Expression filter = new Comparison(ComparisonOperation.GT, floatExpr,
                 Constant.create(3.3f, DataType.FLOAT));
-        e = new MinAggregate(intExpr, new WindowSize(3), filter);
+        e = new MinAggregate(floatExpr, new WindowSize(3), filter);
         res = e.run(null, view);
         assertThat(res, equalTo(4.4f));
     }
 
     @Test
     public void testMinNull() {
+        WindowSize ws = new WindowSize(5);
         Expression nuli = Constant.NULL;
         Expression nulb = Constant.NULL;
 
-        Expression e = new MinAggregate(nuli, new WindowSize(3), Constant.TRUE);
+        Expression e = new MinAggregate(nuli, ws, Constant.TRUE);
         Object res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
 
-        e = new MinAggregate(intExpr, new WindowSize(3), nulb);
+        e = new MinAggregate(intExpr, ws, nulb);
         res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
 
-        e = new MinAggregate(nuli, new WindowSize(3), nulb);
+        e = new MinAggregate(nuli, ws, nulb);
         res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
+
+        e = new MinAggregate(intExpr, ws, Constant.TRUE);
+        res = e.run(null, nullView);
+        assertThat(res, equalTo(1));
     }
 
     @Test
@@ -234,7 +250,7 @@ public class AggregateTest {
 
         e = new MaxAggregate(intExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo(2));
+        assertThat(res, equalTo(4));
 
         Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
                 Constant.create(3, DataType.INTEGER));
@@ -252,31 +268,36 @@ public class AggregateTest {
 
         e = new MaxAggregate(floatExpr, new WindowSize(3), Constant.TRUE);
         res = e.run(null, view);
-        assertThat(res, equalTo(2.2f));
+        assertThat(res, equalTo(4.4f));
 
-        Expression filter = new Comparison(ComparisonOperation.GT, intExpr,
+        Expression filter = new Comparison(ComparisonOperation.GT, floatExpr,
                 Constant.create(3.3f, DataType.FLOAT));
-        e = new MaxAggregate(intExpr, new WindowSize(3), filter);
+        e = new MaxAggregate(floatExpr, new WindowSize(3), filter);
         res = e.run(null, view);
         assertThat(res, equalTo(4.4f));
     }
 
     @Test
     public void testMaxNull() {
+        WindowSize ws = new WindowSize(5);
         Expression nuli = Constant.NULL;
         Expression nulb = Constant.NULL;
 
-        Expression e = new MaxAggregate(nuli, new WindowSize(3), Constant.TRUE);
+        Expression e = new MaxAggregate(nuli, ws, Constant.TRUE);
         Object res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
 
-        e = new MaxAggregate(intExpr, new WindowSize(3), nulb);
+        e = new MaxAggregate(intExpr, ws, nulb);
         res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
 
-        e = new MaxAggregate(nuli, new WindowSize(3), nulb);
+        e = new MaxAggregate(nuli, ws, nulb);
         res = e.run(null, view);
-        assertThat(res, equalTo(0));
+        assertThat(res, equalTo(null));
+
+        e = new MaxAggregate(intExpr, ws, Constant.TRUE);
+        res = e.run(null, nullView);
+        assertThat(res, equalTo(3));
     }
 
     @Test
@@ -300,11 +321,16 @@ public class AggregateTest {
 
     @Test
     public void testCountNull() {
+        WindowSize ws = new WindowSize(5);
         Expression nulb = Constant.NULL;
 
-        Expression e = new CountAggregate(new WindowSize(3), nulb);
+        Expression e = new CountAggregate(ws, nulb);
         Object res = e.run(null, view);
         assertThat(res, equalTo(0));
+
+        e = new CountAggregate(ws, Constant.TRUE);
+        res = e.run(null, view);
+        assertThat(res, equalTo(5));
     }
 
 }
