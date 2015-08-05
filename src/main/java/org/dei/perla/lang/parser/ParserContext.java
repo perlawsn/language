@@ -40,7 +40,7 @@ public final class ParserContext {
      * @return
      */
     public boolean addAttributeReference(AttributeAST att) {
-        String id = att.getIdentifier();
+        String id = att.getId();
         List<AttributeAST> usages = atts.get(id);
         if (usages == null) {
             usages = new ArrayList<>();

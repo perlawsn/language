@@ -29,12 +29,18 @@ public final class ConstantAST extends ExpressionAST {
 
     public ConstantAST(Object value, TypeClass type) {
         super();
+        if (!type.isConcrete()) {
+            throw new IllegalArgumentException("Type class must be concrete");
+        }
         this.type = type;
         this.value = value;
     }
 
     public ConstantAST(Token token, TypeClass type, Object value) {
         super(token);
+        if (!type.isConcrete()) {
+            throw new IllegalArgumentException("Type class must be concrete");
+        }
         this.type = type;
         this.value = value;
     }

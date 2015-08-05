@@ -508,7 +508,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression();
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
         AttributeAST att = (AttributeAST) a.getOperand();
-        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
@@ -516,7 +516,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression();
         assertThat(a.getOperation(), equalTo(AggregateOperation.MAX));
         att = (AttributeAST) a.getOperand();
-        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
@@ -524,7 +524,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression();
         assertThat(a.getOperation(), equalTo(AggregateOperation.MIN));
         att = (AttributeAST) a.getOperand();
-        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
@@ -532,7 +532,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression();
         assertThat(a.getOperation(), equalTo(AggregateOperation.AVG));
         att = (AttributeAST) a.getOperand();
-        assertThat(att.getIdentifier(), equalTo("temperature"));
+        assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
     }
@@ -564,12 +564,12 @@ public class ParserASTTEst {
     public void testAttributeReferenceAST() throws Exception {
         ParserAST p = getParser("temperature");
         AttributeAST a = p.AttributeReference();
-        assertThat(a.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getId(), equalTo("temperature"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
 
         p = getParser("temperature: float");
         a = p.AttributeReference();
-        assertThat(a.getIdentifier(), equalTo("temperature"));
+        assertThat(a.getId(), equalTo("temperature"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.FLOAT));
     }
 

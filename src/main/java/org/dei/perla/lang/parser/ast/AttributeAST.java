@@ -32,7 +32,7 @@ public final class AttributeAST extends ExpressionAST {
         this.type = new TypeVariable(type);
     }
 
-    public String getIdentifier() {
+    public String getId() {
         return id;
     }
 
