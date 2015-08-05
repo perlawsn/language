@@ -1,13 +1,10 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,42 +46,6 @@ public final class Select {
 
     public Object[] getDefault() {
         return def;
-    }
-
-    /**
-     * This method indicates if all the field references inside the data
-     * management clause are bound.
-     *
-     * <p>It is important to note that the {@code Select} clause does not
-     * neet to be complete in order to be executed.
-     *
-     * @return true if all the components of the data management clause are
-     * complete (i.e., all field references are bound to an actual FPC
-     * attribute).
-     */
-    public boolean isComplete() {
-        for (Expression f : fields) {
-            if (!f.isComplete()) {
-                return false;
-            }
-        }
-
-        return group.isComplete() && having.isComplete();
-    }
-
-    public Select bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        List<Expression> bfields = new ArrayList<>();
-        fields.forEach(f -> bfields.add(f.bind(atts, bound, err)));
-
-        GroupBy bgroup = null;
-        if (group != null) {
-            bgroup = group.bind(atts, bound, err);
-        }
-
-        Expression bhaving = having.bind(atts, bound, err);
-
-        return new Select(bfields, upto, bgroup, bhaving, def);
     }
 
     public List<Object[]> select(BufferView buffer) {

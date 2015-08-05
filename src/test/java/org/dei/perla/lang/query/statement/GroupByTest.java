@@ -2,8 +2,6 @@ package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.Field;
 import org.junit.Test;
 
@@ -12,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Guido Rota 16/03/15.
@@ -25,9 +23,9 @@ public class GroupByTest {
     private static final List<Field> fields;
     static {
         fields = new ArrayList<>();
-        fields.add(new Field("integer"));
-        fields.add(new Field("float"));
-        fields.add(new Field("string"));
+        fields.add(new Field("integer", DataType.INTEGER, 0));
+        fields.add(new Field("float", DataType.FLOAT, 1));
+        fields.add(new Field("string", DataType.STRING, 2));
     }
 
     private static final Attribute intAtt =
@@ -36,14 +34,6 @@ public class GroupByTest {
             Attribute.create("float", DataType.FLOAT);
     private static final Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
-
-    private static final List<Attribute> atts;
-    static {
-        atts = new ArrayList<>();
-        atts.add(intAtt);
-        atts.add(floatAtt);
-        atts.add(stringAtt);
-    }
 
     @Test
     public void creation() {
@@ -64,21 +54,6 @@ public class GroupByTest {
         for (int i = 0; i < fields.size(); i++) {
             assertThat(g.getGroups().get(i), equalTo(fields.get(i)));
         }
-    }
-
-    @Test
-    public void bind() {
-        Errors err = new Errors();
-
-        GroupBy g = new GroupBy(SEC_10, 54, fields);
-        for (Expression e : g.getGroups()) {
-            assertFalse(e.isComplete());
-        }
-
-        GroupBy ng = g.bind(atts, new ArrayList<>(), err);
-        assertTrue(err.isEmpty());
-        assertThat(ng.getDuration(), equalTo(g.getDuration()));
-        assertThat(ng.getCount(), equalTo(g.getCount()));
     }
 
 }

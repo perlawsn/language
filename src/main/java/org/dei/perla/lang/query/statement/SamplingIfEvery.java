@@ -1,10 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,18 +45,6 @@ public final class SamplingIfEvery implements Sampling {
 
     public Refresh getRefresh() {
         return refresh;
-    }
-
-    @Override
-    public boolean isComplete() {
-        return refresh.isComplete() && ifevery.isComplete();
-    }
-
-    public SamplingIfEvery bind(Collection<Attribute> atts, Errors err) {
-        List<Attribute> bound = new ArrayList<>();
-        IfEvery bifevery = ifevery.bind(atts, bound, err);
-        Refresh brefresh = refresh.bind(atts);
-        return new SamplingIfEvery(bifevery, bound, ratePolicy, brefresh);
     }
 
 }

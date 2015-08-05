@@ -6,7 +6,6 @@ import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.AsyncUtils;
-import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.IfEvery;
 import org.dei.perla.lang.query.statement.Refresh;
@@ -60,8 +59,6 @@ public final class SamplerIfEvery implements Sampler {
     protected SamplerIfEvery(SamplingIfEvery sampling, List<Attribute> atts, Fpc fpc,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
-        Conditions.checkIllegalArgument(sampling.isComplete(),
-                "SAMPLING IF EVERY clause is not complete.");
 
         this.sampling = sampling;
         this.atts = atts;

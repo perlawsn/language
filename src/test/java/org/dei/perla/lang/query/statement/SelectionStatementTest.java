@@ -30,8 +30,10 @@ public class SelectionStatementTest {
             alarmAtt
     });
 
-    private static final Expression tempField = new Field("temperature");
-    private static final Expression humField = new Field("humidity");
+    private static final Expression tempField =
+            new Field("temperature", DataType.INTEGER, 0);
+    private static final Expression humField =
+            new Field("humidity", DataType.INTEGER, 0);
 
     @Test
     public void testSamplingQuery() throws Exception {
@@ -39,12 +41,12 @@ public class SelectionStatementTest {
         List<Expression> fields = new ArrayList<>();
         fields.add(tempField);
         fields.add(humField);
-        fields.add(Aggregate.createSum(tempField, new WindowSize(5),
-                Constant.TRUE, err));
+        fields.add(new SumAggregate(tempField, new WindowSize(5),
+                Constant.TRUE));
         assertTrue(err.isEmpty());
 
-        Expression having = Comparison.createGE(humField,
-                Constant.INTEGER_0, err);
+        Expression having = new Comparison(ComparisonOperation.GE,
+                humField, Constant.INTEGER_0);
         assertTrue(err.isEmpty());
 
         Select sel = new Select(fields, WindowSize.ONE, GroupBy.NONE, having,
@@ -64,12 +66,6 @@ public class SelectionStatementTest {
         assertThat(query.getTerminate(), equalTo(WindowSize.ZERO));
         assertThat(query.getExecutionConditions(),
                 equalTo(ExecutionConditions.ALL_NODES));
-
-        query = query.bind(atts);
-        assertTrue(query.getExecutionConditions().isComplete());
-        assertTrue(query.getSampling().isComplete());
-        assertTrue(query.getExecutionConditions().isComplete());
-        assertTrue(query.getWhere().isComplete());
     }
 
 }

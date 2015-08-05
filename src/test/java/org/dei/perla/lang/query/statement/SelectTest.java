@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
  * @author Guido Rota 03/03/15.
  */
 public class SelectTest {
-
+/*
     private static Attribute tsAtt = Attribute.TIMESTAMP;
     private static Attribute integerAtt =
             Attribute.create("integer", DataType.INTEGER);
@@ -350,5 +350,5 @@ public class SelectTest {
         assertTrue(r[1] instanceof Integer);
         assertThat(r[1], equalTo(def[1]));
     }
-
+*/
 }

@@ -1,13 +1,9 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.buffer.BufferView;
-import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.query.expression.Expression;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,29 +82,6 @@ public final class SelectionStatement implements Statement {
 
     public WindowSize getTerminate() {
         return terminate;
-    }
-
-    public SelectionStatement bind(Collection<Attribute> atts) throws BindingException {
-        Errors err = new Errors();
-
-        List<Attribute> dataAtts = new ArrayList<>();
-        Select bselect = select.bind(atts, dataAtts, err);
-        Expression bwhere = where.bind(atts, dataAtts, err);
-
-        Sampling bsampling = sampling.bind(atts, err);
-        ExecutionConditions bcond = cond.bind(atts, err);
-
-        if (!err.isEmpty()) {
-            throw new BindingException(err.asString());
-        }
-
-        // Add timestamp attribute if not explicitly included in the query
-        if (!dataAtts.contains(Attribute.TIMESTAMP)) {
-            dataAtts.add(Attribute.TIMESTAMP);
-        }
-
-        return new SelectionStatement(bselect, dataAtts, every, bsampling, bwhere, bcond,
-                terminate);
     }
 
     public List<Object[]> select(BufferView buffer) {

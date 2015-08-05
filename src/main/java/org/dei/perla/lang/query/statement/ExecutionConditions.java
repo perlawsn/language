@@ -8,8 +8,6 @@ import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,17 +72,6 @@ public final class ExecutionConditions {
 
     public Refresh getRefresh() {
         return refresh;
-    }
-
-    public boolean isComplete() {
-        return cond.isComplete() && refresh.isComplete();
-    }
-
-    public ExecutionConditions bind(Collection<Attribute> atts, Errors err) {
-        List<Attribute> bound = new ArrayList<>();
-        Expression bcond = cond.bind(atts, bound, err);
-        Refresh brefresh = refresh.bind(atts);
-        return new ExecutionConditions(bcond, specs, brefresh, bound);
     }
 
 }

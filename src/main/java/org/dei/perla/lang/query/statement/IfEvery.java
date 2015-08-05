@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.CastInteger;
 import org.dei.perla.lang.query.expression.Expression;
@@ -9,8 +8,6 @@ import org.dei.perla.lang.query.expression.LogicValue;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Guido Rota 23/03/15.
@@ -52,7 +49,7 @@ public final class IfEvery {
         }
 
         if (t == DataType.FLOAT) {
-            value = CastInteger.create(value, err);
+            value = new CastInteger(value);
         }
 
         return new IfEvery(cond, value, unit);
@@ -64,28 +61,6 @@ public final class IfEvery {
                     "been set");
         }
         this.next = next;
-    }
-
-    public boolean isComplete() {
-        if (next != null && !next.isComplete()) {
-            return false;
-        }
-        return cond.isComplete() && value.isComplete();
-    }
-
-    public IfEvery bind(Collection<Attribute> atts,
-            List<Attribute> bound, Errors err) {
-        Expression bcond = cond.bind(atts, bound, err);
-        Expression bvalue = value.bind(atts, bound, err);
-        IfEvery ife = IfEvery.create(bcond, bvalue, unit, err);
-        if (ife == null) {
-            return null;
-        }
-
-        if (next != null) {
-            ife.next = next.bind(atts, bound, err);
-        }
-        return ife;
     }
 
     public Duration run(Object[] sample) {

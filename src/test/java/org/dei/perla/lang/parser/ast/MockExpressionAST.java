@@ -3,6 +3,10 @@ package org.dei.perla.lang.parser.ast;
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.Expression;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.Map;
 
 /**
  * Test Abstract Syntax Tree expression node
@@ -20,6 +24,11 @@ public final class MockExpressionAST extends ExpressionAST {
     @Override
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
         return bound.restrict(type);
+    }
+
+    @Override
+    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        throw new NotImplementedException();
     }
 
 }

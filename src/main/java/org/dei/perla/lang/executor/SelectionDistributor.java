@@ -4,7 +4,6 @@ import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.executor.statement.QueryHandler;
 import org.dei.perla.lang.executor.statement.SelectionExecutor;
-import org.dei.perla.lang.query.BindingException;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SelectionStatement;
@@ -69,15 +68,10 @@ public class SelectionDistributor {
                 continue;
             }
 
-            try {
-                SelectionStatement q = query.bind(fpc.getAttributes());
-                SelectionExecutor se = new SelectionExecutor(q, handler, fpc);
-                execs.add(se);
-                se.start();
-                managed.add(fpc);
-            } catch (BindingException e) {
-                // TODO: Ignore silently? do something else??
-            }
+            SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
+            execs.add(se);
+            se.start();
+            managed.add(fpc);
         }
     }
 

@@ -6,7 +6,6 @@ import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.AsyncUtils;
-import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
@@ -86,8 +85,6 @@ public final class SelectionExecutor {
         this.query = query;
         select = query.getSelect();
         execCond = query.getExecutionConditions();
-        Conditions.checkIllegalArgument(execCond.isComplete(),
-                "Incomplete execution condition");
         where = query.getWhere();
         this.fpc = fpc;
         this.handler = handler;

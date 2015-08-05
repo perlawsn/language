@@ -59,19 +59,11 @@ public final class AggregateAST extends ExpressionAST {
     public boolean inferType(TypeVariable bound, ParserContext ctx) {
         if (op == AggregateOperation.COUNT) {
             return inferCountType(bound, ctx);
+        } else if (op == AggregateOperation.AVG) {
+            return inferAvgType(bound, ctx);
+        } else {
+            return inferGeneralType(bound, ctx);
         }
-
-        boolean res = bound.restrict(TypeClass.NUMERIC);
-        if (!res) {
-            String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.NUMERIC);
-            ctx.addError(msg);
-            return false;
-        }
-        setType(bound);
-        res = operand.inferType(bound, ctx);
-        TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
-        return res && filter.inferType(filterBound, ctx);
     }
 
     private boolean inferCountType(TypeVariable bound, ParserContext ctx) {
@@ -85,6 +77,35 @@ public final class AggregateAST extends ExpressionAST {
         setType(bound);
         TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
         return filter.inferType(filterBound, ctx);
+    }
+
+    private boolean inferAvgType(TypeVariable bound, ParserContext ctx) {
+        boolean res = bound.restrict(TypeClass.FLOAT);
+        if (!res) {
+            String msg = typeErrorString(op.name(), getPosition(),
+                    bound.getTypeClass(), TypeClass.FLOAT);
+            ctx.addError(msg);
+            return false;
+        }
+        setType(bound);
+        TypeVariable ob = new TypeVariable(TypeClass.NUMERIC);
+        TypeVariable fb = new TypeVariable(TypeClass.BOOLEAN);
+        res = operand.inferType(bound, ctx);
+        return res && filter.inferType(fb, ctx);
+    }
+
+    private boolean inferGeneralType(TypeVariable bound, ParserContext ctx) {
+        boolean res = bound.restrict(TypeClass.NUMERIC);
+        if (!res) {
+            String msg = typeErrorString(op.name(), getPosition(),
+                    bound.getTypeClass(), TypeClass.NUMERIC);
+            ctx.addError(msg);
+            return false;
+        }
+        setType(bound);
+        res = operand.inferType(bound, ctx);
+        TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
+        return res && filter.inferType(filterBound, ctx);
     }
 
     @Override

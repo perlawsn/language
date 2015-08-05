@@ -1433,7 +1433,7 @@ ExpressionAST BooleanNegation() :
     e = BooleanPredicate()
     {
         if (invert) {
-            e = new BoolNotAST(t, e);
+            e = new NotAST(t, e);
         }
         return e;
     }
@@ -1483,7 +1483,7 @@ ExpressionAST Is(ExpressionAST e) :
     )
     {
         if (invert) {
-            is = new BoolNotAST(t, is);
+            is = new NotAST(t, is);
         }
         return is;
     }
@@ -1703,7 +1703,7 @@ ExpressionAST ArithmeticFactor() :
     e = PrimaryExpression()
     {
         if (s == Sign.MINUS) {
-            e = new ArithmeticInverseAST(t, e);
+            e = new InverseAST(t, e);
         }
         return e;
     }

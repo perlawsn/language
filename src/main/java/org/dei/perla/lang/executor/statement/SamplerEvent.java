@@ -6,7 +6,6 @@ import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.sample.Sample;
 import org.dei.perla.core.utils.AsyncUtils;
-import org.dei.perla.core.utils.Conditions;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SamplingEvent;
@@ -42,9 +41,6 @@ public final class SamplerEvent implements Sampler {
     protected SamplerEvent(SamplingEvent sampling, List<Attribute> atts, Fpc fpc,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
-        Conditions.checkIllegalArgument(sampling.isComplete(),
-                "SAMPLING ON EVENT clause is not complete.");
-
         this.sampling = sampling;
         this.fpc = fpc;
         this.atts = atts;

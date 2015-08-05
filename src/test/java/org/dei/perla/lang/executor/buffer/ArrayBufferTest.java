@@ -3,15 +3,11 @@ package org.dei.perla.lang.executor.buffer;
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.query.expression.Comparison;
-import org.dei.perla.lang.query.expression.Constant;
-import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.Field;
+import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -529,14 +525,11 @@ public class ArrayBufferTest {
 
         count.value = 0;
         sub = v.subView(11);
-        List<Attribute> bound = new ArrayList<>();
-        bound.add(Attribute.TIMESTAMP);
-        bound.add(Attribute.create("integer", DataType.INTEGER));
         Errors err = new Errors();
-        Expression where = Comparison.createGT(new Field("integer"),
-                Constant.create(5, DataType.INTEGER), err);
+        Expression where = new Comparison(ComparisonOperation.GT,
+                new Field("integer", DataType.INTEGER, 1),
+                Constant.create(5, DataType.INTEGER));
         assertTrue(err.isEmpty());
-        where = where.bind(atts, bound, err);
         assertTrue(err.isEmpty());
         sub.forEach((r, view) -> count.value++, where);
         assertThat(count.value, equalTo(5));
