@@ -11,8 +11,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 
 /**
  * @author Guido Rota 31/07/15.
@@ -30,6 +30,19 @@ public class ExpressionASTTest {
     private static final MockExpressionAST timestampExp =
             new MockExpressionAST(TypeClass.TIMESTAMP);
 
+    private static final AttributeAST idAtt =
+            new AttributeAST("id", TypeClass.ID);
+    private static final AttributeAST intAtt =
+            new AttributeAST("integer", TypeClass.INTEGER);
+    private static final AttributeAST floatAtt =
+            new AttributeAST("float", TypeClass.FLOAT);
+    private static final AttributeAST stringAtt =
+            new AttributeAST("string", TypeClass.STRING);
+    private static final AttributeAST boolAtt =
+            new AttributeAST("bool", TypeClass.BOOLEAN);
+    private static final AttributeAST timestampAtt =
+            new AttributeAST("timestamp", TypeClass.TIMESTAMP);
+
     @Test
     public void testConstantAST() {
         ConstantAST c = new ConstantAST(10, TypeClass.INTEGER);
@@ -37,7 +50,7 @@ public class ExpressionASTTest {
         assertThat(c.getValue(), equalTo(10));
     }
 
-    @Test(expected = ExceptionInInitializerError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testNonConcreteConstantAST() {
         ConstantAST c = new ConstantAST(10, TypeClass.ANY);
     }
@@ -201,6 +214,24 @@ public class ExpressionASTTest {
         assertThat(b.getTypeClass(), equalTo(TypeClass.BOOLEAN));
     }
 
+    @Test
+    public void testBooleanBinaryCompilation() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        BoolAST ba = new BoolAST(BoolOperation.AND, boolAtt, boolAtt);
+        Bool b = (Bool) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(b.getOperation(), equalTo(ba.getOperation()));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
+
+        ba = new BoolAST(BoolOperation.OR, ConstantAST.TRUE, ConstantAST.FALSE);
+        Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testBooleanBinaryNoType() {
         BoolAST b = new BoolAST(BoolOperation.OR, boolExp, boolExp);
@@ -244,6 +275,23 @@ public class ExpressionASTTest {
         v = new TypeVariable(TypeClass.NUMERIC);
         n = new NotAST(boolExp);
         assertFalse(n.inferType(v, ctx));
+    }
+
+    @Test
+    public void testBooleanNotCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        NotAST na = new NotAST(boolAtt);
+        Not n = (Not) na.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(n.getType(), equalTo(DataType.BOOLEAN));
+
+        na = new NotAST(ConstantAST.TRUE);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        Constant c = (Constant) na.compile(ctx, atts);
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
     }
 
     @Test(expected = IllegalStateException.class)

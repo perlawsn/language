@@ -4,7 +4,6 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Expression;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public final class MockExpressionAST extends ExpressionAST {
 
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
 }

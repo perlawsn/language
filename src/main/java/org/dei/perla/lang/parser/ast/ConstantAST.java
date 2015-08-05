@@ -29,7 +29,7 @@ public final class ConstantAST extends ExpressionAST {
 
     public ConstantAST(Object value, TypeClass type) {
         super();
-        if (!type.isConcrete()) {
+        if (value != null && !type.isConcrete()) {
             throw new IllegalArgumentException("Type class must be concrete");
         }
         this.type = type;
@@ -38,7 +38,7 @@ public final class ConstantAST extends ExpressionAST {
 
     public ConstantAST(Token token, TypeClass type, Object value) {
         super(token);
-        if (!type.isConcrete()) {
+        if (value != null && !type.isConcrete()) {
             throw new IllegalArgumentException("Type class must be concrete");
         }
         this.type = type;
