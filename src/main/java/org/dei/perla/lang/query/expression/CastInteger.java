@@ -30,8 +30,14 @@ public final class CastInteger extends Expression {
         Object o = e.run(sample, buffer);
         if (o == null) {
             return null;
+        } else if (o instanceof Integer) {
+            return o;
+        } else if (o instanceof Float) {
+            return ((Float) o).intValue();
+        } else {
+            throw new RuntimeException("Cannot convert " +
+                    o.getClass().getSimpleName() + " to integer");
         }
-        return ((Float) o).intValue();
     }
 
     @Override

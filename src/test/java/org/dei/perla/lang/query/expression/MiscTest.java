@@ -31,7 +31,6 @@ public class MiscTest {
     public void castFloatNull() {
         Expression cast = new CastFloat(Constant.NULL);
         assertThat(cast.run(null, null), equalTo(null));
-        assertThat(cast, equalTo(Constant.NULL));
     }
 
     @Test
@@ -41,18 +40,17 @@ public class MiscTest {
 
         Expression e = new CastInteger(cInt);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        assertThat(e.run(null, null), equalTo(1f));
+        assertThat(e.run(null, null), equalTo(1));
 
         e = new CastInteger(cFloat);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
-        assertThat(e.run(null, null), equalTo(1.2f));
+        assertThat(e.run(null, null), equalTo(1));
     }
 
     @Test
     public void castIntegerNull() {
         Expression cast = new CastInteger(Constant.NULL);
         assertThat(cast.run(null, null), equalTo(null));
-        assertThat(cast, equalTo(Constant.NULL));
     }
 
     @Test
