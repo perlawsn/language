@@ -6,7 +6,7 @@ import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.Field;
+import org.dei.perla.lang.query.expression.Attribute;
 
 import java.util.Map;
 
@@ -15,18 +15,18 @@ import java.util.Map;
  *
  * @author Guido Rota 30/07/15.
  */
-public final class AttributeReferenceAST extends ExpressionAST {
+public final class AttributeAST extends ExpressionAST {
 
     private final String id;
     private final TypeVariable type;
 
-    public AttributeReferenceAST(String id, TypeClass type) {
+    public AttributeAST(String id, TypeClass type) {
         super();
         this.id = id;
         this.type = new TypeVariable(type);
     }
 
-    public AttributeReferenceAST(Token token, String id, TypeClass type) {
+    public AttributeAST(Token token, String id, TypeClass type) {
         super(token);
         this.id = id;
         this.type = new TypeVariable(type);
@@ -57,7 +57,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
      * other {@code AttributeReferenceAST} is not compatible with this
      * reference's type.
      */
-    public boolean mergeTypes(AttributeReferenceAST other) {
+    public boolean mergeTypes(AttributeAST other) {
         TypeVariable t1 = type;
         TypeVariable t2 = other.type;
         return TypeVariable.merge(t1, t2);
@@ -96,7 +96,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
             idx = atts.size();
             atts.put(id, idx);
         }
-        return new Field(id, tc.toDataType(), idx);
+        return new Attribute(id, tc.toDataType(), idx);
     }
 
 }

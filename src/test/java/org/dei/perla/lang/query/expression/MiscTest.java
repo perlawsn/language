@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -151,25 +150,25 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        Attribute intAtt = Attribute.create("integer", DataType.INTEGER);
-        Attribute floatAtt = Attribute.create("float", DataType.FLOAT);
-        Attribute stringAtt = Attribute.create("string", DataType.STRING);
+        org.dei.perla.core.sample.Attribute intAtt = org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
+        org.dei.perla.core.sample.Attribute floatAtt = org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
+        org.dei.perla.core.sample.Attribute stringAtt = org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
         Object[][] sample = new Object[][]{
                 {1, 2.3f, "test"},
                 {23, 2.4f, "tset"}
         };
 
-        Expression e = new Field(intAtt.getId(), intAtt.getType(), 0);
+        Expression e = new Attribute(intAtt.getId(), intAtt.getType(), 0);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(sample[0], null), equalTo(1));
         assertThat(e.run(sample[1], null), equalTo(23));
 
-        e = new Field(floatAtt.getId(), floatAtt.getType(), 1);
+        e = new Attribute(floatAtt.getId(), floatAtt.getType(), 1);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(sample[0], null), equalTo(2.3f));
         assertThat(e.run(sample[1], null), equalTo(2.4f));
 
-        e = new Field(stringAtt.getId(), stringAtt.getType(), 2);
+        e = new Attribute(stringAtt.getId(), stringAtt.getType(), 2);
         assertThat(e.getType(), equalTo(DataType.STRING));
         assertThat(e.run(sample[0], null), equalTo("test"));
         assertThat(e.run(sample[1], null), equalTo("tset"));

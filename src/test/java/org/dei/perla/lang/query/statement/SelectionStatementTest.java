@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
@@ -17,23 +16,23 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectionStatementTest {
 
-    private static final Attribute tempAtt =
-            Attribute.create("temperature", DataType.INTEGER);
-    private static final Attribute humAtt =
-            Attribute.create("humidity", DataType.INTEGER);
-    private static final Attribute alarmAtt =
-            Attribute.create("alarm", DataType.BOOLEAN);
+    private static final org.dei.perla.core.sample.Attribute tempAtt =
+            org.dei.perla.core.sample.Attribute.create("temperature", DataType.INTEGER);
+    private static final org.dei.perla.core.sample.Attribute humAtt =
+            org.dei.perla.core.sample.Attribute.create("humidity", DataType.INTEGER);
+    private static final org.dei.perla.core.sample.Attribute alarmAtt =
+            org.dei.perla.core.sample.Attribute.create("alarm", DataType.BOOLEAN);
 
-    private static final List<Attribute> atts = Arrays.asList(new Attribute[]{
+    private static final List<org.dei.perla.core.sample.Attribute> atts = Arrays.asList(new org.dei.perla.core.sample.Attribute[]{
             tempAtt,
             humAtt,
             alarmAtt
     });
 
     private static final Expression tempField =
-            new Field("temperature", DataType.INTEGER, 0);
+            new Attribute("temperature", DataType.INTEGER, 0);
     private static final Expression humField =
-            new Field("humidity", DataType.INTEGER, 0);
+            new Attribute("humidity", DataType.INTEGER, 0);
 
     @Test
     public void testSamplingQuery() throws Exception {

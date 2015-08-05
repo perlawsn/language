@@ -67,8 +67,8 @@ public class ExpressionASTTest {
 
     @Test
     public void testAttributeReference() {
-        AttributeReferenceAST a =
-                new AttributeReferenceAST("att", TypeClass.ANY);
+        AttributeAST a =
+                new AttributeAST("att", TypeClass.ANY);
         assertThat(a.getIdentifier(), equalTo("att"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
 
@@ -78,7 +78,7 @@ public class ExpressionASTTest {
         assertTrue(res);
         assertThat(a.getTypeClass(), equalTo(TypeClass.NUMERIC));
 
-        a = new AttributeReferenceAST("att", TypeClass.INTEGER);
+        a = new AttributeAST("att", TypeClass.INTEGER);
         res = a.inferType(v, ctx);
         assertTrue(res);
         assertThat(a.getTypeClass(), equalTo(TypeClass.INTEGER));
@@ -87,7 +87,7 @@ public class ExpressionASTTest {
         Map<String, TypeClass> attTypes = ctx.getAttributeTypes();
         assertThat(attTypes.get("att"), equalTo(TypeClass.INTEGER));
 
-        a = new AttributeReferenceAST("asd", TypeClass.NUMERIC);
+        a = new AttributeAST("asd", TypeClass.NUMERIC);
         v = new TypeVariable(TypeClass.ANY);
         res = a.inferType(v, ctx);
         assertTrue(res);
@@ -97,8 +97,8 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAttributeReferenceSetType() {
-        AttributeReferenceAST a =
-                new AttributeReferenceAST("att", TypeClass.ANY);
+        AttributeAST a =
+                new AttributeAST("att", TypeClass.ANY);
         a.setType(new TypeVariable(TypeClass.NUMERIC));
     }
 
@@ -665,7 +665,7 @@ public class ExpressionASTTest {
     @Test
     public void testInference() {
         ExpressionAST op1 = new ConstantAST("3", TypeClass.INTEGER);
-        ExpressionAST op2 = new AttributeReferenceAST("integer", TypeClass.ANY);
+        ExpressionAST op2 = new AttributeAST("integer", TypeClass.ANY);
         ExpressionAST e =
                 new ArithmeticAST(ArithmeticOperation.ADDITION, op1, op2);
 

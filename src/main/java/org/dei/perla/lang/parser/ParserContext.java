@@ -2,7 +2,7 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
+import org.dei.perla.lang.parser.ast.AttributeAST;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public final class ParserContext {
 
     private final Errors err = new Errors();
 
-    private final Map<String, List<AttributeReferenceAST>> atts = new HashMap<>();
+    private final Map<String, List<AttributeAST>> atts = new HashMap<>();
 
     public void addError(String msg) {
         err.addError(msg);
@@ -39,9 +39,9 @@ public final class ParserContext {
      * @param att
      * @return
      */
-    public boolean addAttributeReference(AttributeReferenceAST att) {
+    public boolean addAttributeReference(AttributeAST att) {
         String id = att.getIdentifier();
-        List<AttributeReferenceAST> usages = atts.get(id);
+        List<AttributeAST> usages = atts.get(id);
         if (usages == null) {
             usages = new ArrayList<>();
             usages.add(att);
@@ -50,7 +50,7 @@ public final class ParserContext {
         }
 
         boolean clean = true;
-        for (AttributeReferenceAST ot : usages) {
+        for (AttributeAST ot : usages) {
             if (!att.mergeTypes(ot)) {
                 String msg = "Incompatible type for attribute '" + id + "': " +
                         "usage at " + att.getPosition() + " of type '" +
@@ -71,9 +71,9 @@ public final class ParserContext {
 
     public Map<String, TypeClass> getAttributeTypes() {
         Map<String, TypeClass> fm = new HashMap<>();
-        for (Entry<String, List<AttributeReferenceAST>> e : atts.entrySet()) {
+        for (Entry<String, List<AttributeAST>> e : atts.entrySet()) {
             String id = e.getKey();
-            List<AttributeReferenceAST> fl = e.getValue();
+            List<AttributeAST> fl = e.getValue();
             // All the FieldAST inside the field's list are guaranteed
             // to be of the same TypeClass if no type errors were found.
             // Hence, we can just retrieve the first one.

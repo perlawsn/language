@@ -270,12 +270,12 @@ public class ComparisonTest {
         Expression e = new Comparison(ComparisonOperation.GE, c1, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         Object res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.FALSE));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Comparison(ComparisonOperation.GE, c1, c2);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.TRUE));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Comparison(ComparisonOperation.GE, c2, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -289,12 +289,12 @@ public class ComparisonTest {
         e = new Comparison(ComparisonOperation.GE, c1, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.FALSE));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Comparison(ComparisonOperation.GE, c1, c2);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.TRUE));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Comparison(ComparisonOperation.GE, c2, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -308,12 +308,12 @@ public class ComparisonTest {
         e = new Comparison(ComparisonOperation.GE, c1, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.FALSE));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Comparison(ComparisonOperation.GE, c1, c2);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.TRUE));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Comparison(ComparisonOperation.GE, c2, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -324,12 +324,12 @@ public class ComparisonTest {
         e = new Comparison(ComparisonOperation.GE, t1, t1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.FALSE));
+        assertThat(res, equalTo(LogicValue.TRUE));
 
         e = new Comparison(ComparisonOperation.GE, t1, t2);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         res = e.run(null, null);
-        assertThat(res, equalTo(LogicValue.TRUE));
+        assertThat(res, equalTo(LogicValue.FALSE));
 
         e = new Comparison(ComparisonOperation.GE, c2, c1);
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
@@ -636,7 +636,7 @@ public class ComparisonTest {
     @Test
     public void testLike() {
         Expression c = Constant.create("test", DataType.STRING);
-        Expression e = new Like(c, "_est");
+        Expression e = new Like(c, ".est");
         assertThat(e.getType(), equalTo(DataType.BOOLEAN));
         assertThat(e.run(null, null), equalTo(LogicValue.TRUE));
 

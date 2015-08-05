@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -22,30 +21,30 @@ import static org.junit.Assert.assertTrue;
  */
 public class AggregateTest {
 
-    private static Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static Attribute stringAtt =
-            Attribute.create("string", DataType.STRING);
-    private static Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
+    private static org.dei.perla.core.sample.Attribute intAtt =
+            org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
+    private static org.dei.perla.core.sample.Attribute stringAtt =
+            org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
+    private static org.dei.perla.core.sample.Attribute floatAtt =
+            org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
 
     private static final Expression intExpr =
-            new Field("integer", DataType.INTEGER, 0);
+            new Attribute("integer", DataType.INTEGER, 0);
     private static final Expression stringExpr =
-            new Field("string", DataType.STRING, 1);
+            new Attribute("string", DataType.STRING, 1);
     private static final Expression floatExpr =
-            new Field("float", DataType.FLOAT, 2);
+            new Attribute("float", DataType.FLOAT, 2);
 
     private static BufferView view;
     private static BufferView nullView;
 
     @BeforeClass
     public static void setupBuffer() {
-        List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
+        List<org.dei.perla.core.sample.Attribute> bufAtts = Arrays.asList(new org.dei.perla.core.sample.Attribute[]{
                 intAtt,
                 stringAtt,
                 floatAtt,
-                Attribute.TIMESTAMP
+                org.dei.perla.core.sample.Attribute.TIMESTAMP
         });
         Buffer b = new ArrayBuffer(bufAtts, 10);
         b.add(new Object[]{0, "test", 0.0f, Instant.now()});

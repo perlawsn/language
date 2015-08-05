@@ -1,11 +1,10 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.Field;
+import org.dei.perla.lang.query.expression.Attribute;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -22,16 +21,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class IfEveryTest {
 
-    private static final Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static final Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-    private static final Attribute stringAtt =
-            Attribute.create("string", DataType.STRING);
-    private static final Attribute boolAtt =
-            Attribute.create("boolean", DataType.BOOLEAN);
+    private static final org.dei.perla.core.sample.Attribute intAtt =
+            org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
+    private static final org.dei.perla.core.sample.Attribute floatAtt =
+            org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
+    private static final org.dei.perla.core.sample.Attribute stringAtt =
+            org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
+    private static final org.dei.perla.core.sample.Attribute boolAtt =
+            org.dei.perla.core.sample.Attribute.create("boolean", DataType.BOOLEAN);
 
-    private static final List<Attribute> atts;
+    private static final List<org.dei.perla.core.sample.Attribute> atts;
     static {
         atts = new ArrayList<>();
         atts.add(intAtt);
@@ -50,13 +49,13 @@ public class IfEveryTest {
     }
 
     private static final Expression fInt =
-            new Field("integer", DataType.INTEGER, 0);
+            new Attribute("integer", DataType.INTEGER, 0);
     private static final Expression fFloat =
-            new Field("float", DataType.FLOAT, 1);
+            new Attribute("float", DataType.FLOAT, 1);
     private static final Expression fString =
-            new Field("string", DataType.STRING, 2);
+            new Attribute("string", DataType.STRING, 2);
     private static final Expression fBool =
-            new Field("boolean", DataType.BOOLEAN, 3);
+            new Attribute("boolean", DataType.BOOLEAN, 3);
 
     @Test
     public void testSingle() {

@@ -1,7 +1,6 @@
 package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
@@ -21,11 +20,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class ArrayBufferTest {
 
-    private static final List<Attribute> atts;
+    private static final List<org.dei.perla.core.sample.Attribute> atts;
     static {
-        Attribute[] as = new Attribute[] {
-                Attribute.TIMESTAMP,
-                Attribute.create("integer", DataType.INTEGER)
+        org.dei.perla.core.sample.Attribute[] as = new org.dei.perla.core.sample.Attribute[] {
+                org.dei.perla.core.sample.Attribute.TIMESTAMP,
+                org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER)
         };
         atts = Arrays.asList(as);
     }
@@ -527,7 +526,7 @@ public class ArrayBufferTest {
         sub = v.subView(11);
         Errors err = new Errors();
         Expression where = new Comparison(ComparisonOperation.GT,
-                new Field("integer", DataType.INTEGER, 1),
+                new Attribute("integer", DataType.INTEGER, 1),
                 Constant.create(5, DataType.INTEGER));
         assertTrue(err.isEmpty());
         assertTrue(err.isEmpty());

@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
+import org.dei.perla.lang.parser.ast.AttributeAST;
 import org.junit.Test;
 
 import java.util.Map;
@@ -31,14 +31,14 @@ public class ParseContextTest {
     @Test
     public void testAttributeTypeChecking() {
         ParserContext ctx = new ParserContext();
-        AttributeReferenceAST ar0 =
-                new AttributeReferenceAST("att1", TypeClass.ANY);
-        AttributeReferenceAST ar1 =
-                new AttributeReferenceAST("att1", TypeClass.NUMERIC);
-        AttributeReferenceAST ar2 =
-                new AttributeReferenceAST("att1", TypeClass.INTEGER);
-        AttributeReferenceAST ar3 =
-                new AttributeReferenceAST("att1", TypeClass.FLOAT);
+        AttributeAST ar0 =
+                new AttributeAST("att1", TypeClass.ANY);
+        AttributeAST ar1 =
+                new AttributeAST("att1", TypeClass.NUMERIC);
+        AttributeAST ar2 =
+                new AttributeAST("att1", TypeClass.INTEGER);
+        AttributeAST ar3 =
+                new AttributeAST("att1", TypeClass.FLOAT);
 
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
@@ -70,14 +70,14 @@ public class ParseContextTest {
     @Test
     public void testAttributeTypeTracking() {
         ParserContext ctx = new ParserContext();
-        AttributeReferenceAST ar0 =
-                new AttributeReferenceAST("att1", TypeClass.ANY);
-        AttributeReferenceAST ar1 =
-                new AttributeReferenceAST("att1", TypeClass.INTEGER);
-        AttributeReferenceAST ar2 =
-                new AttributeReferenceAST("att2", TypeClass.BOOLEAN);
-        AttributeReferenceAST ar3 =
-                new AttributeReferenceAST("att3", TypeClass.FLOAT);
+        AttributeAST ar0 =
+                new AttributeAST("att1", TypeClass.ANY);
+        AttributeAST ar1 =
+                new AttributeAST("att1", TypeClass.INTEGER);
+        AttributeAST ar2 =
+                new AttributeAST("att2", TypeClass.BOOLEAN);
+        AttributeAST ar3 =
+                new AttributeAST("att3", TypeClass.FLOAT);
 
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
