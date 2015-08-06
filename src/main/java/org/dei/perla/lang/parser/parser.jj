@@ -43,20 +43,6 @@ PARSER_BEGIN(ParserAST)
 
     public final class ParserAST {
 
-        private static final Object[] EMPTY_DEFAULT = new Object[0];
-
-        private static final String ERROR_STRING = "Error near element %s" +
-                "(line %s, column %s): ";
-
-        private static void addError(String msg, Token t, Errors err) {
-            err.addError(ERROR_STRING + msg, t.image, t.beginLine,
-                    t.beginColumn);
-        }
-
-        private static Errors inContext(Errors err, Token t) {
-            return err.inContext(ERROR_STRING, t.image, t.beginLine,
-                    t.beginColumn);
-        }
 
     }
 
@@ -1365,7 +1351,7 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-ExpressionAST Expression() :
+ExpressionAST Expression(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1373,16 +1359,16 @@ ExpressionAST Expression() :
     Token t;
 }
 {
-    e1 = BooleanTerm()
+    e1 = BooleanTerm(type, src, err)
     (
         t = <OPERATOR_OR>
-        e2 = BooleanTerm()
+        e2 = BooleanTerm(type, src, err)
         { e1 = new BoolAST(t, BoolOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanTerm() :
+ExpressionAST BooleanTerm(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1390,16 +1376,16 @@ ExpressionAST BooleanTerm() :
     Token t;
 }
 {
-    e1 = BooleanFactor()
+    e1 = BooleanFactor(type, src, err)
     (
         t = <OPERATOR_AND>
-        e2 = BooleanFactor()
+        e2 = BooleanFactor(type, src, err)
         { e1 = new BoolAST(t, BoolOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanFactor() :
+ExpressionAST BooleanFactor(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1407,16 +1393,16 @@ ExpressionAST BooleanFactor() :
     Token t;
 }
 {
-    e1 = BooleanNegation()
+    e1 = BooleanNegation(type, src, err)
     (
         t = <OPERATOR_XOR>
-        e2 = BooleanNegation()
+        e2 = BooleanNegation(type, src, err)
         { e1 = new BoolAST(t, BoolOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanNegation() :
+ExpressionAST BooleanNegation(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e;
     boolean invert = false;
@@ -1430,7 +1416,7 @@ ExpressionAST BooleanNegation() :
             invert = !invert;
         }
     )*
-    e = BooleanPredicate()
+    e = BooleanPredicate(type, src, err)
     {
         if (invert) {
             e = new NotAST(t, e);
@@ -1439,18 +1425,18 @@ ExpressionAST BooleanNegation() :
     }
 }
 
-ExpressionAST BooleanPredicate() :
+ExpressionAST BooleanPredicate(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e;
 }
 {
-    e = Comparison()
+    e = Comparison(type, src, err)
     [
         e = Is(e)
         |
         e = Like(e)
         |
-        e = Between(e)
+        e = Between(e, type, src, err)
     ]
     { return e; }
 }
@@ -1502,7 +1488,8 @@ ExpressionAST Like(ExpressionAST e) :
     { return new LikeAST(t, e, pattern); }
 }
 
-ExpressionAST Between(ExpressionAST e) :
+ExpressionAST Between(ExpressionAST e, ExpressionType type,
+        String src, Errors err) :
 {
     ExpressionAST b;
     ExpressionAST min;
@@ -1512,15 +1499,15 @@ ExpressionAST Between(ExpressionAST e) :
 }
 {
     t = <KEYWORD_BETWEEN>
-    min = BitwiseExpression()
+    min = BitwiseExpression(type, src, err)
     <OPERATOR_AND>
-    max = BitwiseExpression()
+    max = BitwiseExpression(type, src, err)
     {
         return new BetweenAST(t, e, min, max);
     }
 }
 
-ExpressionAST Comparison() :
+ExpressionAST Comparison(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1529,11 +1516,11 @@ ExpressionAST Comparison() :
     Token t;
 }
 {
-    e1 = BitwiseExpression()
+    e1 = BitwiseExpression(type, src, err)
     [
         op = ComparisonOperation()
         { t = token; }
-        e2 = BitwiseExpression()
+        e2 = BitwiseExpression(type, src, err)
         {
             e1 = new ComparisonAST(t, op, e1, e2);
         }
@@ -1541,7 +1528,7 @@ ExpressionAST Comparison() :
     { return e1; }
 }
 
-ExpressionAST BitwiseExpression() :
+ExpressionAST BitwiseExpression(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1549,16 +1536,16 @@ ExpressionAST BitwiseExpression() :
     Token t;
 }
 {
-    e1 = BitwiseTerm()
+    e1 = BitwiseTerm(type, src, err)
     (
         t = <OPERATOR_BITWISE_OR>
-        e2 = BitwiseTerm()
+        e2 = BitwiseTerm(type, src, err)
         { e1 = new BitwiseAST(t, BitwiseOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseTerm() :
+ExpressionAST BitwiseTerm(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1566,16 +1553,16 @@ ExpressionAST BitwiseTerm() :
     Token t;
 }
 {
-    e1 = BitwiseFactor()
+    e1 = BitwiseFactor(type, src, err)
     (
         t = <OPERATOR_BITWISE_AND>
-        e2 = BitwiseFactor()
+        e2 = BitwiseFactor(type, src, err)
         { e1 = new BitwiseAST(t, BitwiseOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseFactor() :
+ExpressionAST BitwiseFactor(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1583,16 +1570,16 @@ ExpressionAST BitwiseFactor() :
     Token t;
 }
 {
-    e1 = BitwiseShift()
+    e1 = BitwiseShift(type, src, err)
     (
         t = <OPERATOR_BITWISE_XOR>
-        e2 = BitwiseShift()
+        e2 = BitwiseShift(type, src, err)
         { e1 = new BitwiseAST(t, BitwiseOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseShift() :
+ExpressionAST BitwiseShift(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1601,7 +1588,7 @@ ExpressionAST BitwiseShift() :
     Token t;
 }
 {
-    e1 = BitwiseNegation()
+    e1 = BitwiseNegation(type, src, err)
     (
         (
             t = <OPERATOR_BITWISE_LSH>
@@ -1610,13 +1597,13 @@ ExpressionAST BitwiseShift() :
             t = <OPERATOR_BITWISE_RSH>
             { op = BitwiseOperation.RSH; }
         )
-        e2 = BitwiseNegation()
+        e2 = BitwiseNegation(type, src, err)
         { e1 = new BitwiseAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseNegation() :
+ExpressionAST BitwiseNegation(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e;
     boolean not = false;
@@ -1628,7 +1615,7 @@ ExpressionAST BitwiseNegation() :
         t = <OPERATOR_BITWISE_NOT>
         { not = !not; }
     )*
-    e = ArithmeticExpression()
+    e = ArithmeticExpression(type, src, err)
     {
         if (not) {
             e = new BitwiseNotAST(t, e);
@@ -1637,7 +1624,7 @@ ExpressionAST BitwiseNegation() :
     }
 }
 
-ExpressionAST ArithmeticExpression() :
+ExpressionAST ArithmeticExpression(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1646,7 +1633,7 @@ ExpressionAST ArithmeticExpression() :
     Token t;
 }
 {
-    e1 = ArithmeticTerm()
+    e1 = ArithmeticTerm(type, src, err)
     (
         (
             t = <OPERATOR_PLUS>
@@ -1655,13 +1642,13 @@ ExpressionAST ArithmeticExpression() :
             t = <OPERATOR_MINUS>
             { op = ArithmeticOperation.SUBTRACTION; }
         )
-        e2 = ArithmeticTerm()
+        e2 = ArithmeticTerm(type, src, err)
         { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST ArithmeticTerm() :
+ExpressionAST ArithmeticTerm(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1670,7 +1657,7 @@ ExpressionAST ArithmeticTerm() :
     Token t;
 }
 {
-    e1 = ArithmeticFactor()
+    e1 = ArithmeticFactor(type, src, err)
     (
         (
             t = <OPERATOR_MULTIPLY>
@@ -1682,13 +1669,13 @@ ExpressionAST ArithmeticTerm() :
             t = <OPERATOR_MODULO>
             { op = ArithmeticOperation.MODULO; }
         )
-        e2 = ArithmeticFactor()
+        e2 = ArithmeticFactor(type, src, err)
         { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST ArithmeticFactor() :
+ExpressionAST ArithmeticFactor(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e;
     Sign s = Sign.PLUS;
@@ -1700,7 +1687,7 @@ ExpressionAST ArithmeticFactor() :
         s = Sign()
         { t = token; }
     ]
-    e = PrimaryExpression()
+    e = PrimaryExpression(type, src, err)
     {
         if (s == Sign.MINUS) {
             e = new InverseAST(t, e);
@@ -1709,7 +1696,7 @@ ExpressionAST ArithmeticFactor() :
     }
 }
 
-ExpressionAST PrimaryExpression() :
+ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
 {
     ExpressionAST e;
 
@@ -1721,19 +1708,34 @@ ExpressionAST PrimaryExpression() :
     |
     (
         "("
-        e = Expression()
+        e = Expression(type, src, err)
         { return e; }
         ")"
     )
     |
-    e = Aggregate()
-    { return e; }
+    e = Aggregate(type, src, err)
+    {
+        if (type != ExpressionType.AGGREGATE) {
+            err.addError("Aggregate expressions forbidden in " + src +
+                " at line " + token.beginLine + ", column " + token.beginColumn);
+            return ConstantAST.NULL;
+        } else {
+            return e;
+        }
+    }
     |
-    e = AttributeReference()
-    { return e; }
+    e = Attribute()
+    {
+        if (type == ExpressionType.CONSTANT) {
+            err.addError("Only constant expressions are allowed in " + src +
+                " at line " + token.beginLine + ", column " + token.beginColumn);
+        } else {
+            return e;
+        }
+    }
 }
 
-AttributeReferenceAST AttributeReference() :
+AttributeAST Attribute() :
 {
     String id;
     TypeClass type = TypeClass.ANY;
@@ -1747,10 +1749,10 @@ AttributeReferenceAST AttributeReference() :
         ":"
         type = TypeClass()
     ]
-    { return new AttributeReferenceAST(token, id, type); }
+    { return new AttributeAST(token, id, type); }
 }
 
-ExpressionAST Aggregate() :
+ExpressionAST Aggregate(ExpressionType type, String src, Errors err) :
 {
     AggregateOperation op;
     ExpressionAST operand = ConstantAST.NULL;
@@ -1773,7 +1775,7 @@ ExpressionAST Aggregate() :
             ws = WindowSize()
             [
                 ","
-                filter = Expression()
+                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", err)
             ]
             ")"
         )
@@ -1782,12 +1784,12 @@ ExpressionAST Aggregate() :
             op = AggregateOperation()
             { t = token; }
             "("
-            operand = Expression()
+            operand = Expression(ExpressionType.SIMPLE, "aggregate operand", err)
             ","
             ws = WindowSize()
             [
                 ","
-                filter = Expression()
+                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", err)
             ]
             ")"
         )

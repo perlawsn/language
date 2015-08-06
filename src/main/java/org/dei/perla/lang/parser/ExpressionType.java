@@ -12,7 +12,7 @@ public enum ExpressionType {
     // attributes
     CONSTANT,
 
-    // Simple expression, no IF EXIST and aggregations allowed
+    // Simple expression, attribute references and aggregations allowed
     SIMPLE,
 
     // Aggregation nodes allowed
