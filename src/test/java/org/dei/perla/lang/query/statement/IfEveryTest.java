@@ -4,7 +4,7 @@ import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.Attribute;
+import org.dei.perla.lang.query.expression.AttributeReference;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -49,13 +49,13 @@ public class IfEveryTest {
     }
 
     private static final Expression fInt =
-            new Attribute("integer", DataType.INTEGER, 0);
+            new AttributeReference("integer", DataType.INTEGER, 0);
     private static final Expression fFloat =
-            new Attribute("float", DataType.FLOAT, 1);
+            new AttributeReference("float", DataType.FLOAT, 1);
     private static final Expression fString =
-            new Attribute("string", DataType.STRING, 2);
+            new AttributeReference("string", DataType.STRING, 2);
     private static final Expression fBool =
-            new Attribute("boolean", DataType.BOOLEAN, 3);
+            new AttributeReference("boolean", DataType.BOOLEAN, 3);
 
     @Test
     public void testSingle() {

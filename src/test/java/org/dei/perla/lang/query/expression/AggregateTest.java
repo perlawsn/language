@@ -29,11 +29,11 @@ public class AggregateTest {
             org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
 
     private static final Expression intExpr =
-            new Attribute("integer", DataType.INTEGER, 0);
+            new AttributeReference("integer", DataType.INTEGER, 0);
     private static final Expression stringExpr =
-            new Attribute("string", DataType.STRING, 1);
+            new AttributeReference("string", DataType.STRING, 1);
     private static final Expression floatExpr =
-            new Attribute("float", DataType.FLOAT, 2);
+            new AttributeReference("float", DataType.FLOAT, 2);
 
     private static BufferView view;
     private static BufferView nullView;

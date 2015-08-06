@@ -30,9 +30,9 @@ public class SelectionStatementTest {
     });
 
     private static final Expression tempField =
-            new Attribute("temperature", DataType.INTEGER, 0);
+            new AttributeReference("temperature", DataType.INTEGER, 0);
     private static final Expression humField =
-            new Attribute("humidity", DataType.INTEGER, 0);
+            new AttributeReference("humidity", DataType.INTEGER, 0);
 
     @Test
     public void testSamplingQuery() throws Exception {

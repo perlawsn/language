@@ -158,17 +158,17 @@ public class MiscTest {
                 {23, 2.4f, "tset"}
         };
 
-        Expression e = new Attribute(intAtt.getId(), intAtt.getType(), 0);
+        Expression e = new AttributeReference(intAtt.getId(), intAtt.getType(), 0);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(sample[0], null), equalTo(1));
         assertThat(e.run(sample[1], null), equalTo(23));
 
-        e = new Attribute(floatAtt.getId(), floatAtt.getType(), 1);
+        e = new AttributeReference(floatAtt.getId(), floatAtt.getType(), 1);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(sample[0], null), equalTo(2.3f));
         assertThat(e.run(sample[1], null), equalTo(2.4f));
 
-        e = new Attribute(stringAtt.getId(), stringAtt.getType(), 2);
+        e = new AttributeReference(stringAtt.getId(), stringAtt.getType(), 2);
         assertThat(e.getType(), equalTo(DataType.STRING));
         assertThat(e.run(sample[0], null), equalTo("test"));
         assertThat(e.run(sample[1], null), equalTo("tset"));

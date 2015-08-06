@@ -526,7 +526,7 @@ public class ArrayBufferTest {
         sub = v.subView(11);
         Errors err = new Errors();
         Expression where = new Comparison(ComparisonOperation.GT,
-                new Attribute("integer", DataType.INTEGER, 1),
+                new AttributeReference("integer", DataType.INTEGER, 1),
                 Constant.create(5, DataType.INTEGER));
         assertTrue(err.isEmpty());
         assertTrue(err.isEmpty());

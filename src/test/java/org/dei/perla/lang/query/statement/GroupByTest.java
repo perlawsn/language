@@ -1,7 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.lang.query.expression.Attribute;
+import org.dei.perla.lang.query.expression.AttributeReference;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -19,12 +19,12 @@ public class GroupByTest {
     private static final Duration SEC_10 = Duration.ofSeconds(10);
     private static final Duration MIN_10 = Duration.ofMinutes(10);
 
-    private static final List<Attribute> atts;
+    private static final List<AttributeReference> atts;
     static {
         atts = new ArrayList<>();
-        atts.add(new Attribute("integer", DataType.INTEGER, 0));
-        atts.add(new Attribute("float", DataType.FLOAT, 1));
-        atts.add(new Attribute("string", DataType.STRING, 2));
+        atts.add(new AttributeReference("integer", DataType.INTEGER, 0));
+        atts.add(new AttributeReference("float", DataType.FLOAT, 1));
+        atts.add(new AttributeReference("string", DataType.STRING, 2));
     }
 
     private static final org.dei.perla.core.sample.Attribute intAtt =

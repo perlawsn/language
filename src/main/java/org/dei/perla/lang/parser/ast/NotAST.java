@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -28,7 +29,7 @@ public final class NotAST extends UnaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("not", getPosition(),
@@ -41,8 +42,8 @@ public final class NotAST extends UnaryExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
-        Expression opExp = operand.compile(ctx, atts);
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+        Expression opExp = operand.toExpression(ctx, atts);
 
         if (opExp instanceof Constant) {
             LogicValue l = (LogicValue) ((Constant) opExp).getValue();

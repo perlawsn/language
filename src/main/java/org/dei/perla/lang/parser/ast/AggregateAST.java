@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -94,7 +95,7 @@ public final class AggregateAST extends ExpressionAST {
         return res && filter.inferType(fb, ctx);
     }
 
-    private boolean inferGeneralType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferGeneralType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.NUMERIC);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
@@ -109,12 +110,12 @@ public final class AggregateAST extends ExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         Expression opExp = null;
         if (operand != null) {
-            opExp = operand.compile(ctx, atts);
+            opExp = operand.toExpression(ctx, atts);
         }
-        Expression filExp = filter.compile(ctx, atts);
+        Expression filExp = filter.toExpression(ctx, atts);
 
         switch (op) {
             case AVG:

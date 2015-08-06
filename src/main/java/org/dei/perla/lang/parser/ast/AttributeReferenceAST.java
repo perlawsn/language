@@ -1,12 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.Attribute;
+import org.dei.perla.lang.query.expression.AttributeReference;
 
 import java.util.Map;
 
@@ -15,18 +16,18 @@ import java.util.Map;
  *
  * @author Guido Rota 30/07/15.
  */
-public final class AttributeAST extends ExpressionAST {
+public final class AttributeReferenceAST extends ExpressionAST {
 
     private final String id;
     private final TypeVariable type;
 
-    public AttributeAST(String id, TypeClass type) {
+    public AttributeReferenceAST(String id, TypeClass type) {
         super();
         this.id = id;
         this.type = new TypeVariable(type);
     }
 
-    public AttributeAST(Token token, String id, TypeClass type) {
+    public AttributeReferenceAST(Token token, String id, TypeClass type) {
         super(token);
         this.id = id;
         this.type = new TypeVariable(type);
@@ -34,6 +35,22 @@ public final class AttributeAST extends ExpressionAST {
 
     public String getId() {
         return id;
+    }
+
+    /**
+     * Creates the {@link Attribute} object referenced by this {@code
+     * AttributeReferenceAST}.
+     *
+     * @return attribute object referenced by this object
+     * @throws IllegalStateException if the type class associated with the
+     * reference is not concreate
+     */
+    public Attribute toAttribute() {
+        TypeClass t = type.getTypeClass();
+        if (!t.isConcrete()) {
+            throw new IllegalStateException("TypeClass is not concrete");
+        }
+        return Attribute.create(id, t.toDataType());
     }
 
     @Override
@@ -57,14 +74,14 @@ public final class AttributeAST extends ExpressionAST {
      * other {@code AttributeReferenceAST} is not compatible with this
      * reference's type.
      */
-    public boolean mergeTypes(AttributeAST other) {
+    public boolean mergeTypes(AttributeReferenceAST other) {
         TypeVariable t1 = type;
         TypeVariable t2 = other.type;
         return TypeVariable.merge(t1, t2);
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = true;
 
         TypeClass prev = type.getTypeClass();
@@ -81,7 +98,7 @@ public final class AttributeAST extends ExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         TypeClass tc = type.getTypeClass();
         if (!tc.isConcrete()) {
             String msg = "Cannot compile, attribute '" + id + "' at " +
@@ -91,12 +108,13 @@ public final class AttributeAST extends ExpressionAST {
             return Constant.NULL;
         }
 
-        Integer idx = atts.get(id);
+        Attribute att = Attribute.create(id, type.getTypeClass().toDataType());
+        Integer idx = atts.get(att);
         if (idx == null) {
             idx = atts.size();
-            atts.put(id, idx);
+            atts.put(att, idx);
         }
-        return new Attribute(id, tc.toDataType(), idx);
+        return new AttributeReference(id, tc.toDataType(), idx);
     }
 
 }

@@ -1,6 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -60,12 +61,12 @@ public final class ConstantAST extends ExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         return bound.restrict(this.type);
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         if (value == null) {
             return Constant.NULL;
         }

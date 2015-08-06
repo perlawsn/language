@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -28,7 +29,7 @@ public final class IsNullAST extends UnaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("IS NULL", getPosition(),
@@ -41,8 +42,8 @@ public final class IsNullAST extends UnaryExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
-        Expression e = operand.compile(null, atts);
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+        Expression e = operand.toExpression(null, atts);
         if (e instanceof Constant) {
             LogicValue l = IsNull.compute(((Constant) e).getValue());
             return Constant.create(l, DataType.BOOLEAN);

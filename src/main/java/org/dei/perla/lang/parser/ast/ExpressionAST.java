@@ -1,9 +1,11 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.Map;
@@ -56,6 +58,27 @@ public abstract class ExpressionAST extends NodeAST {
     }
 
     /**
+     * Compiles the AST tree identified by this object into an executable
+     * {@link Expression}.
+     *
+     * @param bound type constraint, designates the desired type (or type
+     *             class) of the expression being analyzed. This information is
+     *             used by the inference algorithm to perform the type analysis.
+     * @param ctx context object used to store intermediate results and errors
+     * @param atts map employed for storing the attribute binding order
+     * @return expression object corresponding to the AST node
+     */
+    public Expression compile(TypeVariable bound, ParserContext ctx,
+            Map<Attribute, Integer> atts) {
+        boolean typeOk = inferType(bound, ctx);
+        if (!typeOk) {
+            return Constant.NULL;
+        }
+
+        return toExpression(ctx, atts);
+    }
+
+    /**
      * Traverses the expression tree to infer the data type of the fields.
      * Type errors and inconsistencies are reported through the {@link Errors}
      * object in the {@link ParserContext}.
@@ -66,10 +89,17 @@ public abstract class ExpressionAST extends NodeAST {
      * @param ctx context object used to store intermediate results and errors
      * @return true if no type errors were found, false otherwise.
      */
-    public abstract boolean inferType(TypeVariable bound, ParserContext ctx);
+    protected abstract boolean inferType(TypeVariable bound, ParserContext ctx);
 
-    public abstract Expression compile(ParserContext ctx,
-            Map<String, Integer> atts);
+    /**
+     * Creates an {@link Expression} object corresponding to the AST node.
+     *
+     * @param ctx context object used to store intermediate results and errors
+     * @param atts map employed for storing the attribute binding order
+     * @return expression object corresponding to the ExpressionAST node
+     */
+    protected abstract Expression toExpression(ParserContext ctx,
+            Map<Attribute, Integer> atts);
 
     /**
      * Returns a string message that can be used to report the occurrence of

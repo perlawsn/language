@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -52,7 +53,7 @@ public final class BetweenAST extends ExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("BETWEEN", getPosition(),
@@ -78,7 +79,7 @@ public final class BetweenAST extends ExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         TypeClass t = operand.getTypeClass();
         if (t == TypeClass.ID || t == TypeClass.BOOLEAN) {
             String msg = "Comparison operation 'between' forbidden on " +
@@ -87,9 +88,9 @@ public final class BetweenAST extends ExpressionAST {
             return Constant.NULL;
         }
 
-        Expression opExp = operand.compile(ctx, atts);
-        Expression minExp = operand.compile(ctx, atts);
-        Expression maxExp = operand.compile(ctx, atts);
+        Expression opExp = operand.toExpression(ctx, atts);
+        Expression minExp = operand.toExpression(ctx, atts);
+        Expression maxExp = operand.toExpression(ctx, atts);
 
         if (opExp instanceof Constant && minExp instanceof Constant &&
                 maxExp instanceof Constant) {

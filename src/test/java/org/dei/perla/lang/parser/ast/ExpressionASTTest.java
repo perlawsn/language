@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.*;
@@ -31,18 +32,18 @@ public class ExpressionASTTest {
     private static final MockExpressionAST timestampExp =
             new MockExpressionAST(TypeClass.TIMESTAMP);
 
-    private static final AttributeAST idAtt =
-            new AttributeAST("id", TypeClass.ID);
-    private static final AttributeAST intAtt =
-            new AttributeAST("integer", TypeClass.INTEGER);
-    private static final AttributeAST floatAtt =
-            new AttributeAST("float", TypeClass.FLOAT);
-    private static final AttributeAST stringAtt =
-            new AttributeAST("string", TypeClass.STRING);
-    private static final AttributeAST boolAtt =
-            new AttributeAST("bool", TypeClass.BOOLEAN);
-    private static final AttributeAST timestampAtt =
-            new AttributeAST("timestamp", TypeClass.TIMESTAMP);
+    private static final AttributeReferenceAST idAtt =
+            new AttributeReferenceAST("id", TypeClass.ID);
+    private static final AttributeReferenceAST intAtt =
+            new AttributeReferenceAST("integer", TypeClass.INTEGER);
+    private static final AttributeReferenceAST floatAtt =
+            new AttributeReferenceAST("float", TypeClass.FLOAT);
+    private static final AttributeReferenceAST stringAtt =
+            new AttributeReferenceAST("string", TypeClass.STRING);
+    private static final AttributeReferenceAST boolAtt =
+            new AttributeReferenceAST("bool", TypeClass.BOOLEAN);
+    private static final AttributeReferenceAST timestampAtt =
+            new AttributeReferenceAST("timestamp", TypeClass.TIMESTAMP);
 
     @Test
     public void testConstantAST() {
@@ -88,22 +89,22 @@ public class ExpressionASTTest {
     @Test
     public void testConstantCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         ConstantAST ca = new ConstantAST(10, TypeClass.INTEGER);
-        Constant c = (Constant) ca.compile(ctx, atts);
+        Constant c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10));
 
         ca = new ConstantAST("test", TypeClass.STRING);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.STRING));
         assertThat(c.getValue(), equalTo("test"));
 
         ca = ConstantAST.NULL;
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c, equalTo(Constant.NULL));
     }
@@ -116,7 +117,7 @@ public class ExpressionASTTest {
 
     @Test
     public void testAttribute() {
-        AttributeAST a = new AttributeAST("att", TypeClass.ANY);
+        AttributeReferenceAST a = new AttributeReferenceAST("att", TypeClass.ANY);
         assertThat(a.getId(), equalTo("att"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
     }
@@ -125,13 +126,13 @@ public class ExpressionASTTest {
     public void testAttributeInference() {
         ParserContext ctx = new ParserContext();
 
-        AttributeAST a = new AttributeAST("att", TypeClass.ANY);
+        AttributeReferenceAST a = new AttributeReferenceAST("att", TypeClass.ANY);
         TypeVariable v = new TypeVariable(TypeClass.NUMERIC);
         boolean res = a.inferType(v, ctx);
         assertTrue(res);
         assertThat(a.getTypeClass(), equalTo(TypeClass.NUMERIC));
 
-        a = new AttributeAST("att", TypeClass.INTEGER);
+        a = new AttributeReferenceAST("att", TypeClass.INTEGER);
         res = a.inferType(v, ctx);
         assertTrue(res);
         assertThat(a.getTypeClass(), equalTo(TypeClass.INTEGER));
@@ -140,7 +141,7 @@ public class ExpressionASTTest {
         Map<String, TypeClass> attTypes = ctx.getAttributeTypes();
         assertThat(attTypes.get("att"), equalTo(TypeClass.INTEGER));
 
-        a = new AttributeAST("asd", TypeClass.NUMERIC);
+        a = new AttributeReferenceAST("asd", TypeClass.NUMERIC);
         v = new TypeVariable(TypeClass.ANY);
         res = a.inferType(v, ctx);
         assertTrue(res);
@@ -151,41 +152,41 @@ public class ExpressionASTTest {
     @Test
     public void testAttributeCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
-        AttributeAST aa = new AttributeAST("att1", TypeClass.INTEGER);
-        Attribute a = (Attribute) aa.compile(ctx, atts);
+        AttributeReferenceAST aa = new AttributeReferenceAST("att1", TypeClass.INTEGER);
+        AttributeReference a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
         assertThat(a.getType(), equalTo(aa.getTypeClass().toDataType()));
         assertThat(a.getIndex(), equalTo(0));
-        assertThat(atts.get(aa.getId()), equalTo(0));
+        assertThat(atts.get(aa.toAttribute()), equalTo(0));
 
-        aa = new AttributeAST("att2", TypeClass.STRING);
-        a = (Attribute) aa.compile(ctx, atts);
+        aa = new AttributeReferenceAST("att2", TypeClass.STRING);
+        a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
         assertThat(a.getType(), equalTo(aa.getTypeClass().toDataType()));
         assertThat(a.getIndex(), equalTo(1));
-        assertThat(atts.get(aa.getId()), equalTo(1));
+        assertThat(atts.get(aa.toAttribute()), equalTo(1));
 
-        aa = new AttributeAST("att1", TypeClass.INTEGER);
-        a = (Attribute) aa.compile(ctx, atts);
+        aa = new AttributeReferenceAST("att1", TypeClass.INTEGER);
+        a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
         assertThat(a.getType(), equalTo(aa.getTypeClass().toDataType()));
         assertThat(a.getIndex(), equalTo(0));
 
-        aa = new AttributeAST("att3", TypeClass.ANY);
-        Constant c = (Constant) aa.compile(ctx, atts);
+        aa = new AttributeReferenceAST("att3", TypeClass.ANY);
+        Constant c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testAttributeReferenceSetType() {
-        AttributeAST a =
-                new AttributeAST("att", TypeClass.ANY);
+        AttributeReferenceAST a =
+                new AttributeReferenceAST("att", TypeClass.ANY);
         a.setType(new TypeVariable(TypeClass.NUMERIC));
     }
 
@@ -223,30 +224,30 @@ public class ExpressionASTTest {
     @Test
     public void testBooleanBinaryCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         BoolAST ba = new BoolAST(BoolOperation.AND, boolAtt, boolAtt);
-        Bool b = (Bool) ba.compile(ctx, atts);
+        Bool b = (Bool) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(b.getOperation(), equalTo(ba.getOperation()));
         assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         ba = new BoolAST(BoolOperation.OR, ConstantAST.TRUE, ConstantAST.FALSE);
-        Constant c = (Constant) ba.compile(ctx, atts);
+        Constant c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ba = new BoolAST(BoolOperation.AND, ConstantAST.TRUE,
                 ConstantAST.FALSE);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ba = new BoolAST(BoolOperation.XOR, ConstantAST.TRUE,
                 ConstantAST.FALSE);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -300,22 +301,22 @@ public class ExpressionASTTest {
     @Test
     public void testBooleanNotCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         NotAST na = new NotAST(boolAtt);
-        Not n = (Not) na.compile(ctx, atts);
+        Not n = (Not) na.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(n.getType(), equalTo(DataType.BOOLEAN));
 
         na = new NotAST(ConstantAST.TRUE);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        Constant c = (Constant) na.compile(ctx, atts);
+        Constant c = (Constant) na.toExpression(ctx, atts);
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         na = new NotAST(ConstantAST.FALSE);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        c = (Constant) na.compile(ctx, atts);
+        c = (Constant) na.toExpression(ctx, atts);
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
@@ -366,10 +367,10 @@ public class ExpressionASTTest {
     @Test
     public void testBitwiseBinaryCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         BitwiseAST ba = new BitwiseAST(BitwiseOperation.OR, intAtt, intAtt);
-        Bitwise b = (Bitwise) ba.compile(ctx, atts);
+        Bitwise b = (Bitwise) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(b.getOperation(), equalTo(ba.getOperation()));
         assertThat(b.getType(), equalTo(DataType.INTEGER));
@@ -378,31 +379,31 @@ public class ExpressionASTTest {
         ConstantAST c2 = new ConstantAST(2, TypeClass.INTEGER);
 
         ba = new BitwiseAST(BitwiseOperation.OR, c1, c2);
-        Constant c = (Constant) ba.compile(ctx, atts);
+        Constant c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(32423 | 2));
 
         ba = new BitwiseAST(BitwiseOperation.AND, c1, c2);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(32423 & 2));
 
         ba = new BitwiseAST(BitwiseOperation.XOR, c1, c2);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(32423 ^ 2));
 
         ba = new BitwiseAST(BitwiseOperation.LSH, c1, c2);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(32423 << 2));
 
         ba = new BitwiseAST(BitwiseOperation.RSH, c1, c2);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(32423 >> 2));
@@ -456,15 +457,15 @@ public class ExpressionASTTest {
     @Test
     public void testBitwiseNotCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         BitwiseNotAST ba = new BitwiseNotAST(intAtt);
-        BitwiseNot b = (BitwiseNot) ba.compile(ctx, atts);
+        BitwiseNot b = (BitwiseNot) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(b.getType(), equalTo(DataType.INTEGER));
 
         ba = new BitwiseNotAST(new ConstantAST(10, TypeClass.INTEGER));
-        Constant c = (Constant) ba.compile(ctx, atts);
+        Constant c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(~10));
@@ -518,67 +519,67 @@ public class ExpressionASTTest {
     @Test
     public void testIsCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         IsAST ia = new IsAST(intAtt, LogicValue.TRUE);
-        Is i = (Is) ia.compile(ctx, atts);
+        Is i = (Is) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(i.getType(), equalTo(DataType.BOOLEAN));
         assertThat(i.getLogicValue(), equalTo(ia.getLogicValue()));
 
         ia = new IsAST(ConstantAST.TRUE, LogicValue.TRUE);
-        Constant c = (Constant) ia.compile(ctx, atts);
+        Constant c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ia = new IsAST(ConstantAST.FALSE, LogicValue.TRUE);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
                 LogicValue.TRUE);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(ConstantAST.TRUE, LogicValue.FALSE);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(ConstantAST.FALSE, LogicValue.FALSE);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
                 LogicValue.FALSE);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(ConstantAST.TRUE, LogicValue.UNKNOWN);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(ConstantAST.FALSE, LogicValue.UNKNOWN);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsAST(new ConstantAST(LogicValue.UNKNOWN, TypeClass.BOOLEAN),
                 LogicValue.UNKNOWN);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -635,21 +636,21 @@ public class ExpressionASTTest {
     @Test
     public void testIsNullCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         IsNullAST ia = new IsNullAST(intAtt);
-        IsNull i = (IsNull) ia.compile(ctx, atts);
+        IsNull i = (IsNull) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(i.getType(), equalTo(DataType.BOOLEAN));
 
         ia = new IsNullAST(new ConstantAST(10, TypeClass.INTEGER));
-        Constant c = (Constant) ia.compile(ctx, atts);
+        Constant c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         ia = new IsNullAST(ConstantAST.NULL);
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -694,27 +695,27 @@ public class ExpressionASTTest {
     @Test
     public void testLikeCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         LikeAST la = new LikeAST(stringAtt, "test");
-        Like l = (Like) la.compile(ctx, atts);
+        Like l = (Like) la.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(l.getType(), equalTo(DataType.BOOLEAN));
 
         la = new LikeAST(new ConstantAST("test", TypeClass.STRING), "test");
-        Constant c = (Constant) la.compile(ctx, atts);
+        Constant c = (Constant) la.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         la = new LikeAST(new ConstantAST("rest", TypeClass.STRING), "test");
-        c = (Constant) la.compile(ctx, atts);
+        c = (Constant) la.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.FALSE));
 
         la = new LikeAST(ConstantAST.NULL, "test");
-        c = (Constant) la.compile(ctx, atts);
+        c = (Constant) la.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.UNKNOWN));
@@ -779,12 +780,12 @@ public class ExpressionASTTest {
     @Test
     public void testArithmeticCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         ArithmeticAST aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
                 intAtt, intAtt);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        Arithmetic a = (Arithmetic) aa.compile(ctx, atts);
+        Arithmetic a = (Arithmetic) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getOperation(), equalTo(aa.getOperation()));
         assertThat(a.getType(), equalTo(DataType.INTEGER));
@@ -797,7 +798,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
                 c1int, c2int);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        Constant c = (Constant) aa.compile(ctx, atts);
+        Constant c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10 + 34));
@@ -805,7 +806,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.SUBTRACTION,
                 c1int, c2int);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10 - 34));
@@ -813,7 +814,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.DIVISION,
                 c1int, c2int);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10 / 34));
@@ -821,7 +822,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.PRODUCT,
                 c1int, c2int);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10 * 34));
@@ -829,7 +830,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.MODULO,
                 c1int, c2int);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10 % 34));
@@ -837,7 +838,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
                 c1float, c2float);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.2f + 75f));
@@ -845,7 +846,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.SUBTRACTION,
                 c1float, c2float);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.2f - 75f));
@@ -853,7 +854,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.DIVISION,
                 c1float, c2float);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.2f / 75f));
@@ -861,7 +862,7 @@ public class ExpressionASTTest {
         aa = new ArithmeticAST(ArithmeticOperation.PRODUCT,
                 c1float, c2float);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) aa.compile(ctx, atts);
+        c = (Constant) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.2f * 75f));
@@ -919,24 +920,24 @@ public class ExpressionASTTest {
     @Test
     public void testArithmeticInverseCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         InverseAST ia = new InverseAST(intAtt);
         assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        Inverse i = (Inverse) ia.compile(ctx, atts);
+        Inverse i = (Inverse) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(i.getType(), equalTo(DataType.INTEGER));
 
         ia = new InverseAST(new ConstantAST(10, TypeClass.INTEGER));
         assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        Constant c = (Constant) ia.compile(ctx, atts);
+        Constant c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(-10));
 
         ia = new InverseAST(new ConstantAST(2.5f, TypeClass.FLOAT));
         assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        c = (Constant) ia.compile(ctx, atts);
+        c = (Constant) ia.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(-2.5f));
@@ -995,11 +996,11 @@ public class ExpressionASTTest {
     @Test
     public void testComparisonCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         ComparisonAST ca = new ComparisonAST(ComparisonOperation.EQ,
                 intAtt, intAtt);
-        Comparison c = (Comparison) ca.compile(ctx, atts);
+        Comparison c = (Comparison) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getOperation(), equalTo(ca.getOperation()));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
@@ -1009,37 +1010,37 @@ public class ExpressionASTTest {
         ConstantAST c2int = new ConstantAST(25, TypeClass.INTEGER);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1int, c2int);
-        Constant r = (Constant) ca.compile(ctx, atts);
+        Constant r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1int, c2int);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.GT, c1int, c2int);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.GE, c1int, c2int);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.LT, c1int, c2int);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.LE, c1int, c2int);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1049,37 +1050,37 @@ public class ExpressionASTTest {
         ConstantAST c2float = new ConstantAST(34f, TypeClass.FLOAT);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.GT, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.GE, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.LT, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.LE, c1float, c2float);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1089,37 +1090,37 @@ public class ExpressionASTTest {
         ConstantAST c2string = new ConstantAST("fdsa", TypeClass.STRING);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.GT, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.GE, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.LT, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.LE, c1string, c2string);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1131,37 +1132,37 @@ public class ExpressionASTTest {
         ConstantAST c2ts = new ConstantAST(i, TypeClass.TIMESTAMP);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.GT, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.GE, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.LT, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
 
         ca = new ComparisonAST(ComparisonOperation.LE, c1ts, c2ts);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1173,13 +1174,13 @@ public class ExpressionASTTest {
                 TypeClass.BOOLEAN);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1bool, c2bool);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1bool, c2bool);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1189,13 +1190,13 @@ public class ExpressionASTTest {
         ConstantAST c2id = new ConstantAST(123, TypeClass.ID);
 
         ca = new ComparisonAST(ComparisonOperation.EQ, c1id, c2id);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.FALSE));
 
         ca = new ComparisonAST(ComparisonOperation.NE, c1id, c2id);
-        r = (Constant) ca.compile(ctx, atts);
+        r = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
@@ -1204,7 +1205,7 @@ public class ExpressionASTTest {
     @Test
     public void testComparisonForbiddenOperation() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         // Bool tests
         ConstantAST c1bool = new ConstantAST(LogicValue.TRUE,
@@ -1214,25 +1215,25 @@ public class ExpressionASTTest {
 
         ComparisonAST ca =
                 new ComparisonAST(ComparisonOperation.GT, c1bool, c2bool);
-        Constant c = (Constant) ca.compile(ctx, atts);
+        Constant c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.GE, c1bool, c2bool);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.LT, c1bool, c2bool);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.LE, c1bool, c2bool);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
@@ -1242,25 +1243,25 @@ public class ExpressionASTTest {
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.GT, c1id, c2id);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.GE, c1id, c2id);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.LT, c1id, c2id);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ca = new ComparisonAST(ComparisonOperation.LE, c1id, c2id);
-        c = (Constant) ca.compile(ctx, atts);
+        c = (Constant) ca.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
     }
@@ -1323,10 +1324,10 @@ public class ExpressionASTTest {
     @Test
     public void testBetweenCompile() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         BetweenAST ba = new BetweenAST(intAtt, intAtt, intAtt);
-        Between b = (Between) ba.compile(ctx, atts);
+        Between b = (Between) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
@@ -1336,13 +1337,13 @@ public class ExpressionASTTest {
         ConstantAST maxInt = new ConstantAST(30, TypeClass.INTEGER);
 
         ba = new BetweenAST(midInt, minInt, maxInt);
-        Constant c = (Constant) ba.compile(ctx, atts);
+        Constant c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ba = new BetweenAST(maxInt, minInt, midInt);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -1353,13 +1354,13 @@ public class ExpressionASTTest {
         ConstantAST maxFloat = new ConstantAST(3.5f, TypeClass.FLOAT);
 
         ba = new BetweenAST(midFloat, minFloat, maxFloat);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ba = new BetweenAST(maxFloat, minFloat, midFloat);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -1370,13 +1371,13 @@ public class ExpressionASTTest {
         ConstantAST maxString = new ConstantAST("ccc", TypeClass.STRING);
 
         ba = new BetweenAST(midString, minString, maxString);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ba = new BetweenAST(maxString, minString, midString);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -1390,13 +1391,13 @@ public class ExpressionASTTest {
         ConstantAST maxTs = new ConstantAST(i, TypeClass.TIMESTAMP);
 
         ba = new BetweenAST(midTs, minTs, maxTs);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
 
         ba = new BetweenAST(maxTs, minTs, midTs);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
@@ -1405,7 +1406,7 @@ public class ExpressionASTTest {
     @Test
     public void testBetweenForbiddenTypes() {
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         // ID test
         ConstantAST minId = new ConstantAST(1, TypeClass.ID);
@@ -1413,13 +1414,13 @@ public class ExpressionASTTest {
         ConstantAST maxId = new ConstantAST(3, TypeClass.ID);
 
         BetweenAST ba = new BetweenAST(midId, minId, maxId);
-        Constant c = (Constant) ba.compile(ctx, atts);
+        Constant c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ba = new BetweenAST(maxId, minId, midId);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
@@ -1430,13 +1431,13 @@ public class ExpressionASTTest {
 
         ctx = new ParserContext();
         ba = new BetweenAST(midBool, minBool, maxBool);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
 
         ctx = new ParserContext();
         ba = new BetweenAST(maxBool, minBool, midBool);
-        c = (Constant) ba.compile(ctx, atts);
+        c = (Constant) ba.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(1));
         assertThat(c, equalTo(Constant.NULL));
     }
@@ -1516,12 +1517,12 @@ public class ExpressionASTTest {
     public void testAggregateCompile() {
         WindowSize ws = new WindowSize(12);
         ParserContext ctx = new ParserContext();
-        Map<String, Integer> atts = new HashMap<>();
+        Map<Attribute, Integer> atts = new HashMap<>();
 
         AggregateAST aa = new AggregateAST(AggregateOperation.MIN,
                 intAtt, ws, ConstantAST.TRUE);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        MinAggregate min = (MinAggregate) aa.compile(ctx, atts);
+        MinAggregate min = (MinAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(min.getType(), equalTo(DataType.INTEGER));
         assertThat(min.getWindowSize(), equalTo(aa.getWindowSize()));
@@ -1530,7 +1531,7 @@ public class ExpressionASTTest {
         aa = new AggregateAST(AggregateOperation.MAX,
                 intAtt, ws, ConstantAST.TRUE);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        MaxAggregate max = (MaxAggregate) aa.compile(ctx, atts);
+        MaxAggregate max = (MaxAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(max.getType(), equalTo(DataType.INTEGER));
         assertThat(max.getWindowSize(), equalTo(aa.getWindowSize()));
@@ -1539,7 +1540,7 @@ public class ExpressionASTTest {
         aa = new AggregateAST(AggregateOperation.SUM,
                 intAtt, ws, ConstantAST.TRUE);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        SumAggregate sum = (SumAggregate) aa.compile(ctx, atts);
+        SumAggregate sum = (SumAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
         assertThat(sum.getWindowSize(), equalTo(aa.getWindowSize()));
@@ -1548,7 +1549,7 @@ public class ExpressionASTTest {
         aa = new AggregateAST(AggregateOperation.AVG,
                 intAtt, ws, ConstantAST.TRUE);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        AvgAggregate avg = (AvgAggregate) aa.compile(ctx, atts);
+        AvgAggregate avg = (AvgAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
         assertThat(avg.getWindowSize(), equalTo(aa.getWindowSize()));
@@ -1557,7 +1558,7 @@ public class ExpressionASTTest {
         aa = new AggregateAST(AggregateOperation.COUNT,
                 intAtt, ws, ConstantAST.TRUE);
         assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
-        CountAggregate count = (CountAggregate) aa.compile(ctx, atts);
+        CountAggregate count = (CountAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(count.getType(), equalTo(DataType.INTEGER));
         assertThat(count.getWindowSize(), equalTo(aa.getWindowSize()));
@@ -1605,7 +1606,7 @@ public class ExpressionASTTest {
     @Test
     public void testInference() {
         ExpressionAST op1 = new ConstantAST("3", TypeClass.INTEGER);
-        ExpressionAST op2 = new AttributeAST("integer", TypeClass.ANY);
+        ExpressionAST op2 = new AttributeReferenceAST("integer", TypeClass.ANY);
         ExpressionAST e =
                 new ArithmeticAST(ArithmeticOperation.ADDITION, op1, op2);
 

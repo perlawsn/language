@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -36,7 +37,7 @@ public final class ComparisonAST extends BinaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
@@ -50,7 +51,7 @@ public final class ComparisonAST extends BinaryExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         TypeClass t = left.getTypeClass();
         if ((t == TypeClass.ID || t == TypeClass.BOOLEAN) &&
                 op != ComparisonOperation.EQ && op != ComparisonOperation.NE) {
@@ -60,8 +61,8 @@ public final class ComparisonAST extends BinaryExpressionAST {
             return Constant.NULL;
         }
 
-        Expression leftExp = left.compile(ctx, atts);
-        Expression rightExp = right.compile(ctx, atts);
+        Expression leftExp = left.toExpression(ctx, atts);
+        Expression rightExp = right.toExpression(ctx, atts);
 
         if (leftExp instanceof Constant && rightExp instanceof Constant) {
             Object o1 = ((Constant) leftExp).getValue();

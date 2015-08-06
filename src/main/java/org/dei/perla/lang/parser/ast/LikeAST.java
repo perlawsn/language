@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.descriptor.DataType;
 import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -35,7 +36,7 @@ public final class LikeAST extends UnaryExpressionAST {
     }
 
     @Override
-    public boolean inferType(TypeVariable bound, ParserContext ctx) {
+    protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = bound.restrict(TypeClass.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("LIKE", getPosition(),
@@ -49,8 +50,8 @@ public final class LikeAST extends UnaryExpressionAST {
     }
 
     @Override
-    public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
-        Expression e = operand.compile(ctx, atts);
+    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+        Expression e = operand.toExpression(ctx, atts);
 
         if (e instanceof Constant) {
             Object o = Like.compute(((Constant) e).getValue(), pattern);

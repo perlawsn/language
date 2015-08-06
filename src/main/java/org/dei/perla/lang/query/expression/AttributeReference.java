@@ -9,7 +9,7 @@ import org.dei.perla.lang.executor.buffer.BufferView;
  *
  * @author Guido Rota 23/02/15.
  */
-public final class Attribute extends Expression {
+public final class AttributeReference extends Expression {
 
     private final String id;
     private final DataType type;
@@ -23,7 +23,7 @@ public final class Attribute extends Expression {
      * @param type attribute type
      * @param idx index of the attribute in the sample array
      */
-    public Attribute(String id, DataType type, int idx) {
+    public AttributeReference(String id, DataType type, int idx) {
         this.id = id;
         this.type = type;
         this.idx = idx;

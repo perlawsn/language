@@ -548,7 +548,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", err);
         assertTrue(err.isEmpty());
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
-        AttributeAST att = (AttributeAST) a.getOperand();
+        AttributeReferenceAST att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
@@ -557,7 +557,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", err);
         assertTrue(err.isEmpty());
         assertThat(a.getOperation(), equalTo(AggregateOperation.MAX));
-        att = (AttributeAST) a.getOperand();
+        att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
@@ -566,7 +566,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", err);
         assertTrue(err.isEmpty());
         assertThat(a.getOperation(), equalTo(AggregateOperation.MIN));
-        att = (AttributeAST) a.getOperand();
+        att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
@@ -575,7 +575,7 @@ public class ParserASTTEst {
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", err);
         assertTrue(err.isEmpty());
         assertThat(a.getOperation(), equalTo(AggregateOperation.AVG));
-        att = (AttributeAST) a.getOperand();
+        att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
@@ -609,7 +609,7 @@ public class ParserASTTEst {
         Errors err = new Errors();
         ParserAST p = getParser("temperature");
         assertTrue(err.isEmpty());
-        AttributeAST a = p.Attribute();
+        AttributeReferenceAST a = p.Attribute();
         assertThat(a.getId(), equalTo("temperature"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
 
