@@ -66,6 +66,9 @@ public final class ConstantAST extends ExpressionAST {
 
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        if (value == null) {
+            return Constant.NULL;
+        }
         return Constant.create(value, type.toDataType());
     }
 

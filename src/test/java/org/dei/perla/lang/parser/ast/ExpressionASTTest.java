@@ -100,6 +100,11 @@ public class ExpressionASTTest {
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.STRING));
         assertThat(c.getValue(), equalTo("test"));
+
+        ca = ConstantAST.NULL;
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c, equalTo(Constant.NULL));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -626,6 +631,29 @@ public class ExpressionASTTest {
         assertFalse(is.inferType(v, ctx));
     }
 
+    @Test
+    public void testIsNullCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        IsNullAST ia = new IsNullAST(intAtt);
+        IsNull i = (IsNull) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(i.getType(), equalTo(DataType.BOOLEAN));
+
+        ia = new IsNullAST(new ConstantAST(10, TypeClass.INTEGER));
+        Constant c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        ia = new IsNullAST(ConstantAST.NULL);
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testIsNullNoType() {
         IsNullAST is = new IsNullAST(intExp);
@@ -660,6 +688,35 @@ public class ExpressionASTTest {
 
         l = new LikeAST(intExp, "test");
         assertFalse(l.inferType(v, ctx));
+    }
+
+    @Test
+    public void testLikeCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        LikeAST la = new LikeAST(stringAtt, "test");
+        Like l = (Like) la.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(l.getType(), equalTo(DataType.BOOLEAN));
+
+        la = new LikeAST(new ConstantAST("test", TypeClass.STRING), "test");
+        Constant c = (Constant) la.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        la = new LikeAST(new ConstantAST("rest", TypeClass.STRING), "test");
+        c = (Constant) la.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.FALSE));
+
+        la = new LikeAST(ConstantAST.NULL, "test");
+        c = (Constant) la.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.UNKNOWN));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -718,6 +775,97 @@ public class ExpressionASTTest {
         assertFalse(a.inferType(v, ctx));
     }
 
+    @Test
+    public void testArithmeticCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        ArithmeticAST aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
+                intAtt, intAtt);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        Arithmetic a = (Arithmetic) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(a.getOperation(), equalTo(aa.getOperation()));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
+
+        ConstantAST c1int = new ConstantAST(10, TypeClass.INTEGER);
+        ConstantAST c2int = new ConstantAST(34, TypeClass.INTEGER);
+        ConstantAST c1float = new ConstantAST(3.2f, TypeClass.FLOAT);
+        ConstantAST c2float = new ConstantAST(75f, TypeClass.FLOAT);
+
+        aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
+                c1int, c2int);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        Constant c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10 + 34));
+
+        aa = new ArithmeticAST(ArithmeticOperation.SUBTRACTION,
+                c1int, c2int);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10 - 34));
+
+        aa = new ArithmeticAST(ArithmeticOperation.DIVISION,
+                c1int, c2int);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10 / 34));
+
+        aa = new ArithmeticAST(ArithmeticOperation.PRODUCT,
+                c1int, c2int);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10 * 34));
+
+        aa = new ArithmeticAST(ArithmeticOperation.MODULO,
+                c1int, c2int);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10 % 34));
+
+        aa = new ArithmeticAST(ArithmeticOperation.ADDITION,
+                c1float, c2float);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertThat(c.getValue(), equalTo(3.2f + 75f));
+
+        aa = new ArithmeticAST(ArithmeticOperation.SUBTRACTION,
+                c1float, c2float);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertThat(c.getValue(), equalTo(3.2f - 75f));
+
+        aa = new ArithmeticAST(ArithmeticOperation.DIVISION,
+                c1float, c2float);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertThat(c.getValue(), equalTo(3.2f / 75f));
+
+        aa = new ArithmeticAST(ArithmeticOperation.PRODUCT,
+                c1float, c2float);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertThat(c.getValue(), equalTo(3.2f * 75f));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testArithmeticNoType() {
         ArithmeticAST a =
@@ -765,6 +913,32 @@ public class ExpressionASTTest {
         v = new TypeVariable(TypeClass.ID);
         i = new InverseAST(floatExp);
         assertFalse(i.inferType(v, ctx));
+    }
+
+    @Test
+    public void testArithmeticInverseCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        InverseAST ia = new InverseAST(intAtt);
+        assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        Inverse i = (Inverse) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(i.getType(), equalTo(DataType.INTEGER));
+
+        ia = new InverseAST(new ConstantAST(10, TypeClass.INTEGER));
+        assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        Constant c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(-10));
+
+        ia = new InverseAST(new ConstantAST(2.5f, TypeClass.FLOAT));
+        assertTrue(ia.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        c = (Constant) ia.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
+        assertThat(c.getValue(), equalTo(-2.5f));
     }
 
     @Test(expected = IllegalStateException.class)
