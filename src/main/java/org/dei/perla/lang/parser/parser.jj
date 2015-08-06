@@ -511,22 +511,22 @@ TOKEN :
  * PRODUCTIONS
  */
 
-StatementAST Statement():
+StatementAST Statement(Errors err):
 {
     StatementAST s;
 }
 {
     (
-    s = SetParametersStament()
+    s = SetParametersStament(err)
     |
-    s = CreationStatement()
+    s = CreationStatement(err)
     |
-    s = InsertionStatement()
+    s = InsertionStatement(err)
     )
     { return s; }
 }
 
-SetStatementAST SetParametersStament():
+SetStatementAST SetParametersStament(Errors err):
 {
     int id;
     SetParameterAST p;
@@ -537,11 +537,11 @@ SetStatementAST SetParametersStament():
 }
 {
     t = <KEYWORD_SET>
-    p = SetParameter()
+    p = SetParameter(err)
     { params.add(p); }
     (
         ","
-        p = SetParameter()
+        p = SetParameter(err)
         { params.add(p); }
     )*
     <KEYWORD_ON>
@@ -559,7 +559,7 @@ SetStatementAST SetParametersStament():
     { return new SetStatementAST(t, params, ids); }
 }
 
-SetParameterAST SetParameter():
+SetParameterAST SetParameter(Errors err):
 {
     String id;
     ExpressionAST e;
@@ -570,11 +570,11 @@ SetParameterAST SetParameter():
     id = Identifier()
     { t = token; }
     "="
-    e = Expression()
+    e = Expression(ExpressionType.CONSTANT, "set value", err)
     { return new SetParameterAST(t, id, e); }
 }
 
-CreationStatementAST CreationStatement() :
+CreationStatementAST CreationStatement(Errors err) :
 {
     String stream;
     List<FieldDefinitionAST> fields;
@@ -586,35 +586,35 @@ CreationStatementAST CreationStatement() :
     t = <KEYWORD_CREATE>
     <KEYWORD_STREAM>
     stream = Identifier() // Stream name
-    fields = FieldDefinitionList()
+    fields = FieldDefinitionList(err)
     [
         <KEYWORD_AS>
-        sel = SelectionStatement()
+        sel = SelectionStatement(err)
     ]
     {
         return new CreationStatementAST(t, stream, fields, sel);
     }
 }
 
-List<FieldDefinitionAST> FieldDefinitionList() :
+List<FieldDefinitionAST> FieldDefinitionList(Errors err) :
 {
     List<FieldDefinitionAST> fields = new ArrayList<FieldDefinitionAST>();
     FieldDefinitionAST f;
 }
 {
     "("
-    f = FieldDefinition()
+    f = FieldDefinition(err)
     { fields.add(f); }
     (
         ","
-        f = FieldDefinition()
+        f = FieldDefinition(err)
         { fields.add(f); }
     )*
     ")"
     { return fields; }
 }
 
-FieldDefinitionAST FieldDefinition() :
+FieldDefinitionAST FieldDefinition(Errors err) :
 {
     String name;
     DataType type;
@@ -629,7 +629,7 @@ FieldDefinitionAST FieldDefinition() :
     [
         <KEYWORD_DEFAULT>
         (
-            def = Expression()
+            def = Expression(ExpressionType.CONSTANT, "default field value", err)
             |
             <CONSTANT_NULL>
         )
@@ -637,7 +637,7 @@ FieldDefinitionAST FieldDefinition() :
     { return new FieldDefinitionAST(t, name, type, def); }
 }
 
-InsertionStatementAST InsertionStatement() :
+InsertionStatementAST InsertionStatement(Errors err) :
 {
     String stream;
     List<String> fl = new ArrayList<String>();
@@ -653,7 +653,7 @@ InsertionStatementAST InsertionStatement() :
     [
         fl = FieldList()
     ]
-    sel = SelectionStatement()
+    sel = SelectionStatement(err)
     { return new InsertionStatementAST(t, stream, fl, sel); }
 }
 
@@ -675,7 +675,7 @@ List<String> FieldList() :
     { return fl; }
 }
 
-SelectionStatementAST SelectionStatement() :
+SelectionStatementAST SelectionStatement(Errors err) :
 {
     WindowSize every;
     List<FieldSelectionAST> fsl;
@@ -695,12 +695,12 @@ SelectionStatementAST SelectionStatement() :
     every = EveryClause()
     { t = token; }
     <KEYWORD_SELECT>
-    fsl = FieldSelectionList()
+    fsl = FieldSelectionList(err)
     [
         gby = GroupByClause()
     ]
     [
-        having = HavingClause()
+        having = HavingClause(err)
     ]
     [
         upto = UpToClause()
@@ -708,15 +708,15 @@ SelectionStatementAST SelectionStatement() :
     [
         oes = OnEmptySelectionClause()
     ]
-    sampling = SamplingClause()
+    sampling = SamplingClause(err)
     [
         // This optional where clause filters the sampled values before adding
         // them to the local buffer
         <KEYWORD_WHERE>
-        where = Expression()
+        where = Expression(ExpressionType.SIMPLE, "where clause", err)
     ]
     [
-        ec = ExecutionConditionsClause()
+        ec = ExecutionConditionsClause(err)
     ]
     [
         terminate = TerminateAfterClause()
@@ -737,23 +737,23 @@ WindowSize EveryClause() :
     { return ws; }
 }
 
-List<FieldSelectionAST> FieldSelectionList() :
+List<FieldSelectionAST> FieldSelectionList(Errors err) :
 {
     List<FieldSelectionAST> fsl = new ArrayList<FieldSelectionAST>();
     FieldSelectionAST fs;
 }
 {
-    fs = FieldSelection()
+    fs = FieldSelection(err)
     { fsl.add(fs); }
     (
         ","
-        fs = FieldSelection()
+        fs = FieldSelection(err)
         { fsl.add(fs); }
     )*
     { return fsl; }
 }
 
-FieldSelectionAST FieldSelection() :
+FieldSelectionAST FieldSelection(Errors err) :
 {
     ExpressionAST field;
     ExpressionAST def = ConstantAST.NULL;
@@ -761,12 +761,12 @@ FieldSelectionAST FieldSelection() :
     Token t;
 }
 {
-    field = Expression()
+    field = Expression(ExpressionType.AGGREGATE, "select field", err)
     { t = token; }
     [
         <KEYWORD_DEFAULT>
         (
-            def = Expression()
+            def = Expression(ExpressionType.CONSTANT, "default field value", err)
             |
             <CONSTANT_NULL>
         )
@@ -796,7 +796,7 @@ GroupByAST GroupByClause() :
     { return new GroupByAST(t, fs); }
 }
 
-HavingAST HavingClause() :
+HavingAST HavingClause(Errors err) :
 {
     ExpressionAST e;
 
@@ -804,7 +804,7 @@ HavingAST HavingClause() :
 }
 {
     t = <KEYWORD_HAVING>
-    e = Expression()
+    e = Expression(ExpressionType.AGGREGATE, "having clause", err)
     { return new HavingAST(t, e); }
 }
 
@@ -835,7 +835,7 @@ OnEmptySelection OnEmptySelectionClause() :
     )
 }
 
-SamplingAST SamplingClause() :
+SamplingAST SamplingClause(Errors err) :
 {
     List<String> events;
 
@@ -852,7 +852,7 @@ SamplingAST SamplingClause() :
         { return new SamplingEventAST(t, events); }
         |
         (
-            ife = IfEveryClause()
+            ife = IfEveryClause(err)
             [
                 policy = OnUnsupportedSRClause()
             ]
@@ -884,7 +884,7 @@ List<String> OnEventClause() :
     { return evs; }
 }
 
-List<IfEveryAST> IfEveryClause() :
+List<IfEveryAST> IfEveryClause(Errors err) :
 {
     List<IfEveryAST> ifeList = new ArrayList<IfEveryAST>();
     IfEveryAST ife;
@@ -897,8 +897,8 @@ List<IfEveryAST> IfEveryClause() :
     (
         (
             t = <KEYWORD_IF>
-            cond = Expression()
-            every = EveryDuration()
+            cond = Expression(ExpressionType.SIMPLE, "if-every clause", err)
+            every = EveryDuration(err)
             {
                 ife = new IfEveryAST(t, cond, every);
                 ifeList.add(ife);
@@ -906,7 +906,7 @@ List<IfEveryAST> IfEveryClause() :
         )+
         (
             t = <KEYWORD_ELSE>
-            every = EveryDuration()
+            every = EveryDuration(err)
             {
                 ife = new IfEveryAST(t, ConstantAST.TRUE, every);
                 ifeList.add(ife);
@@ -916,7 +916,7 @@ List<IfEveryAST> IfEveryClause() :
     )
     |
     (
-        every = EveryDuration()
+        every = EveryDuration(err)
         {
             ife = new IfEveryAST(token, ConstantAST.TRUE, every);
             ifeList.add(ife);
@@ -925,7 +925,7 @@ List<IfEveryAST> IfEveryClause() :
     { return ifeList; }
 }
 
-EveryAST EveryDuration() :
+EveryAST EveryDuration(Errors err) :
 {
     ExpressionAST value;
     TemporalUnit unit;
@@ -934,7 +934,7 @@ EveryAST EveryDuration() :
 }
 {
     t = <KEYWORD_EVERY>
-    value = Expression()
+    value = Expression(ExpressionType.SIMPLE, "every clause", err)
     unit = TimeUnit()
     {
         return new EveryAST(t, value, unit);
@@ -982,7 +982,7 @@ RefreshAST RefreshClause() :
     )
 }
 
-ExecutionConditionsAST ExecutionConditionsClause() :
+ExecutionConditionsAST ExecutionConditionsClause(Errors err) :
 {
     ExpressionAST cond = ConstantAST.TRUE;
     NodeSpecificationsAST specs = null;
@@ -994,7 +994,7 @@ ExecutionConditionsAST ExecutionConditionsClause() :
     t = <KEYWORD_EXECUTE>
     [
         <KEYWORD_IF>
-        cond = Expression()
+        cond = Expression(ExpressionType.SIMPLE, "execute if clause", err)
     ]
     [
         specs = NodeSpecifications()
