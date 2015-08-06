@@ -1729,6 +1729,7 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
         if (type == ExpressionType.CONSTANT) {
             err.addError("Only constant expressions are allowed in " + src +
                 " at line " + token.beginLine + ", column " + token.beginColumn);
+            return ConstantAST.NULL;
         } else {
             return e;
         }
