@@ -8,6 +8,7 @@ import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -991,6 +992,181 @@ public class ExpressionASTTest {
         assertFalse(c.inferType(v, ctx));
     }
 
+    @Test
+    public void testComparisonCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        ComparisonAST ca = new ComparisonAST(ComparisonOperation.EQ,
+                intAtt, intAtt);
+        Comparison c = (Comparison) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getOperation(), equalTo(ca.getOperation()));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+
+        // Integer tests
+        ConstantAST c1int = new ConstantAST(10, TypeClass.INTEGER);
+        ConstantAST c2int = new ConstantAST(25, TypeClass.INTEGER);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1int, c2int);
+        Constant r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1int, c2int);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.GT, c1int, c2int);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.GE, c1int, c2int);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.LT, c1int, c2int);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.LE, c1int, c2int);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        // Float tests
+        ConstantAST c1float = new ConstantAST(1.2f, TypeClass.FLOAT);
+        ConstantAST c2float = new ConstantAST(34f, TypeClass.FLOAT);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.GT, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.GE, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.LT, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.LE, c1float, c2float);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        // Float tests
+        ConstantAST c1string = new ConstantAST("asdf", TypeClass.STRING);
+        ConstantAST c2string = new ConstantAST("fdsa", TypeClass.STRING);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.GT, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.GE, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.LT, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.LE, c1string, c2string);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        // Timestamp tests
+        Instant i = Instant.ofEpochSecond(1438850110);
+        ConstantAST c1ts = new ConstantAST(i, TypeClass.TIMESTAMP);
+        i = Instant.ofEpochSecond(1438850111);
+        ConstantAST c2ts = new ConstantAST(i, TypeClass.TIMESTAMP);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.GT, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.GE, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.LT, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        ca = new ComparisonAST(ComparisonOperation.LE, c1ts, c2ts);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testComparisonNoType() {
         ComparisonAST c =
@@ -1044,6 +1220,88 @@ public class ExpressionASTTest {
         v = new TypeVariable(TypeClass.BOOLEAN);
         b = new BetweenAST(boolExp, boolExp, intExp);
         assertFalse(b.inferType(v, ctx));
+    }
+
+    @Test
+    public void testBetweenCompile() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        BetweenAST ba = new BetweenAST(intAtt, intAtt, intAtt);
+        Between b = (Between) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
+
+        // INTEGER test
+        ConstantAST minInt = new ConstantAST(10, TypeClass.INTEGER);
+        ConstantAST midInt = new ConstantAST(25, TypeClass.INTEGER);
+        ConstantAST maxInt = new ConstantAST(30, TypeClass.INTEGER);
+
+        ba = new BetweenAST(midInt, minInt, maxInt);
+        Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ba = new BetweenAST(maxInt, minInt, midInt);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        // FLOAT test
+        ConstantAST minFloat = new ConstantAST(1.0f, TypeClass.FLOAT);
+        ConstantAST midFloat = new ConstantAST(2.5f, TypeClass.FLOAT);
+        ConstantAST maxFloat = new ConstantAST(3.5f, TypeClass.FLOAT);
+
+        ba = new BetweenAST(midFloat, minFloat, maxFloat);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ba = new BetweenAST(maxFloat, minFloat, midFloat);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        // STRING test
+        ConstantAST minString = new ConstantAST("aaa", TypeClass.STRING);
+        ConstantAST midString = new ConstantAST("bbb", TypeClass.STRING);
+        ConstantAST maxString = new ConstantAST("ccc", TypeClass.STRING);
+
+        ba = new BetweenAST(midString, minString, maxString);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ba = new BetweenAST(maxString, minString, midString);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        // TIMESTAMP test
+        Instant i = Instant.ofEpochSecond(1438850110);
+        ConstantAST minTs = new ConstantAST(i, TypeClass.TIMESTAMP);
+        i = Instant.ofEpochSecond(1438850111);
+        ConstantAST midTs = new ConstantAST(i, TypeClass.TIMESTAMP);
+        i = Instant.ofEpochSecond(1438850112);
+        ConstantAST maxTs = new ConstantAST(i, TypeClass.TIMESTAMP);
+
+        ba = new BetweenAST(midTs, minTs, maxTs);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+
+        ba = new BetweenAST(maxTs, minTs, midTs);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1115,6 +1373,58 @@ public class ExpressionASTTest {
         v = new TypeVariable(TypeClass.NUMERIC);
         a = new AggregateAST(AggregateOperation.COUNT, null, ws, floatExp);
         assertFalse(a.inferType(v, ctx));
+    }
+
+    @Test
+    public void testAggregateCompile() {
+        WindowSize ws = new WindowSize(12);
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        AggregateAST aa = new AggregateAST(AggregateOperation.MIN,
+                intAtt, ws, ConstantAST.TRUE);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        MinAggregate min = (MinAggregate) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(min.getType(), equalTo(DataType.INTEGER));
+        assertThat(min.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(min.getFilter(), equalTo(Constant.TRUE));
+
+        aa = new AggregateAST(AggregateOperation.MAX,
+                intAtt, ws, ConstantAST.TRUE);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        MaxAggregate max = (MaxAggregate) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(max.getType(), equalTo(DataType.INTEGER));
+        assertThat(max.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(max.getFilter(), equalTo(Constant.TRUE));
+
+        aa = new AggregateAST(AggregateOperation.SUM,
+                intAtt, ws, ConstantAST.TRUE);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        SumAggregate sum = (SumAggregate) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(sum.getType(), equalTo(DataType.INTEGER));
+        assertThat(sum.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(sum.getFilter(), equalTo(Constant.TRUE));
+
+        aa = new AggregateAST(AggregateOperation.AVG,
+                intAtt, ws, ConstantAST.TRUE);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        AvgAggregate avg = (AvgAggregate) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(avg.getType(), equalTo(DataType.FLOAT));
+        assertThat(avg.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(avg.getFilter(), equalTo(Constant.TRUE));
+
+        aa = new AggregateAST(AggregateOperation.COUNT,
+                intAtt, ws, ConstantAST.TRUE);
+        assertTrue(aa.inferType(new TypeVariable(TypeClass.ANY), ctx));
+        CountAggregate count = (CountAggregate) aa.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(count.getType(), equalTo(DataType.INTEGER));
+        assertThat(count.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(count.getFilter(), equalTo(Constant.TRUE));
     }
 
     @Test(expected = IllegalStateException.class)

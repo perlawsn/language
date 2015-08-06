@@ -90,7 +90,7 @@ public final class AggregateAST extends ExpressionAST {
         setType(bound);
         TypeVariable ob = new TypeVariable(TypeClass.NUMERIC);
         TypeVariable fb = new TypeVariable(TypeClass.BOOLEAN);
-        res = operand.inferType(bound, ctx);
+        res = operand.inferType(ob, ctx);
         return res && filter.inferType(fb, ctx);
     }
 
