@@ -1165,6 +1165,104 @@ public class ExpressionASTTest {
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(r.getType(), equalTo(DataType.BOOLEAN));
         assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        // Bool tests
+        ConstantAST c1bool = new ConstantAST(LogicValue.TRUE,
+                TypeClass.BOOLEAN);
+        ConstantAST c2bool = new ConstantAST(LogicValue.FALSE,
+                TypeClass.BOOLEAN);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1bool, c2bool);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1bool, c2bool);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+
+        // ID tests
+        ConstantAST c1id = new ConstantAST(312, TypeClass.ID);
+        ConstantAST c2id = new ConstantAST(123, TypeClass.ID);
+
+        ca = new ComparisonAST(ComparisonOperation.EQ, c1id, c2id);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.FALSE));
+
+        ca = new ComparisonAST(ComparisonOperation.NE, c1id, c2id);
+        r = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(r.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(r.getValue(), equalTo(LogicValue.TRUE));
+    }
+
+    @Test
+    public void testComparisonForbiddenOperation() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        // Bool tests
+        ConstantAST c1bool = new ConstantAST(LogicValue.TRUE,
+                TypeClass.BOOLEAN);
+        ConstantAST c2bool = new ConstantAST(LogicValue.FALSE,
+                TypeClass.BOOLEAN);
+
+        ComparisonAST ca =
+                new ComparisonAST(ComparisonOperation.GT, c1bool, c2bool);
+        Constant c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.GE, c1bool, c2bool);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.LT, c1bool, c2bool);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.LE, c1bool, c2bool);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        // ID tests
+        ConstantAST c1id = new ConstantAST(312, TypeClass.ID);
+        ConstantAST c2id = new ConstantAST(123, TypeClass.ID);
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.GT, c1id, c2id);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.GE, c1id, c2id);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.LT, c1id, c2id);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ca = new ComparisonAST(ComparisonOperation.LE, c1id, c2id);
+        c = (Constant) ca.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1302,6 +1400,45 @@ public class ExpressionASTTest {
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
+    }
+
+    @Test
+    public void testBetweenForbiddenTypes() {
+        ParserContext ctx = new ParserContext();
+        Map<String, Integer> atts = new HashMap<>();
+
+        // ID test
+        ConstantAST minId = new ConstantAST(1, TypeClass.ID);
+        ConstantAST midId = new ConstantAST(2, TypeClass.ID);
+        ConstantAST maxId = new ConstantAST(3, TypeClass.ID);
+
+        BetweenAST ba = new BetweenAST(midId, minId, maxId);
+        Constant c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ba = new BetweenAST(maxId, minId, midId);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        // BOOLEAN test
+        ConstantAST minBool = new ConstantAST(1, TypeClass.BOOLEAN);
+        ConstantAST midBool = new ConstantAST(2, TypeClass.BOOLEAN);
+        ConstantAST maxBool = new ConstantAST(3, TypeClass.BOOLEAN);
+
+        ctx = new ParserContext();
+        ba = new BetweenAST(midBool, minBool, maxBool);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
+
+        ctx = new ParserContext();
+        ba = new BetweenAST(maxBool, minBool, midBool);
+        c = (Constant) ba.compile(ctx, atts);
+        assertThat(ctx.getErrorCount(), equalTo(1));
+        assertThat(c, equalTo(Constant.NULL));
     }
 
     @Test(expected = IllegalStateException.class)

@@ -12,7 +12,8 @@ import org.dei.perla.lang.query.expression.Expression;
 import java.util.Map;
 
 /**
- * Between Abstract Syntax Tree node
+ * Between Abstract Syntax Tree node. This operation is not allowed on
+ * operands with type ID and BOOLEAN.
  *
  * @author Guido Rota 30/07/15.
  */
@@ -78,6 +79,14 @@ public final class BetweenAST extends ExpressionAST {
 
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        TypeClass t = operand.getTypeClass();
+        if (t == TypeClass.ID || t == TypeClass.BOOLEAN) {
+            String msg = "Comparison operation 'between' forbidden on " +
+                    "arguments of type '" + t + "' at " + getPosition();
+            ctx.addError(msg);
+            return Constant.NULL;
+        }
+
         Expression opExp = operand.compile(ctx, atts);
         Expression minExp = operand.compile(ctx, atts);
         Expression maxExp = operand.compile(ctx, atts);

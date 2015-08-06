@@ -5,15 +5,13 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
-import org.dei.perla.lang.query.expression.Comparison;
-import org.dei.perla.lang.query.expression.ComparisonOperation;
-import org.dei.perla.lang.query.expression.Constant;
-import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.*;
 
 import java.util.Map;
 
 /**
- * Comparison Abstract Syntax Tree node
+ * Comparison Abstract Syntax Tree node. For data types ID and BOOLEAN the
+ * only comparison operators allowed are EQ and NE.
  *
  * @author Guido Rota 30/07/15.
  */
@@ -53,6 +51,15 @@ public final class ComparisonAST extends BinaryExpressionAST {
 
     @Override
     public Expression compile(ParserContext ctx, Map<String, Integer> atts) {
+        TypeClass t = left.getTypeClass();
+        if ((t == TypeClass.ID || t == TypeClass.BOOLEAN) &&
+                op != ComparisonOperation.EQ && op != ComparisonOperation.NE) {
+            String msg = "Comparison operation '" + op + "' forbidden on " +
+                    "arguments of type '" + t + "' at " + getPosition();
+            ctx.addError(msg);
+            return Constant.NULL;
+        }
+
         Expression leftExp = left.compile(ctx, atts);
         Expression rightExp = right.compile(ctx, atts);
 
