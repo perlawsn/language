@@ -35,6 +35,15 @@ public final class ParserContext {
     }
 
     /**
+     * Returns a textual description of all errors encountered while parsing.
+     *
+     * @return Description of all errors encountered during parsing
+     */
+    public String getErrorDescription() {
+        return err.asString();
+    }
+
+    /**
      * Adds a new usage of a
      * @param att
      * @return

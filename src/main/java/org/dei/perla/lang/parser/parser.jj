@@ -36,7 +36,6 @@ PARSER_BEGIN(ParserAST)
     import org.dei.perla.lang.query.expression.*;
     import org.dei.perla.lang.query.statement.*;
 
-    import org.dei.perla.core.utils.Errors;
     import org.dei.perla.core.descriptor.DataType;
     import org.dei.perla.core.registry.TypeClass;
     import org.dei.perla.core.registry.DataTemplate;
@@ -511,22 +510,22 @@ TOKEN :
  * PRODUCTIONS
  */
 
-StatementAST Statement(Errors err):
+StatementAST Statement(ParserContext ctx):
 {
     StatementAST s;
 }
 {
     (
-    s = SetParametersStament(err)
+    s = SetParametersStament(ctx)
     |
-    s = CreationStatement(err)
+    s = CreationStatement(ctx)
     |
-    s = InsertionStatement(err)
+    s = InsertionStatement(ctx)
     )
     { return s; }
 }
 
-SetStatementAST SetParametersStament(Errors err):
+SetStatementAST SetParametersStament(ParserContext ctx):
 {
     int id;
     SetParameterAST p;
@@ -537,11 +536,11 @@ SetStatementAST SetParametersStament(Errors err):
 }
 {
     t = <KEYWORD_SET>
-    p = SetParameter(err)
+    p = SetParameter(ctx)
     { params.add(p); }
     (
         ","
-        p = SetParameter(err)
+        p = SetParameter(ctx)
         { params.add(p); }
     )*
     <KEYWORD_ON>
@@ -559,7 +558,7 @@ SetStatementAST SetParametersStament(Errors err):
     { return new SetStatementAST(t, params, ids); }
 }
 
-SetParameterAST SetParameter(Errors err):
+SetParameterAST SetParameter(ParserContext ctx):
 {
     String id;
     ExpressionAST e;
@@ -570,11 +569,11 @@ SetParameterAST SetParameter(Errors err):
     id = Identifier()
     { t = token; }
     "="
-    e = Expression(ExpressionType.CONSTANT, "set value", err)
+    e = Expression(ExpressionType.CONSTANT, "set value", ctx)
     { return new SetParameterAST(t, id, e); }
 }
 
-CreationStatementAST CreationStatement(Errors err) :
+CreationStatementAST CreationStatement(ParserContext ctx) :
 {
     String stream;
     List<FieldDefinitionAST> fields;
@@ -586,35 +585,35 @@ CreationStatementAST CreationStatement(Errors err) :
     t = <KEYWORD_CREATE>
     <KEYWORD_STREAM>
     stream = Identifier() // Stream name
-    fields = FieldDefinitionList(err)
+    fields = FieldDefinitionList(ctx)
     [
         <KEYWORD_AS>
-        sel = SelectionStatement(err)
+        sel = SelectionStatement(ctx)
     ]
     {
         return new CreationStatementAST(t, stream, fields, sel);
     }
 }
 
-List<FieldDefinitionAST> FieldDefinitionList(Errors err) :
+List<FieldDefinitionAST> FieldDefinitionList(ParserContext ctx) :
 {
     List<FieldDefinitionAST> fields = new ArrayList<FieldDefinitionAST>();
     FieldDefinitionAST f;
 }
 {
     "("
-    f = FieldDefinition(err)
+    f = FieldDefinition(ctx)
     { fields.add(f); }
     (
         ","
-        f = FieldDefinition(err)
+        f = FieldDefinition(ctx)
         { fields.add(f); }
     )*
     ")"
     { return fields; }
 }
 
-FieldDefinitionAST FieldDefinition(Errors err) :
+FieldDefinitionAST FieldDefinition(ParserContext ctx) :
 {
     String name;
     DataType type;
@@ -629,7 +628,7 @@ FieldDefinitionAST FieldDefinition(Errors err) :
     [
         <KEYWORD_DEFAULT>
         (
-            def = Expression(ExpressionType.CONSTANT, "default field value", err)
+            def = Expression(ExpressionType.CONSTANT, "default field value", ctx)
             |
             <CONSTANT_NULL>
         )
@@ -637,7 +636,7 @@ FieldDefinitionAST FieldDefinition(Errors err) :
     { return new FieldDefinitionAST(t, name, type, def); }
 }
 
-InsertionStatementAST InsertionStatement(Errors err) :
+InsertionStatementAST InsertionStatement(ParserContext ctx) :
 {
     String stream;
     List<String> fl = new ArrayList<String>();
@@ -653,7 +652,7 @@ InsertionStatementAST InsertionStatement(Errors err) :
     [
         fl = FieldList()
     ]
-    sel = SelectionStatement(err)
+    sel = SelectionStatement(ctx)
     { return new InsertionStatementAST(t, stream, fl, sel); }
 }
 
@@ -675,7 +674,7 @@ List<String> FieldList() :
     { return fl; }
 }
 
-SelectionStatementAST SelectionStatement(Errors err) :
+SelectionStatementAST SelectionStatement(ParserContext ctx) :
 {
     WindowSize every;
     List<FieldSelectionAST> fsl;
@@ -695,12 +694,12 @@ SelectionStatementAST SelectionStatement(Errors err) :
     every = EveryClause()
     { t = token; }
     <KEYWORD_SELECT>
-    fsl = FieldSelectionList(err)
+    fsl = FieldSelectionList(ctx)
     [
         gby = GroupByClause()
     ]
     [
-        having = HavingClause(err)
+        having = HavingClause(ctx)
     ]
     [
         upto = UpToClause()
@@ -708,15 +707,15 @@ SelectionStatementAST SelectionStatement(Errors err) :
     [
         oes = OnEmptySelectionClause()
     ]
-    sampling = SamplingClause(err)
+    sampling = SamplingClause(ctx)
     [
         // This optional where clause filters the sampled values before adding
         // them to the local buffer
         <KEYWORD_WHERE>
-        where = Expression(ExpressionType.SIMPLE, "where clause", err)
+        where = Expression(ExpressionType.SIMPLE, "where clause", ctx)
     ]
     [
-        ec = ExecutionConditionsClause(err)
+        ec = ExecutionConditionsClause(ctx)
     ]
     [
         terminate = TerminateAfterClause()
@@ -737,23 +736,23 @@ WindowSize EveryClause() :
     { return ws; }
 }
 
-List<FieldSelectionAST> FieldSelectionList(Errors err) :
+List<FieldSelectionAST> FieldSelectionList(ParserContext ctx) :
 {
     List<FieldSelectionAST> fsl = new ArrayList<FieldSelectionAST>();
     FieldSelectionAST fs;
 }
 {
-    fs = FieldSelection(err)
+    fs = FieldSelection(ctx)
     { fsl.add(fs); }
     (
         ","
-        fs = FieldSelection(err)
+        fs = FieldSelection(ctx)
         { fsl.add(fs); }
     )*
     { return fsl; }
 }
 
-FieldSelectionAST FieldSelection(Errors err) :
+FieldSelectionAST FieldSelection(ParserContext ctx) :
 {
     ExpressionAST field;
     ExpressionAST def = ConstantAST.NULL;
@@ -761,12 +760,12 @@ FieldSelectionAST FieldSelection(Errors err) :
     Token t;
 }
 {
-    field = Expression(ExpressionType.AGGREGATE, "select field", err)
+    field = Expression(ExpressionType.AGGREGATE, "select field", ctx)
     { t = token; }
     [
         <KEYWORD_DEFAULT>
         (
-            def = Expression(ExpressionType.CONSTANT, "default field value", err)
+            def = Expression(ExpressionType.CONSTANT, "default field value", ctx)
             |
             <CONSTANT_NULL>
         )
@@ -796,7 +795,7 @@ GroupByAST GroupByClause() :
     { return new GroupByAST(t, fs); }
 }
 
-HavingAST HavingClause(Errors err) :
+HavingAST HavingClause(ParserContext ctx) :
 {
     ExpressionAST e;
 
@@ -804,7 +803,7 @@ HavingAST HavingClause(Errors err) :
 }
 {
     t = <KEYWORD_HAVING>
-    e = Expression(ExpressionType.AGGREGATE, "having clause", err)
+    e = Expression(ExpressionType.AGGREGATE, "having clause", ctx)
     { return new HavingAST(t, e); }
 }
 
@@ -835,7 +834,7 @@ OnEmptySelection OnEmptySelectionClause() :
     )
 }
 
-SamplingAST SamplingClause(Errors err) :
+SamplingAST SamplingClause(ParserContext ctx) :
 {
     List<String> events;
 
@@ -852,7 +851,7 @@ SamplingAST SamplingClause(Errors err) :
         { return new SamplingEventAST(t, events); }
         |
         (
-            ife = IfEveryClause(err)
+            ife = IfEveryClause(ctx)
             [
                 policy = OnUnsupportedSRClause()
             ]
@@ -884,7 +883,7 @@ List<String> OnEventClause() :
     { return evs; }
 }
 
-List<IfEveryAST> IfEveryClause(Errors err) :
+List<IfEveryAST> IfEveryClause(ParserContext ctx) :
 {
     List<IfEveryAST> ifeList = new ArrayList<IfEveryAST>();
     IfEveryAST ife;
@@ -897,8 +896,8 @@ List<IfEveryAST> IfEveryClause(Errors err) :
     (
         (
             t = <KEYWORD_IF>
-            cond = Expression(ExpressionType.SIMPLE, "if-every clause", err)
-            every = EveryDuration(err)
+            cond = Expression(ExpressionType.SIMPLE, "if-every clause", ctx)
+            every = EveryDuration(ctx)
             {
                 ife = new IfEveryAST(t, cond, every);
                 ifeList.add(ife);
@@ -906,7 +905,7 @@ List<IfEveryAST> IfEveryClause(Errors err) :
         )+
         (
             t = <KEYWORD_ELSE>
-            every = EveryDuration(err)
+            every = EveryDuration(ctx)
             {
                 ife = new IfEveryAST(t, ConstantAST.TRUE, every);
                 ifeList.add(ife);
@@ -916,7 +915,7 @@ List<IfEveryAST> IfEveryClause(Errors err) :
     )
     |
     (
-        every = EveryDuration(err)
+        every = EveryDuration(ctx)
         {
             ife = new IfEveryAST(token, ConstantAST.TRUE, every);
             ifeList.add(ife);
@@ -925,7 +924,7 @@ List<IfEveryAST> IfEveryClause(Errors err) :
     { return ifeList; }
 }
 
-EveryAST EveryDuration(Errors err) :
+EveryAST EveryDuration(ParserContext ctx) :
 {
     ExpressionAST value;
     TemporalUnit unit;
@@ -934,7 +933,7 @@ EveryAST EveryDuration(Errors err) :
 }
 {
     t = <KEYWORD_EVERY>
-    value = Expression(ExpressionType.SIMPLE, "every clause", err)
+    value = Expression(ExpressionType.SIMPLE, "every clause", ctx)
     unit = TimeUnit()
     {
         return new EveryAST(t, value, unit);
@@ -982,7 +981,7 @@ RefreshAST RefreshClause() :
     )
 }
 
-ExecutionConditionsAST ExecutionConditionsClause(Errors err) :
+ExecutionConditionsAST ExecutionConditionsClause(ParserContext ctx) :
 {
     ExpressionAST cond = ConstantAST.TRUE;
     NodeSpecificationsAST specs = null;
@@ -994,7 +993,7 @@ ExecutionConditionsAST ExecutionConditionsClause(Errors err) :
     t = <KEYWORD_EXECUTE>
     [
         <KEYWORD_IF>
-        cond = Expression(ExpressionType.SIMPLE, "execute if clause", err)
+        cond = Expression(ExpressionType.SIMPLE, "execute if clause", ctx)
     ]
     [
         specs = NodeSpecifications()
@@ -1351,7 +1350,7 @@ String Identifier() :
 /*
  * EXPRESSIONS
  */
-ExpressionAST Expression(ExpressionType type, String src, Errors err) :
+ExpressionAST Expression(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1359,16 +1358,16 @@ ExpressionAST Expression(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BooleanTerm(type, src, err)
+    e1 = BooleanTerm(type, src, ctx)
     (
         t = <OPERATOR_OR>
-        e2 = BooleanTerm(type, src, err)
+        e2 = BooleanTerm(type, src, ctx)
         { e1 = new BoolAST(t, BoolOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanTerm(ExpressionType type, String src, Errors err) :
+ExpressionAST BooleanTerm(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1376,16 +1375,16 @@ ExpressionAST BooleanTerm(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BooleanFactor(type, src, err)
+    e1 = BooleanFactor(type, src, ctx)
     (
         t = <OPERATOR_AND>
-        e2 = BooleanFactor(type, src, err)
+        e2 = BooleanFactor(type, src, ctx)
         { e1 = new BoolAST(t, BoolOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanFactor(ExpressionType type, String src, Errors err) :
+ExpressionAST BooleanFactor(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1393,16 +1392,16 @@ ExpressionAST BooleanFactor(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BooleanNegation(type, src, err)
+    e1 = BooleanNegation(type, src, ctx)
     (
         t = <OPERATOR_XOR>
-        e2 = BooleanNegation(type, src, err)
+        e2 = BooleanNegation(type, src, ctx)
         { e1 = new BoolAST(t, BoolOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BooleanNegation(ExpressionType type, String src, Errors err) :
+ExpressionAST BooleanNegation(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e;
     boolean invert = false;
@@ -1416,7 +1415,7 @@ ExpressionAST BooleanNegation(ExpressionType type, String src, Errors err) :
             invert = !invert;
         }
     )*
-    e = BooleanPredicate(type, src, err)
+    e = BooleanPredicate(type, src, ctx)
     {
         if (invert) {
             e = new NotAST(t, e);
@@ -1425,18 +1424,18 @@ ExpressionAST BooleanNegation(ExpressionType type, String src, Errors err) :
     }
 }
 
-ExpressionAST BooleanPredicate(ExpressionType type, String src, Errors err) :
+ExpressionAST BooleanPredicate(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e;
 }
 {
-    e = Comparison(type, src, err)
+    e = Comparison(type, src, ctx)
     [
         e = Is(e)
         |
         e = Like(e)
         |
-        e = Between(e, type, src, err)
+        e = Between(e, type, src, ctx)
     ]
     { return e; }
 }
@@ -1489,7 +1488,7 @@ ExpressionAST Like(ExpressionAST e) :
 }
 
 ExpressionAST Between(ExpressionAST e, ExpressionType type,
-        String src, Errors err) :
+        String src, ParserContext ctx) :
 {
     ExpressionAST b;
     ExpressionAST min;
@@ -1499,15 +1498,15 @@ ExpressionAST Between(ExpressionAST e, ExpressionType type,
 }
 {
     t = <KEYWORD_BETWEEN>
-    min = BitwiseExpression(type, src, err)
+    min = BitwiseExpression(type, src, ctx)
     <OPERATOR_AND>
-    max = BitwiseExpression(type, src, err)
+    max = BitwiseExpression(type, src, ctx)
     {
         return new BetweenAST(t, e, min, max);
     }
 }
 
-ExpressionAST Comparison(ExpressionType type, String src, Errors err) :
+ExpressionAST Comparison(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1516,11 +1515,11 @@ ExpressionAST Comparison(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BitwiseExpression(type, src, err)
+    e1 = BitwiseExpression(type, src, ctx)
     [
         op = ComparisonOperation()
         { t = token; }
-        e2 = BitwiseExpression(type, src, err)
+        e2 = BitwiseExpression(type, src, ctx)
         {
             e1 = new ComparisonAST(t, op, e1, e2);
         }
@@ -1528,7 +1527,7 @@ ExpressionAST Comparison(ExpressionType type, String src, Errors err) :
     { return e1; }
 }
 
-ExpressionAST BitwiseExpression(ExpressionType type, String src, Errors err) :
+ExpressionAST BitwiseExpression(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1536,16 +1535,16 @@ ExpressionAST BitwiseExpression(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BitwiseTerm(type, src, err)
+    e1 = BitwiseTerm(type, src, ctx)
     (
         t = <OPERATOR_BITWISE_OR>
-        e2 = BitwiseTerm(type, src, err)
+        e2 = BitwiseTerm(type, src, ctx)
         { e1 = new BitwiseAST(t, BitwiseOperation.OR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseTerm(ExpressionType type, String src, Errors err) :
+ExpressionAST BitwiseTerm(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1553,16 +1552,16 @@ ExpressionAST BitwiseTerm(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BitwiseFactor(type, src, err)
+    e1 = BitwiseFactor(type, src, ctx)
     (
         t = <OPERATOR_BITWISE_AND>
-        e2 = BitwiseFactor(type, src, err)
+        e2 = BitwiseFactor(type, src, ctx)
         { e1 = new BitwiseAST(t, BitwiseOperation.AND, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseFactor(ExpressionType type, String src, Errors err) :
+ExpressionAST BitwiseFactor(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1570,16 +1569,16 @@ ExpressionAST BitwiseFactor(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BitwiseShift(type, src, err)
+    e1 = BitwiseShift(type, src, ctx)
     (
         t = <OPERATOR_BITWISE_XOR>
-        e2 = BitwiseShift(type, src, err)
+        e2 = BitwiseShift(type, src, ctx)
         { e1 = new BitwiseAST(t, BitwiseOperation.XOR, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseShift(ExpressionType type, String src, Errors err) :
+ExpressionAST BitwiseShift(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1588,7 +1587,7 @@ ExpressionAST BitwiseShift(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = BitwiseNegation(type, src, err)
+    e1 = BitwiseNegation(type, src, ctx)
     (
         (
             t = <OPERATOR_BITWISE_LSH>
@@ -1597,13 +1596,13 @@ ExpressionAST BitwiseShift(ExpressionType type, String src, Errors err) :
             t = <OPERATOR_BITWISE_RSH>
             { op = BitwiseOperation.RSH; }
         )
-        e2 = BitwiseNegation(type, src, err)
+        e2 = BitwiseNegation(type, src, ctx)
         { e1 = new BitwiseAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST BitwiseNegation(ExpressionType type, String src, Errors err) :
+ExpressionAST BitwiseNegation(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e;
     boolean not = false;
@@ -1615,7 +1614,7 @@ ExpressionAST BitwiseNegation(ExpressionType type, String src, Errors err) :
         t = <OPERATOR_BITWISE_NOT>
         { not = !not; }
     )*
-    e = ArithmeticExpression(type, src, err)
+    e = ArithmeticExpression(type, src, ctx)
     {
         if (not) {
             e = new BitwiseNotAST(t, e);
@@ -1624,7 +1623,7 @@ ExpressionAST BitwiseNegation(ExpressionType type, String src, Errors err) :
     }
 }
 
-ExpressionAST ArithmeticExpression(ExpressionType type, String src, Errors err) :
+ExpressionAST ArithmeticExpression(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1633,7 +1632,7 @@ ExpressionAST ArithmeticExpression(ExpressionType type, String src, Errors err) 
     Token t;
 }
 {
-    e1 = ArithmeticTerm(type, src, err)
+    e1 = ArithmeticTerm(type, src, ctx)
     (
         (
             t = <OPERATOR_PLUS>
@@ -1642,13 +1641,13 @@ ExpressionAST ArithmeticExpression(ExpressionType type, String src, Errors err) 
             t = <OPERATOR_MINUS>
             { op = ArithmeticOperation.SUBTRACTION; }
         )
-        e2 = ArithmeticTerm(type, src, err)
+        e2 = ArithmeticTerm(type, src, ctx)
         { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST ArithmeticTerm(ExpressionType type, String src, Errors err) :
+ExpressionAST ArithmeticTerm(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e1;
     ExpressionAST e2;
@@ -1657,7 +1656,7 @@ ExpressionAST ArithmeticTerm(ExpressionType type, String src, Errors err) :
     Token t;
 }
 {
-    e1 = ArithmeticFactor(type, src, err)
+    e1 = ArithmeticFactor(type, src, ctx)
     (
         (
             t = <OPERATOR_MULTIPLY>
@@ -1669,13 +1668,13 @@ ExpressionAST ArithmeticTerm(ExpressionType type, String src, Errors err) :
             t = <OPERATOR_MODULO>
             { op = ArithmeticOperation.MODULO; }
         )
-        e2 = ArithmeticFactor(type, src, err)
+        e2 = ArithmeticFactor(type, src, ctx)
         { e1 = new ArithmeticAST(t, op, e1, e2); }
     )*
     { return e1; }
 }
 
-ExpressionAST ArithmeticFactor(ExpressionType type, String src, Errors err) :
+ExpressionAST ArithmeticFactor(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e;
     Sign s = Sign.PLUS;
@@ -1687,7 +1686,7 @@ ExpressionAST ArithmeticFactor(ExpressionType type, String src, Errors err) :
         s = Sign()
         { t = token; }
     ]
-    e = PrimaryExpression(type, src, err)
+    e = PrimaryExpression(type, src, ctx)
     {
         if (s == Sign.MINUS) {
             e = new InverseAST(t, e);
@@ -1696,7 +1695,7 @@ ExpressionAST ArithmeticFactor(ExpressionType type, String src, Errors err) :
     }
 }
 
-ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
+ExpressionAST PrimaryExpression(ExpressionType type, String src, ParserContext ctx) :
 {
     ExpressionAST e;
 
@@ -1708,15 +1707,15 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
     |
     (
         "("
-        e = Expression(type, src, err)
+        e = Expression(type, src, ctx)
         { return e; }
         ")"
     )
     |
-    e = Aggregate(type, src, err)
+    e = Aggregate(type, src, ctx)
     {
         if (type != ExpressionType.AGGREGATE) {
-            err.addError("Aggregate expressions forbidden in " + src +
+            ctx.addError("Aggregate expressions forbidden in " + src +
                 " at line " + token.beginLine + ", column " + token.beginColumn);
             return ConstantAST.NULL;
         } else {
@@ -1724,10 +1723,10 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
         }
     }
     |
-    e = Attribute()
+    e = AttributeReference()
     {
         if (type == ExpressionType.CONSTANT) {
-            err.addError("Only constant expressions are allowed in " + src +
+            ctx.addError("Only constant expressions are allowed in " + src +
                 " at line " + token.beginLine + ", column " + token.beginColumn);
             return ConstantAST.NULL;
         } else {
@@ -1736,7 +1735,7 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, Errors err) :
     }
 }
 
-AttributeAST Attribute() :
+AttributeReferenceAST AttributeReference() :
 {
     String id;
     TypeClass type = TypeClass.ANY;
@@ -1750,10 +1749,10 @@ AttributeAST Attribute() :
         ":"
         type = TypeClass()
     ]
-    { return new AttributeAST(token, id, type); }
+    { return new AttributeReferenceAST(token, id, type); }
 }
 
-ExpressionAST Aggregate(ExpressionType type, String src, Errors err) :
+ExpressionAST Aggregate(ExpressionType type, String src, ParserContext ctx) :
 {
     AggregateOperation op;
     ExpressionAST operand = ConstantAST.NULL;
@@ -1776,7 +1775,7 @@ ExpressionAST Aggregate(ExpressionType type, String src, Errors err) :
             ws = WindowSize()
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", err)
+                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", ctx)
             ]
             ")"
         )
@@ -1785,12 +1784,12 @@ ExpressionAST Aggregate(ExpressionType type, String src, Errors err) :
             op = AggregateOperation()
             { t = token; }
             "("
-            operand = Expression(ExpressionType.SIMPLE, "aggregate operand", err)
+            operand = Expression(ExpressionType.SIMPLE, "aggregate operand", ctx)
             ","
             ws = WindowSize()
             [
                 ","
-                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", err)
+                filter = Expression(ExpressionType.SIMPLE, "aggregate filter", ctx)
             ]
             ")"
         )

@@ -11,8 +11,35 @@ import org.dei.perla.lang.query.expression.Expression;
 import java.util.Map;
 
 /**
- * A generic expression node of the Abstract Syntax Tree. All concrete
- * expression nodes inherit from this class.
+ * A generic expression node of the Abstract Syntax Tree.
+ *
+ * <p>Expression compilation is performed in three steps:
+ * <ul>
+ *     <li>The AST parser reads input text and produces the abstract syntax
+ *     tree representation of the expression. During this phase the
+ *     expression is checked against some context-aware grammar rules that
+ *     ensure that the expression is suitable to be used in the clause where
+ *     it is declared. These rules forbid the declaration of expressions
+ *     containing aggregations or attribute references in some clauses of the
+ *     query (i.e., no aggregations are allowed in the SAMPLING clause, etc).
+ *     For further information, see how the enum {@link ExpressionType} is
+ *     employed in the JavaCC parser.
+ *     </li>
+ *     <li>The {@code inferType} method is invoked to infer the data type
+ *     of all attribute references in the expression, and to check the type
+ *     correctness of the entire expression. Depending on the expression,
+ *     this phase may not pin down a concrete type for every referenced
+ *     attribute.
+ *     </li>
+ *     <li>The {@code toExpression} method is invoked to create an
+ *     executable expression from the parsed Abstract Syntax Tree. During
+ *     this phase, additional type checks are performed to ensure that all
+ *     expression operands are used appropriately (see {@link CompareAST} and
+ *     {@link BetweenAST}). Moreover, attribute references whose inferred
+ *     type class is not concrete are reported to the user, which will then be
+ *     prompted to insert additional type annotations in the expression.
+ *     </li>
+ * </ul>
  *
  * @author Guido Rota 30/07/15.
  */
@@ -68,9 +95,10 @@ public abstract class ExpressionAST extends NodeAST {
      * @param atts map employed for storing the attribute binding order
      * @return expression object corresponding to the AST node
      */
-    public Expression compile(TypeVariable bound, ParserContext ctx,
+    public Expression compile(TypeClass bound, ParserContext ctx,
             Map<Attribute, Integer> atts) {
-        boolean typeOk = inferType(bound, ctx);
+        TypeVariable v = new TypeVariable(bound);
+        boolean typeOk = inferType(v, ctx);
         if (!typeOk) {
             return Constant.NULL;
         }

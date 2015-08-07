@@ -3,23 +3,23 @@ package org.dei.perla.lang.parser;
 /**
  * @author Guido Rota 17/04/15.
  */
-public class QueryParsingException extends Exception {
+public class StatementParseException extends Exception {
 
     private static final long serialVersionUID = -8730467304973987914L;
 
-    public QueryParsingException() {
+    public StatementParseException() {
         super();
     }
 
-    public QueryParsingException(String msg) {
+    public StatementParseException(String msg) {
         super(msg);
     }
 
-    public QueryParsingException(Throwable cause) {
+    public StatementParseException(Throwable cause) {
         super(cause);
     }
 
-    public QueryParsingException(String msg, Throwable cause) {
+    public StatementParseException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
