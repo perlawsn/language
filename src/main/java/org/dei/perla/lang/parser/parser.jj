@@ -42,6 +42,9 @@ PARSER_BEGIN(ParserAST)
 
     public final class ParserAST {
 
+        private String getPosition(Token t) {
+            return "line " + t.beginLine + ", column " + t.beginColumn;
+        }
 
     }
 
@@ -691,7 +694,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     Token t;
 }
 {
-    every = EveryClause()
+    every = EveryClause(ctx)
     { t = token; }
     <KEYWORD_SELECT>
     fsl = FieldSelectionList(ctx)
@@ -702,7 +705,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
         having = HavingClause(ctx)
     ]
     [
-        upto = UpToClause()
+        upto = UpToClause(ctx)
     ]
     [
         oes = OnEmptySelectionClause()
@@ -726,13 +729,13 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     }
 }
 
-WindowSize EveryClause() :
+WindowSize EveryClause(ParserContext ctx) :
 {
     WindowSize ws;
 }
 {
     <KEYWORD_EVERY>
-    ws = WindowSize()
+    ws = WindowSize("every clause", ctx)
     { return ws; }
 }
 
@@ -807,14 +810,14 @@ HavingAST HavingClause(ParserContext ctx) :
     { return new HavingAST(t, e); }
 }
 
-WindowSize UpToClause() :
+WindowSize UpToClause(ParserContext ctx) :
 {
     WindowSize ws;
 }
 {
     <KEYWORD_UP>
     <KEYWORD_TO>
-    ws = WindowSize()
+    ws = WindowSize("upto clause", ctx)
     { return ws; }
 }
 
@@ -1100,25 +1103,35 @@ LogicValue ConstantBoolean() :
 
 float ConstantFloat() :
 {
-    Token value;
+    int coeff = 1;
 }
 {
-    (
-        value = <CONSTANT_FLOAT>
-    )
-    { return Float.parseFloat(value.image); }
+    [
+        "-"
+        { coeff = -1; }
+    ]
+    <CONSTANT_FLOAT>
+    { return coeff * Float.parseFloat(token.image); }
 }
 
 int ConstantInteger() :
 {
-    Token value;
+    int coeff = 1;
+    int value = 0;
 }
 {
-    value = <CONSTANT_INTEGER_10>
-    { return Integer.parseInt(value.image); }
-    |
-    value = <CONSTANT_INTEGER_16>
-    { return Integer.parseInt(value.image.substring(2), 16); }
+    [
+        "-"
+        { coeff = -1; }
+    ]
+    (
+        <CONSTANT_INTEGER_10>
+        { value = Integer.parseInt(token.image); }
+        |
+        <CONSTANT_INTEGER_16>
+        { value = Integer.parseInt(token.image.substring(2), 16); }
+    )
+    { return coeff * value; }
 }
 
 String ConstantString() :
@@ -1313,25 +1326,30 @@ int SelectionsNumber() :
     )
 }
 
-WindowSize WindowSize() :
+WindowSize WindowSize(String src, ParserContext ctx) :
 {
-    Token t;
     Duration d;
     int samples;
     WindowSize ws;
 }
 {
     (
-        LOOKAHEAD(2)
+        LOOKAHEAD(3)
         d = Duration()
         {
-            t = token;
+            if (d.isZero() || d.isNegative()) {
+                ctx.addError("Invalid " + src + " window size at " +
+                    getPosition(token) + ": duration must be greater than 0");
+            }
             ws = new WindowSize(d);
         }
         |
         samples = SamplesNumber()
         {
-            t = token;
+            if (samples <= 0) {
+                ctx.addError("Invalid " + src + " window size at " +
+                    getPosition(token) + ": sample count must be greater than 0");
+            }
             ws = new WindowSize(samples);
         }
     )
@@ -1712,22 +1730,24 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, ParserContext c
         ")"
     )
     |
+    { t = getToken(1); }
     e = Aggregate(type, src, ctx)
     {
         if (type != ExpressionType.AGGREGATE) {
             ctx.addError("Aggregate expressions forbidden in " + src +
-                " at line " + token.beginLine + ", column " + token.beginColumn);
+                " at " + getPosition(t));
             return ConstantAST.NULL;
         } else {
             return e;
         }
     }
     |
+    { t = getToken(1); }
     e = AttributeReference()
     {
         if (type == ExpressionType.CONSTANT) {
             ctx.addError("Only constant expressions are allowed in " + src +
-                " at line " + token.beginLine + ", column " + token.beginColumn);
+                " at " + getPosition(t));
             return ConstantAST.NULL;
         } else {
             return e;
@@ -1772,7 +1792,7 @@ ExpressionAST Aggregate(ExpressionType type, String src, ParserContext ctx) :
             "("
             "*"
             ","
-            ws = WindowSize()
+            ws = WindowSize("aggregate", ctx)
             [
                 ","
                 filter = Expression(ExpressionType.SIMPLE, "aggregate filter", ctx)
@@ -1786,7 +1806,7 @@ ExpressionAST Aggregate(ExpressionType type, String src, ParserContext ctx) :
             "("
             operand = Expression(ExpressionType.SIMPLE, "aggregate operand", ctx)
             ","
-            ws = WindowSize()
+            ws = WindowSize("aggregate", ctx)
             [
                 ","
                 filter = Expression(ExpressionType.SIMPLE, "aggregate filter", ctx)

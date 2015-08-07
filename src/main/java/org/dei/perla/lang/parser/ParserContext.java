@@ -35,6 +35,17 @@ public final class ParserContext {
     }
 
     /**
+     * Indicates if one or more errors have been added to this context object
+     * while parsing
+     *
+     * @return true if one or more errors were found during the parsing
+     * phase, false otherwise
+     */
+    public boolean hasErrors() {
+        return !err.isEmpty();
+    }
+
+    /**
      * Returns a textual description of all errors encountered while parsing.
      *
      * @return Description of all errors encountered during parsing

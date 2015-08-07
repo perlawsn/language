@@ -2,11 +2,13 @@ package org.dei.perla.lang.parser;
 
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.lang.parser.ast.ExpressionAST;
-import org.dei.perla.lang.parser.ast.StatementAST;
+import org.dei.perla.lang.parser.ast.*;
 import org.dei.perla.lang.persistence.StreamDriver;
 import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.statement.CreationStatement;
+import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.Statement;
+import org.dei.perla.lang.query.statement.WindowSize;
 
 import java.io.StringReader;
 import java.util.Map;
@@ -41,7 +43,39 @@ public final class Parser {
         return s;
     }
 
-    protected Statement parseStatement(StatementAST s, ParserContext ctx) {
+    protected Statement parseStatement(StatementAST stm, ParserContext ctx) {
+        if (stm instanceof CreationStatementAST) {
+            CreationStatementAST create = (CreationStatementAST) stm;
+            return parseCreationStatement(create, ctx);
+        } else if (stm instanceof InsertionStatementAST) {
+            InsertionStatementAST insert = (InsertionStatementAST) stm;
+            return parseInsertionStatement(insert, ctx);
+        } else if (stm instanceof SetStatementAST) {
+            SetStatementAST set = (SetStatementAST) stm;
+            return parseSetStatement(set, ctx);
+        } else {
+            throw new RuntimeException("Unknown statement " +
+                    stm.getClass().getSimpleName());
+        }
+    }
+
+    protected CreationStatement parseCreationStatement(
+            CreationStatementAST create, ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    protected CreationStatement parseInsertionStatement(
+            InsertionStatementAST insert, ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    protected CreationStatement parseSetStatement(
+            SetStatementAST set, ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    protected SelectionStatement parseSelectionStatement(
+            SelectionStatementAST sel, ParserContext ctx) {
         throw new RuntimeException("unimplemented");
     }
 

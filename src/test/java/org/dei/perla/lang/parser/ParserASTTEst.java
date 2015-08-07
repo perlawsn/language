@@ -13,9 +13,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Guido Rota 30/07/15.
@@ -71,6 +70,18 @@ public class ParserASTTEst {
         ParserAST p = getParser("3.14");
         float f = p.ConstantFloat();
         assertThat(f, equalTo(3.14f));
+
+        p = getParser("-5.2");
+        f = p.ConstantFloat();
+        assertThat(f, equalTo(-5.2f));
+
+        p = getParser("0.0");
+        f = p.ConstantFloat();
+        assertThat(f, equalTo(0f));
+
+        p = getParser("-0.0");
+        f = p.ConstantFloat();
+        assertThat(f, equalTo(-0f));
     }
 
     @Test
@@ -78,6 +89,18 @@ public class ParserASTTEst {
         ParserAST p = getParser("3");
         int i = p.ConstantInteger();
         assertThat(i, equalTo(3));
+
+        p = getParser("-5");
+        i = p.ConstantInteger();
+        assertThat(i, equalTo(-5));
+
+        p = getParser("0");
+        i = p.ConstantInteger();
+        assertThat(i, equalTo(0));
+
+        p = getParser("-0");
+        i = p.ConstantInteger();
+        assertThat(i, equalTo(0));
     }
 
     @Test
@@ -266,15 +289,33 @@ public class ParserASTTEst {
 
     @Test
     public void testWindowSize() throws Exception {
+        ParserContext ctx = new ParserContext();
+
         ParserAST p = getParser("3 seconds");
-        WindowSize w = p.WindowSize();
+        WindowSize w = p.WindowSize("", ctx);
+        assertFalse(ctx.hasErrors());
         assertThat(w.getType(), equalTo(WindowType.TIME));
         assertThat(w.getDuration(), equalTo(Duration.ofSeconds(3)));
 
         p = getParser("23 samples");
-        w = p.WindowSize();
+        w = p.WindowSize("", ctx);
+        assertFalse(ctx.hasErrors());
         assertThat(w.getType(), equalTo(WindowType.SAMPLE));
         assertThat(w.getSamples(), equalTo(23));
+
+        ctx = new ParserContext();
+        p = getParser("-3 seconds");
+        w = p.WindowSize("", ctx);
+        assertTrue(ctx.hasErrors());
+        assertThat(w.getType(), equalTo(WindowType.TIME));
+        assertThat(w.getDuration(), equalTo(Duration.ofSeconds(-3)));
+
+        ctx = new ParserContext();
+        p = getParser("-23 samples");
+        w = p.WindowSize("", ctx);
+        assertTrue(ctx.hasErrors());
+        assertThat(w.getType(), equalTo(WindowType.SAMPLE));
+        assertThat(w.getSamples(), equalTo(-23));
     }
 
     @Test
@@ -300,28 +341,28 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("true or false");
         BoolAST b = (BoolAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BoolOperation.OR));
         assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
         assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
 
         p = getParser("true and false");
         b = (BoolAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BoolOperation.AND));
         assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
         assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
 
         p = getParser("true xor false");
         b = (BoolAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BoolOperation.XOR));
         assertThat(b.getLeftOperand(), equalTo(ConstantAST.TRUE));
         assertThat(b.getRightOperand(), equalTo(ConstantAST.FALSE));
 
         p = getParser("not true");
         NotAST not = (NotAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(not.getOperand(), equalTo(ConstantAST.TRUE));
     }
 
@@ -330,13 +371,13 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("true is unknown");
         IsAST is = (IsAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
         assertThat(is.getLogicValue(), equalTo(LogicValue.UNKNOWN));
 
         p = getParser("true is not unknown");
         NotAST b = (NotAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         is = (IsAST) ((NotAST) b).getOperand();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
         assertThat(is.getLogicValue(), equalTo(LogicValue.UNKNOWN));
@@ -347,12 +388,12 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("true is null");
         IsNullAST is = (IsNullAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
 
         p = getParser("true is not null");
         NotAST b = (NotAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         is = (IsNullAST) b.getOperand();
         assertThat(is.getOperand(), equalTo(ConstantAST.TRUE));
     }
@@ -362,7 +403,7 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("'test' like 'te?t'");
         LikeAST l = (LikeAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(l.getOperand(),
                 equalTo(new ConstantAST("test", TypeClass.STRING)));
         assertThat(l.getPattern(), equalTo("te?t"));
@@ -373,7 +414,7 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("5 between 12 and 32");
         BetweenAST b = (BetweenAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperand(), equalTo(
                 new ConstantAST(5, TypeClass.INTEGER)));
         assertThat(b.getMin(), equalTo(
@@ -390,49 +431,49 @@ public class ParserASTTEst {
 
         ParserAST p = getParser("5 = 12");
         ComparisonAST c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.EQ));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 != 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.NE));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 <> 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.NE));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 > 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.GT));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 >= 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.GE));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 < 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.LT));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
 
         p = getParser("5 <= 12");
         c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(c.getOperation(), equalTo(ComparisonOperation.LE));
         assertThat(c.getLeftOperand(), equalTo(op1));
         assertThat(c.getRightOperand(), equalTo(op2));
@@ -446,42 +487,42 @@ public class ParserASTTEst {
 
         ParserAST p = getParser("43 | 12");
         BitwiseAST b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BitwiseOperation.OR));
         assertThat(b.getLeftOperand(), equalTo(op1));
         assertThat(b.getRightOperand(), equalTo(op2));
 
         p = getParser("43 & 12");
         b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BitwiseOperation.AND));
         assertThat(b.getLeftOperand(), equalTo(op1));
         assertThat(b.getRightOperand(), equalTo(op2));
 
         p = getParser("43 ^ 12");
         b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BitwiseOperation.XOR));
         assertThat(b.getLeftOperand(), equalTo(op1));
         assertThat(b.getRightOperand(), equalTo(op2));
 
         p = getParser("43 >> 12");
         b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BitwiseOperation.RSH));
         assertThat(b.getLeftOperand(), equalTo(op1));
         assertThat(b.getRightOperand(), equalTo(op2));
 
         p = getParser("43 << 12");
         b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(b.getOperation(), equalTo(BitwiseOperation.LSH));
         assertThat(b.getLeftOperand(), equalTo(op1));
         assertThat(b.getRightOperand(), equalTo(op2));
 
         p = getParser("~43");
         BitwiseNotAST bn = (BitwiseNotAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(bn.getOperand(), equalTo(op1));
     }
 
@@ -493,42 +534,42 @@ public class ParserASTTEst {
 
         ParserAST p = getParser("43 + 12");
         ArithmeticAST a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(ArithmeticOperation.ADDITION));
         assertThat(a.getLeftOperand(), equalTo(op1));
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("43 - 12");
         a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(ArithmeticOperation.SUBTRACTION));
         assertThat(a.getLeftOperand(), equalTo(op1));
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("43 * 12");
         a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(ArithmeticOperation.PRODUCT));
         assertThat(a.getLeftOperand(), equalTo(op1));
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("43 / 12");
         a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(ArithmeticOperation.DIVISION));
         assertThat(a.getLeftOperand(), equalTo(op1));
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("43 % 12");
         a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(ArithmeticOperation.MODULO));
         assertThat(a.getLeftOperand(), equalTo(op1));
         assertThat(a.getRightOperand(), equalTo(op2));
 
         p = getParser("-43");
         InverseAST inv = (InverseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(inv.getOperand(), equalTo(op1));
     }
 
@@ -539,14 +580,14 @@ public class ParserASTTEst {
 
         ParserAST p = getParser("count(*, 3 seconds, false)");
         AggregateAST a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.COUNT));
         assertThat(a.getWindowSize(), equalTo(ws));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("sum(temperature, 3 seconds, false)");
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
         AttributeReferenceAST att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
@@ -555,7 +596,7 @@ public class ParserASTTEst {
 
         p = getParser("max(temperature, 3 seconds, false)");
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.MAX));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
@@ -564,7 +605,7 @@ public class ParserASTTEst {
 
         p = getParser("min(temperature, 3 seconds, false)");
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.MIN));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
@@ -573,7 +614,7 @@ public class ParserASTTEst {
 
         p = getParser("avg(temperature, 3 seconds, false)");
         a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.AVG));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
@@ -608,7 +649,7 @@ public class ParserASTTEst {
     public void testAttributeAST() throws Exception {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("temperature");
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
         AttributeReferenceAST a = p.AttributeReference();
         assertThat(a.getId(), equalTo("temperature"));
         assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
@@ -624,11 +665,11 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("temperature + pressure - 3");
         p.Expression(ExpressionType.SIMPLE, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
 
         p = getParser("temperature + COUNT(*, 5 seconds)");
         p.Expression(ExpressionType.SIMPLE, "", ctx);
-        assertThat(ctx.getErrorCount(), greaterThan(0));
+        assertTrue(ctx.hasErrors());
     }
 
     @Test
@@ -636,16 +677,16 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
         ParserAST p = getParser("12 + 5");
         p.Expression(ExpressionType.CONSTANT, "", ctx);
-        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertFalse(ctx.hasErrors());
 
         p = getParser("temperature + 5");
         p.Expression(ExpressionType.CONSTANT, "", ctx);
-        assertThat(ctx.getErrorCount(), greaterThan(0));
+        assertTrue(ctx.hasErrors());
 
         ctx = new ParserContext();
         p = getParser("5 + count(*, 12 seconds)");
         p.Expression(ExpressionType.CONSTANT, "", ctx);
-        assertThat(ctx.getErrorCount(), greaterThan(0));
+        assertTrue(ctx.hasErrors());
     }
 
 }
