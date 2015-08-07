@@ -689,7 +689,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     Select sel;
     ExpressionAST where = ConstantAST.TRUE;
     ExecutionConditionsAST ec = null;
-    TerminateAfterAST terminate = null;
+    WindowSize terminate = null;
 
     Token t;
 }
@@ -721,7 +721,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
         ec = ExecutionConditionsClause(ctx)
     ]
     [
-        terminate = TerminateAfterClause()
+        terminate = TerminateAfterClause(ctx)
     ]
     {
         return new SelectionStatementAST(t, every, fsl, gby, having, upto,
@@ -1054,26 +1054,15 @@ DataTemplate Specification() :
     { return DataTemplate.create(id, tc); }
 }
 
-TerminateAfterAST TerminateAfterClause() :
+WindowSize TerminateAfterClause(ParserContext ctx) :
 {
-    Duration d;
-    int count;
-    WindowSize w;
-
-    Token t;
+    WindowSize ws;
 }
 {
-    t = <KEYWORD_TERMINATE>
+    <KEYWORD_TERMINATE>
     <KEYWORD_AFTER>
-    (
-        LOOKAHEAD(2)
-        d = Duration()
-        { w = new WindowSize(d); }
-        |
-        count = SelectionsNumber()
-        { w = new WindowSize(count); }
-    )
-    { return new TerminateAfterAST(t, w); }
+    ws = WindowSize("terminate after clause", ctx)
+    { return ws; }
 }
 
 /*
@@ -1102,28 +1091,17 @@ LogicValue ConstantBoolean() :
 }
 
 float ConstantFloat() :
+{}
 {
-    int coeff = 1;
-}
-{
-    [
-        "-"
-        { coeff = -1; }
-    ]
     <CONSTANT_FLOAT>
-    { return coeff * Float.parseFloat(token.image); }
+    { return Float.parseFloat(token.image); }
 }
 
 int ConstantInteger() :
 {
-    int coeff = 1;
     int value = 0;
 }
 {
-    [
-        "-"
-        { coeff = -1; }
-    ]
     (
         <CONSTANT_INTEGER_10>
         { value = Integer.parseInt(token.image); }
@@ -1131,7 +1109,7 @@ int ConstantInteger() :
         <CONSTANT_INTEGER_16>
         { value = Integer.parseInt(token.image.substring(2), 16); }
     )
-    { return coeff * value; }
+    { return value; }
 }
 
 String ConstantString() :
@@ -1328,16 +1306,17 @@ int SelectionsNumber() :
 
 WindowSize WindowSize(String src, ParserContext ctx) :
 {
+    boolean neg = false;
     Duration d;
     int samples;
     WindowSize ws;
 }
 {
     (
-        LOOKAHEAD(3)
+        LOOKAHEAD(2)
         d = Duration()
         {
-            if (d.isZero() || d.isNegative()) {
+            if (d.isZero() || neg) {
                 ctx.addError("Invalid " + src + " window size at " +
                     getPosition(token) + ": duration must be greater than 0");
             }
@@ -1346,7 +1325,7 @@ WindowSize WindowSize(String src, ParserContext ctx) :
         |
         samples = SamplesNumber()
         {
-            if (samples <= 0) {
+            if (samples == 0 || neg) {
                 ctx.addError("Invalid " + src + " window size at " +
                     getPosition(token) + ": sample count must be greater than 0");
             }

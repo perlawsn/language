@@ -71,17 +71,9 @@ public class ParserASTTEst {
         float f = p.ConstantFloat();
         assertThat(f, equalTo(3.14f));
 
-        p = getParser("-5.2");
-        f = p.ConstantFloat();
-        assertThat(f, equalTo(-5.2f));
-
         p = getParser("0.0");
         f = p.ConstantFloat();
         assertThat(f, equalTo(0f));
-
-        p = getParser("-0.0");
-        f = p.ConstantFloat();
-        assertThat(f, equalTo(-0f));
     }
 
     @Test
@@ -90,15 +82,7 @@ public class ParserASTTEst {
         int i = p.ConstantInteger();
         assertThat(i, equalTo(3));
 
-        p = getParser("-5");
-        i = p.ConstantInteger();
-        assertThat(i, equalTo(-5));
-
         p = getParser("0");
-        i = p.ConstantInteger();
-        assertThat(i, equalTo(0));
-
-        p = getParser("-0");
         i = p.ConstantInteger();
         assertThat(i, equalTo(0));
     }

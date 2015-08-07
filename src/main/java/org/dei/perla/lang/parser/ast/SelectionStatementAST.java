@@ -21,7 +21,7 @@ public final class SelectionStatementAST extends StatementAST {
     private final SamplingAST sampling;
     private final ExpressionAST where;
     private final ExecutionConditionsAST execCond;
-    private final TerminateAfterAST terminate;
+    private final WindowSize terminate;
 
     public SelectionStatementAST(Token t,
             WindowSize every,
@@ -33,7 +33,7 @@ public final class SelectionStatementAST extends StatementAST {
             SamplingAST sampling,
             ExpressionAST where,
             ExecutionConditionsAST execCond,
-            TerminateAfterAST terminate) {
+            WindowSize terminate) {
         super(t);
         this.every = every;
         this.fields = Collections.unmodifiableList(fields);
@@ -83,7 +83,7 @@ public final class SelectionStatementAST extends StatementAST {
         return execCond;
     }
 
-    public TerminateAfterAST getTerminateAfter() {
+    public WindowSize getTerminateAfter() {
         return terminate;
     }
 
