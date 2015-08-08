@@ -1306,7 +1306,6 @@ int SelectionsNumber() :
 
 WindowSize WindowSize(String src, ParserContext ctx) :
 {
-    boolean neg = false;
     Duration d;
     int samples;
     WindowSize ws;
@@ -1316,7 +1315,7 @@ WindowSize WindowSize(String src, ParserContext ctx) :
         LOOKAHEAD(2)
         d = Duration()
         {
-            if (d.isZero() || neg) {
+            if (d.isZero()) {
                 ctx.addError("Invalid " + src + " window size at " +
                     getPosition(token) + ": duration must be greater than 0");
             }
@@ -1325,7 +1324,7 @@ WindowSize WindowSize(String src, ParserContext ctx) :
         |
         samples = SamplesNumber()
         {
-            if (samples == 0 || neg) {
+            if (samples == 0) {
                 ctx.addError("Invalid " + src + " window size at " +
                     getPosition(token) + ": sample count must be greater than 0");
             }

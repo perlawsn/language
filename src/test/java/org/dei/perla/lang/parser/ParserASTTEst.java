@@ -288,18 +288,18 @@ public class ParserASTTEst {
         assertThat(w.getSamples(), equalTo(23));
 
         ctx = new ParserContext();
-        p = getParser("-3 seconds");
+        p = getParser("0 seconds");
         w = p.WindowSize("", ctx);
         assertTrue(ctx.hasErrors());
         assertThat(w.getType(), equalTo(WindowType.TIME));
-        assertThat(w.getDuration(), equalTo(Duration.ofSeconds(-3)));
+        assertThat(w.getDuration(), equalTo(Duration.ofSeconds(0)));
 
         ctx = new ParserContext();
-        p = getParser("-23 samples");
+        p = getParser("0 samples");
         w = p.WindowSize("", ctx);
         assertTrue(ctx.hasErrors());
         assertThat(w.getType(), equalTo(WindowType.SAMPLE));
-        assertThat(w.getSamples(), equalTo(-23));
+        assertThat(w.getSamples(), equalTo(0));
     }
 
     @Test
