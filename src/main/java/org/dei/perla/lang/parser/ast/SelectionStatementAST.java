@@ -1,13 +1,17 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.lang.parser.OnEmptySelection;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.statement.Statement;
 import org.dei.perla.lang.query.statement.WindowSize;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * Selection statement Abstract Syntax Tree node.
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class SelectionStatementAST extends StatementAST {
@@ -85,6 +89,11 @@ public final class SelectionStatementAST extends StatementAST {
 
     public WindowSize getTerminateAfter() {
         return terminate;
+    }
+
+    @Override
+    public Statement compile(ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

@@ -1,11 +1,15 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.statement.Statement;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * Creation statement Abstract Syntax Tree node.
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class CreationStatementAST extends StatementAST {
@@ -32,6 +36,11 @@ public final class CreationStatementAST extends StatementAST {
 
     public SelectionStatementAST getSelection() {
         return selection;
+    }
+
+    @Override
+    public Statement compile(ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }
