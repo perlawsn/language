@@ -679,17 +679,17 @@ List<String> FieldList() :
 
 SelectionStatementAST SelectionStatement(ParserContext ctx) :
 {
-    WindowSize every;
+    WindowSizeAST every;
     List<FieldSelectionAST> fsl;
     GroupByAST gby = null;
     HavingAST having = null;
-    WindowSize upto = WindowSize.ONE;
+    WindowSizeAST upto = null;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     SamplingAST sampling;
     Select sel;
     ExpressionAST where = ConstantAST.TRUE;
     ExecutionConditionsAST ec = null;
-    WindowSize terminate = null;
+    WindowSizeAST terminate = null;
 
     Token t;
 }
@@ -729,9 +729,9 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     }
 }
 
-WindowSize EveryClause(ParserContext ctx) :
+WindowSizeAST EveryClause(ParserContext ctx) :
 {
-    WindowSize ws;
+    WindowSizeAST ws;
 }
 {
     <KEYWORD_EVERY>
@@ -810,9 +810,9 @@ HavingAST HavingClause(ParserContext ctx) :
     { return new HavingAST(t, e); }
 }
 
-WindowSize UpToClause(ParserContext ctx) :
+WindowSizeAST UpToClause(ParserContext ctx) :
 {
-    WindowSize ws;
+    WindowSizeAST ws;
 }
 {
     <KEYWORD_UP>
@@ -1054,9 +1054,9 @@ DataTemplate Specification() :
     { return DataTemplate.create(id, tc); }
 }
 
-WindowSize TerminateAfterClause(ParserContext ctx) :
+WindowSizeAST TerminateAfterClause(ParserContext ctx) :
 {
-    WindowSize ws;
+    WindowSizeAST ws;
 }
 {
     <KEYWORD_TERMINATE>
@@ -1273,25 +1273,6 @@ Duration Duration() :
     { return Duration.of(value, tu); }
 }
 
-int SamplesNumber() :
-{
-    int samples;
-}
-{
-    (
-        (
-            samples = ConstantInteger()
-            <KEYWORD_SAMPLES>
-            { return samples; }
-        )
-        |
-        (
-            <KEYWORD_ONE>
-            { return 1; }
-        )
-    )
-}
-
 int SelectionsNumber() :
 {
     int value;
@@ -1304,32 +1285,28 @@ int SelectionsNumber() :
     )
 }
 
-WindowSize WindowSize(String src, ParserContext ctx) :
+WindowSizeAST WindowSize(String src, ParserContext ctx) :
 {
-    Duration d;
-    int samples;
-    WindowSize ws;
+    ExpressionAST value;
+    TemporalUnit unit;
+    WindowSizeAST ws;
+
+    Token t;
 }
 {
+    <KEYWORD_ONE>
+    { ws = new SampleWindowAST(token, ConstantAST.ONE); }
+    |
     (
-        LOOKAHEAD(2)
-        d = Duration()
-        {
-            if (d.isZero()) {
-                ctx.addError("Invalid " + src + " window size at " +
-                    getPosition(token) + ": duration must be greater than 0");
-            }
-            ws = new WindowSize(d);
-        }
-        |
-        samples = SamplesNumber()
-        {
-            if (samples == 0) {
-                ctx.addError("Invalid " + src + " window size at " +
-                    getPosition(token) + ": sample count must be greater than 0");
-            }
-            ws = new WindowSize(samples);
-        }
+        value = Expression(ExpressionType.CONSTANT, src, ctx)
+        { t = token; }
+        (
+            <KEYWORD_SAMPLES>
+            { ws = new SampleWindowAST(t, value); }
+            |
+            unit = TimeUnit()
+            { ws = new DurationWindowAST(t, value, unit); }
+        )
     )
     { return ws; }
 }
@@ -1754,7 +1731,7 @@ ExpressionAST Aggregate(ExpressionType type, String src, ParserContext ctx) :
 {
     AggregateOperation op;
     ExpressionAST operand = ConstantAST.NULL;
-    WindowSize ws;
+    WindowSizeAST ws;
     ExpressionAST filter = ConstantAST.TRUE;
     ExpressionAST e;
 

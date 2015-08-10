@@ -5,7 +5,6 @@ import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ast.*;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
-import org.dei.perla.lang.query.statement.WindowSize.WindowType;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -13,7 +12,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
 /**
@@ -254,17 +253,6 @@ public class ParserASTTEst {
     }
 
     @Test
-    public void testSamplesNumber() throws Exception {
-        ParserAST p = getParser("3 samples");
-        int s = p.SamplesNumber();
-        assertThat(s, equalTo(3));
-
-        p = getParser("one");
-        s = p.SamplesNumber();
-        assertThat(s, equalTo(1));
-    }
-
-    @Test
     public void testSelectionsNumber() throws Exception {
         ParserAST p = getParser("4 selections");
         int s = p.SelectionsNumber();
@@ -276,30 +264,26 @@ public class ParserASTTEst {
         ParserContext ctx = new ParserContext();
 
         ParserAST p = getParser("3 seconds");
-        WindowSize w = p.WindowSize("", ctx);
+        DurationWindowAST dw = (DurationWindowAST) p.WindowSize("", ctx);
         assertFalse(ctx.hasErrors());
-        assertThat(w.getType(), equalTo(WindowType.TIME));
-        assertThat(w.getDuration(), equalTo(Duration.ofSeconds(3)));
+        ConstantAST c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
 
         p = getParser("23 samples");
-        w = p.WindowSize("", ctx);
+        SampleWindowAST sw = (SampleWindowAST) p.WindowSize("", ctx);
         assertFalse(ctx.hasErrors());
-        assertThat(w.getType(), equalTo(WindowType.SAMPLE));
-        assertThat(w.getSamples(), equalTo(23));
+        c = (ConstantAST) sw.getSamples();
+        assertThat(c.getValue(), equalTo(23));
+
+        p = getParser("-15 seconds");
+        p.WindowSize("", ctx);
+        assertFalse(ctx.hasErrors());
 
         ctx = new ParserContext();
-        p = getParser("0 seconds");
-        w = p.WindowSize("", ctx);
-        assertTrue(ctx.hasErrors());
-        assertThat(w.getType(), equalTo(WindowType.TIME));
-        assertThat(w.getDuration(), equalTo(Duration.ofSeconds(0)));
-
-        ctx = new ParserContext();
-        p = getParser("0 samples");
-        w = p.WindowSize("", ctx);
-        assertTrue(ctx.hasErrors());
-        assertThat(w.getType(), equalTo(WindowType.SAMPLE));
-        assertThat(w.getSamples(), equalTo(0));
+        p = getParser("-1 * 32 samples");
+        p.WindowSize("", ctx);
+        assertFalse(ctx.hasErrors());
     }
 
     @Test

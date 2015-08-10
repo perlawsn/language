@@ -1,6 +1,8 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.statement.Statement;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +28,11 @@ public final class SetStatementAST extends StatementAST {
 
     public List<Integer> getIds() {
         return ids;
+    }
+
+    @Override
+    public Statement compile(ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

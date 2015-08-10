@@ -18,6 +18,9 @@ import java.util.Map;
  */
 public final class ConstantAST extends ExpressionAST {
 
+    public static final ConstantAST ONE =
+            new ConstantAST(1, TypeClass.INTEGER);
+
     public static final ConstantAST TRUE =
             new ConstantAST(LogicValue.TRUE, TypeClass.BOOLEAN);
     public static final ConstantAST FALSE =

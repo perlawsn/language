@@ -6,7 +6,6 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.*;
-import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -1461,7 +1460,8 @@ public class ExpressionASTTest {
     public void testAggregate() {
         MockExpressionAST op1 = new MockExpressionAST(TypeClass.INTEGER);
         MockExpressionAST op2 = new MockExpressionAST(TypeClass.BOOLEAN);
-        WindowSize ws = new WindowSize(12);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(12, TypeClass.INTEGER));
         AggregateAST a = new AggregateAST(AggregateOperation.SUM, op1, ws, op2);
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
         assertThat(a.getOperand(), equalTo(op1));
@@ -1471,7 +1471,8 @@ public class ExpressionASTTest {
 
     @Test
     public void testAggregateInference() {
-        WindowSize ws = new WindowSize(12);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(12, TypeClass.INTEGER));
         ParserContext ctx = new ParserContext();
 
         AggregateAST a =
@@ -1515,7 +1516,8 @@ public class ExpressionASTTest {
 
     @Test
     public void testAggregateCompile() {
-        WindowSize ws = new WindowSize(12);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(12, TypeClass.INTEGER));
         ParserContext ctx = new ParserContext();
         Map<Attribute, Integer> atts = new HashMap<>();
 
@@ -1567,7 +1569,8 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateNoType() {
-        WindowSize ws = new WindowSize(4);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
         a.getTypeClass();
@@ -1575,7 +1578,8 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateDoubleTypeSet() {
-        WindowSize ws = new WindowSize(4);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
         ParserContext ctx = new ParserContext();
@@ -1586,7 +1590,8 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateCountNoType() {
-        WindowSize ws = new WindowSize(4);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
         a.getTypeClass();
@@ -1594,7 +1599,8 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateContDoubleTypeSet() {
-        WindowSize ws = new WindowSize(4);
+        WindowSizeAST ws = new SampleWindowAST(
+                new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
         ParserContext ctx = new ParserContext();

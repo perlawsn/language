@@ -19,11 +19,11 @@ public final class AggregateAST extends ExpressionAST {
 
     private final AggregateOperation op;
     private final ExpressionAST operand;
-    private final WindowSize window;
+    private final WindowSizeAST window;
     private final ExpressionAST filter;
 
     public AggregateAST(AggregateOperation op, ExpressionAST operand,
-            WindowSize window, ExpressionAST filter) {
+            WindowSizeAST window, ExpressionAST filter) {
         super();
         this.op = op;
         this.operand = operand;
@@ -32,7 +32,7 @@ public final class AggregateAST extends ExpressionAST {
     }
 
     public AggregateAST(Token token, AggregateOperation op,
-            ExpressionAST operand, WindowSize window, ExpressionAST filter) {
+            ExpressionAST operand, WindowSizeAST window, ExpressionAST filter) {
         super(token);
         this.op = op;
         this.operand = operand;
@@ -48,7 +48,7 @@ public final class AggregateAST extends ExpressionAST {
         return operand;
     }
 
-    public WindowSize getWindowSize() {
+    public WindowSizeAST getWindowSize() {
         return window;
     }
 
@@ -117,17 +117,19 @@ public final class AggregateAST extends ExpressionAST {
         }
         Expression filExp = filter.toExpression(ctx, atts);
 
+        WindowSize ws = window.compile(ctx);
+
         switch (op) {
             case AVG:
-                return new AvgAggregate(opExp, window, filExp);
+                return new AvgAggregate(opExp, ws, filExp);
             case MIN:
-                return new MinAggregate(opExp, window, filExp);
+                return new MinAggregate(opExp, ws, filExp);
             case MAX:
-                return new MaxAggregate(opExp, window, filExp);
+                return new MaxAggregate(opExp, ws, filExp);
             case SUM:
-                return new SumAggregate(opExp, window, filExp);
+                return new SumAggregate(opExp, ws, filExp);
             case COUNT:
-                return new CountAggregate(window, filExp);
+                return new CountAggregate(ws, filExp);
             default:
                 throw new RuntimeException("unknown aggregate " + op);
         }

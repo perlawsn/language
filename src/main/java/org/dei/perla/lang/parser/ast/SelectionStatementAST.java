@@ -4,7 +4,6 @@ import org.dei.perla.lang.parser.OnEmptySelection;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.statement.Statement;
-import org.dei.perla.lang.query.statement.WindowSize;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,28 +15,28 @@ import java.util.List;
  */
 public final class SelectionStatementAST extends StatementAST {
 
-    private final WindowSize every;
+    private final WindowSizeAST every;
     private final List<FieldSelectionAST> fields;
     private final GroupByAST groupBy;
     private final HavingAST having;
-    private final WindowSize upto;
+    private final WindowSizeAST upto;
     private final OnEmptySelection oes;
     private final SamplingAST sampling;
     private final ExpressionAST where;
     private final ExecutionConditionsAST execCond;
-    private final WindowSize terminate;
+    private final WindowSizeAST terminate;
 
     public SelectionStatementAST(Token t,
-            WindowSize every,
+            WindowSizeAST every,
             List<FieldSelectionAST> fields,
             GroupByAST groupBy,
             HavingAST having,
-            WindowSize upto,
+            WindowSizeAST upto,
             OnEmptySelection oes,
             SamplingAST sampling,
             ExpressionAST where,
             ExecutionConditionsAST execCond,
-            WindowSize terminate) {
+            WindowSizeAST terminate) {
         super(t);
         this.every = every;
         this.fields = Collections.unmodifiableList(fields);
@@ -51,7 +50,7 @@ public final class SelectionStatementAST extends StatementAST {
         this.terminate = terminate;
     }
 
-    public WindowSize getEvery() {
+    public WindowSizeAST getEvery() {
         return every;
     }
 
@@ -67,7 +66,7 @@ public final class SelectionStatementAST extends StatementAST {
         return having;
     }
 
-    public WindowSize getUpto() {
+    public WindowSizeAST getUpto() {
         return upto;
     }
 
@@ -87,7 +86,7 @@ public final class SelectionStatementAST extends StatementAST {
         return execCond;
     }
 
-    public WindowSize getTerminateAfter() {
+    public WindowSizeAST getTerminateAfter() {
         return terminate;
     }
 
