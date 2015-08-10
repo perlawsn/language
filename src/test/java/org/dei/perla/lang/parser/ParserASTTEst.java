@@ -550,7 +550,11 @@ public class ParserASTTEst {
         AggregateAST a = (AggregateAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
         assertFalse(ctx.hasErrors());
         assertThat(a.getOperation(), equalTo(AggregateOperation.COUNT));
-        assertThat(a.getWindowSize(), equalTo(ws));
+        DurationWindowAST dw = (DurationWindowAST) a.getWindowSize();
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
+        ConstantAST c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("sum(temperature, 3 seconds, false)");
@@ -559,7 +563,11 @@ public class ParserASTTEst {
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
         AttributeReferenceAST att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
-        assertThat(a.getWindowSize(), equalTo(ws));
+        dw = (DurationWindowAST) a.getWindowSize();
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
+        c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("max(temperature, 3 seconds, false)");
@@ -568,7 +576,11 @@ public class ParserASTTEst {
         assertThat(a.getOperation(), equalTo(AggregateOperation.MAX));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
-        assertThat(a.getWindowSize(), equalTo(ws));
+        dw = (DurationWindowAST) a.getWindowSize();
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
+        c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("min(temperature, 3 seconds, false)");
@@ -577,7 +589,11 @@ public class ParserASTTEst {
         assertThat(a.getOperation(), equalTo(AggregateOperation.MIN));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
-        assertThat(a.getWindowSize(), equalTo(ws));
+        dw = (DurationWindowAST) a.getWindowSize();
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
+        c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("avg(temperature, 3 seconds, false)");
@@ -586,7 +602,11 @@ public class ParserASTTEst {
         assertThat(a.getOperation(), equalTo(AggregateOperation.AVG));
         att = (AttributeReferenceAST) a.getOperand();
         assertThat(att.getId(), equalTo("temperature"));
-        assertThat(a.getWindowSize(), equalTo(ws));
+        dw = (DurationWindowAST) a.getWindowSize();
+        assertThat(dw.getUnit(), equalTo(ChronoUnit.SECONDS));
+        c = (ConstantAST) dw.getValue();
+        assertThat(c.getValue(), equalTo(3));
+        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
     }
 
