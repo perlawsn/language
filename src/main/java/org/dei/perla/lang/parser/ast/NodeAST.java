@@ -14,23 +14,20 @@ public abstract class NodeAST {
     private final int line;
 
     /**
-     * Empty constructor, employed in test cases and private internal
-     * constructor (see {@link ConstantAST} for a usage example).
-     */
-    public NodeAST() {
-        column = -1;
-        line = -1;
-    }
-
-    /**
      * Creates a new {@code NodeAST} node using the information contained in
-     * the lexer token passed as a parameter.
+     * the lexer token passed as a parameter. For test purposes, the token
+     * reference may be null.
      *
-     * @param token Lexer token
+     * @param token Lexer token.
      */
     public NodeAST(Token token) {
-        this.column = token.beginColumn;
-        this.line = token.beginLine;
+        if (token != null) {
+            this.column = token.beginColumn;
+            this.line = token.beginLine;
+        } else {
+            this.column = -1;
+            this.line = -1;
+        }
     }
 
     /**

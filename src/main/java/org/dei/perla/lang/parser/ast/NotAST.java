@@ -21,7 +21,7 @@ import java.util.Map;
 public final class NotAST extends UnaryExpressionAST {
 
     public NotAST(ExpressionAST operand) {
-        super(operand);
+        this(null, operand);
     }
 
     public NotAST(Token token, ExpressionAST operand) {

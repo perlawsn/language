@@ -20,7 +20,7 @@ import java.util.Map;
 public final class InverseAST extends UnaryExpressionAST {
 
     public InverseAST(ExpressionAST operand) {
-        super(operand);
+        this(null, operand);
     }
 
     public InverseAST(Token token, ExpressionAST operand) {

@@ -12,6 +12,10 @@ public final class EveryAST extends NodeAST {
     private final ExpressionAST value;
     private final TemporalUnit unit;
 
+    public EveryAST(ExpressionAST value, TemporalUnit unit) {
+        this(null, value, unit);
+    }
+
     public EveryAST(Token token, ExpressionAST value, TemporalUnit unit) {
         super(token);
         this.value = value;

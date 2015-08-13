@@ -1,47 +1,98 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
-import org.dei.perla.lang.query.expression.Constant;
-import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.statement.WindowSize;
+import org.dei.perla.lang.query.statement.WindowSize.WindowType;
 
-import java.util.Collections;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 
 /**
- * Common base class for window size Abstract Syntax Tree node
+ * WindowSize Abstract Syntax Tree node
  *
  * @author Guido Rota 10/08/15.
  */
-public abstract class WindowSizeAST extends NodeAST {
+public final class WindowSizeAST extends NodeAST {
 
-    public WindowSizeAST() {
-        super();
+    private final WindowType type;
+
+    // Sample-based window size
+    private final ExpressionAST samples;
+
+    // Duration-based window size
+    private final ExpressionAST value;
+    private final TemporalUnit unit;
+
+
+    public WindowSizeAST(ExpressionAST samples) {
+        this(null, samples);
     }
 
-    public WindowSizeAST(Token t) {
+    public WindowSizeAST(Token t, ExpressionAST samples) {
         super(t);
+        type = WindowType.SAMPLE;
+        this.samples = samples;
+        value = null;
+        unit = null;
     }
 
-    /**
-     * Utility method employed to evaluate the value of an integer ConstantAST
-     *
-     * @param value constant to convert
-     * @param ctx Context for the storage of intermediate parsing state
-     * @return integer value of the {@link ConstantAST} node
-     */
-    protected static int evaluateConstant(ExpressionAST value,
-            ParserContext ctx) {
-        Expression e = value.compile(TypeClass.INTEGER, ctx,
-                Collections.emptyMap());
-        if (!(e instanceof Constant)) {
-            throw new IllegalStateException("Parser bug found, WindowSize " +
-                    "expression is not constant");
+    public WindowSizeAST(ExpressionAST value, TemporalUnit unit) {
+        this(null, value, unit);
+    }
+
+    public WindowSizeAST(Token t, ExpressionAST value, TemporalUnit unit) {
+        super(t);
+        type = WindowType.TIME;
+        this.value = value;
+        this.unit = unit;
+        samples = null;
+    }
+
+    public WindowType getType() {
+        return type;
+    }
+
+    public ExpressionAST getSamples() {
+        return samples;
+    }
+
+    public ExpressionAST getDurationValue() {
+        return value;
+    }
+
+    public TemporalUnit getDurationUnit() {
+        return unit;
+    }
+
+    public WindowSize compile(ParserContext ctx) {
+        switch (type) {
+            case TIME:
+                return compileDuration(ctx);
+            case SAMPLE:
+                return compileSamples(ctx);
+            default:
+                throw new RuntimeException("Unexpected WindowSize type " +
+                        type);
         }
-        return (Integer) ((Constant) e).getValue();
     }
 
-    public abstract WindowSize compile(ParserContext ctx);
+    public WindowSize compileDuration(ParserContext ctx) {
+        int v = value.evalIntConstant(ctx);
+        if (v <= 0) {
+            ctx.addError("Window size duration at " + getPosition() +
+                    " cannot be less or equal to zero");
+        }
+        return new WindowSize(Duration.of(v, unit));
+    }
+
+    public WindowSize compileSamples(ParserContext ctx) {
+        int s = samples.evalIntConstant(ctx);
+        if (s <= 0) {
+            ctx.addError("Window size sample count at " + getPosition() +
+                    " cannot be less or equal to zero");
+        }
+        return new WindowSize(s);
+    }
 
 }

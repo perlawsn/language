@@ -23,6 +23,10 @@ public final class NodeSpecificationsAST extends NodeAST {
         specs = null;
     }
 
+    public NodeSpecificationsAST(List<DataTemplate> specs) {
+        this(null, specs);
+    }
+
     public NodeSpecificationsAST(Token token, List<DataTemplate> specs) {
         super(token);
         this.type = NodeSpecificationsType.SPECS;

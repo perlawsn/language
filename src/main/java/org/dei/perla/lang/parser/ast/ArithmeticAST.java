@@ -25,8 +25,7 @@ public final class ArithmeticAST extends BinaryExpressionAST {
 
     public ArithmeticAST(ArithmeticOperation op, ExpressionAST left,
             ExpressionAST right) {
-        super(left, right);
-        this.op = op;
+        this(null, op, left, right);
     }
 
     public ArithmeticAST(Token token, ArithmeticOperation op,

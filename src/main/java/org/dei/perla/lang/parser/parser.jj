@@ -859,7 +859,7 @@ SamplingAST SamplingClause(ParserContext ctx) :
                 policy = OnUnsupportedSRClause()
             ]
             [
-                refresh = RefreshClause()
+                refresh = RefreshClause(ctx)
             ]
             { return new SamplingIfEveryAST(t, ife, policy, refresh); }
         )
@@ -962,10 +962,11 @@ RatePolicy OnUnsupportedSRClause() :
     )
 }
 
-RefreshAST RefreshClause() :
+RefreshAST RefreshClause(ParserContext ctx) :
 {
     List<String> es;
-    Duration d;
+    ExpressionAST value;
+    TemporalUnit unit;
 
     Token t;
 }
@@ -976,8 +977,9 @@ RefreshAST RefreshClause() :
         { return new RefreshAST(t, es); }
         |
         <KEYWORD_EVERY>
-        d = Duration()
-        { return new RefreshAST(t, d); }
+        value = Expression(ExpressionType.CONSTANT, "refresh every", ctx)
+        unit = TimeUnit()
+        { return new RefreshAST(t, value, unit); }
         |
         <KEYWORD_NEVER>
         { return RefreshAST.NEVER; }
@@ -1002,7 +1004,7 @@ ExecutionConditionsAST ExecutionConditionsClause(ParserContext ctx) :
         specs = NodeSpecifications()
     ]
     [
-        r = RefreshClause()
+        r = RefreshClause(ctx)
     ]
     { return new ExecutionConditionsAST(t, cond, specs, r); }
 }
@@ -1262,17 +1264,6 @@ AggregateOperation AggregateOperation() :
     { return AggregateOperation.SUM; }
 }
 
-Duration Duration() :
-{
-    TemporalUnit tu;
-    int value;
-}
-{
-    value = ConstantInteger()
-    tu = TimeUnit()
-    { return Duration.of(value, tu); }
-}
-
 int SelectionsNumber() :
 {
     int value;
@@ -1295,17 +1286,17 @@ WindowSizeAST WindowSize(String src, ParserContext ctx) :
 }
 {
     <KEYWORD_ONE>
-    { ws = new SampleWindowAST(token, ConstantAST.ONE); }
+    { ws = new WindowSizeAST(token, ConstantAST.ONE); }
     |
     (
         value = Expression(ExpressionType.CONSTANT, src, ctx)
         { t = token; }
         (
             <KEYWORD_SAMPLES>
-            { ws = new SampleWindowAST(t, value); }
+            { ws = new WindowSizeAST(t, value); }
             |
             unit = TimeUnit()
-            { ws = new DurationWindowAST(t, value, unit); }
+            { ws = new WindowSizeAST(t, value, unit); }
         )
     )
     { return ws; }

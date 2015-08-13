@@ -22,9 +22,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
     private final TypeVariable type;
 
     public AttributeReferenceAST(String id, TypeClass type) {
-        super();
-        this.id = id;
-        this.type = new TypeVariable(type);
+        this(null, id, type);
     }
 
     public AttributeReferenceAST(Token token, String id, TypeClass type) {

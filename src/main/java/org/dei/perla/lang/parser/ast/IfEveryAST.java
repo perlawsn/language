@@ -10,6 +10,10 @@ public final class IfEveryAST extends NodeAST {
     private final ExpressionAST cond;
     private final EveryAST every;
 
+    public IfEveryAST(ExpressionAST cond, EveryAST every) {
+        this(null, cond, every);
+    }
+
     public IfEveryAST(Token token, ExpressionAST cond, EveryAST every) {
         super(token);
         this.cond = cond;

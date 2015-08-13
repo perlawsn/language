@@ -18,6 +18,11 @@ public final class InsertionStatementAST extends StatementAST {
     private final List<String> fields;
     private final SelectionStatementAST selection;
 
+    public InsertionStatementAST(String stream, List<String> fields,
+            SelectionStatementAST selection) {
+        this(null, stream, fields, selection);
+    }
+
     public InsertionStatementAST(Token token, String stream,
             List<String> fields, SelectionStatementAST selection) {
         super(token);

@@ -18,6 +18,11 @@ public final class CreationStatementAST extends StatementAST {
     private final List<FieldDefinitionAST> fields;
     private final SelectionStatementAST selection;
 
+    public CreationStatementAST(String stream,
+            List<FieldDefinitionAST> fields, SelectionStatementAST selection) {
+        this(null, stream, fields, selection);
+    }
+
     public CreationStatementAST(Token token, String stream,
             List<FieldDefinitionAST> fields, SelectionStatementAST selection) {
         super(token);

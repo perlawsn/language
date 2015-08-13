@@ -6,6 +6,7 @@ import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.*;
+import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
 import java.time.Instant;
@@ -1460,7 +1461,7 @@ public class ExpressionASTTest {
     public void testAggregate() {
         MockExpressionAST op1 = new MockExpressionAST(TypeClass.INTEGER);
         MockExpressionAST op2 = new MockExpressionAST(TypeClass.BOOLEAN);
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(12, TypeClass.INTEGER));
         AggregateAST a = new AggregateAST(AggregateOperation.SUM, op1, ws, op2);
         assertThat(a.getOperation(), equalTo(AggregateOperation.SUM));
@@ -1471,7 +1472,7 @@ public class ExpressionASTTest {
 
     @Test
     public void testAggregateInference() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(12, TypeClass.INTEGER));
         ParserContext ctx = new ParserContext();
 
@@ -1516,9 +1517,11 @@ public class ExpressionASTTest {
 
     @Test
     public void testAggregateCompile() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(12, TypeClass.INTEGER));
         ParserContext ctx = new ParserContext();
+        WindowSize cws = ws.compile(ctx);
+        assertFalse(ctx.hasErrors());
         Map<Attribute, Integer> atts = new HashMap<>();
 
         AggregateAST aa = new AggregateAST(AggregateOperation.MIN,
@@ -1527,7 +1530,7 @@ public class ExpressionASTTest {
         MinAggregate min = (MinAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(min.getType(), equalTo(DataType.INTEGER));
-        assertThat(min.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(min.getWindowSize(), equalTo(cws));
         assertThat(min.getFilter(), equalTo(Constant.TRUE));
 
         aa = new AggregateAST(AggregateOperation.MAX,
@@ -1536,7 +1539,7 @@ public class ExpressionASTTest {
         MaxAggregate max = (MaxAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(max.getType(), equalTo(DataType.INTEGER));
-        assertThat(max.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(max.getWindowSize(), equalTo(cws));
         assertThat(max.getFilter(), equalTo(Constant.TRUE));
 
         aa = new AggregateAST(AggregateOperation.SUM,
@@ -1545,7 +1548,7 @@ public class ExpressionASTTest {
         SumAggregate sum = (SumAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(sum.getType(), equalTo(DataType.INTEGER));
-        assertThat(sum.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(sum.getWindowSize(), equalTo(cws));
         assertThat(sum.getFilter(), equalTo(Constant.TRUE));
 
         aa = new AggregateAST(AggregateOperation.AVG,
@@ -1554,7 +1557,7 @@ public class ExpressionASTTest {
         AvgAggregate avg = (AvgAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(avg.getType(), equalTo(DataType.FLOAT));
-        assertThat(avg.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(avg.getWindowSize(), equalTo(cws));
         assertThat(avg.getFilter(), equalTo(Constant.TRUE));
 
         aa = new AggregateAST(AggregateOperation.COUNT,
@@ -1563,13 +1566,13 @@ public class ExpressionASTTest {
         CountAggregate count = (CountAggregate) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(count.getType(), equalTo(DataType.INTEGER));
-        assertThat(count.getWindowSize(), equalTo(aa.getWindowSize()));
+        assertThat(count.getWindowSize(), equalTo(cws));
         assertThat(count.getFilter(), equalTo(Constant.TRUE));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateNoType() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
@@ -1578,7 +1581,7 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateDoubleTypeSet() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
@@ -1590,7 +1593,7 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateCountNoType() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
@@ -1599,7 +1602,7 @@ public class ExpressionASTTest {
 
     @Test(expected = IllegalStateException.class)
     public void testAggregateContDoubleTypeSet() {
-        WindowSizeAST ws = new SampleWindowAST(
+        WindowSizeAST ws = new WindowSizeAST(
                 new ConstantAST(4, TypeClass.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);

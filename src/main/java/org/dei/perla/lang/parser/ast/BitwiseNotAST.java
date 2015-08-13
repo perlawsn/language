@@ -20,7 +20,7 @@ import java.util.Map;
 public final class BitwiseNotAST extends UnaryExpressionAST {
 
     public BitwiseNotAST(ExpressionAST operand) {
-        super(operand);
+        this(null, operand);
     }
 
     public BitwiseNotAST(Token token, ExpressionAST operand) {

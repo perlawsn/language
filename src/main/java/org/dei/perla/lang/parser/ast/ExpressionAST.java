@@ -8,6 +8,7 @@ import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -46,10 +47,6 @@ import java.util.Map;
 public abstract class ExpressionAST extends NodeAST {
 
     private TypeVariable type;
-
-    public ExpressionAST() {
-        super();
-    }
 
     public ExpressionAST(Token token) {
         super(token);
@@ -146,6 +143,29 @@ public abstract class ExpressionAST extends NodeAST {
         return "Incompatible types: operator " + operator + " of type '" +
                 found + "' found at " + position  + "where an " +
                 "operation of type '" + expected + "' was required.";
+    }
+
+    /**
+     * Utility method employed to evaluate the value of an integer
+     * ConstantAST. See {@link DurationWindowAST} and {@link SampleWindowAST}
+     * for additional examples.
+     *
+     * @param ctx Context for the storage of intermediate parsing state
+     * @return integer value of the {@link ConstantAST} node
+     */
+    protected int evalIntConstant(ParserContext ctx) {
+        Expression e = compile(TypeClass.INTEGER, ctx,
+                Collections.emptyMap());
+        if (!(e instanceof Constant)) {
+            throw new IllegalStateException("Parser bug found, WindowSize " +
+                    "expression is not constant");
+        }
+
+        Constant c = (Constant) e;
+        if (c.getValue() == null) {
+            return 0;
+        }
+        return (Integer) c.getValue();
     }
 
 }

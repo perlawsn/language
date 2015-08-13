@@ -22,8 +22,7 @@ public final class LikeAST extends UnaryExpressionAST {
     private final String pattern;
 
     public LikeAST(ExpressionAST operand, String pattern) {
-        super(operand);
-        this.pattern = pattern;
+        this(null, operand, pattern);
     }
 
     public LikeAST(Token token, ExpressionAST operand, String pattern) {

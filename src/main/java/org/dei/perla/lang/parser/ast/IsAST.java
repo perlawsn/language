@@ -23,8 +23,7 @@ public final class IsAST extends UnaryExpressionAST {
     private final LogicValue value;
 
     public IsAST(ExpressionAST operand, LogicValue value) {
-        super(operand);
-        this.value = value;
+        this(null, operand, value);
     }
 
     public IsAST(Token token, ExpressionAST operand, LogicValue value) {

@@ -12,6 +12,10 @@ public final class GroupByAST extends NodeAST {
 
     private final List<String> fields;
 
+    public GroupByAST(List<String> fields) {
+        this(null, fields);
+    }
+
     public GroupByAST(Token token, List<String> fields) {
         super(token);
         this.fields = Collections.unmodifiableList(fields);

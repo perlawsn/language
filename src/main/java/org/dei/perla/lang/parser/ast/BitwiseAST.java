@@ -26,8 +26,7 @@ public final class BitwiseAST extends BinaryExpressionAST {
 
     public BitwiseAST(BitwiseOperation op, ExpressionAST left,
             ExpressionAST right) {
-        super(left, right);
-        this.op = op;
+        this(null, op, left, right);
     }
 
     public BitwiseAST(Token token, BitwiseOperation op,

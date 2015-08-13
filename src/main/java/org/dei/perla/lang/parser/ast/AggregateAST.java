@@ -24,11 +24,7 @@ public final class AggregateAST extends ExpressionAST {
 
     public AggregateAST(AggregateOperation op, ExpressionAST operand,
             WindowSizeAST window, ExpressionAST filter) {
-        super();
-        this.op = op;
-        this.operand = operand;
-        this.window = window;
-        this.filter = filter;
+        this(null, op, operand, window, filter);
     }
 
     public AggregateAST(Token token, AggregateOperation op,

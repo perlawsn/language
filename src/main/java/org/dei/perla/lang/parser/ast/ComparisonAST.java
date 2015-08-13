@@ -22,8 +22,7 @@ public final class ComparisonAST extends BinaryExpressionAST {
 
     public ComparisonAST(ComparisonOperation op, ExpressionAST left,
             ExpressionAST right) {
-        super(left, right);
-        this.op = op;
+        this(null, op, left, right);
     }
 
     public ComparisonAST(Token token, ComparisonOperation op,

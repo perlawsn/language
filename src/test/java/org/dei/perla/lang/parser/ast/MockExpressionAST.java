@@ -18,6 +18,7 @@ public final class MockExpressionAST extends ExpressionAST {
     private final TypeClass type;
 
     public MockExpressionAST(TypeClass type) {
+        super(null);
         this.type = type;
     }
 

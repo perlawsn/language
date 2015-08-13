@@ -12,6 +12,11 @@ public final class FieldDefinitionAST extends NodeAST {
     private final DataType type;
     private final ExpressionAST defValue;
 
+    public FieldDefinitionAST(String name, DataType type,
+            ExpressionAST defValue) {
+        this(null, name, type, defValue);
+    }
+
     public FieldDefinitionAST(Token token, String name,
             DataType type, ExpressionAST defValue) {
         super(token);

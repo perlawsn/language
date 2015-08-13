@@ -26,6 +26,20 @@ public final class SelectionStatementAST extends StatementAST {
     private final ExecutionConditionsAST execCond;
     private final WindowSizeAST terminate;
 
+    public SelectionStatementAST(WindowSizeAST every,
+            List<FieldSelectionAST> fields,
+            GroupByAST groupBy,
+            HavingAST having,
+            WindowSizeAST upto,
+            OnEmptySelection oes,
+            SamplingAST sampling,
+            ExpressionAST where,
+            ExecutionConditionsAST execCond,
+            WindowSizeAST terminate) {
+        this(null, every, fields, groupBy, having, upto, oes, sampling,
+                where, execCond, terminate);
+    }
+
     public SelectionStatementAST(Token t,
             WindowSizeAST every,
             List<FieldSelectionAST> fields,

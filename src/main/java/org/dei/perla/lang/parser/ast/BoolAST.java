@@ -24,8 +24,7 @@ public final class BoolAST extends BinaryExpressionAST {
     private final BoolOperation op;
 
     public BoolAST(BoolOperation op, ExpressionAST left, ExpressionAST right) {
-        super(left, right);
-        this.op = op;
+        this(null, op, left, right);
     }
 
     public BoolAST(Token token, BoolOperation op, ExpressionAST left,

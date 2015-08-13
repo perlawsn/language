@@ -11,6 +11,11 @@ public final class ExecutionConditionsAST extends NodeAST {
     private final NodeSpecificationsAST specs;
     private final RefreshAST refresh;
 
+    public ExecutionConditionsAST(ExpressionAST cond,
+            NodeSpecificationsAST specs, RefreshAST refresh) {
+        this(null, cond, specs, refresh);
+    }
+
     public ExecutionConditionsAST(Token token, ExpressionAST cond,
             NodeSpecificationsAST specs, RefreshAST refresh) {
         super(token);

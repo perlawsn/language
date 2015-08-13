@@ -21,7 +21,7 @@ import java.util.Map;
 public final class IsNullAST extends UnaryExpressionAST {
 
     public IsNullAST(ExpressionAST operand) {
-        super(operand);
+        this(null, operand);
     }
 
     public IsNullAST(Token token, ExpressionAST operand) {

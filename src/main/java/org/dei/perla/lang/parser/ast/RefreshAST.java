@@ -4,6 +4,7 @@ import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.statement.RefreshType;
 
 import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,19 +17,30 @@ public final class RefreshAST extends NodeAST {
 
     private final RefreshType type;
     private final List<String> events;
-    private final Duration duration;
+    private final ExpressionAST value;
+    private final TemporalUnit unit;
+
+    public RefreshAST(List<String> events) {
+        this(null, events);
+    }
 
     public RefreshAST(Token token, List<String> events) {
         super(token);
         type = RefreshType.EVENT;
         this.events = Collections.unmodifiableList(events);
-        duration = null;
+        value = null;
+        unit = null;
     }
 
-    public RefreshAST(Token token, Duration duration) {
+    public RefreshAST(ExpressionAST value, TemporalUnit unit) {
+        this(null, value, unit);
+    }
+
+    public RefreshAST(Token token, ExpressionAST value, TemporalUnit unit) {
         super(token);
         type = RefreshType.TIME;
-        this.duration = duration;
+        this.value = value;
+        this.unit = unit;
         events = null;
     }
 
@@ -36,7 +48,8 @@ public final class RefreshAST extends NodeAST {
         super(null);
         type = RefreshType.NEVER;
         events = null;
-        duration = null;
+        value = null;
+        unit = null;
     }
 
     public RefreshType getRefreshType() {
@@ -44,19 +57,15 @@ public final class RefreshAST extends NodeAST {
     }
 
     public List<String> getEvents() {
-        if (type != RefreshType.EVENT) {
-            throw new RuntimeException(
-                    "No events in " + type.name() + " refresh");
-        }
         return events;
     }
 
-    public Duration getDuration() {
-        if (type != RefreshType.TIME) {
-            throw new RuntimeException(
-                    "No duration in " + type.name() + " refresh");
-        }
-        return duration;
+    public ExpressionAST getDurationValue() {
+        return value;
+    }
+
+    public TemporalUnit getDurationUnit() {
+        return unit;
     }
 
 }

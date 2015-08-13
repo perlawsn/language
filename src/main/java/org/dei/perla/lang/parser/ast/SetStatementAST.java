@@ -15,6 +15,10 @@ public final class SetStatementAST extends StatementAST {
     private final List<SetParameterAST> params;
     private final List<Integer> ids;
 
+    public SetStatementAST(List<SetParameterAST> params, List<Integer> ids) {
+        this(null, params, ids);
+    }
+
     public SetStatementAST(Token token, List<SetParameterAST> params,
             List<Integer> ids) {
         super(token);

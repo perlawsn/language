@@ -26,10 +26,7 @@ public final class BetweenAST extends ExpressionAST {
 
     public BetweenAST(ExpressionAST operand, ExpressionAST min,
             ExpressionAST max) {
-        super();
-        this.operand = operand;
-        this.min = min;
-        this.max = max;
+        this(null, operand, min, max);
     }
 
     public BetweenAST(Token token, ExpressionAST operand, ExpressionAST min,

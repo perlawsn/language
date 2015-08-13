@@ -19,7 +19,8 @@ public class WindowSizeASTTest {
     @Test
     public void testSampleWindow() {
         ConstantAST c = new ConstantAST(23, TypeClass.INTEGER);
-        SampleWindowAST w = new SampleWindowAST(c);
+        WindowSizeAST w = new WindowSizeAST(c);
+        assertThat(w.getType(), equalTo(WindowSize.WindowType.SAMPLE));
         assertThat(w.getSamples(), equalTo(c));
 
         ParserContext ctx = new ParserContext();
@@ -29,7 +30,7 @@ public class WindowSizeASTTest {
         assertThat(ws.getSamples(), equalTo(23));
 
         c = new ConstantAST(-23, TypeClass.INTEGER);
-        w = new SampleWindowAST(c);
+        w = new WindowSizeAST(c);
         assertThat(w.getSamples(), equalTo(c));
 
         ctx = new ParserContext();
@@ -40,10 +41,11 @@ public class WindowSizeASTTest {
     @Test
     public void testDurationWindow() {
         ConstantAST c = new ConstantAST(65, TypeClass.INTEGER);
-        DurationWindowAST w = new DurationWindowAST(c, ChronoUnit.DAYS);
-        assertThat(w.getValue(), equalTo(c));
-        assertThat(w.getUnit(), equalTo(ChronoUnit.DAYS));
+        WindowSizeAST w = new WindowSizeAST(c, ChronoUnit.DAYS);
 
+        assertThat(w.getType(), equalTo(WindowSize.WindowType.TIME));
+        assertThat(w.getDurationValue(), equalTo(c));
+        assertThat(w.getDurationUnit(), equalTo(ChronoUnit.DAYS));
         ParserContext ctx = new ParserContext();
         WindowSize ws = w.compile(ctx);
         assertFalse(ctx.hasErrors());
@@ -51,9 +53,9 @@ public class WindowSizeASTTest {
         assertThat(ws.getDuration(), equalTo(Duration.ofDays(65)));
 
         c = new ConstantAST(-65, TypeClass.INTEGER);
-        w = new DurationWindowAST(c, ChronoUnit.DAYS);
-        assertThat(w.getValue(), equalTo(c));
-        assertThat(w.getUnit(), equalTo(ChronoUnit.DAYS));
+        w = new WindowSizeAST(c, ChronoUnit.DAYS);
+        assertThat(w.getDurationValue(), equalTo(c));
+        assertThat(w.getDurationUnit(), equalTo(ChronoUnit.DAYS));
 
         ctx = new ParserContext();
         w.compile(ctx);

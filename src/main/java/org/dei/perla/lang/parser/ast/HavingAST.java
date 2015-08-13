@@ -9,6 +9,10 @@ public final class HavingAST extends NodeAST {
 
     private final ExpressionAST cond;
 
+    public HavingAST(ExpressionAST cond) {
+        this(null, cond);
+    }
+
     public HavingAST(Token token, ExpressionAST cond) {
         super(token);
         this.cond = cond;
