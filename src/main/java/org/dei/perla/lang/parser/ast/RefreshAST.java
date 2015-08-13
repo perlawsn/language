@@ -1,6 +1,8 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.RefreshType;
 
 import java.time.Duration;
@@ -52,7 +54,7 @@ public final class RefreshAST extends NodeAST {
         unit = null;
     }
 
-    public RefreshType getRefreshType() {
+    public RefreshType getType() {
         return type;
     }
 
@@ -66,6 +68,32 @@ public final class RefreshAST extends NodeAST {
 
     public TemporalUnit getDurationUnit() {
         return unit;
+    }
+
+    public Refresh compile(ParserContext ctx) {
+        switch (type) {
+            case NEVER:
+                return Refresh.NEVER;
+            case EVENT:
+                return compileEvents(ctx);
+            case TIME:
+                return compileTime(ctx);
+            default:
+                throw new RuntimeException("Unknown refresh type " + type);
+        }
+    }
+
+    private Refresh compileEvents(ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    private Refresh compileTime(ParserContext ctx) {
+        int v = value.evalIntConstant(ctx);
+        if (v <= 0) {
+            ctx.addError("Refresh duration at " + getPosition() + " " +
+                    "cannot be less or equal to zero");
+        }
+        return new Refresh(Duration.of(v, unit));
     }
 
 }

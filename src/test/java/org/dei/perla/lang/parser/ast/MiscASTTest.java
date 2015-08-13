@@ -2,11 +2,15 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.registry.TypeClass;
 import org.dei.perla.lang.parser.ParserContext;
+import org.dei.perla.lang.query.statement.Refresh;
+import org.dei.perla.lang.query.statement.RefreshType;
 import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
@@ -14,7 +18,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * @author Guido Rota 10/08/15.
  */
-public class WindowSizeASTTest {
+public class MiscASTTest {
 
     @Test
     public void testSampleWindow() {
@@ -37,9 +41,7 @@ public class WindowSizeASTTest {
         w.compile(ctx);
         assertTrue(ctx.hasErrors());
     }
-
-    @Test
-    public void testDurationWindow() {
+@Test public void testDurationWindow() {
         ConstantAST c = new ConstantAST(65, TypeClass.INTEGER);
         WindowSizeAST w = new WindowSizeAST(c, ChronoUnit.DAYS);
 
@@ -60,6 +62,45 @@ public class WindowSizeASTTest {
         ctx = new ParserContext();
         w.compile(ctx);
         assertTrue(ctx.hasErrors());
+    }
+
+    @Test
+    public void testRefreshNever() {
+        RefreshAST ra = RefreshAST.NEVER;
+        assertThat(ra.getType(), equalTo(RefreshType.NEVER));
+
+        ParserContext ctx = new ParserContext();
+        Refresh r = ra.compile(ctx);
+        assertThat(r.getType(), equalTo(RefreshType.NEVER));
+    }
+
+    @Test
+    public void testRefreshDuration() {
+        ConstantAST c = new ConstantAST(12, TypeClass.INTEGER);
+        RefreshAST ra = new RefreshAST(c, ChronoUnit.DAYS);
+        assertThat(ra.getType(), equalTo(RefreshType.TIME));
+        assertThat(ra.getDurationValue(), equalTo(c));
+        assertThat(ra.getDurationUnit(), equalTo(ChronoUnit.DAYS));
+
+        ParserContext ctx = new ParserContext();
+        Refresh r = ra.compile(ctx);
+        assertThat(r.getType(), equalTo(RefreshType.TIME));
+        assertThat(r.getDuration(), equalTo(Duration.ofDays(12)));
+    }
+
+    @Test
+    public void testRefreshEvents() {
+        List<String> es = new ArrayList<>();
+        es.add("test1");
+        es.add("test2");
+        RefreshAST ra = new RefreshAST(es);
+        assertThat(ra.getType(), equalTo(RefreshType.EVENT));
+        assertTrue(ra.getEvents().containsAll(es));
+        assertThat(ra.getEvents().size(), equalTo(es.size()));
+
+        ParserContext ctx = new ParserContext();
+        Refresh r = ra.compile(ctx);
+        assertThat(r.getType(), equalTo(RefreshType.EVENT));
     }
 
 }

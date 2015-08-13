@@ -77,7 +77,7 @@ public final class WindowSizeAST extends NodeAST {
         }
     }
 
-    public WindowSize compileDuration(ParserContext ctx) {
+    private WindowSize compileDuration(ParserContext ctx) {
         int v = value.evalIntConstant(ctx);
         if (v <= 0) {
             ctx.addError("Window size duration at " + getPosition() +
@@ -86,7 +86,7 @@ public final class WindowSizeAST extends NodeAST {
         return new WindowSize(Duration.of(v, unit));
     }
 
-    public WindowSize compileSamples(ParserContext ctx) {
+    private WindowSize compileSamples(ParserContext ctx) {
         int s = samples.evalIntConstant(ctx);
         if (s <= 0) {
             ctx.addError("Window size sample count at " + getPosition() +
