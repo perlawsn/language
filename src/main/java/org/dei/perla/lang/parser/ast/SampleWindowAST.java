@@ -29,7 +29,12 @@ public final class SampleWindowAST extends WindowSizeAST {
 
     @Override
     public WindowSize compile(ParserContext ctx) {
-        throw new RuntimeException("unimplemented");
+        int s = evaluateConstant(samples, ctx);
+        if (s <= 0) {
+            ctx.addError("Window size sample count at " + getPosition() +
+                    " cannot be less or equal to zero");
+        }
+        return new WindowSize(s);
     }
 
 }

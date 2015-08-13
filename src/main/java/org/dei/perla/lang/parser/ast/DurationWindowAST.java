@@ -4,6 +4,7 @@ import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.statement.WindowSize;
 
+import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 
 /**
@@ -38,7 +39,12 @@ public final class DurationWindowAST extends WindowSizeAST {
 
     @Override
     public WindowSize compile(ParserContext ctx) {
-        throw new RuntimeException("unimplemented");
+        int v = evaluateConstant(value, ctx);
+        if (v <= 0) {
+            ctx.addError("Window size duration at " + getPosition() +
+                    " cannot be less or equal to zero");
+        }
+        return new WindowSize(Duration.of(v, unit));
     }
 
 }
