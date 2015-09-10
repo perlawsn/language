@@ -1,12 +1,7 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.utils.Errors;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * An interface representing a generic {@code Expression} node.

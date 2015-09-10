@@ -1,5 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -26,38 +27,37 @@ public final class MaxAggregate extends Aggregate {
             return null;
         }
 
-        switch (type) {
-            case INTEGER:
-                IntAccumulator maxi = new IntAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Integer vi = (Integer) e.run(r, b);
-                    if (vi != null && (maxi.value == null || maxi.value < vi)) {
-                        maxi.value = vi;
-                    }
-                }, filter);
-                return maxi.value;
-            case FLOAT:
-                FloatAccumulator maxf = new FloatAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Float vf = (Float) e.run(r, b);
-                    if (vf != null && (maxf.value == null || maxf.value < vf)) {
-                        maxf.value = vf;
-                    }
-                }, filter);
-                return maxf.value;
-            case TIMESTAMP:
-                InstantAccumulator maxt = new InstantAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Instant vt = (Instant) e.run(r, b);
-                    if (vt != null && (maxt.value == null ||
-                            maxt.value.compareTo(vt) < 0)) {
-                        maxt.value = vt;
-                    }
-                }, filter);
-                return maxt.value;
-            default:
-                throw new RuntimeException(
-                        "max aggregation not defined for type " + type);
+        if (type == DataType.INTEGER) {
+            IntAccumulator maxi = new IntAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Integer vi = (Integer) e.run(r, b);
+                if (vi != null && (maxi.value == null || maxi.value < vi)) {
+                    maxi.value = vi;
+                }
+            }, filter);
+            return maxi.value;
+        } else if (type == DataType.FLOAT) {
+            FloatAccumulator maxf = new FloatAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Float vf = (Float) e.run(r, b);
+                if (vf != null && (maxf.value == null || maxf.value < vf)) {
+                    maxf.value = vf;
+                }
+            }, filter);
+            return maxf.value;
+        } else if (type == DataType.TIMESTAMP) {
+            InstantAccumulator maxt = new InstantAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Instant vt = (Instant) e.run(r, b);
+                if (vt != null && (maxt.value == null ||
+                        maxt.value.compareTo(vt) < 0)) {
+                    maxt.value = vt;
+                }
+            }, filter);
+            return maxt.value;
+        } else {
+            throw new RuntimeException(
+                    "max aggregation not defined for type " + type);
         }
     }
 

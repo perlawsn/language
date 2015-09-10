@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -64,44 +64,44 @@ public final class AggregateAST extends ExpressionAST {
     }
 
     private boolean inferCountType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.INTEGER);
+        boolean res = bound.restrict(DataType.INTEGER);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.INTEGER);
+                    bound.getType(), DataType.INTEGER);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
-        TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
+        TypeVariable filterBound = new TypeVariable(DataType.BOOLEAN);
         return filter.inferType(filterBound, ctx);
     }
 
     private boolean inferAvgType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.FLOAT);
+        boolean res = bound.restrict(DataType.FLOAT);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.FLOAT);
+                    bound.getType(), DataType.FLOAT);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
-        TypeVariable ob = new TypeVariable(TypeClass.NUMERIC);
-        TypeVariable fb = new TypeVariable(TypeClass.BOOLEAN);
+        TypeVariable ob = new TypeVariable(DataType.NUMERIC);
+        TypeVariable fb = new TypeVariable(DataType.BOOLEAN);
         res = operand.inferType(ob, ctx);
         return res && filter.inferType(fb, ctx);
     }
 
     protected boolean inferGeneralType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.NUMERIC);
+        boolean res = bound.restrict(DataType.NUMERIC);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.NUMERIC);
+                    bound.getType(), DataType.NUMERIC);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
         res = operand.inferType(bound, ctx);
-        TypeVariable filterBound = new TypeVariable(TypeClass.BOOLEAN);
+        TypeVariable filterBound = new TypeVariable(DataType.BOOLEAN);
         return res && filter.inferType(filterBound, ctx);
     }
 

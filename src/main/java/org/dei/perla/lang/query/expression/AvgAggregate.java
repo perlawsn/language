@@ -1,6 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -25,38 +25,37 @@ public final class AvgAggregate extends Aggregate {
         }
 
         IntAccumulator count = new IntAccumulator(0);
-        switch (e.getType()) {
-            case INTEGER:
-                IntAccumulator si = new IntAccumulator(0);
-                buffer.forEach((r, b) -> {
-                    Integer v = (Integer) e.run(r, b);
-                    if (v != null) {
-                        si.value += (Integer) e.run(r, b);
-                        count.value++;
-                    }
-                }, filter);
-                if (count.value == 0) {
-                    return 0;
-                } else {
-                    return si.value.floatValue() / count.value;
+        if (e.getType() == DataType.INTEGER) {
+            IntAccumulator si = new IntAccumulator(0);
+            buffer.forEach((r, b) -> {
+                Integer v = (Integer) e.run(r, b);
+                if (v != null) {
+                    si.value += (Integer) e.run(r, b);
+                    count.value++;
                 }
-            case FLOAT:
-                FloatAccumulator sf = new FloatAccumulator(0f);
-                buffer.forEach((r, b) -> {
-                    Float v = (Float) e.run(r, b);
-                    if (v != null) {
-                        sf.value += (Float) e.run(r, b);
-                        count.value++;
-                    }
-                }, filter);
-                if (count.value == 0) {
-                    return 0;
-                } else {
-                    return sf.value / count.value;
+            }, filter);
+            if (count.value == 0) {
+                return 0;
+            } else {
+                return si.value.floatValue() / count.value;
+            }
+        } else if (e.getType() == DataType.FLOAT) {
+            FloatAccumulator sf = new FloatAccumulator(0f);
+            buffer.forEach((r, b) -> {
+                Float v = (Float) e.run(r, b);
+                if (v != null) {
+                    sf.value += (Float) e.run(r, b);
+                    count.value++;
                 }
-            default:
-                throw new RuntimeException(
-                        "avg aggregation not defined for type " + type);
+            }, filter);
+            if (count.value == 0) {
+                return 0;
+            } else {
+                return sf.value / count.value;
+            }
+        } else {
+            throw new RuntimeException(
+                    "avg aggregation not defined for type " + type);
         }
     }
 

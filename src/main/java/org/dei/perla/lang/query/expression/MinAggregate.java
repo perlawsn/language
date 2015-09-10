@@ -1,5 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -26,38 +27,37 @@ public final class MinAggregate extends Aggregate {
             return null;
         }
 
-        switch (type) {
-            case INTEGER:
-                IntAccumulator mini = new IntAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Integer vi = (Integer) e.run(r, b);
-                    if (vi != null && (mini.value == null || mini.value > vi)) {
-                        mini.value = vi;
-                    }
-                }, filter);
-                return mini.value;
-            case FLOAT:
-                FloatAccumulator minf = new FloatAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Float vf = (Float) e.run(r, b);
-                    if (vf != null && (minf.value == null || minf.value > vf)) {
-                        minf.value = vf;
-                    }
-                }, filter);
-                return minf.value;
-            case TIMESTAMP:
-                InstantAccumulator mint = new InstantAccumulator(null);
-                buffer.forEach((r, b) -> {
-                    Instant vt = (Instant) e.run(r, b);
-                    if (vt != null && (mint.value == null ||
-                            mint.value.compareTo(vt) > 0)) {
-                        mint.value = vt;
-                    }
-                }, filter);
-                return mint.value;
-            default:
-                throw new RuntimeException(
-                        "min aggregation not defined for type " + type);
+        if (type == DataType.INTEGER) {
+            IntAccumulator mini = new IntAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Integer vi = (Integer) e.run(r, b);
+                if (vi != null && (mini.value == null || mini.value > vi)) {
+                    mini.value = vi;
+                }
+            }, filter);
+            return mini.value;
+        } else if (type == DataType.FLOAT) {
+            FloatAccumulator minf = new FloatAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Float vf = (Float) e.run(r, b);
+                if (vf != null && (minf.value == null || minf.value > vf)) {
+                    minf.value = vf;
+                }
+            }, filter);
+            return minf.value;
+        } else if (type == DataType.TIMESTAMP) {
+            InstantAccumulator mint = new InstantAccumulator(null);
+            buffer.forEach((r, b) -> {
+                Instant vt = (Instant) e.run(r, b);
+                if (vt != null && (mint.value == null ||
+                        mint.value.compareTo(vt) > 0)) {
+                    mint.value = vt;
+                }
+            }, filter);
+            return mint.value;
+        } else {
+            throw new RuntimeException(
+                    "min aggregation not defined for type " + type);
         }
     }
 

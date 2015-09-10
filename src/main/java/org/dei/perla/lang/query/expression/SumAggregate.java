@@ -1,5 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -24,28 +25,27 @@ public final class SumAggregate extends Aggregate {
             return 0;
         }
 
-        switch (type) {
-            case INTEGER:
-                IntAccumulator si = new IntAccumulator(0);
-                buffer.forEach((r, b) -> {
-                    Integer v = (Integer) e.run(r, b);
-                    if (v != null) {
-                        si.value += v;
-                    }
-                }, filter);
-                return si.value;
-            case FLOAT:
-                FloatAccumulator sf = new FloatAccumulator(0f);
-                buffer.forEach((r, b) -> {
-                    Float v = (Float) e.run(r, b);
-                    if (v != null) {
-                        sf.value += v;
-                    }
-                }, filter);
-                return sf.value;
-            default:
-                throw new RuntimeException(
-                        "sum aggregation not defined for type " + type);
+        if (type == DataType.INTEGER) {
+            IntAccumulator si = new IntAccumulator(0);
+            buffer.forEach((r, b) -> {
+                Integer v = (Integer) e.run(r, b);
+                if (v != null) {
+                    si.value += v;
+                }
+            }, filter);
+            return si.value;
+        } else if (type == DataType.FLOAT) {
+            FloatAccumulator sf = new FloatAccumulator(0f);
+            buffer.forEach((r, b) -> {
+                Float v = (Float) e.run(r, b);
+                if (v != null) {
+                    sf.value += v;
+                }
+            }, filter);
+            return sf.value;
+        } else {
+            throw new RuntimeException(
+                    "sum aggregation not defined for type " + type);
         }
     }
 

@@ -1,6 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 
 /**
@@ -37,13 +37,12 @@ public final class Inverse extends Expression {
             return null;
         }
 
-        switch (type) {
-            case INTEGER:
-                return - (Integer) o;
-            case FLOAT:
-                return - (Float) o;
-            default:
-                throw new RuntimeException("unexpected type " + type);
+        if (type == DataType.INTEGER) {
+            return - (Integer) o;
+        } else if (type == DataType.FLOAT) {
+            return - (Float) o;
+        } else {
+            throw new RuntimeException("unexpected type " + type);
         }
     }
 

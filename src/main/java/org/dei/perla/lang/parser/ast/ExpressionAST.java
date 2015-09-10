@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -55,7 +55,7 @@ public abstract class ExpressionAST extends NodeAST {
     /**
      * Sets the {@link TypeVariable} associated with this expression node. It
      * is the implementation's responsibility to check that the {@link
-     * TypeClass} associated with the type variable is consistend with the
+     * DataType} associated with the type variable is consistend with the
      * output type of the operation.
      *
      * @param type type variable linked to this node
@@ -74,11 +74,11 @@ public abstract class ExpressionAST extends NodeAST {
      * @return output type of the expression node
      * @throws IllegalStateException if no type variable is set
      */
-    public TypeClass getTypeClass() {
+    public DataType getDataType() {
         if (type == null) {
             throw new IllegalStateException("Cannot return, no type set");
         }
-        return type.getTypeClass();
+        return type.getType();
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class ExpressionAST extends NodeAST {
      * @param atts map employed for storing the attribute binding order
      * @return expression object corresponding to the AST node
      */
-    public Expression compile(TypeClass bound, ParserContext ctx,
+    public Expression compile(DataType bound, ParserContext ctx,
             Map<Attribute, Integer> atts) {
         TypeVariable v = new TypeVariable(bound);
         boolean typeOk = inferType(v, ctx);
@@ -139,7 +139,7 @@ public abstract class ExpressionAST extends NodeAST {
      * @return textual description of the type error
      */
     protected String typeErrorString(String operator, String position,
-            TypeClass expected, TypeClass found) {
+            DataType expected, DataType found) {
         return "Incompatible types: operator " + operator + " of type '" +
                 found + "' found at " + position  + "where an " +
                 "operation of type '" + expected + "' was required.";
@@ -154,7 +154,7 @@ public abstract class ExpressionAST extends NodeAST {
      * @return integer value of the {@link ConstantAST} node
      */
     protected int evalIntConstant(ParserContext ctx) {
-        Expression e = compile(TypeClass.INTEGER, ctx,
+        Expression e = compile(DataType.INTEGER, ctx,
                 Collections.emptyMap());
         if (!(e instanceof Constant)) {
             throw new IllegalStateException("Parser bug found, WindowSize " +

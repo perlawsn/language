@@ -1,6 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.BufferView;
 
 /**
@@ -49,14 +49,13 @@ public final class Arithmetic extends Expression {
             return null;
         }
 
-        switch (type) {
-            case INTEGER:
-                return computeInteger(op, o1, o2);
-            case FLOAT:
-                return computeFloat(op, o1, o2);
-            default:
-                throw new RuntimeException(
-                        "Unsupported arithmetic operand type");
+        if (type == DataType.INTEGER) {
+            return computeInteger(op, o1, o2);
+        } else if (type == DataType.FLOAT) {
+            return computeFloat(op, o1, o2);
+        } else {
+            throw new RuntimeException(
+                    "Unsupported arithmetic operand type");
         }
     }
 
