@@ -1,24 +1,46 @@
 package org.dei.perla.lang.parser;
 
-import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.fpc.DataType;
 
 /**
+ * A variale for storing the type of an {@link Fpc} {@link Attribute} while
+ * parsing a PerLa query. This class is mainly employed to infer the type of
+ * the {@link Attribute}s used in a query.
+ *
  * @author Guido Rota 31/07/15.
  */
 public final class TypeVariable {
 
-    private TypeClass type;
+    // The type is not final, as its value needs to be refined during the
+    // parsing process
+    private DataType type;
 
-    public TypeVariable(TypeClass type) {
+    public TypeVariable(DataType type) {
         this.type = type;
     }
 
-    public TypeClass getTypeClass() {
+    /**
+     * Returns the current type stored in the variable
+     *
+     * @return Current type of the {@code TypeVariable}
+     */
+    public DataType getType() {
         return type;
     }
 
-    public boolean restrict(TypeClass other) {
-        TypeClass t = strictest(type, other);
+    /**
+     * Changes the type inside the {@code TypeVariable} to the strictest type
+     * between the current {@code TypeVariable}'s type and the {@link
+     * DataType} passed as parameter. See {@code DataType.strictest()} for
+     * further information
+     *
+     * @param other type boundary used during the restriction operation
+     * @return true if the operation completed successfully, false if the
+     * current {@code TypeVariable} type is not compatible with the boundary
+     * passed as parameter
+     */
+    public boolean restrict(DataType other) {
+        DataType t = DataType.strictest(type, other);
         if (t == null) {
             return false;
         }
@@ -27,8 +49,18 @@ public final class TypeVariable {
         return true;
     }
 
+    /**
+     * Merges the inner type of two {@code TypeVariable}s. This operation is
+     * equivalent to invoking the {@code restrict()} method on each {@code
+     * TypeVariable} using the other's type as a parameter.
+     *
+     * @param t1 first {@code TypeVariable}
+     * @param t2 second {@code TypeVariable}
+     * @return true if the operation completed successfully, false if the
+     * {@code TypeVariable}'s types are incompatible
+     */
     public static boolean merge(TypeVariable t1, TypeVariable t2) {
-        TypeClass t = strictest(t1.type, t2.type);
+        DataType t = DataType.strictest(t1.type, t2.type);
         if (t == null) {
             return false;
         }
@@ -36,27 +68,6 @@ public final class TypeVariable {
         t1.type = t;
         t2.type = t;
         return true;
-    }
-
-    private static TypeClass strictest(TypeClass t1, TypeClass t2) {
-        if (t1 == t2) {
-            return t1;
-        }
-
-        if (t1.ordinal() > t2.ordinal()) {
-            TypeClass tmp = t1;
-            t1 = t2;
-            t2 = tmp;
-        }
-
-        if (t1 == TypeClass.ANY) {
-            return t2;
-        } else if (t1 == TypeClass.NUMERIC &&
-                (t2 == TypeClass.INTEGER || t2 == TypeClass.FLOAT)) {
-            return t2;
-        } else {
-            return null;
-        }
     }
 
     @Override
