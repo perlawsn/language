@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -19,23 +19,23 @@ import java.util.Map;
 public final class ConstantAST extends ExpressionAST {
 
     public static final ConstantAST ONE =
-            new ConstantAST(1, TypeClass.INTEGER);
+            new ConstantAST(1, DataType.INTEGER);
 
     public static final ConstantAST TRUE =
-            new ConstantAST(LogicValue.TRUE, TypeClass.BOOLEAN);
+            new ConstantAST(LogicValue.TRUE, DataType.BOOLEAN);
     public static final ConstantAST FALSE =
-            new ConstantAST(LogicValue.FALSE, TypeClass.BOOLEAN);
+            new ConstantAST(LogicValue.FALSE, DataType.BOOLEAN);
     public static final ConstantAST NULL =
-            new ConstantAST(null, TypeClass.ANY);
+            new ConstantAST(null, DataType.ANY);
 
-    private final TypeClass type;
+    private final DataType type;
     private final Object value;
 
-    public ConstantAST(Object value, TypeClass type) {
+    public ConstantAST(Object value, DataType type) {
         this(null, type, value);
     }
 
-    public ConstantAST(Token token, TypeClass type, Object value) {
+    public ConstantAST(Token token, DataType type, Object value) {
         super(token);
         if (value != null && !type.isConcrete()) {
             throw new IllegalArgumentException("Type class must be concrete");
@@ -50,7 +50,7 @@ public final class ConstantAST extends ExpressionAST {
     }
 
     @Override
-    public TypeClass getTypeClass() {
+    public DataType getDataType() {
         return type;
     }
 
@@ -68,7 +68,7 @@ public final class ConstantAST extends ExpressionAST {
         if (value == null) {
             return Constant.NULL;
         }
-        return Constant.create(value, type.toDataType());
+        return Constant.create(value, type);
     }
 
     @Override

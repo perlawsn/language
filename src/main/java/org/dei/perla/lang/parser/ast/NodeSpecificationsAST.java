@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.DataTemplate;
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.parser.Token;
 
 import java.util.Collections;
@@ -15,7 +15,7 @@ public final class NodeSpecificationsAST extends NodeAST {
             new NodeSpecificationsAST();
 
     private final NodeSpecificationsType type;
-    private final List<DataTemplate> specs;
+    private final List<Attribute> specs;
 
     private NodeSpecificationsAST() {
         super(null);
@@ -23,11 +23,11 @@ public final class NodeSpecificationsAST extends NodeAST {
         specs = null;
     }
 
-    public NodeSpecificationsAST(List<DataTemplate> specs) {
+    public NodeSpecificationsAST(List<Attribute> specs) {
         this(null, specs);
     }
 
-    public NodeSpecificationsAST(Token token, List<DataTemplate> specs) {
+    public NodeSpecificationsAST(Token token, List<Attribute> specs) {
         super(token);
         this.type = NodeSpecificationsType.SPECS;
         this.specs = Collections.unmodifiableList(specs);
@@ -37,7 +37,7 @@ public final class NodeSpecificationsAST extends NodeAST {
         return type;
     }
 
-    public List<DataTemplate> getSpecifications() {
+    public List<Attribute> getSpecifications() {
         if (type != NodeSpecificationsType.SPECS) {
             throw new RuntimeException(
                     "No specs list in NodeSpecifications ALL");

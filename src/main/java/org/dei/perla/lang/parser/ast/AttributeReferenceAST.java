@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -21,11 +21,11 @@ public final class AttributeReferenceAST extends ExpressionAST {
     private final String id;
     private final TypeVariable type;
 
-    public AttributeReferenceAST(String id, TypeClass type) {
+    public AttributeReferenceAST(String id, DataType type) {
         this(null, id, type);
     }
 
-    public AttributeReferenceAST(Token token, String id, TypeClass type) {
+    public AttributeReferenceAST(Token token, String id, DataType type) {
         super(token);
         this.id = id;
         this.type = new TypeVariable(type);
@@ -44,11 +44,11 @@ public final class AttributeReferenceAST extends ExpressionAST {
      * reference is not concreate
      */
     public Attribute toAttribute() {
-        TypeClass t = type.getTypeClass();
+        DataType t = type.getType();
         if (!t.isConcrete()) {
-            throw new IllegalStateException("TypeClass is not concrete");
+            throw new IllegalStateException("DataType is not concrete");
         }
-        return Attribute.create(id, t.toDataType());
+        return Attribute.create(id, t);
     }
 
     @Override
@@ -58,8 +58,8 @@ public final class AttributeReferenceAST extends ExpressionAST {
     }
 
     @Override
-    public TypeClass getTypeClass() {
-        return type.getTypeClass();
+    public DataType getDataType() {
+        return type.getType();
     }
 
     /**
@@ -82,8 +82,8 @@ public final class AttributeReferenceAST extends ExpressionAST {
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = true;
 
-        TypeClass prev = type.getTypeClass();
-        TypeClass curr = bound.getTypeClass();
+        DataType prev = type.getType();
+        DataType curr = bound.getType();
         if (!TypeVariable.merge(type, bound)) {
             String msg = "Incompatible type for attribute '" + id + "': " +
                     "usage at " + getPosition() + " of type '" + type + " is " +
@@ -97,7 +97,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
 
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        TypeClass tc = type.getTypeClass();
+        DataType tc = type.getType();
         if (!tc.isConcrete()) {
             String msg = "Cannot compile, attribute '" + id + "' at " +
                     getPosition() + " of type class " + tc + " cannot map " +
@@ -106,13 +106,13 @@ public final class AttributeReferenceAST extends ExpressionAST {
             return Constant.NULL;
         }
 
-        Attribute att = Attribute.create(id, type.getTypeClass().toDataType());
+        Attribute att = Attribute.create(id, type.getType());
         Integer idx = atts.get(att);
         if (idx == null) {
             idx = atts.size();
             atts.put(att, idx);
         }
-        return new AttributeReference(id, tc.toDataType(), idx);
+        return new AttributeReference(id, tc, idx);
     }
 
 }

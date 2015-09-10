@@ -1,8 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -39,10 +38,10 @@ public final class BoolAST extends BinaryExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.BOOLEAN);
+        boolean res = bound.restrict(DataType.BOOLEAN);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.BOOLEAN);
+                    bound.getType(), DataType.BOOLEAN);
             ctx.addError(msg);
             return false;
         }

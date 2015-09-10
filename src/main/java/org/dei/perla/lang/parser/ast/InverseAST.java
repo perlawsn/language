@@ -1,8 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -29,10 +28,10 @@ public final class InverseAST extends UnaryExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.NUMERIC);
+        boolean res = bound.restrict(DataType.NUMERIC);
         if (!res) {
             String msg = typeErrorString("-", getPosition(),
-                    bound.getTypeClass(), TypeClass.NUMERIC);
+                    bound.getType(), DataType.NUMERIC);
             ctx.addError(msg);
             return false;
         }
@@ -43,7 +42,7 @@ public final class InverseAST extends UnaryExpressionAST {
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         Expression opExp = operand.toExpression(ctx, atts);
-        DataType opType = getTypeClass().toDataType();
+        DataType opType = getDataType();
 
         if (opExp instanceof Constant) {
             Object o = ((Constant) opExp).getValue();

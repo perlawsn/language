@@ -1,8 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -29,10 +28,10 @@ public final class BitwiseNotAST extends UnaryExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.INTEGER);
+        boolean res = bound.restrict(DataType.INTEGER);
         if (!res) {
             String msg = typeErrorString("~", getPosition(),
-                    bound.getTypeClass(), TypeClass.INTEGER);
+                    bound.getType(), DataType.INTEGER);
             ctx.addError(msg);
             return false;
         }

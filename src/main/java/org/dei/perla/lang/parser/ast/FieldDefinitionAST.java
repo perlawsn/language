@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.Token;
 
 /**

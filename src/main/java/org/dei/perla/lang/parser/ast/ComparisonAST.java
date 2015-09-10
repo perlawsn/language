@@ -1,12 +1,14 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
-import org.dei.perla.lang.query.expression.*;
+import org.dei.perla.lang.query.expression.Comparison;
+import org.dei.perla.lang.query.expression.ComparisonOperation;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.Map;
 
@@ -37,22 +39,22 @@ public final class ComparisonAST extends BinaryExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.BOOLEAN);
+        boolean res = bound.restrict(DataType.BOOLEAN);
         if (!res) {
             String msg = typeErrorString(op.name(), getPosition(),
-                    bound.getTypeClass(), TypeClass.BOOLEAN);
+                    bound.getType(), DataType.BOOLEAN);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
-        TypeVariable newBound = new TypeVariable(TypeClass.ANY);
+        TypeVariable newBound = new TypeVariable(DataType.ANY);
         return left.inferType(newBound, ctx) && right.inferType(newBound, ctx);
     }
 
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        TypeClass t = left.getTypeClass();
-        if ((t == TypeClass.ID || t == TypeClass.BOOLEAN) &&
+        DataType t = left.getDataType();
+        if ((t == DataType.ID || t == DataType.BOOLEAN) &&
                 op != ComparisonOperation.EQ && op != ComparisonOperation.NE) {
             String msg = "Comparison operation '" + op + "' forbidden on " +
                     "arguments of type '" + t + "' at " + getPosition();

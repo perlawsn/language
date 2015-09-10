@@ -1,8 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -51,21 +50,21 @@ public final class BetweenAST extends ExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
-        boolean res = bound.restrict(TypeClass.BOOLEAN);
+        boolean res = bound.restrict(DataType.BOOLEAN);
         if (!res) {
             String msg = typeErrorString("BETWEEN", getPosition(),
-                    bound.getTypeClass(), TypeClass.BOOLEAN);
+                    bound.getType(), DataType.BOOLEAN);
             ctx.addError(msg);
             return false;
         }
         setType(bound);
 
-        TypeVariable newBound = new TypeVariable(TypeClass.ANY);
+        TypeVariable newBound = new TypeVariable(DataType.ANY);
         res = operand.inferType(newBound, ctx) && min.inferType(newBound, ctx)
                 && max.inferType(newBound, ctx);
 
-        if (newBound.getTypeClass() == TypeClass.BOOLEAN ||
-                newBound.getTypeClass() == TypeClass.ID) {
+        if (newBound.getType() == DataType.BOOLEAN ||
+                newBound.getType() == DataType.ID) {
             String msg = "BOOLEAN and ID operand types are not compatible " +
                     "with BETWEEN operation at " + getPosition();
             ctx.addError(msg);
@@ -77,8 +76,8 @@ public final class BetweenAST extends ExpressionAST {
 
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        TypeClass t = operand.getTypeClass();
-        if (t == TypeClass.ID || t == TypeClass.BOOLEAN) {
+        DataType t = operand.getDataType();
+        if (t == DataType.ID || t == DataType.BOOLEAN) {
             String msg = "Comparison operation 'between' forbidden on " +
                     "arguments of type '" + t + "' at " + getPosition();
             ctx.addError(msg);
