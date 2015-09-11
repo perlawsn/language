@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser;
 
-import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 import org.junit.Test;
 
@@ -32,52 +32,52 @@ public class ParseContextTest {
     public void testAttributeTypeChecking() {
         ParserContext ctx = new ParserContext();
         AttributeReferenceAST ar0 =
-                new AttributeReferenceAST("att1", TypeClass.ANY);
+                new AttributeReferenceAST("att1", DataType.ANY);
         AttributeReferenceAST ar1 =
-                new AttributeReferenceAST("att1", TypeClass.NUMERIC);
+                new AttributeReferenceAST("att1", DataType.NUMERIC);
         AttributeReferenceAST ar2 =
-                new AttributeReferenceAST("att1", TypeClass.INTEGER);
+                new AttributeReferenceAST("att1", DataType.INTEGER);
         AttributeReferenceAST ar3 =
-                new AttributeReferenceAST("att1", TypeClass.FLOAT);
+                new AttributeReferenceAST("att1", DataType.FLOAT);
 
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getTypeClass(), equalTo(TypeClass.ANY));
+        assertThat(ar0.getDataType(), equalTo(DataType.ANY));
 
         res = ctx.addAttributeReference(ar1);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getTypeClass(), equalTo(TypeClass.NUMERIC));
-        assertThat(ar1.getTypeClass(), equalTo(TypeClass.NUMERIC));
+        assertThat(ar0.getDataType(), equalTo(DataType.NUMERIC));
+        assertThat(ar1.getDataType(), equalTo(DataType.NUMERIC));
 
         res = ctx.addAttributeReference(ar2);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar1.getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar2.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(ar0.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar1.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar2.getDataType(), equalTo(DataType.INTEGER));
 
         res = ctx.addAttributeReference(ar3);
         assertFalse(res);
         assertThat(ctx.getErrorCount(), greaterThan(0));
-        assertThat(ar0.getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar1.getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar2.getTypeClass(), equalTo(TypeClass.INTEGER));
-        assertThat(ar3.getTypeClass(), equalTo(TypeClass.FLOAT));
+        assertThat(ar0.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar1.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar2.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar3.getDataType(), equalTo(DataType.FLOAT));
     }
 
     @Test
     public void testAttributeTypeTracking() {
         ParserContext ctx = new ParserContext();
         AttributeReferenceAST ar0 =
-                new AttributeReferenceAST("att1", TypeClass.ANY);
+                new AttributeReferenceAST("att1", DataType.ANY);
         AttributeReferenceAST ar1 =
-                new AttributeReferenceAST("att1", TypeClass.INTEGER);
+                new AttributeReferenceAST("att1", DataType.INTEGER);
         AttributeReferenceAST ar2 =
-                new AttributeReferenceAST("att2", TypeClass.BOOLEAN);
+                new AttributeReferenceAST("att2", DataType.BOOLEAN);
         AttributeReferenceAST ar3 =
-                new AttributeReferenceAST("att3", TypeClass.FLOAT);
+                new AttributeReferenceAST("att3", DataType.FLOAT);
 
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
@@ -88,11 +88,11 @@ public class ParseContextTest {
         res = ctx.addAttributeReference(ar3);
         assertTrue(res);
 
-        Map<String, TypeClass> attTypes = ctx.getAttributeTypes();
+        Map<String, DataType> attTypes = ctx.getAttributeTypes();
         assertThat(attTypes.size(), equalTo(3));
-        assertThat(attTypes.get("att1"), equalTo(TypeClass.INTEGER));
-        assertThat(attTypes.get("att2"), equalTo(TypeClass.BOOLEAN));
-        assertThat(attTypes.get("att3"), equalTo(TypeClass.FLOAT));
+        assertThat(attTypes.get("att1"), equalTo(DataType.INTEGER));
+        assertThat(attTypes.get("att2"), equalTo(DataType.BOOLEAN));
+        assertThat(attTypes.get("att3"), equalTo(DataType.FLOAT));
     }
 
 }

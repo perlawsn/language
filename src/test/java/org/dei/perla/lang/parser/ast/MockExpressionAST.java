@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Expression;
@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public final class MockExpressionAST extends ExpressionAST {
 
-    private final TypeClass type;
+    private final DataType type;
 
-    public MockExpressionAST(TypeClass type) {
+    public MockExpressionAST(DataType type) {
         super(null);
         this.type = type;
     }

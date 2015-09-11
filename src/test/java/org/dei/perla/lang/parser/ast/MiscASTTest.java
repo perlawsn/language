@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.RefreshType;
@@ -12,8 +12,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 
 /**
  * @author Guido Rota 10/08/15.
@@ -22,7 +22,7 @@ public class MiscASTTest {
 
     @Test
     public void testSampleWindow() {
-        ConstantAST c = new ConstantAST(23, TypeClass.INTEGER);
+        ConstantAST c = new ConstantAST(23, DataType.INTEGER);
         WindowSizeAST w = new WindowSizeAST(c);
         assertThat(w.getType(), equalTo(WindowSize.WindowType.SAMPLE));
         assertThat(w.getSamples(), equalTo(c));
@@ -33,7 +33,7 @@ public class MiscASTTest {
         assertThat(ws.getType(), equalTo(WindowSize.WindowType.SAMPLE));
         assertThat(ws.getSamples(), equalTo(23));
 
-        c = new ConstantAST(-23, TypeClass.INTEGER);
+        c = new ConstantAST(-23, DataType.INTEGER);
         w = new WindowSizeAST(c);
         assertThat(w.getSamples(), equalTo(c));
 
@@ -42,7 +42,7 @@ public class MiscASTTest {
         assertTrue(ctx.hasErrors());
     }
 @Test public void testDurationWindow() {
-        ConstantAST c = new ConstantAST(65, TypeClass.INTEGER);
+        ConstantAST c = new ConstantAST(65, DataType.INTEGER);
         WindowSizeAST w = new WindowSizeAST(c, ChronoUnit.DAYS);
 
         assertThat(w.getType(), equalTo(WindowSize.WindowType.TIME));
@@ -54,7 +54,7 @@ public class MiscASTTest {
         assertThat(ws.getType(), equalTo(WindowSize.WindowType.TIME));
         assertThat(ws.getDuration(), equalTo(Duration.ofDays(65)));
 
-        c = new ConstantAST(-65, TypeClass.INTEGER);
+        c = new ConstantAST(-65, DataType.INTEGER);
         w = new WindowSizeAST(c, ChronoUnit.DAYS);
         assertThat(w.getDurationValue(), equalTo(c));
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.DAYS));
@@ -76,7 +76,7 @@ public class MiscASTTest {
 
     @Test
     public void testRefreshDuration() {
-        ConstantAST c = new ConstantAST(12, TypeClass.INTEGER);
+        ConstantAST c = new ConstantAST(12, DataType.INTEGER);
         RefreshAST ra = new RefreshAST(c, ChronoUnit.DAYS);
         assertThat(ra.getType(), equalTo(RefreshType.TIME));
         assertThat(ra.getDurationValue(), equalTo(c));

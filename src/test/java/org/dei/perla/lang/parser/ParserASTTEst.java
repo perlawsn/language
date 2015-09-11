@@ -1,7 +1,6 @@
 package org.dei.perla.lang.parser;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ast.*;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
@@ -142,37 +141,10 @@ public class ParserASTTEst {
         p = getParser("id");
         t = p.Type();
         assertThat(t, equalTo(DataType.ID));
-    }
-
-    @Test
-    public void testTypeClass() throws Exception {
-        ParserAST p = getParser("integer");
-        TypeClass t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.INTEGER));
-
-        p = getParser("float");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.FLOAT));
-
-        p = getParser("boolean");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.BOOLEAN));
-
-        p = getParser("string");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.STRING));
-
-        p = getParser("timestamp");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.TIMESTAMP));
-
-        p = getParser("id");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.ID));
 
         p = getParser("any");
-        t = p.TypeClass();
-        assertThat(t, equalTo(TypeClass.ANY));
+        t = p.Type();
+        assertThat(t, equalTo(DataType.ANY));
     }
 
     @Test
@@ -360,7 +332,7 @@ public class ParserASTTEst {
         LikeAST l = (LikeAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
         assertFalse(ctx.hasErrors());
         assertThat(l.getOperand(),
-                equalTo(new ConstantAST("test", TypeClass.STRING)));
+                equalTo(new ConstantAST("test", DataType.STRING)));
         assertThat(l.getPattern(), equalTo("te?t"));
     }
 
@@ -371,18 +343,18 @@ public class ParserASTTEst {
         BetweenAST b = (BetweenAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
         assertFalse(ctx.hasErrors());
         assertThat(b.getOperand(), equalTo(
-                new ConstantAST(5, TypeClass.INTEGER)));
+                new ConstantAST(5, DataType.INTEGER)));
         assertThat(b.getMin(), equalTo(
-                new ConstantAST(12, TypeClass.INTEGER)));
+                new ConstantAST(12, DataType.INTEGER)));
         assertThat(b.getMax(), equalTo(
-                new ConstantAST(32, TypeClass.INTEGER)));
+                new ConstantAST(32, DataType.INTEGER)));
     }
 
     @Test
     public void testComparison() throws Exception {
         ParserContext ctx = new ParserContext();
-        ConstantAST op1 = new ConstantAST(5, TypeClass.INTEGER);
-        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
+        ConstantAST op1 = new ConstantAST(5, DataType.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, DataType.INTEGER);
 
         ParserAST p = getParser("5 = 12");
         ComparisonAST c = (ComparisonAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
@@ -437,8 +409,8 @@ public class ParserASTTEst {
     @Test
     public void testBitwise() throws Exception {
         ParserContext ctx = new ParserContext();
-        ConstantAST op1 = new ConstantAST(43, TypeClass.INTEGER);
-        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
+        ConstantAST op1 = new ConstantAST(43, DataType.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, DataType.INTEGER);
 
         ParserAST p = getParser("43 | 12");
         BitwiseAST b = (BitwiseAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
@@ -484,8 +456,8 @@ public class ParserASTTEst {
     @Test
     public void testArithmetic() throws Exception {
         ParserContext ctx = new ParserContext();
-        ConstantAST op1 = new ConstantAST(43, TypeClass.INTEGER);
-        ConstantAST op2 = new ConstantAST(12, TypeClass.INTEGER);
+        ConstantAST op1 = new ConstantAST(43, DataType.INTEGER);
+        ConstantAST op2 = new ConstantAST(12, DataType.INTEGER);
 
         ParserAST p = getParser("43 + 12");
         ArithmeticAST a = (ArithmeticAST) p.Expression(ExpressionType.AGGREGATE, "", ctx);
@@ -542,7 +514,7 @@ public class ParserASTTEst {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         ConstantAST c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("sum(temperature, 3 seconds, false)");
@@ -556,7 +528,7 @@ public class ParserASTTEst {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("max(temperature, 3 seconds, false)");
@@ -570,7 +542,7 @@ public class ParserASTTEst {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("min(temperature, 3 seconds, false)");
@@ -584,7 +556,7 @@ public class ParserASTTEst {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("avg(temperature, 3 seconds, false)");
@@ -598,7 +570,7 @@ public class ParserASTTEst {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
     }
 
@@ -606,22 +578,22 @@ public class ParserASTTEst {
     public void testConstantAST() throws Exception {
         ParserAST p = getParser("34");
         ConstantAST c = p.Constant();
-        assertThat(c.getTypeClass(), equalTo(TypeClass.INTEGER));
+        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(34));
 
         p = getParser("3.1415");
         c = p.Constant();
-        assertThat(c.getTypeClass(), equalTo(TypeClass.FLOAT));
+        assertThat(c.getDataType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.1415f));
 
         p = getParser("'test'");
         c = p.Constant();
-        assertThat(c.getTypeClass(), equalTo(TypeClass.STRING));
+        assertThat(c.getDataType(), equalTo(DataType.STRING));
         assertThat(c.getValue(), equalTo("test"));
 
         p = getParser("TRUE");
         c = p.Constant();
-        assertThat(c.getTypeClass(), equalTo(TypeClass.BOOLEAN));
+        assertThat(c.getDataType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
@@ -632,12 +604,12 @@ public class ParserASTTEst {
         assertFalse(ctx.hasErrors());
         AttributeReferenceAST a = p.AttributeReference();
         assertThat(a.getId(), equalTo("temperature"));
-        assertThat(a.getTypeClass(), equalTo(TypeClass.ANY));
+        assertThat(a.getDataType(), equalTo(DataType.ANY));
 
         p = getParser("temperature: float");
         a = p.AttributeReference();
         assertThat(a.getId(), equalTo("temperature"));
-        assertThat(a.getTypeClass(), equalTo(TypeClass.FLOAT));
+        assertThat(a.getDataType(), equalTo(DataType.FLOAT));
     }
 
     @Test

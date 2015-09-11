@@ -27,7 +27,6 @@ PARSER_BEGIN(ParserAST)
 
     import java.time.temporal.TemporalUnit;
     import java.time.temporal.ChronoUnit;
-    import java.time.Duration;
     import java.util.List;
     import java.util.ArrayList;
 
@@ -36,9 +35,8 @@ PARSER_BEGIN(ParserAST)
     import org.dei.perla.lang.query.expression.*;
     import org.dei.perla.lang.query.statement.*;
 
-    import org.dei.perla.core.descriptor.DataType;
-    import org.dei.perla.core.registry.TypeClass;
-    import org.dei.perla.core.registry.DataTemplate;
+    import org.dei.perla.core.fpc.DataType;
+    import org.dei.perla.core.fpc.Attribute;
 
     public final class ParserAST {
 
@@ -1011,7 +1009,7 @@ ExecutionConditionsAST ExecutionConditionsClause(ParserContext ctx) :
 
 NodeSpecificationsAST NodeSpecifications() :
 {
-    List<DataTemplate> specs;
+    List<Attribute> specs;
 
     Token t;
 }
@@ -1026,34 +1024,34 @@ NodeSpecificationsAST NodeSpecifications() :
     )
 }
 
-List<DataTemplate> SpecificationList() :
+List<Attribute> SpecificationList() :
 {
-    List<DataTemplate> ts = new ArrayList<DataTemplate>();
-    DataTemplate t;
+    List<Attribute> as = new ArrayList<Attribute>();
+    Attribute a;
 }
 {
-    t = Specification()
-    { ts.add(t); }
+    a = Specification()
+    { as.add(a); }
     (
         ","
-        t = Specification()
-        { ts.add(t); }
+        a = Specification()
+        { as.add(a); }
     )*
-    { return ts; }
+    { return as; }
 }
 
-DataTemplate Specification() :
+Attribute Specification() :
 {
     String id;
-    TypeClass tc = TypeClass.ANY;
+    DataType type = DataType.ANY;
 }
 {
     id = Identifier()
     [
         ":"
-        tc = TypeClass()
+        type = Type()
     ]
-    { return DataTemplate.create(id, tc); }
+    { return Attribute.create(id, type); }
 }
 
 WindowSizeAST TerminateAfterClause(ParserContext ctx) :
@@ -1142,17 +1140,17 @@ ConstantAST Constant() :
 {
     (
         value = ConstantBoolean()
-        { return new ConstantAST(token, TypeClass.BOOLEAN, value); }
+        { return new ConstantAST(token, DataType.BOOLEAN, value); }
         |
         value = ConstantString()
-        { return new ConstantAST(token, TypeClass.STRING, value); }
+        { return new ConstantAST(token, DataType.STRING, value); }
         |
         LOOKAHEAD(1)
         value = ConstantInteger()
-        { return new ConstantAST(token, TypeClass.INTEGER, value); }
+        { return new ConstantAST(token, DataType.INTEGER, value); }
         |
         value = ConstantFloat()
-        { return new ConstantAST(token, TypeClass.FLOAT, value); }
+        { return new ConstantAST(token, DataType.FLOAT, value); }
     )
 }
 
@@ -1181,7 +1179,6 @@ ComparisonOperation ComparisonOperation() :
 DataType Type() :
 {}
 {
-    (
     <TYPE_ID>
     { return DataType.ID; }
     |
@@ -1199,34 +1196,9 @@ DataType Type() :
     |
     <TYPE_STRING>
     { return DataType.STRING; }
-    )
-}
-
-TypeClass TypeClass() :
-{}
-{
-    (
-    <TYPE_ID>
-    { return TypeClass.ID; }
-    |
-    <TYPE_TIMESTAMP>
-    { return TypeClass.TIMESTAMP; }
-    |
-    <TYPE_BOOLEAN>
-    { return TypeClass.BOOLEAN; }
-    |
-    <TYPE_INTEGER>
-    { return TypeClass.INTEGER; }
-    |
-    <TYPE_FLOAT>
-    { return TypeClass.FLOAT; }
-    |
-    <TYPE_STRING>
-    { return TypeClass.STRING; }
     |
     <TYPE_ANY>
-    { return TypeClass.ANY; }
-    )
+    { return DataType.ANY; }
 }
 
 TemporalUnit TimeUnit() :
@@ -1704,7 +1676,7 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, ParserContext c
 AttributeReferenceAST AttributeReference() :
 {
     String id;
-    TypeClass type = TypeClass.ANY;
+    DataType type = DataType.ANY;
 
     Token t;
 }
@@ -1713,7 +1685,7 @@ AttributeReferenceAST AttributeReference() :
     { t = token; }
     [
         ":"
-        type = TypeClass()
+        type = Type()
     ]
     { return new AttributeReferenceAST(token, id, type); }
 }

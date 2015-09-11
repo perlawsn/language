@@ -1,6 +1,6 @@
 package org.dei.perla.lang.parser;
 
-import org.dei.perla.core.registry.TypeClass;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 
@@ -74,8 +74,8 @@ public final class ParserContext {
             if (!att.mergeTypes(ot)) {
                 String msg = "Incompatible type for attribute '" + id + "': " +
                         "usage at " + att.getPosition() + " of type '" +
-                        att.getTypeClass() + "' is not compatible with " +
-                        "previous usage of type '" + ot.getTypeClass()  + "' " +
+                        att.getDataType() + "' is not compatible with " +
+                        "previous usage of type '" + ot.getDataType()  + "' " +
                         "at " + ot.getPosition() + ".";
                 err.addError(msg);
                 clean = false;
@@ -89,15 +89,15 @@ public final class ParserContext {
         return clean;
     }
 
-    public Map<String, TypeClass> getAttributeTypes() {
-        Map<String, TypeClass> fm = new HashMap<>();
+    public Map<String, DataType> getAttributeTypes() {
+        Map<String, DataType> fm = new HashMap<>();
         for (Entry<String, List<AttributeReferenceAST>> e : atts.entrySet()) {
             String id = e.getKey();
             List<AttributeReferenceAST> fl = e.getValue();
             // All the FieldAST inside the field's list are guaranteed
-            // to be of the same TypeClass if no type errors were found.
+            // to be of the same DataType if no type errors were found.
             // Hence, we can just retrieve the first one.
-            fm.put(id, fl.get(0).getTypeClass());
+            fm.put(id, fl.get(0).getDataType());
         }
         return fm;
     }
