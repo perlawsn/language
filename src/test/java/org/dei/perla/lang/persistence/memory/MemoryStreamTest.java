@@ -1,6 +1,6 @@
 package org.dei.perla.lang.persistence.memory;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.persistence.*;
 import org.junit.Test;
 

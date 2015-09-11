@@ -1,8 +1,8 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.fpc.Fpc;
-import org.dei.perla.core.sample.Attribute;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.statement.Refresh;

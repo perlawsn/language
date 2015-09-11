@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor.buffer;
 
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
 
 import java.time.Instant;
 import java.util.List;

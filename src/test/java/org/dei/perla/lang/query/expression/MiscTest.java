@@ -1,6 +1,7 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -150,9 +151,9 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        org.dei.perla.core.sample.Attribute intAtt = org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
-        org.dei.perla.core.sample.Attribute floatAtt = org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
-        org.dei.perla.core.sample.Attribute stringAtt = org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
+        Attribute intAtt = Attribute.create("integer", DataType.INTEGER);
+        Attribute floatAtt = Attribute.create("float", DataType.FLOAT);
+        Attribute stringAtt = Attribute.create("string", DataType.STRING);
         Object[][] sample = new Object[][]{
                 {1, 2.3f, "test"},
                 {23, 2.4f, "tset"}

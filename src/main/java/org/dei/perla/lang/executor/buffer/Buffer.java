@@ -1,6 +1,6 @@
 package org.dei.perla.lang.executor.buffer;
 
-import org.dei.perla.core.sample.Sample;
+import org.dei.perla.core.fpc.Sample;
 
 /**
  * @author Guido Rota 18/02/15.

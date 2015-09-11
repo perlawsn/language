@@ -1,6 +1,6 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.DataType;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;

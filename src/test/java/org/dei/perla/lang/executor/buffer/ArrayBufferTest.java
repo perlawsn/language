@@ -1,6 +1,7 @@
 package org.dei.perla.lang.executor.buffer;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
@@ -20,11 +21,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class ArrayBufferTest {
 
-    private static final List<org.dei.perla.core.sample.Attribute> atts;
+    private static final List<Attribute> atts;
     static {
-        org.dei.perla.core.sample.Attribute[] as = new org.dei.perla.core.sample.Attribute[] {
-                org.dei.perla.core.sample.Attribute.TIMESTAMP,
-                org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER)
+        Attribute[] as = new Attribute[] {
+                Attribute.TIMESTAMP,
+                Attribute.create("integer", DataType.INTEGER)
         };
         atts = Arrays.asList(as);
     }

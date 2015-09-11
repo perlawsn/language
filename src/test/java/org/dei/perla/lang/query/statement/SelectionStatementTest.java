@@ -1,6 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
@@ -16,14 +17,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class SelectionStatementTest {
 
-    private static final org.dei.perla.core.sample.Attribute tempAtt =
-            org.dei.perla.core.sample.Attribute.create("temperature", DataType.INTEGER);
-    private static final org.dei.perla.core.sample.Attribute humAtt =
-            org.dei.perla.core.sample.Attribute.create("humidity", DataType.INTEGER);
-    private static final org.dei.perla.core.sample.Attribute alarmAtt =
-            org.dei.perla.core.sample.Attribute.create("alarm", DataType.BOOLEAN);
+    private static final Attribute tempAtt =
+            Attribute.create("temperature", DataType.INTEGER);
+    private static final Attribute humAtt =
+            Attribute.create("humidity", DataType.INTEGER);
+    private static final Attribute alarmAtt =
+            Attribute.create("alarm", DataType.BOOLEAN);
 
-    private static final List<org.dei.perla.core.sample.Attribute> atts = Arrays.asList(new org.dei.perla.core.sample.Attribute[]{
+    private static final List<Attribute> atts = Arrays.asList(new Attribute[]{
             tempAtt,
             humAtt,
             alarmAtt

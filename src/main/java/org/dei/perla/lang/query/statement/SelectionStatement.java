@@ -1,6 +1,6 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.expression.Expression;
 

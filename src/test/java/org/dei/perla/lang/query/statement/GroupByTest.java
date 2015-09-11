@@ -1,6 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.query.expression.AttributeReference;
 import org.junit.Test;
 
@@ -27,12 +28,12 @@ public class GroupByTest {
         atts.add(new AttributeReference("string", DataType.STRING, 2));
     }
 
-    private static final org.dei.perla.core.sample.Attribute intAtt =
-            org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
-    private static final org.dei.perla.core.sample.Attribute floatAtt =
-            org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
-    private static final org.dei.perla.core.sample.Attribute stringAtt =
-            org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
+    private static final Attribute intAtt =
+            Attribute.create("integer", DataType.INTEGER);
+    private static final Attribute floatAtt =
+            Attribute.create("float", DataType.FLOAT);
+    private static final Attribute stringAtt =
+            Attribute.create("string", DataType.STRING);
 
     @Test
     public void creation() {

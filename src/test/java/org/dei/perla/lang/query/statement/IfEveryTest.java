@@ -1,6 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
@@ -21,16 +22,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class IfEveryTest {
 
-    private static final org.dei.perla.core.sample.Attribute intAtt =
-            org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
-    private static final org.dei.perla.core.sample.Attribute floatAtt =
-            org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
-    private static final org.dei.perla.core.sample.Attribute stringAtt =
-            org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
-    private static final org.dei.perla.core.sample.Attribute boolAtt =
-            org.dei.perla.core.sample.Attribute.create("boolean", DataType.BOOLEAN);
+    private static final Attribute intAtt =
+            Attribute.create("integer", DataType.INTEGER);
+    private static final Attribute floatAtt =
+            Attribute.create("float", DataType.FLOAT);
+    private static final Attribute stringAtt =
+            Attribute.create("string", DataType.STRING);
+    private static final Attribute boolAtt =
+            Attribute.create("boolean", DataType.BOOLEAN);
 
-    private static final List<org.dei.perla.core.sample.Attribute> atts;
+    private static final List<Attribute> atts;
     static {
         atts = new ArrayList<>();
         atts.add(intAtt);

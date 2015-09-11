@@ -1,7 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 

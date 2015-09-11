@@ -1,8 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.descriptor.DataType;
-import org.dei.perla.core.registry.DataTemplate;
-import org.dei.perla.core.sample.Attribute;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
@@ -21,12 +20,12 @@ public final class ExecutionConditions {
                     Refresh.NEVER);
 
     private final Expression cond;
-    private final List<DataTemplate> specs;
+    private final List<Attribute> specs;
     private final Refresh refresh;
 
     private final List<Attribute> atts;
 
-    private ExecutionConditions(Expression cond, List<DataTemplate> specs,
+    private ExecutionConditions(Expression cond, List<Attribute> specs,
             Refresh refresh) {
         this.cond = cond;
         this.specs = specs;
@@ -34,7 +33,7 @@ public final class ExecutionConditions {
         atts = Collections.emptyList();
     }
 
-    private ExecutionConditions(Expression cond, List<DataTemplate> specs,
+    private ExecutionConditions(Expression cond, List<Attribute> specs,
             Refresh refresh, List<Attribute> atts) {
         this.cond = cond;
         this.specs = specs;
@@ -43,7 +42,7 @@ public final class ExecutionConditions {
     }
 
     public static ExecutionConditions create(Expression cond,
-            List<DataTemplate> specs, Refresh refresh, Errors err) {
+            List<Attribute> specs, Refresh refresh, Errors err) {
         DataType ct = cond.getType();
         if (ct != null && ct != DataType.BOOLEAN) {
             err.addError("Execution condition must be of type BOOLEAN");
@@ -66,7 +65,7 @@ public final class ExecutionConditions {
         return cond;
     }
 
-    public List<DataTemplate> getSpecs() {
+    public List<Attribute> getSpecs() {
         return specs;
     }
 

@@ -1,6 +1,7 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.descriptor.DataType;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -21,12 +22,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class AggregateTest {
 
-    private static org.dei.perla.core.sample.Attribute intAtt =
-            org.dei.perla.core.sample.Attribute.create("integer", DataType.INTEGER);
-    private static org.dei.perla.core.sample.Attribute stringAtt =
-            org.dei.perla.core.sample.Attribute.create("string", DataType.STRING);
-    private static org.dei.perla.core.sample.Attribute floatAtt =
-            org.dei.perla.core.sample.Attribute.create("float", DataType.FLOAT);
+    private static Attribute intAtt =
+            Attribute.create("integer", DataType.INTEGER);
+    private static Attribute stringAtt =
+            Attribute.create("string", DataType.STRING);
+    private static Attribute floatAtt =
+            Attribute.create("float", DataType.FLOAT);
 
     private static final Expression intExpr =
             new AttributeReference("integer", DataType.INTEGER, 0);
@@ -40,11 +41,11 @@ public class AggregateTest {
 
     @BeforeClass
     public static void setupBuffer() {
-        List<org.dei.perla.core.sample.Attribute> bufAtts = Arrays.asList(new org.dei.perla.core.sample.Attribute[]{
+        List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
                 intAtt,
                 stringAtt,
                 floatAtt,
-                org.dei.perla.core.sample.Attribute.TIMESTAMP
+                Attribute.TIMESTAMP
         });
         Buffer b = new ArrayBuffer(bufAtts, 10);
         b.add(new Object[]{0, "test", 0.0f, Instant.now()});

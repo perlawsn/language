@@ -3,10 +3,10 @@ package org.dei.perla.lang.executor;
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
-import org.dei.perla.core.sample.Attribute;
-import org.dei.perla.core.sample.Sample;
-import org.dei.perla.core.sample.SamplePipeline;
-import org.dei.perla.core.sample.SamplePipeline.PipelineBuilder;
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.Sample;
+import org.dei.perla.core.fpc.SamplePipeline;
+import org.dei.perla.core.fpc.SamplePipeline.PipelineBuilder;
 import org.dei.perla.core.utils.AsyncUtils;
 
 import java.util.*;
