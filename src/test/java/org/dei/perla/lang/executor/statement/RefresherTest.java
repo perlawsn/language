@@ -27,11 +27,11 @@ public class RefresherTest {
         values = Collections.unmodifiableMap(m);
     }
 
-    private static final Set<String> events;
+    private static final List<Attribute> events;
     static {
-        Set<String> s = new HashSet<>();
-        s.add("fire");
-        events = Collections.unmodifiableSet(s);
+        List<Attribute> s = new ArrayList<>();
+        s.add(Attribute.create("fire", DataType.ANY));
+        events = Collections.unmodifiableList(s);
     }
 
     @Test
@@ -58,13 +58,11 @@ public class RefresherTest {
         Thread.sleep(1000);
         assertThat(handler.getDataCount(), greaterThan(count));
     }
-/*
+
     @Test
     public void testEventRefresher() throws Exception {
         SimulatorFpc fpc = new SimulatorFpc(values);
         Refresh refresh = new Refresh(events);
-        refresh = refresh.bind(values.keySet());
-        assertTrue(refresh.isComplete());
 
         LatchingQueryHandler<Refresh, Void> handler =
                 new LatchingQueryHandler<>();
@@ -91,5 +89,5 @@ public class RefresherTest {
         handler.awaitCount(4);
         assertThat(handler.getDataCount(), equalTo(4));
     }
-*/
+
 }
