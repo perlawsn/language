@@ -107,4 +107,24 @@ public class MiscASTTest {
         assertTrue(as.contains(Attribute.create("test2", DataType.ANY)));
     }
 
+    @Test
+    public void testDuplicateRefreshEvents() {
+        List<String> es = new ArrayList<>();
+        es.add("test1");
+        es.add("test2");
+        es.add("test1");
+        RefreshAST ra = new RefreshAST(es);
+        assertThat(ra.getType(), equalTo(RefreshType.EVENT));
+        assertTrue(ra.getEvents().containsAll(es));
+        assertThat(ra.getEvents().size(), equalTo(es.size()));
+
+        ParserContext ctx = new ParserContext();
+        Refresh r = ra.compile(ctx);
+        assertTrue(ctx.hasErrors());
+        assertThat(r.getType(), equalTo(RefreshType.EVENT));
+        List<Attribute> as = r.getEvents();
+        assertTrue(as.contains(Attribute.create("test1", DataType.ANY)));
+        assertTrue(as.contains(Attribute.create("test2", DataType.ANY)));
+    }
+
 }

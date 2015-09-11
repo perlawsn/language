@@ -1,17 +1,16 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guido Rota 27/03/15.
@@ -31,31 +30,22 @@ public class RefreshTest {
         assertThat(r.getType(), equalTo(RefreshType.TIME));
         assertThat(r.getDuration(), equalTo(d));
     }
-/*
+
     @Test
     public void createEventRefresh() {
-        Attribute lb = Attribute.create("low_battery", DataType.INTEGER);
-        Attribute al = Attribute.create("alert", DataType.BOOLEAN);
-
+        Attribute lb = Attribute.create("low_battery", DataType.ANY);
+        Attribute al = Attribute.create("alert", DataType.ANY);
         List<Attribute> atts = Arrays.asList(new Attribute[]{
                 lb,
                 al,
                 Attribute.TIMESTAMP
         });
-        Set<String> names = new TreeSet<>();
-        names.add("low_battery");
-        names.add("alert");
 
-        Refresh r = new Refresh(names);
-        assertFalse(r.isComplete());
+        Refresh r = new Refresh(atts);
         List<Attribute> bound = r.getEvents();
-        assertThat(bound.size(), equalTo(0));
-        r = r.bind(atts);
-        assertTrue(r.isComplete());
-        bound = r.getEvents();
-        assertThat(bound.size(), equalTo(2));
+        assertThat(bound.size(), equalTo(3));
         assertTrue(bound.contains(lb));
         assertTrue(bound.contains(al));
     }
-*/
+
 }

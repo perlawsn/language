@@ -9,8 +9,7 @@ import org.dei.perla.lang.query.statement.RefreshType;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -87,10 +86,18 @@ public final class RefreshAST extends NodeAST {
     }
 
     private Refresh compileEvents(ParserContext ctx) {
-        List<Attribute> es = events
-                .parallelStream()
-                .map((s) -> Attribute.create(s, DataType.ANY))
-                .collect(Collectors.toList());
+        // Check for duplicate events
+        Set<String> names = new HashSet<>();
+        List<Attribute> es = new ArrayList<>();
+        for (String s : events) {
+            if (names.contains(s)) {
+                ctx.addError("Duplicate event '" + s + "' in refresh clause " +
+                        "at " + getPosition());
+                continue;
+            }
+            names.add(s);
+            es.add(Attribute.create(s, DataType.ANY));
+        }
         return new Refresh(es);
     }
 
