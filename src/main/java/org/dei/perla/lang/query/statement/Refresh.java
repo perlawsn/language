@@ -31,7 +31,7 @@ public final class Refresh {
         type = RefreshType.TIME;
     }
 
-    private Refresh(List<Attribute> events) {
+    public Refresh(List<Attribute> events) {
         d = null;
         this.events = Collections.unmodifiableList(events);
         type = RefreshType.EVENT;

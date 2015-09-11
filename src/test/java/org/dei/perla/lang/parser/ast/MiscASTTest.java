@@ -1,5 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.query.statement.Refresh;
@@ -101,6 +102,9 @@ public class MiscASTTest {
         ParserContext ctx = new ParserContext();
         Refresh r = ra.compile(ctx);
         assertThat(r.getType(), equalTo(RefreshType.EVENT));
+        List<Attribute> as = r.getEvents();
+        assertTrue(as.contains(Attribute.create("test1", DataType.ANY)));
+        assertTrue(as.contains(Attribute.create("test2", DataType.ANY)));
     }
 
 }
