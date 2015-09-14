@@ -4,22 +4,17 @@ import org.dei.perla.core.fpc.Attribute;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
+ * Event-based sampling clause
+ *
  * @author Guido Rota 30/03/15.
  */
 public final class SamplingEvent implements Sampling {
 
-    private final Set<String> names;
     private final List<Attribute> events;
 
-    public SamplingEvent(Set<String> events) {
-        this(events, Collections.emptyList());
-    }
-
-    private SamplingEvent(Set<String> names, List<Attribute> events) {
-        this.names = Collections.unmodifiableSet(names);
+    public SamplingEvent(List<Attribute> events) {
         this.events = Collections.unmodifiableList(events);
     }
 

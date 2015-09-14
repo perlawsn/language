@@ -6,7 +6,9 @@ import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -53,8 +55,9 @@ public class SelectionStatementTest {
                 new Object[0]);
         assertTrue(err.isEmpty());
 
-        Set<String> events = new HashSet<>();
-        events.add("alarm");
+        List<Attribute> events = Arrays.asList(new Attribute[] {
+                Attribute.create("alarm", DataType.ANY)
+        });
         Sampling samp = new SamplingEvent(events);
 
         SelectionStatement query = new SelectionStatement(sel, WindowSize.ONE, samp,

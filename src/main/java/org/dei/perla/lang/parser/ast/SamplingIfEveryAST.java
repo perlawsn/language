@@ -1,7 +1,9 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.statement.RatePolicy;
+import org.dei.perla.lang.query.statement.SamplingIfEvery;
 
 import java.util.List;
 
@@ -32,6 +34,10 @@ public final class SamplingIfEveryAST extends SamplingAST {
 
     public RefreshAST getRefresh() {
         return refresh;
+    }
+
+    public SamplingIfEvery compile(ParserContext ctx) {
+        throw new RuntimeException("unimplemented");
     }
 
 }

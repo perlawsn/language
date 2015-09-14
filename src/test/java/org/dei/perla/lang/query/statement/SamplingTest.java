@@ -35,12 +35,12 @@ public class SamplingTest {
         });
     }
 
-    private static final Set<String> names;
+    private static final List<Attribute> events;
     static {
-        Set<String> s = new TreeSet<>();
-        s.add("low_power");
-        s.add("alert");
-        names = Collections.unmodifiableSet(s);
+        events = Arrays.asList(new Attribute[]{
+                Attribute.create("low_power", DataType.ANY),
+                Attribute.create("alert", DataType.ANY)
+        });
     }
 
     @Test
@@ -79,21 +79,15 @@ public class SamplingTest {
         assertThat(s.getRatePolicy(),
                 equalTo(RatePolicy.SLOW_DOWN));
     }
+*/
 
     @Test
     public void testSamplingEvent() {
-        Errors err = new Errors();
-
-        SamplingEvent s = new SamplingEvent(names);
-        assertFalse(s.isComplete());
-        s = s.bind(atts, err);
-        assertTrue(err.isEmpty());
-        assertTrue(s.isComplete());
-        List<Attribute> bound = s.getEvents();
-        assertThat(bound.size(), equalTo(2));
-        assertTrue(bound.contains(lowPowerAtt));
-        assertTrue(bound.contains(alertAtt));
+        SamplingEvent s = new SamplingEvent(events);
+        List<Attribute> atts = s.getEvents();
+        assertThat(atts.size(), equalTo(2));
+        assertTrue(atts.contains(Attribute.create("low_power", DataType.ANY)));
+        assertTrue(atts.contains(Attribute.create("alert", DataType.ANY)));
     }
-*/
 
 }

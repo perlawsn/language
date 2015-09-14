@@ -1,9 +1,12 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.statement.SamplingEvent;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Guido Rota 30/07/15.
@@ -23,6 +26,21 @@ public final class SamplingEventAST extends SamplingAST {
 
     public List<String> getEvents() {
         return events;
+    }
+
+    public SamplingEvent compile(ParserContext ctx) {
+        Set<String> names = new HashSet<>();
+        List<Attribute> atts = new ArrayList<>();
+        for (String s : events) {
+            if (names.contains(s)) {
+                ctx.addError("Duplicate event '" + s + "' in sampling clause " +
+                        "at " + getPosition());
+                continue;
+            }
+            names.add(s);
+            atts.add(Attribute.create(s, DataType.ANY));
+        }
+        return new SamplingEvent(atts);
     }
 
 }

@@ -42,7 +42,8 @@ public class MiscASTTest {
         w.compile(ctx);
         assertTrue(ctx.hasErrors());
     }
-@Test public void testDurationWindow() {
+
+    @Test public void testDurationWindow() {
         ConstantAST c = new ConstantAST(65, DataType.INTEGER);
         WindowSizeAST w = new WindowSizeAST(c, ChronoUnit.DAYS);
 
