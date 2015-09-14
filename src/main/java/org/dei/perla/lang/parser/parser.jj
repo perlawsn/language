@@ -838,7 +838,7 @@ SamplingAST SamplingClause(ParserContext ctx) :
     List<String> events;
 
     List<IfEveryAST> ife;
-    RatePolicy policy = RatePolicy.DO_NOT_SAMPLE;
+    RatePolicy policy = RatePolicy.STRICT;
     RefreshAST refresh = RefreshAST.NEVER;
 
     Token t;

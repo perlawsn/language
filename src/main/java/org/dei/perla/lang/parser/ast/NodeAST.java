@@ -6,6 +6,10 @@ import org.dei.perla.lang.parser.Token;
  * A generic node of the Abstract Syntax Tree. All concrete AST nodes inherit
  * from this class.
  *
+ * <p> AST nodes are compiled to concrete PerLa query classes (org.dei
+ * .perla.lang.query) using the compile method, implemented by each concrete
+ * NodeAST sublcass.
+ *
  * @author Guido Rota 30/07/15.
  */
 public abstract class NodeAST {
