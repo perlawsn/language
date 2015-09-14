@@ -209,9 +209,7 @@ TOKEN :
     |
     < KEYWORD_DO:          "DO"          >
     |
-    < KEYWORD_SLOW:        "SLOW"        >
-    |
-    < KEYWORD_DOWN:        "DOWN"        >
+    < KEYWORD_ADAPT:        "ADAPT"        >
 }
 
 /*
@@ -854,7 +852,7 @@ SamplingAST SamplingClause(ParserContext ctx) :
         (
             ife = IfEveryClause(ctx)
             [
-                policy = OnUnsupportedSRClause()
+                policy = RatePolicy()
             ]
             [
                 refresh = RefreshClause(ctx)
@@ -941,7 +939,7 @@ EveryAST EveryDuration(ParserContext ctx) :
     }
 }
 
-RatePolicy OnUnsupportedSRClause() :
+RatePolicy RatePolicy() :
 {}
 {
     <KEYWORD_ON>
@@ -949,14 +947,17 @@ RatePolicy OnUnsupportedSRClause() :
     <KEYWORD_SAMPLE>
     <KEYWORD_RATE>
     (
-        <KEYWORD_DO>
-        <OPERATOR_NOT>
-        <KEYWORD_SAMPLE>
-        { return RatePolicy.DO_NOT_SAMPLE; }
+        (
+            <KEYWORD_DO>
+            <OPERATOR_NOT>
+            <KEYWORD_SAMPLE>
+            { return RatePolicy.STRICT; }
+        )
         |
-        <KEYWORD_SLOW>
-        <KEYWORD_DOWN>
-        { return RatePolicy.SLOW_DOWN; }
+        (
+            <KEYWORD_ADAPT>
+            { return RatePolicy.ADAPTIVE; }
+        )
     )
 }
 

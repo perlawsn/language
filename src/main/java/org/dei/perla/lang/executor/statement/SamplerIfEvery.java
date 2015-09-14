@@ -203,8 +203,7 @@ public final class SamplerIfEvery implements Sampler {
                     // SamplingHandler.complete method
 
                 } else if (status == INITIALIZING) {
-                    Duration d = ife.run(sample.values());
-                    rate = d;
+                    rate = ife.run(sample.values());
                     sampTask = fpc.get(atts, false, rate, sampHandler);
                     status = SAMPLING;
                 }

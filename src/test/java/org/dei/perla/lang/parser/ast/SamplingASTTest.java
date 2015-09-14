@@ -53,4 +53,9 @@ public class SamplingASTTest {
         assertTrue(ctx.hasErrors());
     }
 
+    @Test
+    public void testIfEvery() {
+
+    }
+
 }

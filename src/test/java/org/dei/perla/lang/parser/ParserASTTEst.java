@@ -3,6 +3,8 @@ package org.dei.perla.lang.parser;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ast.*;
 import org.dei.perla.lang.query.expression.*;
+import org.dei.perla.lang.query.statement.RatePolicy;
+import org.dei.perla.lang.query.statement.RefreshType;
 import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
@@ -10,6 +12,7 @@ import java.io.StringReader;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -17,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * @author Guido Rota 30/07/15.
  */
-public class ParserASTTEst {
+public class ParserASTTest {
 
     private static ParserAST getParser(String s) {
         return new ParserAST(new StringReader(s));
@@ -639,6 +642,147 @@ public class ParserASTTEst {
         p = getParser("5 + count(*, 12 seconds)");
         p.Expression(ExpressionType.CONSTANT, "", ctx);
         assertTrue(ctx.hasErrors());
+    }
+
+    ///////////////////////////////////////////////
+    // SAMPLING
+    ///////////////////////////////////////////////
+
+    @Test
+    public void testSamplingEvent() throws Exception {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("sampling on event fire, smoke");
+        SamplingAST s = p.SamplingClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertTrue(s instanceof SamplingEventAST);
+        SamplingEventAST se = (SamplingEventAST) s;
+        assertThat(se.getEvents().size(), equalTo(2));
+        assertTrue(se.getEvents().contains("fire"));
+        assertTrue(se.getEvents().contains("smoke"));
+    }
+
+    @Test
+    public void testIfEvery() throws Exception {
+        // No conditions
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("every 10 ms");
+        List<IfEveryAST> ifes = p.IfEveryClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(ifes.size(), equalTo(1));
+        IfEveryAST ife = ifes.get(0);
+        assertThat(ife.getCondition(), equalTo(ConstantAST.TRUE));
+        EveryAST ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.MILLIS));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(10, DataType.INTEGER)));
+
+        // Single condition with every
+        ctx = new ParserContext();
+        p = getParser("if temperature > 10 every 10 minutes else every 1 hours");
+        ifes = p.IfEveryClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(ifes.size(), equalTo(2));
+
+        ife = ifes.get(0);
+        assertTrue(ife.getCondition() instanceof ComparisonAST);
+        ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.MINUTES));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(10, DataType.INTEGER)));
+
+        ife = ifes.get(1);
+        assertThat(ife.getCondition(), equalTo(ConstantAST.TRUE));
+        ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.HOURS));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(1, DataType.INTEGER)));
+
+        // Multiple conditions
+        ctx = new ParserContext();
+        p = getParser("if temperature < 10 every 10 minutes " +
+                "if temperature < 20 every 20 minutes " +
+                "else every 1 hours");
+        ifes = p.IfEveryClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(ifes.size(), equalTo(3));
+
+        ife = ifes.get(0);
+        assertTrue(ife.getCondition() instanceof ComparisonAST);
+        ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.MINUTES));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(10, DataType.INTEGER)));
+
+        ife = ifes.get(1);
+        assertTrue(ife.getCondition() instanceof ComparisonAST);
+        ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.MINUTES));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(20, DataType.INTEGER)));
+
+        ife = ifes.get(2);
+        assertThat(ife.getCondition(), equalTo(ConstantAST.TRUE));
+        ev = ife.getEvery();
+        assertThat(ev.getUnit(), equalTo(ChronoUnit.HOURS));
+        assertThat(ev.getValue(),
+                equalTo(new ConstantAST(1, DataType.INTEGER)));
+    }
+
+    @Test
+    public void testRatePolicy() throws Exception {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("on unsupported sample rate do not sample");
+        RatePolicy r = p.RatePolicy();
+        assertFalse(ctx.hasErrors());
+        assertThat(r, equalTo(RatePolicy.STRICT));
+
+        p = getParser("on unsupported sample rate adapt");
+        r = p.RatePolicy();
+        assertFalse(ctx.hasErrors());
+        assertThat(r, equalTo(RatePolicy.ADAPTIVE));
+    }
+
+    @Test
+    public void testSamplingIfEvery() throws Exception {
+        // Plain sampling, no refresh
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("sampling every 10 seconds");
+        SamplingAST s = p.SamplingClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertTrue(s instanceof SamplingIfEveryAST);
+        SamplingIfEveryAST si = (SamplingIfEveryAST) s;
+        assertThat(si.getRefresh(), equalTo(RefreshAST.NEVER));
+        assertThat(si.getRatePolicy(), equalTo(RatePolicy.STRICT));
+        List<IfEveryAST> ifes = si.getIfEvery();
+        assertThat(ifes.size(), equalTo(1));
+
+        // Plain sampling, event refresh
+        ctx = new ParserContext();
+        p = getParser("sampling every 10 seconds refresh on event fire");
+        s = p.SamplingClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertTrue(s instanceof SamplingIfEveryAST);
+        si = (SamplingIfEveryAST) s;
+        assertThat(si.getRefresh().getType(), equalTo(RefreshType.EVENT));
+        assertThat(si.getRatePolicy(), equalTo(RatePolicy.STRICT));
+        ifes = si.getIfEvery();
+        assertThat(ifes.size(), equalTo(1));
+
+        // Complex sampling, time-based refresh, adaptive rate
+        ctx = new ParserContext();
+        p = getParser("sampling if temperature < 10 every 10 seconds " +
+                "if temperature < 20 every 20 seconds " +
+                "else every 1 minutes " +
+                "on unsupported sample rate adapt " +
+                "refresh every 20 minutes");
+        s = p.SamplingClause(ctx);
+        assertFalse(ctx.hasErrors());
+        assertTrue(s instanceof SamplingIfEveryAST);
+        si = (SamplingIfEveryAST) s;
+        assertThat(si.getRefresh().getType(), equalTo(RefreshType.TIME));
+        ifes = si.getIfEvery();
+        assertThat(ifes.size(), equalTo(3));
+        assertThat(si.getRatePolicy(), equalTo(RatePolicy.ADAPTIVE));
     }
 
 }

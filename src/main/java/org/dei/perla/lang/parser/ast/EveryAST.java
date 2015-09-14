@@ -26,7 +26,7 @@ public final class EveryAST extends NodeAST {
         return value;
     }
 
-    public TemporalUnit unit() {
+    public TemporalUnit getUnit() {
         return unit;
     }
 

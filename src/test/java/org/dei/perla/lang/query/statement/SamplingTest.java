@@ -53,33 +53,12 @@ public class SamplingTest {
         Refresh refresh = new Refresh(Duration.ofMinutes(10));
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
-                RatePolicy.DO_NOT_SAMPLE, refresh);
+                RatePolicy.STRICT, refresh);
         assertThat(s.getIfEvery(), equalTo(ife));
         assertThat(s.getRefresh(), equalTo(refresh));
         assertThat(s.getRatePolicy(),
-                equalTo(RatePolicy.DO_NOT_SAMPLE));
+                equalTo(RatePolicy.STRICT));
     }
-/*
-    @Test
-    public void testSamplingIfEveryBind() {
-        Errors err = new Errors();
-        IfEvery ife = IfEvery.create(new Field("boolean"),
-                Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS, err);
-        assertTrue(err.isEmpty());
-        Refresh refresh = new Refresh(names);
-
-        SamplingIfEvery s = new SamplingIfEvery(ife,
-                RatePolicy.SLOW_DOWN, refresh);
-        assertThat(s.getRatePolicy(),
-                equalTo(RatePolicy.SLOW_DOWN));
-
-        assertThat(s.getIfEveryAttributes().size(), equalTo(1));
-        assertTrue(s.getIfEveryAttributes().contains(boolAtt));
-        assertThat(s.getRatePolicy(),
-                equalTo(RatePolicy.SLOW_DOWN));
-    }
-*/
 
     @Test
     public void testSamplingEvent() {
