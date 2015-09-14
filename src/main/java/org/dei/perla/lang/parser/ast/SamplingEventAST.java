@@ -9,6 +9,8 @@ import org.dei.perla.lang.query.statement.SamplingEvent;
 import java.util.*;
 
 /**
+ * Event based sampling clause Abstract Syntax Tree node
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class SamplingEventAST extends SamplingAST {

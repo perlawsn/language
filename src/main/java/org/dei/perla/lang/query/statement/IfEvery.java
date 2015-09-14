@@ -1,8 +1,5 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.core.utils.Errors;
-import org.dei.perla.lang.query.expression.CastInteger;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 
@@ -10,6 +7,8 @@ import java.time.Duration;
 import java.time.temporal.TemporalUnit;
 
 /**
+ * If-Every node element, used to determine the query sampling rate
+ *
  * @author Guido Rota 23/03/15.
  */
 public final class IfEvery {
@@ -17,50 +16,30 @@ public final class IfEvery {
     private final Expression cond;
     private final Expression value;
     private final TemporalUnit unit;
+    private final IfEvery next;
 
-    private IfEvery next = null;
-
-    private IfEvery(Expression cond, Expression value, TemporalUnit unit) {
+    public IfEvery(Expression cond, Expression value, TemporalUnit unit,
+            IfEvery next) {
         this.cond = cond;
         this.value = value;
         this.unit = unit;
-    }
-
-    public static IfEvery create(IfEvery previous, Expression cond,
-            Expression value, TemporalUnit unit, Errors err) {
-        IfEvery ife = IfEvery.create(cond, value, unit, err);
-        previous.setNext(ife);
-        return ife;
-    }
-
-    public static IfEvery create(Expression cond, Expression value,
-            TemporalUnit unit, Errors err) {
-        DataType t = cond.getType();
-        if (t != null && t != DataType.BOOLEAN) {
-            err.addError("Incompatible data type, IF EVERY condition must be " +
-                    "of type boolean");
-            return null;
-        }
-        t = value.getType();
-        if (t != null && t != DataType.INTEGER && t != DataType.FLOAT) {
-            err.addError("Incompatible data type, IF EVERY sampling period " +
-                    "must be a numeric value");
-            return null;
-        }
-
-        if (t == DataType.FLOAT) {
-            value = new CastInteger(value);
-        }
-
-        return new IfEvery(cond, value, unit);
-    }
-
-    private void setNext(IfEvery next) {
-        if (this.next != null) {
-            throw new IllegalStateException("next IF-EVERY node has already " +
-                    "been set");
-        }
         this.next = next;
+    }
+
+    public Expression getCondition() {
+        return cond;
+    }
+
+    public Expression getValue() {
+        return value;
+    }
+
+    public TemporalUnit getUnit() {
+        return unit;
+    }
+
+    public IfEvery getNext() {
+        return next;
     }
 
     public Duration run(Object[] sample) {

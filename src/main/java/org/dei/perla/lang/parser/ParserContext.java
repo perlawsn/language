@@ -55,7 +55,9 @@ public final class ParserContext {
     }
 
     /**
-     * Adds a new usage of a
+     * Tracks a new usage of an attribute. This function checks that the type
+     * of all previous usages is compatible with the new one
+     *
      * @param att
      * @return
      */

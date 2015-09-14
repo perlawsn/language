@@ -82,8 +82,6 @@ public final class AttributeReferenceAST extends ExpressionAST {
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
         boolean res = true;
 
-        DataType prev = type.getType();
-        DataType curr = bound.getType();
         if (!TypeVariable.merge(type, bound)) {
             String msg = "Incompatible type for attribute '" + id + "': " +
                     "usage at " + getPosition() + " of type '" + type + " is " +

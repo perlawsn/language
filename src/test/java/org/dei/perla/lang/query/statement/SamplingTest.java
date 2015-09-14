@@ -1,14 +1,14 @@
 package org.dei.perla.lang.query.statement;
 
-import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.utils.Errors;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.query.expression.Constant;
 import org.junit.Test;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -23,37 +23,37 @@ public class SamplingTest {
             Attribute.create("low_power", DataType.BOOLEAN);
     private static final Attribute alertAtt =
             Attribute.create("alert", DataType.BOOLEAN);
+
+    private static final Attribute intAtt =
+            Attribute.create("integer", DataType.INTEGER);
     private static final Attribute boolAtt =
             Attribute.create("boolean", DataType.BOOLEAN);
 
     private static final List<Attribute> atts;
     static {
         atts = Arrays.asList(new Attribute[] {
-                lowPowerAtt,
-                alertAtt,
+                intAtt,
                 boolAtt
         });
     }
 
     private static final List<Attribute> events;
     static {
-        events = Arrays.asList(new Attribute[]{
-                Attribute.create("low_power", DataType.ANY),
-                Attribute.create("alert", DataType.ANY)
+        events = Arrays.asList(new Attribute[] {
+                lowPowerAtt,
+                alertAtt
         });
     }
 
     @Test
     public void testSamplingIfEvery() {
-        Errors err = new Errors();
-        IfEvery ife = IfEvery.create(Constant.TRUE,
+        IfEvery ife = new IfEvery(Constant.TRUE,
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS, err);
-        assertTrue(err.isEmpty());
+                ChronoUnit.SECONDS, null);
         Refresh refresh = new Refresh(Duration.ofMinutes(10));
 
         SamplingIfEvery s = new SamplingIfEvery(ife,
-                RatePolicy.STRICT, refresh);
+                RatePolicy.STRICT, refresh, atts);
         assertThat(s.getIfEvery(), equalTo(ife));
         assertThat(s.getRefresh(), equalTo(refresh));
         assertThat(s.getRatePolicy(),
@@ -65,8 +65,8 @@ public class SamplingTest {
         SamplingEvent s = new SamplingEvent(events);
         List<Attribute> atts = s.getEvents();
         assertThat(atts.size(), equalTo(2));
-        assertTrue(atts.contains(Attribute.create("low_power", DataType.ANY)));
-        assertTrue(atts.contains(Attribute.create("alert", DataType.ANY)));
+        assertTrue(atts.contains(lowPowerAtt));
+        assertTrue(atts.contains(alertAtt));
     }
 
 }

@@ -82,7 +82,7 @@ public final class SamplerIfEvery implements Sampler {
         }
 
         status = INITIALIZING;
-        List<Attribute> as = sampling.getIfEveryAttributes();
+        List<Attribute> as = sampling.getAttributes();
         Task t = fpc.get(as, true, ifeHandler);
         if (t == null) {
             status = ERROR;
@@ -296,7 +296,7 @@ public final class SamplerIfEvery implements Sampler {
                     return;
                 }
 
-                List<Attribute> as = sampling.getIfEveryAttributes();
+                List<Attribute> as = sampling.getAttributes();
                 Task t = fpc.get(as, true, ifeHandler);
                 if (t == null) {
                     handleError(samplingErrorString(as), null);

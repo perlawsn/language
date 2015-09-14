@@ -30,4 +30,14 @@ public final class EveryAST extends NodeAST {
         return unit;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof EveryAST)) {
+            return false;
+        }
+
+        EveryAST oe = (EveryAST) o;
+        return value.equals(oe.value) && unit.equals(oe.unit);
+    }
+
 }

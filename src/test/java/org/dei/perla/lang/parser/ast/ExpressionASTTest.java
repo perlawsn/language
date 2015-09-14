@@ -1612,7 +1612,7 @@ public class ExpressionASTTest {
     }
 
     @Test
-    public void testInference() {
+    public void testInference1() {
         ExpressionAST op1 = new ConstantAST("3", DataType.INTEGER);
         ExpressionAST op2 = new AttributeReferenceAST("integer", DataType.ANY);
         ExpressionAST e =
@@ -1624,6 +1624,24 @@ public class ExpressionASTTest {
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
         assertThat(e.getDataType(), equalTo(DataType.INTEGER));
+
+        Map<String, DataType> tm = ctx.getAttributeTypes();
+        assertThat(tm.get("integer"), equalTo(DataType.INTEGER));
+    }
+
+    @Test
+    public void testInference2() {
+        ExpressionAST op1 = new AttributeReferenceAST("integer", DataType.ANY);
+        ExpressionAST op2 = new ConstantAST("3", DataType.INTEGER);
+        ExpressionAST e =
+                new ComparisonAST(ComparisonOperation.GT, op1, op2);
+
+        ParserContext ctx = new ParserContext();
+        TypeVariable v = new TypeVariable(DataType.ANY);
+        assertTrue(e.inferType(v, ctx));
+        assertThat(ctx.getErrorCount(), equalTo(0));
+        assertThat(v.getType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.getDataType(), equalTo(DataType.BOOLEAN));
 
         Map<String, DataType> tm = ctx.getAttributeTypes();
         assertThat(tm.get("integer"), equalTo(DataType.INTEGER));

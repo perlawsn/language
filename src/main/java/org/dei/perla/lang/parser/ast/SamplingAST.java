@@ -5,6 +5,8 @@ import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.statement.Sampling;
 
 /**
+ * General sampling clause Abstract Syntax Tree node
+ *
  * @author Guido Rota 30/07/15.
  */
 public abstract class SamplingAST extends NodeAST {
