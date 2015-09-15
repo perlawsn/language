@@ -6,6 +6,7 @@ import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.query.expression.AttributeReference;
 import org.dei.perla.lang.query.expression.ComparisonOperation;
 import org.dei.perla.lang.query.statement.RatePolicy;
+import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SamplingEvent;
 import org.dei.perla.lang.query.statement.SamplingIfEvery;
 import org.junit.Test;
@@ -102,7 +103,7 @@ public class SamplingASTTest {
         SamplingIfEvery s = sa.compile(ctx);
         assertFalse(ctx.hasErrors());
         assertThat(s.getRatePolicy(), equalTo(RatePolicy.STRICT));
-        assertThat(s.getRefresh(), equalTo(RefreshAST.NEVER));
+        assertThat(s.getRefresh(), equalTo(Refresh.NEVER));
     }
 
 }

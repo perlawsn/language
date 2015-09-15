@@ -19,7 +19,11 @@ import java.util.Map;
 public final class AttributeReferenceAST extends ExpressionAST {
 
     private final String id;
-    private final TypeVariable type;
+
+    // Not final, as it changes when performing type inference
+    private TypeVariable type;
+    // Tracks if type inference has already been performed or not
+    private boolean inferenced = false;
 
     public AttributeReferenceAST(String id, DataType type) {
         this(null, id, type);
@@ -33,22 +37,6 @@ public final class AttributeReferenceAST extends ExpressionAST {
 
     public String getId() {
         return id;
-    }
-
-    /**
-     * Creates the {@link Attribute} object referenced by this {@code
-     * AttributeReferenceAST}.
-     *
-     * @return attribute object referenced by this object
-     * @throws IllegalStateException if the type class associated with the
-     * reference is not concreate
-     */
-    public Attribute toAttribute() {
-        DataType t = type.getType();
-        if (!t.isConcrete()) {
-            throw new IllegalStateException("DataType is not concrete");
-        }
-        return Attribute.create(id, t);
     }
 
     @Override
@@ -80,15 +68,21 @@ public final class AttributeReferenceAST extends ExpressionAST {
 
     @Override
     protected boolean inferType(TypeVariable bound, ParserContext ctx) {
+        if (inferenced) {
+            throw new IllegalStateException("Type inference already performed");
+        }
+
+        inferenced = true;
         boolean res = true;
 
-        if (!TypeVariable.merge(type, bound)) {
+        if (!bound.restrict(type.getType())) {
             String msg = "Incompatible type for attribute '" + id + "': " +
                     "usage at " + getPosition() + " of type '" + type + " is " +
                     "not compatible with inferred type '" + bound + "'.";
             ctx.addError(msg);
             res = false;
         }
+        type = bound;
 
         return res && ctx.addAttributeReference(this);
     }
