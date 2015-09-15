@@ -269,6 +269,7 @@ public class SimulatorFpc implements Fpc {
         lk.lock();
         try {
             PeriodicSimTask t = new PeriodicSimTask(atts, periodMs, handler);
+            t.start();
             periodicTasks.add(t);
             addPeriod(periodMs);
             cond.signalAll();
@@ -341,14 +342,9 @@ public class SimulatorFpc implements Fpc {
         }
 
         private void createSample() {
-            lk.lock();
-            try {
-                Sample r = pipeline.run(newSample());
-                handler.data(this, r);
-                handler.complete(this);
-            } finally {
-                lk.unlock();
-            }
+            Sample r = pipeline.run(newSample());
+            handler.data(this, r);
+            handler.complete(this);
         }
 
         @Override
@@ -378,6 +374,9 @@ public class SimulatorFpc implements Fpc {
             super(atts, handler);
             this.periodMs = periodMs;
             generator = new Thread(this::generateValues);
+        }
+
+        protected void start() {
             generator.start();
         }
 
