@@ -124,11 +124,11 @@ public final class SelectionExecutor {
             throws IllegalArgumentException {
         if (samp instanceof SamplingIfEvery) {
             SamplingIfEvery sife = (SamplingIfEvery) samp;
-            return new SamplerIfEvery(sife, atts, fpc, sampHand);
+            return new SamplerIfEvery(sife, fpc, sampHand);
 
         } else if (samp instanceof SamplingEvent) {
             SamplingEvent sev = (SamplingEvent) samp;
-            return new SamplerEvent(sev, atts, fpc, sampHand);
+            return new SamplerEvent(sev, fpc, sampHand);
 
         } else {
             throw new IllegalArgumentException("Cannot start sampling of type" +

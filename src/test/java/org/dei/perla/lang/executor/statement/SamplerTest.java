@@ -74,7 +74,7 @@ public class SamplerTest {
 
         // Test with power == 100
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
                 new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(100);
@@ -84,8 +84,7 @@ public class SamplerTest {
         // Test with power == 65
         vs.put(power, 65);
         fpc = new SimulatorFpc(vs);
-        sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler());
+        sampler = new SamplerIfEvery(samp, fpc, new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(200);
         assertTrue(sampler.isRunning());
@@ -94,8 +93,7 @@ public class SamplerTest {
         // Test with power == 10
         vs.put(power, 10);
         fpc = new SimulatorFpc(vs);
-        sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
-                new NoopQueryHandler());
+        sampler = new SamplerIfEvery(samp, fpc, new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
         assertTrue(sampler.isRunning());
@@ -146,7 +144,7 @@ public class SamplerTest {
                 ref, atts);
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
                 new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(100);
@@ -230,7 +228,7 @@ public class SamplerTest {
         SamplingIfEvery samp = new SamplingIfEvery(ife, RatePolicy.STRICT,
                 ref, atts);
 
-        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
                 new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
@@ -315,7 +313,7 @@ public class SamplerTest {
                 ref, atts);
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
-        SamplerIfEvery sampler = new SamplerIfEvery(samp, Collections.emptyList(), fpc,
+        SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
                 new NoopQueryHandler());
         sampler.start();
         fpc.awaitPeriod(1000);
@@ -341,8 +339,7 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>();
-        SamplerEvent sampler = new SamplerEvent(samp,
-                Collections.emptyList(), fpc, handler);
+        SamplerEvent sampler = new SamplerEvent(samp, fpc, handler);
         sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());
@@ -371,8 +368,7 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>();
-        SamplerEvent sampler = new SamplerEvent(samp,
-                Collections.emptyList(), fpc, handler);
+        SamplerEvent sampler = new SamplerEvent(samp, fpc, handler);
         sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());
