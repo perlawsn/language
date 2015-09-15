@@ -43,28 +43,28 @@ public class ParseContextTest {
         boolean res = ctx.addAttributeReference(ar0);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getDataType(), equalTo(DataType.ANY));
+        assertThat(ar0.getType(), equalTo(DataType.ANY));
 
         res = ctx.addAttributeReference(ar1);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getDataType(), equalTo(DataType.NUMERIC));
-        assertThat(ar1.getDataType(), equalTo(DataType.NUMERIC));
+        assertThat(ar0.getType(), equalTo(DataType.NUMERIC));
+        assertThat(ar1.getType(), equalTo(DataType.NUMERIC));
 
         res = ctx.addAttributeReference(ar2);
         assertTrue(res);
         assertThat(ctx.getErrorCount(), equalTo(0));
-        assertThat(ar0.getDataType(), equalTo(DataType.INTEGER));
-        assertThat(ar1.getDataType(), equalTo(DataType.INTEGER));
-        assertThat(ar2.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(ar0.getType(), equalTo(DataType.INTEGER));
+        assertThat(ar1.getType(), equalTo(DataType.INTEGER));
+        assertThat(ar2.getType(), equalTo(DataType.INTEGER));
 
         res = ctx.addAttributeReference(ar3);
         assertFalse(res);
         assertThat(ctx.getErrorCount(), greaterThan(0));
-        assertThat(ar0.getDataType(), equalTo(DataType.INTEGER));
-        assertThat(ar1.getDataType(), equalTo(DataType.INTEGER));
-        assertThat(ar2.getDataType(), equalTo(DataType.INTEGER));
-        assertThat(ar3.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(ar0.getType(), equalTo(DataType.INTEGER));
+        assertThat(ar1.getType(), equalTo(DataType.INTEGER));
+        assertThat(ar2.getType(), equalTo(DataType.INTEGER));
+        assertThat(ar3.getType(), equalTo(DataType.FLOAT));
     }
 
     @Test

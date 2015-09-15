@@ -76,7 +76,7 @@ public final class BetweenAST extends ExpressionAST {
 
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        DataType t = operand.getDataType();
+        DataType t = operand.getType();
         if (t == DataType.ID || t == DataType.BOOLEAN) {
             String msg = "Comparison operation 'between' forbidden on " +
                     "arguments of type '" + t + "' at " + getPosition();

@@ -34,7 +34,7 @@ public class ExpressionASTTest {
     @Test
     public void testConstantAST() {
         ConstantAST c = new ConstantAST(10, DataType.INTEGER);
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(10));
     }
 
@@ -51,19 +51,19 @@ public class ExpressionASTTest {
         TypeVariable v = new TypeVariable(DataType.INTEGER);
         boolean res = c.inferType(v, ctx);
         assertTrue(res);
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.NUMERIC);
         res = c.inferType(v, ctx);
         assertTrue(res);
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.ANY);
         res = c.inferType(v, ctx);
         assertTrue(res);
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.STRING);
@@ -105,7 +105,7 @@ public class ExpressionASTTest {
     public void testAttribute() {
         AttributeReferenceAST a = new AttributeReferenceAST("att", DataType.ANY);
         assertThat(a.getId(), equalTo("att"));
-        assertThat(a.getDataType(), equalTo(DataType.ANY));
+        assertThat(a.getType(), equalTo(DataType.ANY));
     }
 
     @Test
@@ -116,12 +116,12 @@ public class ExpressionASTTest {
         TypeVariable v = new TypeVariable(DataType.NUMERIC);
         boolean res = a.inferType(v, ctx);
         assertTrue(res);
-        assertThat(a.getDataType(), equalTo(DataType.NUMERIC));
+        assertThat(a.getType(), equalTo(DataType.NUMERIC));
 
         a = new AttributeReferenceAST("att", DataType.INTEGER);
         res = a.inferType(v, ctx);
         assertTrue(res);
-        assertThat(a.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
 
         assertThat(ctx.getErrorCount(), equalTo(0));
         Map<String, DataType> attTypes = ctx.getAttributeTypes();
@@ -132,7 +132,7 @@ public class ExpressionASTTest {
         res = a.inferType(v, ctx);
         assertTrue(res);
         assertThat(v.getType(), equalTo(DataType.NUMERIC));
-        assertThat(a.getDataType(), equalTo(DataType.NUMERIC));
+        assertThat(a.getType(), equalTo(DataType.NUMERIC));
     }
 
     @Test
@@ -144,25 +144,25 @@ public class ExpressionASTTest {
         AttributeReference a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
-        assertThat(a.getType(), equalTo(aa.getDataType()));
+        assertThat(a.getType(), equalTo(aa.getType()));
         assertThat(a.getIndex(), equalTo(0));
-        Attribute att = Attribute.create(aa.getId(), aa.getDataType());
+        Attribute att = Attribute.create(aa.getId(), aa.getType());
         assertThat(atts.get(att), equalTo(0));
 
         aa = new AttributeReferenceAST("att2", DataType.STRING);
         a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
-        assertThat(a.getType(), equalTo(aa.getDataType()));
+        assertThat(a.getType(), equalTo(aa.getType()));
         assertThat(a.getIndex(), equalTo(1));
-        att = Attribute.create(aa.getId(), aa.getDataType());
+        att = Attribute.create(aa.getId(), aa.getType());
         assertThat(atts.get(att), equalTo(1));
 
         aa = new AttributeReferenceAST("att1", DataType.INTEGER);
         a = (AttributeReference) aa.toExpression(ctx, atts);
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(a.getId(), equalTo(aa.getId()));
-        assertThat(a.getType(), equalTo(aa.getDataType()));
+        assertThat(a.getType(), equalTo(aa.getType()));
         assertThat(a.getIndex(), equalTo(0));
 
         aa = new AttributeReferenceAST("att3", DataType.ANY);
@@ -194,19 +194,19 @@ public class ExpressionASTTest {
         BoolAST b = new BoolAST(BoolOperation.AND, boolExp, boolExp);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         b = new BoolAST(BoolOperation.AND, boolExp, intExp);
         assertFalse(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         b = new BoolAST(BoolOperation.AND, intExp, boolExp);
         assertFalse(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         b = new BoolAST(BoolOperation.AND, intExp, stringExp);
         assertFalse(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
     }
 
     @Test
@@ -248,7 +248,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testBooleanBinaryNoType() {
         BoolAST b = new BoolAST(BoolOperation.OR, boolExp, boolExp);
-        b.getDataType();
+        b.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -274,16 +274,16 @@ public class ExpressionASTTest {
         NotAST n = new NotAST(boolExp);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(n.inferType(v, ctx));
-        assertThat(n.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(n.getType(), equalTo(DataType.BOOLEAN));
 
         n = new NotAST(intExp);
         assertFalse(n.inferType(v, ctx));
-        assertThat(n.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(n.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.ANY);
         n = new NotAST(boolExp);
         assertTrue(n.inferType(v, ctx));
-        assertThat(n.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(n.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.NUMERIC);
         n = new NotAST(boolExp);
@@ -318,7 +318,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testBooleanNotNoType() {
         NotAST b = new NotAST(boolExp);
-        b.getDataType();
+        b.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -346,7 +346,7 @@ public class ExpressionASTTest {
         BitwiseAST b = new BitwiseAST(BitwiseOperation.AND, intExp, intExp);
         TypeVariable v = new TypeVariable(DataType.INTEGER);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
 
         b = new BitwiseAST(BitwiseOperation.AND, boolExp, intExp);
         assertFalse(b.inferType(v, ctx));
@@ -410,7 +410,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testBitwiseBinaryNoType() {
         BitwiseAST b = new BitwiseAST(BitwiseOperation.XOR, intExp, intExp);
-        b.getDataType();
+        b.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -436,7 +436,7 @@ public class ExpressionASTTest {
         BitwiseNotAST b = new BitwiseNotAST(intExp);
         TypeVariable v = new TypeVariable(DataType.INTEGER);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
 
         b = new BitwiseNotAST(stringExp);
         assertFalse(b.inferType(v, ctx));
@@ -444,12 +444,12 @@ public class ExpressionASTTest {
         v = new TypeVariable(DataType.ANY);
         b = new BitwiseNotAST(intExp);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.NUMERIC);
         b = new BitwiseNotAST(intExp);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(b.getType(), equalTo(DataType.INTEGER));
     }
 
     @Test
@@ -474,7 +474,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testBitwiseNotNoType() {
         BitwiseNotAST b = new BitwiseNotAST(intExp);
-        b.getDataType();
+        b.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -501,7 +501,7 @@ public class ExpressionASTTest {
         IsAST is = new IsAST(boolExp, LogicValue.TRUE);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
 
         is = new IsAST(intExp, LogicValue.TRUE);
         assertFalse(is.inferType(v, ctx));
@@ -513,7 +513,7 @@ public class ExpressionASTTest {
         v = new TypeVariable(DataType.ANY);
         is = new IsAST(boolExp, LogicValue.TRUE);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
     }
 
     @Test
@@ -590,7 +590,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testIsNoType() {
         IsAST is = new IsAST(boolExp, LogicValue.FALSE);
-        is.getDataType();
+        is.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -616,19 +616,19 @@ public class ExpressionASTTest {
         IsNullAST is = new IsNullAST(intExp);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
         is = new IsNullAST(floatExp);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
         is = new IsNullAST(stringExp);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
         is = new IsNullAST(boolExp);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
         is = new IsNullAST(timestampExp);
         assertTrue(is.inferType(v, ctx));
-        assertThat(is.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(is.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.NUMERIC);
         is = new IsNullAST(intExp);
@@ -663,7 +663,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testIsNullNoType() {
         IsNullAST is = new IsNullAST(intExp);
-        is.getDataType();
+        is.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -690,7 +690,7 @@ public class ExpressionASTTest {
         LikeAST l = new LikeAST(stringExp, "test");
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(l.inferType(v, ctx));
-        assertThat(l.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(l.getType(), equalTo(DataType.BOOLEAN));
 
         l = new LikeAST(intExp, "test");
         assertFalse(l.inferType(v, ctx));
@@ -730,7 +730,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testLikeNoType() {
         LikeAST l = new LikeAST(stringExp, "test");
-        l.getDataType();
+        l.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -762,13 +762,13 @@ public class ExpressionASTTest {
         TypeVariable v = new TypeVariable(DataType.NUMERIC);
         assertTrue(a.inferType(v, ctx));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
-        assertThat(a.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.NUMERIC);
         a = new ArithmeticAST(ArithmeticOperation.ADDITION, floatExp, floatExp);
         assertTrue(a.inferType(v, ctx));
         assertThat(v.getType(), equalTo(DataType.FLOAT));
-        assertThat(a.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(a.getType(), equalTo(DataType.FLOAT));
 
         v = new TypeVariable(DataType.NUMERIC);
         a = new ArithmeticAST(ArithmeticOperation.ADDITION, intExp, floatExp);
@@ -882,7 +882,7 @@ public class ExpressionASTTest {
     public void testArithmeticNoType() {
         ArithmeticAST a =
                 new ArithmeticAST(ArithmeticOperation.ADDITION, intExp, intExp);
-        a.getDataType();
+        a.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -910,13 +910,13 @@ public class ExpressionASTTest {
         TypeVariable v = new TypeVariable(DataType.NUMERIC);
         assertTrue(i.inferType(v, ctx));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
-        assertThat(i.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(i.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.NUMERIC);
         i = new InverseAST(floatExp);
         assertTrue(i.inferType(v, ctx));
         assertThat(v.getType(), equalTo(DataType.FLOAT));
-        assertThat(i.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(i.getType(), equalTo(DataType.FLOAT));
 
         v = new TypeVariable(DataType.INTEGER);
         i = new InverseAST(stringExp);
@@ -958,7 +958,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testArithmeticInverseNoType() {
         InverseAST a = new InverseAST(intExp);
-        a.getDataType();
+        a.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -988,12 +988,12 @@ public class ExpressionASTTest {
                 new ComparisonAST(ComparisonOperation.LT, intExp, intExp);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(c.inferType(v, ctx));
-        assertThat(c.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.ANY);
         c = new ComparisonAST(ComparisonOperation.LT, stringExp, stringExp);
         assertTrue(c.inferType(v, ctx));
-        assertThat(c.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(v.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.BOOLEAN);
@@ -1286,7 +1286,7 @@ public class ExpressionASTTest {
     public void testComparisonNoType() {
         ComparisonAST c =
                 new ComparisonAST(ComparisonOperation.EQ, intExp, intExp);
-        c.getDataType();
+        c.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1317,12 +1317,12 @@ public class ExpressionASTTest {
         BetweenAST b = new BetweenAST(intExp, intExp, intExp);
         TypeVariable v = new TypeVariable(DataType.BOOLEAN);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.BOOLEAN);
         b = new BetweenAST(floatExp, floatExp, floatExp);
         assertTrue(b.inferType(v, ctx));
-        assertThat(b.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(b.getType(), equalTo(DataType.BOOLEAN));
 
         v = new TypeVariable(DataType.INTEGER);
         b = new BetweenAST(floatExp, floatExp, floatExp);
@@ -1467,7 +1467,7 @@ public class ExpressionASTTest {
     @Test(expected = IllegalStateException.class)
     public void testBetweenNoType() {
         BetweenAST b = new BetweenAST(intExp, intExp, intExp);
-        b.getDataType();
+        b.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1502,12 +1502,12 @@ public class ExpressionASTTest {
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
         TypeVariable v = new TypeVariable(DataType.INTEGER);
         assertTrue(a.inferType(v, ctx));
-        assertThat(a.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.FLOAT);
         a = new AggregateAST(AggregateOperation.SUM, floatExp, ws, boolExp);
         assertTrue(a.inferType(v, ctx));
-        assertThat(a.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(a.getType(), equalTo(DataType.FLOAT));
 
         v = new TypeVariable(DataType.INTEGER);
         a = new AggregateAST(AggregateOperation.SUM, intExp, ws, stringExp);
@@ -1520,12 +1520,12 @@ public class ExpressionASTTest {
         v = new TypeVariable(DataType.INTEGER);
         a = new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
         assertTrue(a.inferType(v, ctx));
-        assertThat(a.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.NUMERIC);
         a = new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
         assertTrue(a.inferType(v, ctx));
-        assertThat(a.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(a.getType(), equalTo(DataType.INTEGER));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
 
         v = new TypeVariable(DataType.FLOAT);
@@ -1604,7 +1604,7 @@ public class ExpressionASTTest {
                 new ConstantAST(4, DataType.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.SUM, intExp, ws, boolExp);
-        a.getDataType();
+        a.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1625,7 +1625,7 @@ public class ExpressionASTTest {
                 new ConstantAST(4, DataType.INTEGER));
         AggregateAST a =
                 new AggregateAST(AggregateOperation.COUNT, null, ws, boolExp);
-        a.getDataType();
+        a.getType();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -1652,7 +1652,7 @@ public class ExpressionASTTest {
         assertTrue(e.inferType(v, ctx));
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(v.getType(), equalTo(DataType.INTEGER));
-        assertThat(e.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(e.getType(), equalTo(DataType.INTEGER));
 
         Map<String, DataType> tm = ctx.getAttributeTypes();
         assertThat(tm.get("integer"), equalTo(DataType.INTEGER));
@@ -1670,7 +1670,7 @@ public class ExpressionASTTest {
         assertTrue(e.inferType(v, ctx));
         assertThat(ctx.getErrorCount(), equalTo(0));
         assertThat(v.getType(), equalTo(DataType.BOOLEAN));
-        assertThat(e.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(e.getType(), equalTo(DataType.BOOLEAN));
 
         Map<String, DataType> tm = ctx.getAttributeTypes();
         assertThat(tm.get("integer"), equalTo(DataType.INTEGER));

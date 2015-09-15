@@ -46,7 +46,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
     }
 
     @Override
-    public DataType getDataType() {
+    public DataType getType() {
         return type.getType();
     }
 

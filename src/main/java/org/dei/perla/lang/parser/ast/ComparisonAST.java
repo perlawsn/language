@@ -53,7 +53,7 @@ public final class ComparisonAST extends BinaryExpressionAST {
 
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        DataType t = left.getDataType();
+        DataType t = left.getType();
         if ((t == DataType.ID || t == DataType.BOOLEAN) &&
                 op != ComparisonOperation.EQ && op != ComparisonOperation.NE) {
             String msg = "Comparison operation '" + op + "' forbidden on " +

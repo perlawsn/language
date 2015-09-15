@@ -76,8 +76,8 @@ public final class ParserContext {
             if (!att.mergeTypes(ot)) {
                 String msg = "Incompatible type for attribute '" + id + "': " +
                         "usage at " + att.getPosition() + " of type '" +
-                        att.getDataType() + "' is not compatible with " +
-                        "previous usage of type '" + ot.getDataType()  + "' " +
+                        att.getType() + "' is not compatible with " +
+                        "previous usage of type '" + ot.getType()  + "' " +
                         "at " + ot.getPosition() + ".";
                 err.addError(msg);
                 clean = false;
@@ -99,7 +99,7 @@ public final class ParserContext {
             // All the FieldAST inside the field's list are guaranteed
             // to be of the same DataType if no type errors were found.
             // Hence, we can just retrieve the first one.
-            fm.put(id, fl.get(0).getDataType());
+            fm.put(id, fl.get(0).getType());
         }
         return fm;
     }

@@ -42,7 +42,7 @@ public final class InverseAST extends UnaryExpressionAST {
     @Override
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         Expression opExp = operand.toExpression(ctx, atts);
-        DataType opType = getDataType();
+        DataType opType = getType();
 
         if (opExp instanceof Constant) {
             Object o = ((Constant) opExp).getValue();

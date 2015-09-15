@@ -517,7 +517,7 @@ public class ParserASTTest {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         ConstantAST c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("sum(temperature, 3 seconds, false)");
@@ -531,7 +531,7 @@ public class ParserASTTest {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("max(temperature, 3 seconds, false)");
@@ -545,7 +545,7 @@ public class ParserASTTest {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("min(temperature, 3 seconds, false)");
@@ -559,7 +559,7 @@ public class ParserASTTest {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
 
         p = getParser("avg(temperature, 3 seconds, false)");
@@ -573,7 +573,7 @@ public class ParserASTTest {
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
         c = (ConstantAST) w.getDurationValue();
         assertThat(c.getValue(), equalTo(3));
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(a.getFilter(), equalTo(ConstantAST.FALSE));
     }
 
@@ -581,22 +581,22 @@ public class ParserASTTest {
     public void testConstantAST() throws Exception {
         ParserAST p = getParser("34");
         ConstantAST c = p.Constant();
-        assertThat(c.getDataType(), equalTo(DataType.INTEGER));
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
         assertThat(c.getValue(), equalTo(34));
 
         p = getParser("3.1415");
         c = p.Constant();
-        assertThat(c.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(c.getType(), equalTo(DataType.FLOAT));
         assertThat(c.getValue(), equalTo(3.1415f));
 
         p = getParser("'test'");
         c = p.Constant();
-        assertThat(c.getDataType(), equalTo(DataType.STRING));
+        assertThat(c.getType(), equalTo(DataType.STRING));
         assertThat(c.getValue(), equalTo("test"));
 
         p = getParser("TRUE");
         c = p.Constant();
-        assertThat(c.getDataType(), equalTo(DataType.BOOLEAN));
+        assertThat(c.getType(), equalTo(DataType.BOOLEAN));
         assertThat(c.getValue(), equalTo(LogicValue.TRUE));
     }
 
@@ -607,12 +607,12 @@ public class ParserASTTest {
         assertFalse(ctx.hasErrors());
         AttributeReferenceAST a = p.AttributeReference();
         assertThat(a.getId(), equalTo("temperature"));
-        assertThat(a.getDataType(), equalTo(DataType.ANY));
+        assertThat(a.getType(), equalTo(DataType.ANY));
 
         p = getParser("temperature: float");
         a = p.AttributeReference();
         assertThat(a.getId(), equalTo("temperature"));
-        assertThat(a.getDataType(), equalTo(DataType.FLOAT));
+        assertThat(a.getType(), equalTo(DataType.FLOAT));
     }
 
     @Test

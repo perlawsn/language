@@ -54,7 +54,7 @@ public final class ArithmeticAST extends BinaryExpressionAST {
     protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
         Expression leftExp = left.toExpression(ctx, atts);
         Expression rightExp = right.toExpression(ctx, atts);
-        DataType opType = getDataType();
+        DataType opType = getType();
 
         if (leftExp instanceof Constant && rightExp instanceof Constant) {
             Object o1 = ((Constant) leftExp).getValue();

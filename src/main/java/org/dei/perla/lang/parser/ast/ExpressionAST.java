@@ -74,7 +74,7 @@ public abstract class ExpressionAST extends NodeAST {
      * @return output type of the expression node
      * @throws IllegalStateException if no type variable is set
      */
-    public DataType getDataType() {
+    public DataType getType() {
         if (type == null) {
             throw new IllegalStateException("Cannot return, no type set");
         }

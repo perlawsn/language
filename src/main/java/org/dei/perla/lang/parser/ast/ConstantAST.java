@@ -50,7 +50,7 @@ public final class ConstantAST extends ExpressionAST {
     }
 
     @Override
-    public DataType getDataType() {
+    public DataType getType() {
         return type;
     }
 
