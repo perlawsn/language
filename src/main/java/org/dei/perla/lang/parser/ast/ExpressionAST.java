@@ -152,20 +152,31 @@ public abstract class ExpressionAST extends NodeAST {
      *
      * @param ctx Context for the storage of intermediate parsing state
      * @return integer value of the {@link ConstantAST} node
+     * @throws RuntimeException if the expression is not constant
      */
-    protected int evalIntConstant(ParserContext ctx) {
-        Expression e = compile(DataType.INTEGER, ctx,
-                Collections.emptyMap());
-        if (!(e instanceof Constant)) {
-            throw new IllegalStateException("Parser bug found, WindowSize " +
-                    "expression is not constant");
-        }
-
-        Constant c = (Constant) e;
+    public int evalIntConstant(ParserContext ctx) {
+        Constant c = evalConstant(ctx);
         if (c.getValue() == null) {
             return 0;
         }
         return (Integer) c.getValue();
+    }
+
+    /**
+     * Utility method employed to evaluate the value of a constant {@link
+     * ExpressionAST}
+     *
+     * @param ctx context object employed to store intermediate parsin results
+     * @return {@code Constant} object representing the value of the expression
+     * @throws RuntimeException if the expression is not constant
+     */
+    public Constant evalConstant(ParserContext ctx) {
+        Expression e = compile(DataType.INTEGER, ctx,
+                Collections.emptyMap());
+        if (!(e instanceof Constant)) {
+            throw new RuntimeException("Expression is not constant");
+        }
+        return (Constant) e;
     }
 
 }

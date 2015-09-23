@@ -678,7 +678,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     WindowSizeAST every;
     List<FieldSelectionAST> fsl;
     GroupByAST gby = null;
-    HavingAST having = null;
+    ExpressionAST having = ConstantAST.TRUE;
     WindowSizeAST upto = null;
     OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
     SamplingAST sampling;
@@ -794,16 +794,15 @@ GroupByAST GroupByClause() :
     { return new GroupByAST(t, fs); }
 }
 
-HavingAST HavingClause(ParserContext ctx) :
+ExpressionAST HavingClause(ParserContext ctx) :
 {
     ExpressionAST e;
 
     Token t;
 }
 {
-    t = <KEYWORD_HAVING>
-    e = Expression(ExpressionType.AGGREGATE, "having clause", ctx)
-    { return new HavingAST(t, e); }
+    <KEYWORD_HAVING>
+    { return Expression(ExpressionType.AGGREGATE, "having clause", ctx); }
 }
 
 WindowSizeAST UpToClause(ParserContext ctx) :

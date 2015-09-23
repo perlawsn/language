@@ -1,12 +1,16 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.FieldSelection;
 import org.dei.perla.lang.parser.OnEmptySelection;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
-import org.dei.perla.lang.query.statement.Statement;
+import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.statement.SelectionStatement;
+import org.dei.perla.lang.query.statement.WindowSize;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Selection statement Abstract Syntax Tree node.
@@ -18,7 +22,7 @@ public final class SelectionStatementAST extends StatementAST {
     private final WindowSizeAST every;
     private final List<FieldSelectionAST> fields;
     private final GroupByAST groupBy;
-    private final HavingAST having;
+    private final ExpressionAST having;
     private final WindowSizeAST upto;
     private final OnEmptySelection oes;
     private final SamplingAST sampling;
@@ -29,7 +33,7 @@ public final class SelectionStatementAST extends StatementAST {
     public SelectionStatementAST(WindowSizeAST every,
             List<FieldSelectionAST> fields,
             GroupByAST groupBy,
-            HavingAST having,
+            ExpressionAST having,
             WindowSizeAST upto,
             OnEmptySelection oes,
             SamplingAST sampling,
@@ -44,7 +48,7 @@ public final class SelectionStatementAST extends StatementAST {
             WindowSizeAST every,
             List<FieldSelectionAST> fields,
             GroupByAST groupBy,
-            HavingAST having,
+            ExpressionAST having,
             WindowSizeAST upto,
             OnEmptySelection oes,
             SamplingAST sampling,
@@ -76,7 +80,7 @@ public final class SelectionStatementAST extends StatementAST {
         return groupBy;
     }
 
-    public HavingAST getHaving() {
+    public ExpressionAST getHaving() {
         return having;
     }
 
@@ -105,7 +109,21 @@ public final class SelectionStatementAST extends StatementAST {
     }
 
     @Override
-    public Statement compile(ParserContext ctx) {
+    public SelectionStatement compile(ParserContext ctx) {
+        Map<Attribute, Integer> selAtts = new HashMap<>();
+        WindowSize everyComp = every.compile(ctx);
+
+        List<FieldSelection> fieldsComp = new ArrayList<>();
+        for (FieldSelectionAST fs : fields) {
+            Expression f = fs.getField().compile(DataType.ANY, ctx, selAtts);
+            Expression d = fs.getDefault().evalConstant(ctx);
+            fieldsComp.add(new FieldSelection(f, d));
+        }
+
+        //TODO: group by
+
+        Expression havingComp = having.compile(DataType.BOOLEAN, ctx, selAtts);
+
         throw new RuntimeException("unimplemented");
     }
 
