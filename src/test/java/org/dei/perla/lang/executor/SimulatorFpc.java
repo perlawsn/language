@@ -5,8 +5,7 @@ import org.dei.perla.core.fpc.Task;
 import org.dei.perla.core.fpc.TaskHandler;
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.Sample;
-import org.dei.perla.core.fpc.SamplePipeline;
-import org.dei.perla.core.fpc.SamplePipeline.PipelineBuilder;
+import org.dei.perla.core.fpc.base.SamplePipeline;
 import org.dei.perla.core.utils.AsyncUtils;
 
 import java.util.*;
@@ -315,10 +314,8 @@ public class SimulatorFpc implements Fpc {
         protected SimTask(List<Attribute> atts, TaskHandler handler) {
             this.handler = handler;
 
-            PipelineBuilder pb = SamplePipeline.newBuilder(
-                    SimulatorFpc.this.atts);
-            pb.reorder(atts);
-            pipeline = pb.create();
+            List<Attribute> in = SimulatorFpc.this.atts;
+            pipeline = new SamplePipeline(in, atts);
         }
 
         @Override
