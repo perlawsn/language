@@ -7,6 +7,7 @@ import org.dei.perla.lang.parser.OnEmptySelection;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -123,6 +124,10 @@ public final class SelectionStatementAST extends StatementAST {
         //TODO: group by
 
         Expression havingComp = having.compile(DataType.BOOLEAN, ctx, selAtts);
+        WindowSize uptoComp = upto.compile(ctx);
+        Sampling samplingComp = sampling.compile(ctx);
+
+        WindowSize terminateComp = terminate.compile(ctx);
 
         throw new RuntimeException("unimplemented");
     }
