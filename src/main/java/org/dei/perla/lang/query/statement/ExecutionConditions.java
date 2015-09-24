@@ -27,10 +27,7 @@ public final class ExecutionConditions {
 
     private ExecutionConditions(Expression cond, List<Attribute> specs,
             Refresh refresh) {
-        this.cond = cond;
-        this.specs = specs;
-        this.refresh = refresh;
-        atts = Collections.emptyList();
+        this(cond, specs, refresh, Collections.emptyList());
     }
 
     private ExecutionConditions(Expression cond, List<Attribute> specs,
