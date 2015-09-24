@@ -2,15 +2,14 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Guido Rota 30/07/15.
@@ -48,8 +47,8 @@ public final class ExecutionConditionsAST extends NodeAST {
 
     public ExecutionConditions compile(List<Attribute> atts,
             ParserContext ctx) {
-        Map<Attribute, Integer> attMap = new HashMap<>();
-        Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attMap);
+        AttributeOrder attOrd = new AttributeOrder();
+        Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attOrd);
 
 
         Refresh refComp = refresh.compile(ctx);

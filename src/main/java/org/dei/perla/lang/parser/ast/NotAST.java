@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -9,8 +9,6 @@ import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 import org.dei.perla.lang.query.expression.Not;
-
-import java.util.Map;
 
 /**
  * Boolean NOT Abstract Syntax Tree node
@@ -41,8 +39,8 @@ public final class NotAST extends UnaryExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        Expression opExp = operand.toExpression(ctx, atts);
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
+        Expression opExp = operand.toExpression(ctx, ord);
 
         if (opExp instanceof Constant) {
             LogicValue l = (LogicValue) ((Constant) opExp).getValue();

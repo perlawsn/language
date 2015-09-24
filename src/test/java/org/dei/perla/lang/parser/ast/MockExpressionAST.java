@@ -1,12 +1,10 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Expression;
-
-import java.util.Map;
 
 /**
  * Test Abstract Syntax Tree expression node
@@ -29,7 +27,7 @@ public final class MockExpressionAST extends ExpressionAST {
 
     @Override
     protected Expression toExpression(ParserContext ctx,
-            Map<Attribute, Integer> atts) {
+            AttributeOrder ord) {
         throw new UnsupportedOperationException();
     }
 

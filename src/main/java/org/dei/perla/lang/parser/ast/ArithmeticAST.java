@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -9,8 +9,6 @@ import org.dei.perla.lang.query.expression.Arithmetic;
 import org.dei.perla.lang.query.expression.ArithmeticOperation;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-
-import java.util.Map;
 
 /**
  * An arithmetic operation with 2 operands. The inverse operation is
@@ -51,9 +49,9 @@ public final class ArithmeticAST extends BinaryExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        Expression leftExp = left.toExpression(ctx, atts);
-        Expression rightExp = right.toExpression(ctx, atts);
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
+        Expression leftExp = left.toExpression(ctx, ord);
+        Expression rightExp = right.toExpression(ctx, ord);
         DataType opType = getType();
 
         if (leftExp instanceof Constant && rightExp instanceof Constant) {

@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
@@ -9,8 +9,6 @@ import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.Is;
 import org.dei.perla.lang.query.expression.LogicValue;
-
-import java.util.Map;
 
 /**
  * IS Abstract Syntax Tree node
@@ -48,8 +46,8 @@ public final class IsAST extends UnaryExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        Expression e = operand.toExpression(null, atts);
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
+        Expression e = operand.toExpression(null, ord);
         if (e instanceof Constant) {
             LogicValue l = Is.compute(((Constant) e).getValue(), value);
             return Constant.create(l, DataType.BOOLEAN);

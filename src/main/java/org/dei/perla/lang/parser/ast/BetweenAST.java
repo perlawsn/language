@@ -1,15 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Between;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-
-import java.util.Map;
 
 /**
  * Between Abstract Syntax Tree node. This operation is not allowed on
@@ -75,7 +73,7 @@ public final class BetweenAST extends ExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
         DataType t = operand.getType();
         if (t == DataType.ID || t == DataType.BOOLEAN) {
             String msg = "Comparison operation 'between' forbidden on " +
@@ -84,9 +82,9 @@ public final class BetweenAST extends ExpressionAST {
             return Constant.NULL;
         }
 
-        Expression opExp = operand.toExpression(ctx, atts);
-        Expression minExp = operand.toExpression(ctx, atts);
-        Expression maxExp = operand.toExpression(ctx, atts);
+        Expression opExp = operand.toExpression(ctx, ord);
+        Expression minExp = operand.toExpression(ctx, ord);
+        Expression maxExp = operand.toExpression(ctx, ord);
 
         if (opExp instanceof Constant && minExp instanceof Constant &&
                 maxExp instanceof Constant) {

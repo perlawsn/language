@@ -1,15 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
+import org.dei.perla.lang.query.expression.AttributeReference;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.AttributeReference;
-
-import java.util.Map;
 
 /**
  * A reference to an {@link Fpc} attribute.
@@ -88,7 +86,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
         DataType tc = type.getType();
         if (!tc.isConcrete()) {
             String msg = "Cannot compile, attribute '" + id + "' at " +
@@ -98,12 +96,7 @@ public final class AttributeReferenceAST extends ExpressionAST {
             return Constant.NULL;
         }
 
-        Attribute att = Attribute.create(id, type.getType());
-        Integer idx = atts.get(att);
-        if (idx == null) {
-            idx = atts.size();
-            atts.put(att, idx);
-        }
+        int idx = ord.getIndex(id);
         return new AttributeReference(id, tc, idx);
     }
 

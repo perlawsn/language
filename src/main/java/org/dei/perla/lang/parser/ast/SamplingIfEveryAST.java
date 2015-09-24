@@ -1,7 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.expression.Constant;
@@ -11,10 +11,7 @@ import org.dei.perla.lang.query.statement.RatePolicy;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SamplingIfEvery;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Time based samling clause Abstract Syntax Tree node
@@ -53,19 +50,14 @@ public final class SamplingIfEveryAST extends SamplingAST {
     }
 
     public SamplingIfEvery compile(ParserContext ctx) {
-        Map<Attribute, Integer> ord = new HashMap<>();
+        AttributeOrder ord = new AttributeOrder();
         IfEvery ife = compileIfEvery(ord, ctx);
         Refresh rc = refresh.compile(ctx);
 
-        Attribute[] atts = new Attribute[ord.size()];
-        for (Map.Entry<Attribute, Integer> e : ord.entrySet()) {
-            atts[e.getValue()] = e.getKey();
-        }
-        return new SamplingIfEvery(ife, policy, rc, Arrays.asList(atts));
+        return new SamplingIfEvery(ife, policy, rc, ord.toList(ctx));
     }
 
-    private IfEvery compileIfEvery(Map<Attribute, Integer> ord,
-            ParserContext ctx) {
+    private IfEvery compileIfEvery(AttributeOrder ord, ParserContext ctx) {
         IfEvery ife = null;
         IfEvery prev = null;
         for (int i = ifevery.size() - 1; i >= 0; i--) {
@@ -75,7 +67,7 @@ public final class SamplingIfEveryAST extends SamplingAST {
         return ife;
     }
 
-    private IfEvery compileIfEvery(IfEveryAST ife, Map<Attribute, Integer> ord,
+    private IfEvery compileIfEvery(IfEveryAST ife, AttributeOrder ord,
             ParserContext ctx, IfEvery prev) {
         Expression cond = ife.getCondition()
                 .compile(DataType.BOOLEAN, ctx, ord);

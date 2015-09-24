@@ -1,15 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.Like;
-
-import java.util.Map;
 
 /**
  * LIKE Abstract Syntax Tree node
@@ -48,8 +46,8 @@ public final class LikeAST extends UnaryExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
-        Expression e = operand.toExpression(ctx, atts);
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
+        Expression e = operand.toExpression(ctx, ord);
 
         if (e instanceof Constant) {
             Object o = Like.compute(((Constant) e).getValue(), pattern);

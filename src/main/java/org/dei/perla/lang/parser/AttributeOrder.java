@@ -39,7 +39,7 @@ public final class AttributeOrder {
      * @param ctx
      * @return
      */
-    public List<Attribute> toAttributeList(ParserContext ctx) {
+    public List<Attribute> toList(ParserContext ctx) {
         Attribute[] as = new Attribute[order.size()];
         Map<String, DataType> types = ctx.getAttributeTypes();
 

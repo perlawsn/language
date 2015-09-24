@@ -1,15 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
-
-import java.util.Map;
 
 /**
  * A constant value in the Abstract Syntax Tree.
@@ -64,7 +62,7 @@ public final class ConstantAST extends ExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
         if (value == null) {
             return Constant.NULL;
         }

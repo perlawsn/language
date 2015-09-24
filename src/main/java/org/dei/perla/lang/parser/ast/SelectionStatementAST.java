@@ -1,17 +1,15 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.parser.FieldSelection;
-import org.dei.perla.lang.parser.OnEmptySelection;
-import org.dei.perla.lang.parser.ParserContext;
-import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.parser.*;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.WindowSize;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Selection statement Abstract Syntax Tree node.
@@ -111,7 +109,7 @@ public final class SelectionStatementAST extends StatementAST {
 
     @Override
     public SelectionStatement compile(ParserContext ctx) {
-        Map<Attribute, Integer> selAtts = new HashMap<>();
+        AttributeOrder selAtts = new AttributeOrder();
         WindowSize everyComp = every.compile(ctx);
 
         List<FieldSelection> fieldsComp = new ArrayList<>();

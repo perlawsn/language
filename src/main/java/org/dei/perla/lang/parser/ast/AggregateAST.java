@@ -1,14 +1,12 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.WindowSize;
-
-import java.util.Map;
 
 /**
  * Aggregate Abstract Syntax Tree node
@@ -106,12 +104,12 @@ public final class AggregateAST extends ExpressionAST {
     }
 
     @Override
-    protected Expression toExpression(ParserContext ctx, Map<Attribute, Integer> atts) {
+    protected Expression toExpression(ParserContext ctx, AttributeOrder ord) {
         Expression opExp = null;
         if (operand != null) {
-            opExp = operand.toExpression(ctx, atts);
+            opExp = operand.toExpression(ctx, ord);
         }
-        Expression filExp = filter.toExpression(ctx, atts);
+        Expression filExp = filter.toExpression(ctx, ord);
 
         WindowSize ws = window.compile(ctx);
 

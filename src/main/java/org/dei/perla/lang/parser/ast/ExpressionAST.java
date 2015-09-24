@@ -2,14 +2,12 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * A generic expression node of the Abstract Syntax Tree.
@@ -89,18 +87,18 @@ public abstract class ExpressionAST extends NodeAST {
      *             class) of the expression being analyzed. This information is
      *             used by the inference algorithm to perform the type analysis.
      * @param ctx context object used to store intermediate results and errors
-     * @param atts map employed for storing the attribute binding order
+     * @param ord {@link Attribute} binding order
      * @return expression object corresponding to the AST node
      */
     public Expression compile(DataType bound, ParserContext ctx,
-            Map<Attribute, Integer> atts) {
+            AttributeOrder ord) {
         TypeVariable v = new TypeVariable(bound);
         boolean typeOk = inferType(v, ctx);
         if (!typeOk) {
             return Constant.NULL;
         }
 
-        return toExpression(ctx, atts);
+        return toExpression(ctx, ord);
     }
 
     /**
@@ -120,11 +118,11 @@ public abstract class ExpressionAST extends NodeAST {
      * Creates an {@link Expression} object corresponding to the AST node.
      *
      * @param ctx context object used to store intermediate results and errors
-     * @param atts map employed for storing the attribute binding order
+     * @param ord {@link Attribute} binding order
      * @return expression object corresponding to the ExpressionAST node
      */
     protected abstract Expression toExpression(ParserContext ctx,
-            Map<Attribute, Integer> atts);
+            AttributeOrder ord);
 
     /**
      * Returns a string message that can be used to report the occurrence of
@@ -172,7 +170,7 @@ public abstract class ExpressionAST extends NodeAST {
      */
     public Constant evalConstant(ParserContext ctx) {
         Expression e = compile(DataType.INTEGER, ctx,
-                Collections.emptyMap());
+                new AttributeOrder());
         if (!(e instanceof Constant)) {
             throw new RuntimeException("Expression is not constant");
         }
