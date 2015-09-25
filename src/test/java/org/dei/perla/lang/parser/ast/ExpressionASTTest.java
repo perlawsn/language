@@ -37,6 +37,38 @@ public class ExpressionASTTest {
         assertThat(c.getValue(), equalTo(10));
     }
 
+    @Test
+    public void testEvalIntConstant1() {
+        ParserContext ctx = new ParserContext();
+        ConstantAST c = new ConstantAST(10, DataType.INTEGER);
+        int v = c.evalIntConstant(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(v, equalTo(10));
+    }
+
+    @Test(expected = ClassCastException.class)
+    public void testEvalIntConstant2() {
+        ParserContext ctx = new ParserContext();
+        ConstantAST c = new ConstantAST("test", DataType.STRING);
+        int v = c.evalIntConstant(ctx);
+    }
+
+    @Test
+    public void testEvalConstant1() {
+        ParserContext ctx = new ParserContext();
+        ConstantAST ca = new ConstantAST("test", DataType.STRING);
+        Constant c = ca.evalConstant(ctx);
+        assertThat(c.getType(), equalTo(DataType.STRING));
+        assertThat(c.getValue(), equalTo("test"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testEvalConstant2() {
+        ParserContext ctx = new ParserContext();
+        MockExpressionAST m = new MockExpressionAST(DataType.INTEGER);
+        m.evalConstant(ctx);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testNonConcreteConstantAST() {
         ConstantAST c = new ConstantAST(10, DataType.ANY);

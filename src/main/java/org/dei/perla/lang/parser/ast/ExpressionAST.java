@@ -154,6 +154,9 @@ public abstract class ExpressionAST extends NodeAST {
      */
     public int evalIntConstant(ParserContext ctx) {
         Constant c = evalConstant(ctx);
+        if (c.getType() != DataType.INTEGER) {
+            throw new ClassCastException();
+        }
         if (c.getValue() == null) {
             return 0;
         }
@@ -169,11 +172,12 @@ public abstract class ExpressionAST extends NodeAST {
      * @throws RuntimeException if the expression is not constant
      */
     public Constant evalConstant(ParserContext ctx) {
-        Expression e = compile(DataType.INTEGER, ctx,
-                new AttributeOrder());
-        if (!(e instanceof Constant)) {
+        if (!(this instanceof ConstantAST)) {
             throw new RuntimeException("Expression is not constant");
         }
+
+        Expression e = compile(DataType.ANY, ctx,
+                new AttributeOrder());
         return (Constant) e;
     }
 
