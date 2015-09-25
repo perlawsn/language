@@ -1,5 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
@@ -9,6 +10,7 @@ import org.dei.perla.lang.query.statement.WindowSize;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -164,6 +166,34 @@ public class ExpressionASTTest {
         assertTrue(res);
         assertThat(v.getType(), equalTo(DataType.NUMERIC));
         assertThat(a.getType(), equalTo(DataType.NUMERIC));
+    }
+
+    @Test
+    public void testAttributeOrder() {
+        ParserContext ctx = new ParserContext();
+
+        AttributeReferenceAST cond =
+                new AttributeReferenceAST("cond", DataType.ANY);
+        AttributeReferenceAST tempRef1 =
+                new AttributeReferenceAST("temp", DataType.ANY);
+        AttributeReferenceAST tempRef2 =
+                new AttributeReferenceAST("temp", DataType.ANY);
+
+        ExpressionAST e = new ArithmeticAST(ArithmeticOperation.ADDITION,
+                tempRef1, tempRef2);
+        e = new ComparisonAST(ComparisonOperation.GT, e,
+                new ConstantAST(12, DataType.INTEGER));
+        e = new ComparisonAST(ComparisonOperation.EQ, cond, e);
+        AttributeOrder ord = new AttributeOrder();
+        e.compile(DataType.BOOLEAN, ctx, ord);
+
+        assertThat(ord.getIndex(cond.getId()), equalTo(0));
+        assertThat(ord.getIndex(tempRef1.getId()), equalTo(1));
+        List<Attribute> atts = ord.toList(ctx);
+        assertThat(atts.get(0),
+                equalTo(Attribute.create("cond", DataType.BOOLEAN)));
+        assertThat(atts.get(1),
+                equalTo(Attribute.create("temp", DataType.INTEGER)));
     }
 
     @Test
