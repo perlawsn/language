@@ -65,16 +65,7 @@ public final class Select {
                         "Unexpected upto WindowSize type " + upto.getType());
         }
 
-        if (group.hasNoGroups()) {
-            selectBuffer(ut, buffer, rs);
-        } else {
-            // GROUP BY CLAUSE
-            List<BufferView> bufs = group.createGroups(buffer);
-            for (BufferView b : bufs) {
-                selectBuffer(ut, b, rs);
-                b.release();
-            }
-        }
+        selectBuffer(ut, buffer, rs);
 
         if (def.length > 0 && rs.isEmpty()) {
             // ON EMPTY SELECTION INSERT DEFAULT

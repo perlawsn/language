@@ -3,6 +3,7 @@ package org.dei.perla.lang.parser.ast;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.*;
 import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.statement.GroupBy;
 import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.WindowSize;
@@ -10,6 +11,8 @@ import org.dei.perla.lang.query.statement.WindowSize;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Selection statement Abstract Syntax Tree node.
@@ -119,7 +122,7 @@ public final class SelectionStatementAST extends StatementAST {
             fieldsComp.add(new FieldSelection(f, d));
         }
 
-        //TODO: group by
+        GroupBy groupByComp = compileGroupBy(ctx);
 
         Expression havingComp = having.compile(DataType.BOOLEAN, ctx, selAtts);
         WindowSize uptoComp = upto.compile(ctx);
@@ -128,6 +131,32 @@ public final class SelectionStatementAST extends StatementAST {
         WindowSize terminateComp = terminate.compile(ctx);
 
         throw new RuntimeException("unimplemented");
+    }
+
+    private GroupBy compileGroupBy(ParserContext ctx) {
+        if (groupBy == null) {
+            return null;
+        }
+
+        Set<String> selFields = fields.parallelStream()
+                .map(FieldSelectionAST::getField)
+                .filter(e -> e instanceof AttributeReferenceAST)
+                .map(e -> ((AttributeReferenceAST) e).getId())
+                .collect(Collectors.toSet());
+
+        List<String> missing = groupBy.getFields().parallelStream()
+                .filter(selFields::contains)
+                .collect(Collectors.toList());
+
+        if (missing.size() != 0) {
+            for (String m : missing) {
+                ctx.addError("GROUP BY attribute '" + m + "' is not declared " +
+                        "as a SELECT field");
+            }
+            return null;
+        }
+
+        return new GroupBy(groupBy.getFields());
     }
 
 }
