@@ -1,12 +1,13 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.parser.*;
+import org.dei.perla.lang.parser.AttributeOrder;
+import org.dei.perla.lang.parser.OnEmptySelection;
+import org.dei.perla.lang.parser.ParserContext;
+import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.statement.GroupBy;
-import org.dei.perla.lang.query.statement.Sampling;
-import org.dei.perla.lang.query.statement.SelectionStatement;
-import org.dei.perla.lang.query.statement.WindowSize;
+import org.dei.perla.lang.query.statement.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,22 +116,30 @@ public final class SelectionStatementAST extends StatementAST {
         AttributeOrder selAtts = new AttributeOrder();
         WindowSize everyComp = every.compile(ctx);
 
-        List<FieldSelection> fieldsComp = new ArrayList<>();
-        for (FieldSelectionAST fs : fields) {
+        List<Expression> fieldsComp = new ArrayList<>();
+        Object[] def = new Object[fields.size()];
+        for (int i = 0; i < fields.size(); i++) {
+            FieldSelectionAST fs = fields.get(i);
             Expression f = fs.getField().compile(DataType.ANY, ctx, selAtts);
+            fieldsComp.add(f);
             Expression d = fs.getDefault().evalConstant(ctx);
-            fieldsComp.add(new FieldSelection(f, d));
+            def[i] = d;
         }
 
         GroupBy groupByComp = compileGroupBy(ctx);
-
         Expression havingComp = having.compile(DataType.BOOLEAN, ctx, selAtts);
+        Expression whereComp = where.compile(DataType.BOOLEAN, ctx, selAtts);
         WindowSize uptoComp = upto.compile(ctx);
         Sampling samplingComp = sampling.compile(ctx);
-
         WindowSize terminateComp = terminate.compile(ctx);
 
-        throw new RuntimeException("unimplemented");
+        List<Attribute> atts = selAtts.toList(ctx);
+        ExecutionConditions condComp = execCond.compile(atts, ctx);
+
+        Select sel = new Select(fieldsComp, uptoComp, groupByComp,
+                havingComp, def);
+        return new SelectionStatement(sel, everyComp, samplingComp, whereComp,
+                condComp, terminateComp);
     }
 
     private GroupBy compileGroupBy(ParserContext ctx) {
