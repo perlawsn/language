@@ -30,6 +30,7 @@ public final class SamplerIfEvery implements Sampler {
 
     private final SamplingIfEvery sampling;
     private final Fpc fpc;
+    private final List<Attribute> attributes;
     private final QueryHandler<? super Sampling, Object[]> handler;
     private final IfEvery ife;
 
@@ -51,11 +52,13 @@ public final class SamplerIfEvery implements Sampler {
     private Task evtTask = null;
 
     protected SamplerIfEvery(SamplingIfEvery sampling, Fpc fpc,
+            List<Attribute> attributes,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
 
         this.sampling = sampling;
         this.fpc = fpc;
+        this.attributes = attributes;
         this.handler = handler;
         this.ife = sampling.getIfEvery();
 
@@ -233,7 +236,7 @@ public final class SamplerIfEvery implements Sampler {
         public void complete(Task task) {
             synchronized (SamplerIfEvery.this) {
                 if (status == NEW_RATE) {
-                    sampTask = fpc.get(sampling.getAttributes(), false, rate, sampHandler);
+                    sampTask = fpc.get(attributes, false, rate, sampHandler);
                     status = SAMPLING;
 
                 } else if (status == SAMPLING && task == sampTask) {

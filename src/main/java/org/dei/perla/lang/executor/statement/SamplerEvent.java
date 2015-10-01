@@ -24,7 +24,7 @@ public final class SamplerEvent implements Sampler {
 
     private final SamplingEvent sampling;
     private final Fpc fpc;
-    private final List<Attribute> atts;
+    private final List<Attribute> attributes;
     private final QueryHandler<? super Sampling, Object[]> handler;
 
     private final TaskHandler sampHandler = new SamplingHandler();
@@ -35,12 +35,12 @@ public final class SamplerEvent implements Sampler {
     private Task evtTask;
 
     protected SamplerEvent(SamplingEvent sampling, Fpc fpc,
-            List<Attribute> atts,
+            List<Attribute> attributes,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         this.sampling = sampling;
         this.fpc = fpc;
-        this.atts = atts;
+        this.attributes = attributes;
         this.handler = handler;
     }
 
@@ -189,7 +189,7 @@ public final class SamplerEvent implements Sampler {
                     return;
                 }
 
-                fpc.get(atts, false, sampHandler);
+                fpc.get(attributes, false, sampHandler);
             }
         }
 

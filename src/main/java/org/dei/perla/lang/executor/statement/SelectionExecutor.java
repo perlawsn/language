@@ -123,7 +123,7 @@ public final class SelectionExecutor {
             throws IllegalArgumentException {
         if (samp instanceof SamplingIfEvery) {
             SamplingIfEvery sife = (SamplingIfEvery) samp;
-            return new SamplerIfEvery(sife, fpc, sampHand);
+            return new SamplerIfEvery(sife, fpc, atts, sampHand);
 
         } else if (samp instanceof SamplingEvent) {
             SamplingEvent sev = (SamplingEvent) samp;
