@@ -42,7 +42,7 @@ public final class SelectionExecutor {
 
     private final Buffer buffer;
 
-    private final Sampler sampler;
+    private final SamplerRunner sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
     private final ExecIfRefreshHandler execIfRefHand = new ExecIfRefreshHandler();
     private final ExecIfTaskHandler execIfTaskHand = new ExecIfTaskHandler();
@@ -87,7 +87,7 @@ public final class SelectionExecutor {
 
         // TODO: forecast average buffer length
         buffer = new ArrayBuffer(query.getAttributes(), 512);
-        sampler = createSampler(query.getSampling(), query.getAttributes());
+        sampler = new SamplerRunner(query, fpc, sampHand);
 
         // Initialize EVERY data
         WindowSize every = query.getEvery();
@@ -116,22 +116,6 @@ public final class SelectionExecutor {
             default:
                 throw new RuntimeException("Unexpected WindowSize type " +
                         terminate.getType() + " found in TERMINATE clause");
-        }
-    }
-
-    private Sampler createSampler(Sampling samp, List<Attribute> atts)
-            throws IllegalArgumentException {
-        if (samp instanceof SamplingIfEvery) {
-            SamplingIfEvery sife = (SamplingIfEvery) samp;
-            return new SamplerIfEvery(sife, fpc, atts, sampHand);
-
-        } else if (samp instanceof SamplingEvent) {
-            SamplingEvent sev = (SamplingEvent) samp;
-            return new SamplerEvent(sev, fpc, atts, sampHand);
-
-        } else {
-            throw new IllegalArgumentException("Cannot start sampling of type" +
-                    samp.getClass().getSimpleName());
         }
     }
 
