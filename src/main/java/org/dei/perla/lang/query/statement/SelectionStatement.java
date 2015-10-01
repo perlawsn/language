@@ -21,7 +21,7 @@ public final class SelectionStatement implements Statement {
 
     // List of attributes required to run the data management clauses and the
     // where expression of the sampling clause
-    private final List<Attribute> dataAtts;
+    private final List<Attribute> atts;
 
     /**
      *
@@ -41,14 +41,14 @@ public final class SelectionStatement implements Statement {
         this.where = where;
         this.cond = cond;
         this.terminate = terminate;
-        dataAtts = Collections.emptyList();
+        atts = Collections.emptyList();
     }
 
-    private SelectionStatement(Select select, List<Attribute> dataAtts,
+    private SelectionStatement(Select select, List<Attribute> atts,
             WindowSize every, Sampling sampling, Expression where,
             ExecutionConditions cond, WindowSize terminate) {
         this.select = select;
-        this.dataAtts = Collections.unmodifiableList(dataAtts);
+        this.atts = Collections.unmodifiableList(atts);
         this.every = every;
         this.sampling = sampling;
         this.where = where;
@@ -56,8 +56,8 @@ public final class SelectionStatement implements Statement {
         this.terminate = terminate;
     }
 
-    public List<Attribute> getDataAttributes() {
-        return dataAtts;
+    public List<Attribute> getAttributes() {
+        return atts;
     }
 
     public Select getSelect() {

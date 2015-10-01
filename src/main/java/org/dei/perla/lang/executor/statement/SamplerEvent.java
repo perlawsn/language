@@ -24,6 +24,7 @@ public final class SamplerEvent implements Sampler {
 
     private final SamplingEvent sampling;
     private final Fpc fpc;
+    private final List<Attribute> atts;
     private final QueryHandler<? super Sampling, Object[]> handler;
 
     private final TaskHandler sampHandler = new SamplingHandler();
@@ -34,10 +35,12 @@ public final class SamplerEvent implements Sampler {
     private Task evtTask;
 
     protected SamplerEvent(SamplingEvent sampling, Fpc fpc,
+            List<Attribute> atts,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         this.sampling = sampling;
         this.fpc = fpc;
+        this.atts = atts;
         this.handler = handler;
     }
 
@@ -128,6 +131,8 @@ public final class SamplerEvent implements Sampler {
 
 
     /**
+     * Handler used to sample the data required by the query
+     *
      * @author Guido Rota 14/04/15
      */
     private class SamplingHandler implements TaskHandler {
@@ -161,6 +166,8 @@ public final class SamplerEvent implements Sampler {
 
 
     /**
+     * Handler used to receive event notifications that will trigger a refresh
+     *
      * @author Guido Rota 14/04/15
      */
     private class EventHandler implements TaskHandler {
@@ -170,7 +177,7 @@ public final class SamplerEvent implements Sampler {
             synchronized (SamplerEvent.this) {
                 if (status == RUNNING && task == evtTask) {
                     handleError("REFRESH ON EVENT sampling stopped " +
-                            "prematurely in SAMPLING ON EVENT claus", null);
+                            "prematurely in SAMPLING ON EVENT clause", null);
                 }
             }
         }
@@ -182,7 +189,7 @@ public final class SamplerEvent implements Sampler {
                     return;
                 }
 
-                fpc.get(sampling.getEvents(), false, sampHandler);
+                fpc.get(atts, false, sampHandler);
             }
         }
 

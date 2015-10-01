@@ -339,7 +339,8 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>();
-        SamplerEvent sampler = new SamplerEvent(samp, fpc, handler);
+        SamplerEvent sampler = new SamplerEvent(samp, fpc,
+                Collections.emptyList(), handler);
         sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());
@@ -368,7 +369,8 @@ public class SamplerTest {
         SimulatorFpc fpc = new SimulatorFpc(vs);
         LatchingQueryHandler<Sampling, Object[]> handler = new
                 LatchingQueryHandler<>();
-        SamplerEvent sampler = new SamplerEvent(samp, fpc, handler);
+        SamplerEvent sampler = new SamplerEvent(samp, fpc,
+                Collections.emptyList(), handler);
         sampler.start();
         fpc.awaitStarted();
         assertTrue(sampler.isRunning());

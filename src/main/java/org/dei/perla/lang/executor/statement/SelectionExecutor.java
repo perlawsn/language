@@ -86,9 +86,8 @@ public final class SelectionExecutor {
         this.handler = handler;
 
         // TODO: forecast average buffer length
-        buffer = new ArrayBuffer(query.getDataAttributes(), 512);
-        sampler = createSampler(query.getSampling(),
-                query.getDataAttributes());
+        buffer = new ArrayBuffer(query.getAttributes(), 512);
+        sampler = createSampler(query.getSampling(), query.getAttributes());
 
         // Initialize EVERY data
         WindowSize every = query.getEvery();
@@ -128,7 +127,7 @@ public final class SelectionExecutor {
 
         } else if (samp instanceof SamplingEvent) {
             SamplingEvent sev = (SamplingEvent) samp;
-            return new SamplerEvent(sev, fpc, sampHand);
+            return new SamplerEvent(sev, fpc, atts, sampHand);
 
         } else {
             throw new IllegalArgumentException("Cannot start sampling of type" +
