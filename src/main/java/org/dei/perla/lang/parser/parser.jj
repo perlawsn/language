@@ -520,6 +520,8 @@ StatementAST Statement(ParserContext ctx):
     s = CreationStatement(ctx)
     |
     s = InsertionStatement(ctx)
+    |
+    s = SelectionStatement(ctx)
     )
     { return s; }
 }
