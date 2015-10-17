@@ -44,11 +44,8 @@ public final class SelectionExecutor {
 
     private final SamplerRunner sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
-    private final ExecIfRefreshHandler execIfRefHand = new ExecIfRefreshHandler();
-    private final ExecIfTaskHandler execIfTaskHand = new ExecIfTaskHandler();
     private final Runnable selectRunnable = new SelectRunnable();
 
-    private Refresher executeIfRefresher;
     private Future<?> selectFuture;
     private ScheduledFuture<?> everyTimer;
     private ScheduledFuture<?> terminateTimer;
@@ -144,54 +141,6 @@ public final class SelectionExecutor {
         return status == PAUSED;
     }
 
-    /**
-     * Starts the execution of the {@link SelectionStatement}. Startup errors
-     * will be asynchronously notified through the {@link QueryHandler}
-     * specified in the constructor after the {@code start()} method is
-     * over.
-     */
-    public synchronized void start() {
-        if (status != READY) {
-            throw new IllegalStateException(
-                    "Cannot start, SelectExecutor has already been run");
-        }
-
-        if (isRunning()) {
-            return;
-        }
-
-        startTerminateAfter(query.getTerminate());
-
-        ExecutionConditions ec = query.getExecutionConditions();
-        if (ec.getAttributes().isEmpty()) {
-            status = RUNNING;
-            startEvery(query.getEvery());
-            // Start sampling immediately if the execution condition is
-            // empty or if its value is static.
-            sampler.start();
-
-        } else {
-            // Evaluate the execution condition before starting the
-            // main sampling operation
-            status = INITIALIZING;
-            List<Attribute> as = execCond.getAttributes();
-            Task t = fpc.get(as, true, execIfTaskHand);
-            if (t == null) {
-                status = ERROR;
-                notifyErrorAsync(executeIfStartErrorString(as));
-            }
-        }
-    }
-
-    private String executeIfStartErrorString(List<Attribute> atts) {
-        StringBuilder bld =
-                new StringBuilder("Error starting EXECUTE-IF sampling: ");
-        bld.append("cannot retrieve attributes ");
-        atts.forEach(e -> bld.append(e).append(" "));
-        bld.append("from FPC ").append(fpc.getId());
-        return bld.toString();
-    }
-
     /*
      * Starts the TERMINATE AFTER clause
      */
@@ -234,33 +183,6 @@ public final class SelectionExecutor {
         }
 
         status = STOPPED;
-        stopExecution();
-    }
-
-    /**
-     * Stops the execution of the selection query
-     *
-     * NOTE: This method is not thread safe, and should therefore only be
-     * invoked with proper synchronization.
-     */
-    private void stopExecution() {
-        sampler.stop();
-        if (everyTimer != null) {
-            everyTimer.cancel(false);
-            everyTimer = null;
-        }
-        if (selectFuture != null) {
-            selectFuture.cancel(false);
-            selectFuture = null;
-        }
-        if (terminateTimer != null) {
-            terminateTimer.cancel(false);
-            terminateTimer = null;
-        }
-        if (executeIfRefresher != null) {
-            executeIfRefresher.stop();
-            executeIfRefresher = null;
-        }
     }
 
     /**
@@ -307,20 +229,6 @@ public final class SelectionExecutor {
     }
 
     /**
-     * Simple utility method employed to asynchronously propagate an error
-     *
-     * @param msg error message
-     */
-    private void notifyErrorAsync(String msg) {
-        AsyncUtils.runInNewThread(() -> {
-            synchronized (SelectionExecutor.this) {
-                Exception e = new QueryException(msg);
-                handler.error(query, e);
-            }
-        });
-    }
-
-    /**
      * Simple utility method employed to propagate an error status and stop
      * the sampler
      *
@@ -332,7 +240,6 @@ public final class SelectionExecutor {
      */
     private void handleError(String msg, Throwable cause) {
         status = ERROR;
-        stopExecution();
         handler.error(query, new QueryException(msg, cause));
     }
 
@@ -444,105 +351,6 @@ public final class SelectionExecutor {
             // last time it has been triggered
             if (n == 1 && status == RUNNING) {
                 selectFuture = pool.submit(selectRunnable);
-            }
-        }
-
-    }
-
-
-    /**
-     * Execution condition refresh handler
-     *
-     * @author Guido Rota 23/04/2015
-     */
-    private class ExecIfRefreshHandler implements QueryHandler<Refresh, Void> {
-
-        @Override
-        public void error(Refresh source, Throwable cause) {
-            synchronized (SelectionExecutor.this) {
-                if (status < RUNNING) {
-                    return;
-                }
-
-                handleError("Error while refreshing the EXECUTE-IF " +
-                        "condition", cause);
-            }
-        }
-
-        @Override
-        public void data(Refresh source, Void value) {
-            synchronized (SelectionExecutor.this) {
-                List<Attribute> as = execCond.getAttributes();
-                Task t = fpc.get(as, true, execIfTaskHand);
-                if (t == null) {
-                    handleError(executeIfStartErrorString(as));
-                }
-            }
-        }
-
-    }
-
-
-    /**
-     * Execution condition sampling handler
-     *
-     * @author Guido Rota 28/04/2015
-     */
-    private class ExecIfTaskHandler implements TaskHandler {
-
-        @Override
-        public void complete(Task task) { }
-
-        @Override
-        public void data(Task task, Sample sample) {
-            synchronized (SelectionExecutor.this) {
-                if (status == INITIALIZING) {
-                    startExecIfRefresh(query.getExecutionConditions());
-                    status = RUNNING;
-                }
-
-                if (status < RUNNING) {
-                    return;
-                }
-
-                Expression cond = execCond.getCondition();
-                LogicValue v = (LogicValue) cond.run(sample.values(), null);
-
-                if (v.toBoolean()) {
-                    resume();
-                } else {
-                    pause();
-                }
-            }
-        }
-
-        /*
-         * Starts the REFRESH associated with the EXECUTE IF clause
-         */
-        private void startExecIfRefresh(ExecutionConditions ec) {
-            // Avoid starting the refresher for the EXECUTE IF clause when not
-            // necessary, i.e. if the refresh clause is trivially set to never or
-            // if the execute if condition is constant and does not require any
-            // data from the device in order to be evaluated.
-            if (ec.getRefresh() == Refresh.NEVER ||
-                    ec.getAttributes().isEmpty()) {
-                return;
-            }
-
-            executeIfRefresher = new Refresher(ec.getRefresh(),
-                    execIfRefHand, fpc);
-            executeIfRefresher.start();
-        }
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            synchronized (SelectionExecutor.this) {
-                if (status < RUNNING) {
-                    return;
-                }
-
-                handleError("Error while sampling the attributes required to " +
-                        "evaluate the EXECUTE-IF condition", cause);
             }
         }
 

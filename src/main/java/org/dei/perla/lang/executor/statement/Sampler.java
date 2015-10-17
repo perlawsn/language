@@ -17,7 +17,7 @@ public interface Sampler {
 
     /**
      * Stops executing the {@link Sampling} clause. The clause can be resumed
-     * by invoking the {@code start()} method anew.
+     * by invoking the {@code start()} method again.
      */
     public void stop();
 

@@ -70,8 +70,8 @@ public class SelectionDistributor {
 
             SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
             execs.add(se);
-            se.start();
             managed.add(fpc);
+            throw new RuntimeException("unimplemented");
         }
     }
 

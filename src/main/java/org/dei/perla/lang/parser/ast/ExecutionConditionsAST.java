@@ -50,8 +50,9 @@ public final class ExecutionConditionsAST extends NodeAST {
         AttributeOrder attOrd = new AttributeOrder();
         Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attOrd);
 
-
         Refresh refComp = refresh.compile(ctx);
+        // TODO: If the expression is Constant, then it should not evaluate
+        // to null. Check it!
         throw new RuntimeException("unimplemented");
     }
 
