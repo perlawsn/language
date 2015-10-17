@@ -5,6 +5,7 @@ import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.parser.ast.NodeSpecificationsAST.NodeSpecificationsType;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
@@ -49,7 +50,7 @@ public final class ExecutionConditionsAST extends NodeAST {
         return refresh;
     }
 
-    public ExecutionConditions compile(List<Attribute> specs,
+    public ExecutionConditions compile(List<Attribute> queryAtts,
             ParserContext ctx) {
         AttributeOrder attOrd = new AttributeOrder();
         Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attOrd);
@@ -60,8 +61,13 @@ public final class ExecutionConditionsAST extends NodeAST {
         }
         Refresh refComp = refresh.compile(ctx);
 
+        List<Attribute> specAtts = queryAtts;
+        if (specs.getType() != NodeSpecificationsType.ALL) {
+            specAtts = specs.getSpecifications();
+        }
+
         List<Attribute> atts = attOrd.toList(ctx);
-        return new ExecutionConditions(specs, condComp, atts, refComp);
+        return new ExecutionConditions(specAtts, condComp, atts, refComp);
     }
 
 }

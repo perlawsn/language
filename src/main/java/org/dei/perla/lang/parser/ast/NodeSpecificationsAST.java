@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Node specifications Abstract Syntax Tree node
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class NodeSpecificationsAST extends NodeAST {
