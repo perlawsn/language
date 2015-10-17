@@ -5,13 +5,17 @@ import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.expression.LogicValue;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 
 import java.util.List;
 
 /**
+ * Execution condition Abstract Syntax Tree node
+ *
  * @author Guido Rota 30/07/15.
  */
 public final class ExecutionConditionsAST extends NodeAST {
@@ -45,15 +49,19 @@ public final class ExecutionConditionsAST extends NodeAST {
         return refresh;
     }
 
-    public ExecutionConditions compile(List<Attribute> atts,
+    public ExecutionConditions compile(List<Attribute> specs,
             ParserContext ctx) {
         AttributeOrder attOrd = new AttributeOrder();
         Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attOrd);
-
+        if (condComp instanceof Constant &&
+                ((LogicValue) condComp.run(null, null)).toBoolean() == false) {
+            ctx.addError("Execution condition always evaluates to false");
+            return null;
+        }
         Refresh refComp = refresh.compile(ctx);
-        // TODO: If the expression is Constant, then it should not evaluate
-        // to null. Check it!
-        throw new RuntimeException("unimplemented");
+
+        List<Attribute> atts = attOrd.toList(ctx);
+        return new ExecutionConditions(specs, condComp, atts, refComp);
     }
 
 }

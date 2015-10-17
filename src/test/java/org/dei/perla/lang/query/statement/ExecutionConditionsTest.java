@@ -27,19 +27,20 @@ public class ExecutionConditionsTest {
 
     @Test
     public void testSimple() {
-        Errors err = new Errors();
-
-        ExecutionConditions ec = ExecutionConditions.create(Constant.TRUE,
-                specs, Refresh.NEVER, err);
-        assertThat(ec, notNullValue());
-        assertTrue(err.isEmpty());
-        assertThat(ec.getCondition(), equalTo(Constant.TRUE));
-        assertThat(ec.getRefresh(), equalTo(Refresh.NEVER));
-        List<Attribute> s = ec.getSpecs();
-        assertThat(s.size(), equalTo(specs.size()));
-        assertTrue(s.contains(specs.get(0)));
-        assertTrue(s.contains(specs.get(1)));
-        assertTrue(ec.getAttributes().isEmpty());
+        throw new RuntimeException("unimplemented");
+//        Errors err = new Errors();
+//
+//        ExecutionConditions ec = ExecutionConditions.create(Constant.TRUE,
+//                specs, Refresh.NEVER, err);
+//        assertThat(ec, notNullValue());
+//        assertTrue(err.isEmpty());
+//        assertThat(ec.getCondition(), equalTo(Constant.TRUE));
+//        assertThat(ec.getRefresh(), equalTo(Refresh.NEVER));
+//        List<Attribute> s = ec.getSpecs();
+//        assertThat(s.size(), equalTo(specs.size()));
+//        assertTrue(s.contains(specs.get(0)));
+//        assertTrue(s.contains(specs.get(1)));
+//        assertTrue(ec.getAttributes().isEmpty());
     }
 
 }
