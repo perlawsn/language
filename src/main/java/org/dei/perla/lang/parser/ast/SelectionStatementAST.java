@@ -1,6 +1,5 @@
 package org.dei.perla.lang.parser.ast;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.OnEmptySelection;
@@ -133,8 +132,7 @@ public final class SelectionStatementAST extends StatementAST {
         Sampling samplingComp = sampling.compile(ctx);
         WindowSize terminateComp = terminate.compile(ctx);
 
-        List<Attribute> atts = selAtts.toList(ctx);
-        ExecutionConditions condComp = execCond.compile(atts, ctx);
+        ExecutionConditions condComp = execCond.compile(ctx);
 
         Select sel = new Select(fieldsComp, uptoComp, groupByComp,
                 havingComp, def);

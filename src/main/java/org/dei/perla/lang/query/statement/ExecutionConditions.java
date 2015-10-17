@@ -6,6 +6,7 @@ import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Execution Conditions clause
@@ -15,11 +16,11 @@ import java.util.List;
 public final class ExecutionConditions {
 
     public static final ExecutionConditions ALL_NODES =
-            new ExecutionConditions(Collections.emptyList(),
+            new ExecutionConditions(Collections.emptySet(),
                     Constant.TRUE, Collections.emptyList(), Refresh.NEVER);
 
     private final Expression cond;
-    private final List<Attribute> specs;
+    private final Set<Attribute> specs;
     private final Refresh refresh;
 
     private final List<Attribute> atts;
@@ -27,13 +28,13 @@ public final class ExecutionConditions {
     /**
      * Creates a new {@code ExecutionConditions} object
      *
-     * @param specs list of attributes that the {@link Fpc} must have to be
+     * @param specs set of attributes that the {@link Fpc} must have to be
      *              considered for the execution of the query
      * @param cond execution condition
      * @param atts attributes required to evaluate the execution condition
      * @param refresh refresh clause
      */
-    public ExecutionConditions(List<Attribute> specs, Expression cond,
+    public ExecutionConditions(Set<Attribute> specs, Expression cond,
             List<Attribute> atts, Refresh refresh) {
         this.cond = cond;
         this.specs = specs;
@@ -49,7 +50,7 @@ public final class ExecutionConditions {
         return cond;
     }
 
-    public List<Attribute> getSpecs() {
+    public Set<Attribute> getSpecs() {
         return specs;
     }
 

@@ -1,13 +1,11 @@
 package org.dei.perla.lang.parser;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.parser.ast.AttributeReferenceAST;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -101,7 +99,20 @@ public final class ParserContext {
             // Hence, we can just retrieve the first one.
             fm.put(id, fl.get(0).getType());
         }
-        return fm;
+        return Collections.unmodifiableMap(fm);
+    }
+
+    public Set<Attribute> getAttributes() {
+        Set<Attribute> s = new HashSet<>();
+        for (Entry<String, List<AttributeReferenceAST>> e : atts.entrySet()) {
+            String n = e.getKey();
+            // All the FieldAST inside the field's list are guaranteed
+            // to be of the same DataType if no type errors were found.
+            // Hence, we can just retrieve the first one.
+            DataType t = e.getValue().get(0).getType();
+            s.add(Attribute.create(n, t));
+        }
+        return Collections.unmodifiableSet(s);
     }
 
 }

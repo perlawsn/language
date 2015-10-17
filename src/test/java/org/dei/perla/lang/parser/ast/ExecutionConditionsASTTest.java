@@ -24,23 +24,31 @@ public class ExecutionConditionsASTTest {
     private static final Attribute stringAtt =
             Attribute.create("string", DataType.STRING);
 
-    private static final List<Attribute> attList =
-            Arrays.asList(new Attribute[] { intAtt, floatAtt, stringAtt });
+    private static final List<Attribute> atts =
+            Arrays.asList(new Attribute[] {
+                    intAtt, floatAtt, stringAtt
+            });
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testNodeSpecificationsAll() {
         NodeSpecificationsAST all = NodeSpecificationsAST.ALL;
         assertThat(all.getType(), equalTo(NodeSpecificationsType.ALL));
-        all.getSpecifications();
+        List<Attribute> specAtt = all.getSpecifications();
+        assertTrue(specAtt.isEmpty());
     }
 
     @Test
     public void testNodeSpecifications() {
-        NodeSpecificationsAST spec = new NodeSpecificationsAST(attList);
+        NodeSpecificationsAST spec = new NodeSpecificationsAST(atts);
         assertThat(spec.getType(), equalTo(NodeSpecificationsType.SPECS));
         List<Attribute> specAtt = spec.getSpecifications();
-        assertThat(specAtt.size(), equalTo(attList.size()));
-        assertTrue(specAtt.containsAll(attList));
+        assertThat(specAtt.size(), equalTo(atts.size()));
+        assertTrue(specAtt.containsAll(atts));
+    }
+
+    @Test
+    public void testNodeSpecificationsCompile() {
+        throw new RuntimeException("unimplemented");
     }
 
 }

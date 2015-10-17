@@ -5,7 +5,6 @@ import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
-import org.dei.perla.lang.parser.ast.NodeSpecificationsAST.NodeSpecificationsType;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
@@ -13,6 +12,7 @@ import org.dei.perla.lang.query.statement.ExecutionConditions;
 import org.dei.perla.lang.query.statement.Refresh;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Execution condition Abstract Syntax Tree node
@@ -50,8 +50,13 @@ public final class ExecutionConditionsAST extends NodeAST {
         return refresh;
     }
 
-    public ExecutionConditions compile(List<Attribute> queryAtts,
-            ParserContext ctx) {
+    /**
+     * Compiles the {@code ExecutionConditionsAST} into an executable class
+     *
+     * @param ctx context object employed to store intermediate parsing results
+     * @return runnable {@link ExecutionConditions} class
+     */
+    public ExecutionConditions compile(ParserContext ctx) {
         AttributeOrder attOrd = new AttributeOrder();
         Expression condComp = cond.compile(DataType.BOOLEAN, ctx, attOrd);
         if (condComp instanceof Constant &&
@@ -61,11 +66,7 @@ public final class ExecutionConditionsAST extends NodeAST {
         }
         Refresh refComp = refresh.compile(ctx);
 
-        List<Attribute> specAtts = queryAtts;
-        if (specs.getType() != NodeSpecificationsType.ALL) {
-            specAtts = specs.getSpecifications();
-        }
-
+        Set<Attribute> specAtts = specs.compile(ctx);
         List<Attribute> atts = attOrd.toList(ctx);
         return new ExecutionConditions(specAtts, condComp, atts, refComp);
     }
