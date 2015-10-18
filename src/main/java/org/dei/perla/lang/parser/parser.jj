@@ -989,7 +989,7 @@ RefreshAST RefreshClause(ParserContext ctx) :
 ExecutionConditionsAST ExecutionConditionsClause(ParserContext ctx) :
 {
     ExpressionAST cond = ConstantAST.TRUE;
-    NodeSpecificationsAST specs = null;
+    NodeSpecificationsAST specs = NodeSpecificationsAST.EMPTY;
     RefreshAST r = RefreshAST.NEVER;
 
     Token t;

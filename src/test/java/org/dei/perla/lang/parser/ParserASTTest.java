@@ -1,7 +1,9 @@
 package org.dei.perla.lang.parser;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.ast.*;
+import org.dei.perla.lang.parser.ast.NodeSpecificationsAST.NodeSpecificationsType;
 import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.RatePolicy;
 import org.dei.perla.lang.query.statement.RefreshType;
@@ -15,6 +17,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 
 /**
@@ -783,6 +786,27 @@ public class ParserASTTest {
         ifes = si.getIfEvery();
         assertThat(ifes.size(), equalTo(3));
         assertThat(si.getRatePolicy(), equalTo(RatePolicy.ADAPTIVE));
+    }
+
+    @Test
+    public void testNodeSpecifications() throws Exception {
+        // ALL
+        ParserAST p = getParser("require all");
+        NodeSpecificationsAST spec = p.NodeSpecifications();
+        assertThat(spec, notNullValue());
+        assertThat(spec.getType(), equalTo(NodeSpecificationsType.ALL));
+
+        // SPECS
+        p = getParser("require temperature, pressure:integer");
+        spec = p.NodeSpecifications();
+        assertThat(spec, notNullValue());
+        assertThat(spec.getType(), equalTo(NodeSpecificationsType.SPECS));
+        List<Attribute> specAtts = spec.getSpecifications();
+        assertThat(specAtts.size(), equalTo(2));
+        Attribute a = Attribute.create("temperature", DataType.ANY);
+        assertTrue(specAtts.contains(a));
+        a = Attribute.create("pressure", DataType.INTEGER);
+        assertTrue(specAtts.contains(a));
     }
 
 }

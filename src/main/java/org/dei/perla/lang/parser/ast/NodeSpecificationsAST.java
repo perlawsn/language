@@ -19,6 +19,9 @@ public final class NodeSpecificationsAST extends NodeAST {
     public static NodeSpecificationsAST ALL =
             new NodeSpecificationsAST();
 
+    public static NodeSpecificationsAST EMPTY =
+            new NodeSpecificationsAST(Collections.emptyList());
+
     private final NodeSpecificationsType type;
     private final List<Attribute> specs;
 
