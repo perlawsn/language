@@ -56,10 +56,10 @@ public class SelectionDistributor {
     private void distribute() {
         Collection<Fpc> fpcs;
 
-        if (ec.getSpecs().isEmpty()) {
+        if (ec.getSpecifications().isEmpty()) {
             fpcs = registry.getAll();
         } else {
-            fpcs = registry.get(ec.getSpecs(),
+            fpcs = registry.get(ec.getSpecifications(),
                     Collections.emptyList());
         }
 

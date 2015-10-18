@@ -36,7 +36,7 @@ public class ExecutionConditionsTest {
 //        assertTrue(err.isEmpty());
 //        assertThat(ec.getCondition(), equalTo(Constant.TRUE));
 //        assertThat(ec.getRefresh(), equalTo(Refresh.NEVER));
-//        List<Attribute> s = ec.getSpecs();
+//        List<Attribute> s = ec.getSpecifications();
 //        assertThat(s.size(), equalTo(specs.size()));
 //        assertTrue(s.contains(specs.get(0)));
 //        assertTrue(s.contains(specs.get(1)));

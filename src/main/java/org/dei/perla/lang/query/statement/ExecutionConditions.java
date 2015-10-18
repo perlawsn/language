@@ -42,6 +42,13 @@ public final class ExecutionConditions {
         this.atts = Collections.unmodifiableList(atts);
     }
 
+    /**
+     * Returns the list of {@link Attributes} that must be sampled to
+     * evaluate the execution condition
+     *
+     * @return list of {@link Attributes} required to evaluate the execution
+     * condition
+     */
     public List<Attribute> getAttributes() {
         return atts;
     }
@@ -50,7 +57,7 @@ public final class ExecutionConditions {
         return cond;
     }
 
-    public Set<Attribute> getSpecs() {
+    public Set<Attribute> getSpecifications() {
         return specs;
     }
 
