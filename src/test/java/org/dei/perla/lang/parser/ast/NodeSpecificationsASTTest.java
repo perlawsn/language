@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 /**
  * @author Guido Rota 17/10/15.
  */
-public class ExecutionConditionsASTTest {
+public class NodeSpecificationsASTTest {
 
     private static final Attribute intAtt =
             Attribute.create("int", DataType.INTEGER);

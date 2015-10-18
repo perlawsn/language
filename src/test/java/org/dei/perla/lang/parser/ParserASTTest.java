@@ -809,4 +809,35 @@ public class ParserASTTest {
         assertTrue(specAtts.contains(a));
     }
 
+    @Test
+    public void testExecuteIf() throws Exception {
+        // SIMPLE CONDITION
+        ParserAST p = getParser("execute if true");
+        ParserContext ctx = new ParserContext();
+        ExecutionConditionsAST cond = p.ExecutionConditionsClause(ctx);
+        assertThat(cond, notNullValue());
+        assertThat(cond.getCondition(), equalTo(ConstantAST.TRUE));
+        assertThat(cond.getSpecifications(),
+                equalTo(NodeSpecificationsAST.EMPTY));
+        assertThat(cond.getRefresh(), equalTo(RefreshAST.NEVER));
+
+        // FULL
+        p = getParser(
+                "execute if true require temp:integer refresh every 10 m");
+        cond = p.ExecutionConditionsClause(ctx);
+        assertThat(cond, notNullValue());
+        assertThat(cond.getCondition(), equalTo(ConstantAST.TRUE));
+        NodeSpecificationsAST spec = cond.getSpecifications();
+        assertThat(spec.getType(), equalTo(NodeSpecificationsType.SPECS));
+        List<Attribute> specAtts = spec.getSpecifications();
+        assertThat(specAtts.size(), equalTo(1));
+        Attribute a = Attribute.create("temp", DataType.INTEGER);
+        assertTrue(specAtts.contains(a));
+        RefreshAST ref = cond.getRefresh();
+        assertThat(ref.getType(), equalTo(RefreshType.TIME));
+        assertThat(ref.getDurationUnit(), equalTo(ChronoUnit.MINUTES));
+        ConstantAST c = new ConstantAST(10, DataType.INTEGER);
+        assertThat(ref.getDurationValue(), equalTo(c));
+    }
+
 }
