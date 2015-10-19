@@ -687,7 +687,7 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     GroupByAST gby = null;
     ExpressionAST having = ConstantAST.TRUE;
     WindowSizeAST upto = null;
-    OnEmptySelection oes = OnEmptySelection.INSERT_NOTHING;
+    OnEmptySelection oes = OnEmptySelection.NOTHING;
     SamplingAST sampling;
     Select sel;
     ExpressionAST where = ConstantAST.TRUE;
@@ -835,10 +835,10 @@ OnEmptySelection OnEmptySelectionClause() :
     <KEYWORD_INSERT>
     (
         <KEYWORD_NOTHING>
-        { return OnEmptySelection.INSERT_NOTHING; }
+        { return OnEmptySelection.NOTHING; }
         |
         <KEYWORD_DEFAULT>
-        { return OnEmptySelection.INSERT_DEFAULT; }
+        { return OnEmptySelection.DEFAULT; }
     )
 }
 

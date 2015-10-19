@@ -5,7 +5,7 @@ package org.dei.perla.lang.parser;
  */
 public enum OnEmptySelection {
 
-    INSERT_DEFAULT,
-    INSERT_NOTHING
+    DEFAULT,
+    NOTHING
 
 }

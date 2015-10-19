@@ -8,6 +8,7 @@ import org.dei.perla.lang.query.expression.*;
 import org.dei.perla.lang.query.statement.RatePolicy;
 import org.dei.perla.lang.query.statement.RefreshType;
 import org.dei.perla.lang.query.statement.WindowSize;
+import org.dei.perla.lang.query.statement.WindowSize.WindowType;
 import org.junit.Test;
 
 import java.io.StringReader;
@@ -838,6 +839,54 @@ public class ParserASTTest {
         assertThat(ref.getDurationUnit(), equalTo(ChronoUnit.MINUTES));
         ConstantAST c = new ConstantAST(10, DataType.INTEGER);
         assertThat(ref.getDurationValue(), equalTo(c));
+    }
+
+    @Test
+    public void testGroupBy() throws Exception {
+        ParserAST p = getParser("group by temperature, pressure");
+        ParserContext ctx = new ParserContext();
+        GroupByAST group = p.GroupByClause();
+        assertThat(group, notNullValue());
+        List<String> fields = group.getFields();
+        assertThat(fields.size(), equalTo(2));
+        assertTrue(fields.contains("temperature"));
+        assertTrue(fields.contains("pressure"));
+    }
+
+    @Test
+    public void testEvery() throws Exception {
+        ParserAST p = getParser("every 10 seconds");
+        ParserContext ctx = new ParserContext();
+        WindowSizeAST every = p.EveryClause(ctx);
+        assertThat(every, notNullValue());
+        assertThat(every.getType(), equalTo(WindowType.TIME));
+        assertThat(every.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
+        ConstantAST c = (ConstantAST) every.getDurationValue();
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10));
+    }
+
+    @Test
+    public void testUpTo() throws Exception {
+        ParserAST p = getParser("up to 10 samples");
+        ParserContext ctx = new ParserContext();
+        WindowSizeAST upto = p.UpToClause(ctx);
+        assertThat(upto, notNullValue());
+        assertThat(upto.getType(), equalTo(WindowType.SAMPLE));
+        ConstantAST c = (ConstantAST) upto.getSamples();
+        assertThat(c.getType(), equalTo(DataType.INTEGER));
+        assertThat(c.getValue(), equalTo(10));
+    }
+
+    @Test
+    public void testOnEmptySelection() throws Exception {
+        ParserAST p = getParser("on empty selection insert default");
+        OnEmptySelection oes = p.OnEmptySelectionClause();
+        assertThat(oes, equalTo(OnEmptySelection.DEFAULT));
+
+        p = getParser("on empty selection insert nothing");
+        oes = p.OnEmptySelectionClause();
+        assertThat(oes, equalTo(OnEmptySelection.NOTHING));
     }
 
 }
