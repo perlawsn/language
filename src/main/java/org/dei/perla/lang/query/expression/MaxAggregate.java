@@ -23,7 +23,7 @@ public final class MaxAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
-        if (type == null) {
+        if (e.equals(Constant.NULL)) {
             return null;
         }
 

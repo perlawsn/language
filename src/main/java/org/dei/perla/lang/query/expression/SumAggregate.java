@@ -21,7 +21,7 @@ public final class SumAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
-        if (type == null) {
+        if (e.equals(Constant.NULL)) {
             return 0;
         }
 

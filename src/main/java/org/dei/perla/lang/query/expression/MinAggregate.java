@@ -23,7 +23,7 @@ public final class MinAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
-        if (type == null) {
+        if (e.equals(Constant.NULL)) {
             return null;
         }
 

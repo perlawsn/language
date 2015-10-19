@@ -61,7 +61,7 @@ public class MiscTest {
     @Test
     public void constantNullTest() {
         Expression e = Constant.NULL;
-        assertThat(e.getType(), nullValue());
+        assertThat(e.getType(), equalTo(DataType.ANY));
         assertThat(((Constant) e).getValue(), nullValue());
 
         e = Constant.create(null, DataType.INTEGER);

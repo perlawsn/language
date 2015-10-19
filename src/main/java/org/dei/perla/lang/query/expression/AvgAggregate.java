@@ -20,7 +20,7 @@ public final class AvgAggregate extends Aggregate {
 
     @Override
     public Object compute(BufferView buffer) {
-        if (e.getType() == null) {
+        if (e.equals(Constant.NULL)) {
             return 0;
         }
 
@@ -55,7 +55,7 @@ public final class AvgAggregate extends Aggregate {
             }
         } else {
             throw new RuntimeException(
-                    "avg aggregation not defined for type " + type);
+                    "avg aggregation not defined for type '" + e.getType() + "'");
         }
     }
 
