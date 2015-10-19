@@ -38,7 +38,16 @@ public final class SamplerManager {
 
     private volatile int status = READY;
 
-    public SamplerManager(SelectionStatement query, Fpc fpc,
+    /**
+     * Creates a new {@code SamplerManager} class
+     *
+     * @param query query to execute
+     * @param fpc {@link Fpc} used for sampling the required data
+     * @param handler result handler
+     */
+    public SamplerManager(
+            SelectionStatement query,
+            Fpc fpc,
             QueryHandler<? super Sampling, Object[]> handler) {
         this.sampling = query.getSampling();
         this.cond = query.getExecutionConditions();
@@ -235,8 +244,9 @@ public final class SamplerManager {
         private void startExecIfRefresh(ExecutionConditions ec) {
             // Avoid starting the refresher for the EXECUTE IF clause when not
             // necessary, i.e. if the refresh clause is trivially set to never or
-            // if the execute if condition is constant and does not require any
-            // data from the device in order to be evaluated.
+            // if the execute if condition is constant (no attributes to be
+            // sampled for the expression) and does not require any data from
+            // the device in order to be evaluated.
             if (ec.getRefresh() == Refresh.NEVER ||
                     ec.getAttributes().isEmpty()) {
                 return;

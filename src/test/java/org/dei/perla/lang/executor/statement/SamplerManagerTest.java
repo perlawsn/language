@@ -128,4 +128,49 @@ public class SamplerManagerTest {
         assertTrue(mgr.isRunning());
     }
 
+    @Test
+    public void testUnfitFpc() throws RuntimeException {
+        IfEvery ife = new IfEvery(
+                Constant.TRUE,
+                Constant.create(10, DataType.INTEGER),
+                ChronoUnit.MILLIS,
+                null
+        );
+        SamplingIfEvery sampling = new SamplingIfEvery(
+                ife,
+                RatePolicy.STRICT,
+                Refresh.NEVER,
+                Collections.emptyList()
+        );
+        Expression exp = new Comparison(
+                ComparisonOperation.GT,
+                new AttributeReference("power", DataType.INTEGER, 0),
+                Constant.create(80, DataType.INTEGER)
+        );
+        ExecutionConditions cond = new ExecutionConditions(
+                Collections.emptySet(),
+                exp,
+                Arrays.asList(new Attribute[] {power}),
+                Refresh.NEVER
+        );
+        SelectionStatement query = new SelectionStatement(
+                null,
+                null,
+                sampling,
+                Constant.TRUE,
+                cond,
+                WindowSize.ZERO
+        );
+
+        SimulatorFpc fpc = new SimulatorFpc(values);
+        fpc.setValue(power, 20);
+        LatchingQueryHandler<Sampling, Object[]> handler =
+                new LatchingQueryHandler<>();
+        SamplerManager mgr = new SamplerManager(query, fpc, handler);
+        assertFalse(mgr.isRunning());
+        mgr.start();
+        assertTrue(mgr.isRunning());
+        assertThat(fpc.countPeriodic(), equalTo(0));
+    }
+
 }
