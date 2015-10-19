@@ -66,19 +66,11 @@ public class IfEveryTest {
         Expression cInt = Constant.create(5, DataType.INTEGER);
         Expression cFloat = Constant.create(3.4f, DataType.FLOAT);
 
-        IfEvery e = new IfEvery(Constant.TRUE, cInt, ChronoUnit.DAYS, null);
+        IfEvery e = new IfEvery(Constant.TRUE, cInt, ChronoUnit.DAYS);
         assertThat(e.getCondition(), equalTo(Constant.TRUE));
-        assertThat(e.getNext(), nullValue());
         assertThat(e.getUnit(), equalTo(ChronoUnit.DAYS));
-        d = e.run(null);
-        assertThat(d, equalTo(Duration.ofDays(5)));
-
-        e = new IfEvery(Constant.FALSE, cFloat, ChronoUnit.HOURS, e);
-        assertThat(e.getCondition(), equalTo(Constant.FALSE));
-        assertThat(e.getNext(), notNullValue());
-        assertThat(e.getUnit(), equalTo(ChronoUnit.HOURS));
-        d = e.run(null);
-        assertThat(d, equalTo(Duration.ofDays(5)));
+        Object v = e.getValue().run(null, null);
+        assertThat(v, equalTo(5));
     }
 
     @Test

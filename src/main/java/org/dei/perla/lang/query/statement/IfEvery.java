@@ -5,9 +5,10 @@ import org.dei.perla.lang.query.expression.LogicValue;
 
 import java.time.Duration;
 import java.time.temporal.TemporalUnit;
+import java.util.List;
 
 /**
- * If-Every node element, used to determine the query sampling rate
+ * IF EVERY node element, used to determine the query sampling rate.
  *
  * @author Guido Rota 23/03/15.
  */
@@ -16,14 +17,21 @@ public final class IfEvery {
     private final Expression cond;
     private final Expression value;
     private final TemporalUnit unit;
-    private final IfEvery next;
 
-    public IfEvery(Expression cond, Expression value, TemporalUnit unit,
-            IfEvery next) {
+    /**
+     * Creates a new {@code IfEvery} node
+     *
+     * @param cond Condition
+     * @param value
+     * @param unit
+     */
+    public IfEvery(
+            Expression cond,
+            Expression value,
+            TemporalUnit unit) {
         this.cond = cond;
         this.value = value;
         this.unit = unit;
-        this.next = next;
     }
 
     public Expression getCondition() {
@@ -38,17 +46,34 @@ public final class IfEvery {
         return unit;
     }
 
-    public IfEvery getNext() {
-        return next;
-    }
-
-    public Duration run(Object[] sample) {
-        LogicValue c = (LogicValue) cond.run(sample, null);
-        if (!c.toBoolean()) {
-            return next.run(sample);
+    /**
+     * Utility method employed to evaluate the sampling rate. The {@code
+     * Duration} object returned by this method corresponds to the first
+     * {@code IfEvery} condition evaluating to true.
+     *
+     * <p>It is the programmer's responsibility to ensure that at least one
+     * of the {@code IfEvery} conditions included in the list passed as
+     * parameter evaluates to true. This is usually accomplished by inserting
+     * a final {@link IfEvery} object whose condition is set to {Constant.TRUE}.
+     *
+     * @param ifevery list of {@code IfEvery} conditions
+     * @param sample data employed to evaluate the {@code IfEvery} conditions
+     *               and the resulting sampling rate
+     * @return sampling period
+     * @throws RuntimeException when all IfEvery conditions evaluate to false
+     */
+    public static Duration evaluate(List<IfEvery> ifevery, Object[] sample) {
+        for (IfEvery ife : ifevery) {
+            Expression cond = ife.getCondition();
+            LogicValue c = (LogicValue) cond.run(sample, null);
+            if (c.toBoolean()) {
+                int v = (int) ife.getValue().run(sample, null);
+                TemporalUnit u = ife.getUnit();
+                return Duration.of(v, u);
+            }
         }
-        int v = (int) value.run(sample, null);
-        return Duration.of(v, unit);
+        throw new RuntimeException("Malformed ifevery: missing default " +
+                "case (probable parser bug");
     }
 
 }

@@ -41,36 +41,46 @@ public class SamplerTest {
     public void testSimpleIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
 
-        Expression cond = Constant.TRUE;
-        Expression value = Constant.create(1, DataType.INTEGER);
-        IfEvery ife = new IfEvery(cond, value, ChronoUnit.SECONDS, null);
+        List<IfEvery> ifevery = new ArrayList<>();
 
-        cond = new Comparison(
+        Expression cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
-                Constant.create(20, DataType.INTEGER));
-        value = Constant.create(400, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+                Constant.create(80, DataType.INTEGER));
+        Expression value = Constant.create(100, DataType.INTEGER);
+        IfEvery ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
                 Constant.create(60, DataType.INTEGER));
         value = Constant.create(200, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
-                Constant.create(80, DataType.INTEGER));
-        value = Constant.create(100, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+                Constant.create(20, DataType.INTEGER));
+        value = Constant.create(400, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
+
+        cond = Constant.TRUE;
+        value = Constant.create(1, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.SECONDS);
+        ifevery.add(ife);
 
         List<Attribute> atts = Arrays.asList(new Attribute[] {
                 Attribute.create("power", DataType.INTEGER)
         });
-        SamplingIfEvery samp = new SamplingIfEvery(ife, RatePolicy.STRICT,
-                Refresh.NEVER, atts);
+        SamplingIfEvery samp = new SamplingIfEvery(
+                ifevery,
+                atts,
+                RatePolicy.STRICT,
+                Refresh.NEVER
+        );
 
         // Test with power == 100
         SimulatorFpc fpc = new SimulatorFpc(vs);
@@ -113,37 +123,48 @@ public class SamplerTest {
     public void testTimeRefreshIfEvery() throws Exception {
         Map<Attribute, Object> vs = new HashMap<>(values);
         vs.put(power, 90);
-        Expression cond = Constant.TRUE;
-        Expression value = Constant.create(1, DataType.INTEGER);
-        IfEvery ife = new IfEvery(cond, value, ChronoUnit.SECONDS, null);
 
-        cond = new Comparison(
+        List<IfEvery> ifevery = new ArrayList<>();
+
+        Expression cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
-                Constant.create(20, DataType.INTEGER));
-        value = Constant.create(400, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+                Constant.create(80, DataType.INTEGER));
+        Expression value = Constant.create(100, DataType.INTEGER);
+        IfEvery ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
                 Constant.create(60, DataType.INTEGER));
         value = Constant.create(200, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("power", DataType.INTEGER, 0),
-                Constant.create(80, DataType.INTEGER));
-        value = Constant.create(100, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+                Constant.create(20, DataType.INTEGER));
+        value = Constant.create(400, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
+
+        cond = Constant.TRUE;
+        value = Constant.create(1, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.SECONDS);
+        ifevery.add(ife);
 
         Refresh ref = new Refresh(Duration.ofSeconds(1));
         List<Attribute> atts = Arrays.asList(new Attribute[] {
                 Attribute.create("power", DataType.INTEGER)
         });
-        SamplingIfEvery samp = new SamplingIfEvery(ife, RatePolicy.STRICT,
-                ref, atts);
+        SamplingIfEvery samp = new SamplingIfEvery(
+                ifevery,
+                atts,
+                RatePolicy.STRICT,
+                ref
+        );
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
@@ -202,23 +223,28 @@ public class SamplerTest {
         vs.put(temperature, 25);
         SimulatorFpc fpc = new SimulatorFpc(vs);
 
-        Expression cond = Constant.TRUE;
-        Expression value = Constant.create(1, DataType.INTEGER);
-        IfEvery ife = new IfEvery(cond, value, ChronoUnit.SECONDS, null);
+        List<IfEvery> ifevery = new ArrayList<>();
+
+        Expression cond = new Comparison(
+                ComparisonOperation.GT,
+                new AttributeReference("temperature", DataType.INTEGER, 0),
+                Constant.create(40, DataType.INTEGER));
+        Expression value = Constant.create(100, DataType.INTEGER);
+        IfEvery ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("temperature", DataType.INTEGER, 0),
                 Constant.create(30, DataType.INTEGER));
         value = Constant.create(500, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
-        cond = new Comparison(
-                ComparisonOperation.GT,
-                new AttributeReference("temperature", DataType.INTEGER, 0),
-                Constant.create(40, DataType.INTEGER));
-        value = Constant.create(100, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        cond = Constant.TRUE;
+        value = Constant.create(1, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.SECONDS);
+        ifevery.add(ife);
 
         List<Attribute> evs = Arrays.asList(new Attribute[] {
                 Attribute.create("fire", DataType.ANY)
@@ -227,8 +253,11 @@ public class SamplerTest {
         List<Attribute> atts = Arrays.asList(new Attribute[] {
                 Attribute.create("temperature", DataType.INTEGER)
         });
-        SamplingIfEvery samp = new SamplingIfEvery(ife, RatePolicy.STRICT,
-                ref, atts);
+        SamplingIfEvery samp = new SamplingIfEvery(ifevery,
+                atts,
+                RatePolicy.STRICT,
+                ref
+        );
 
         SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,
                 Collections.emptyList(), new NoopQueryHandler());
@@ -286,23 +315,28 @@ public class SamplerTest {
         Map<Attribute, Object> vs = new HashMap<>(values);
         vs.put(temperature, 25);
 
-        Expression cond = Constant.TRUE;
-        Expression value = Constant.create(1, DataType.INTEGER);
-        IfEvery ife = new IfEvery(cond, value, ChronoUnit.SECONDS, null);
+        List<IfEvery> ifevery = new ArrayList<>();
+
+        Expression cond = new Comparison(
+                ComparisonOperation.GT,
+                new AttributeReference("temperature", DataType.INTEGER, 0),
+                Constant.create(40, DataType.INTEGER));
+        Expression value = Constant.create(100, DataType.INTEGER);
+        IfEvery ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
         cond = new Comparison(
                 ComparisonOperation.GT,
                 new AttributeReference("temperature", DataType.INTEGER, 0),
                 Constant.create(30, DataType.INTEGER));
         value = Constant.create(500, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        ife = new IfEvery(cond, value, ChronoUnit.MILLIS);
+        ifevery.add(ife);
 
-        cond = new Comparison(
-                ComparisonOperation.GT,
-                new AttributeReference("temperature", DataType.INTEGER, 0),
-                Constant.create(40, DataType.INTEGER));
-        value = Constant.create(100, DataType.INTEGER);
-        ife = new IfEvery(cond, value, ChronoUnit.MILLIS, ife);
+        cond = Constant.TRUE;
+        value = Constant.create(1, DataType.INTEGER);
+        ife = new IfEvery(cond, value, ChronoUnit.SECONDS);
+        ifevery.add(ife);
 
         List<Attribute> evs = Arrays.asList(new Attribute[] {
                 Attribute.create("fire", DataType.ANY)
@@ -311,8 +345,12 @@ public class SamplerTest {
         List<Attribute> atts = Arrays.asList(new Attribute[] {
                 Attribute.create("temperature", DataType.INTEGER)
         });
-        SamplingIfEvery samp = new SamplingIfEvery(ife, RatePolicy.STRICT,
-                ref, atts);
+        SamplingIfEvery samp = new SamplingIfEvery(
+                ifevery,
+                atts,
+                RatePolicy.STRICT,
+                ref
+        );
 
         SimulatorFpc fpc = new SimulatorFpc(vs);
         SamplerIfEvery sampler = new SamplerIfEvery(samp, fpc,

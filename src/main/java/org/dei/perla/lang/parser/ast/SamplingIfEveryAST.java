@@ -11,6 +11,8 @@ import org.dei.perla.lang.query.statement.RatePolicy;
 import org.dei.perla.lang.query.statement.Refresh;
 import org.dei.perla.lang.query.statement.SamplingIfEvery;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,24 +53,24 @@ public final class SamplingIfEveryAST extends SamplingAST {
 
     public SamplingIfEvery compile(ParserContext ctx) {
         AttributeOrder ord = new AttributeOrder();
-        IfEvery ife = compileIfEvery(ord, ctx);
+        List<IfEvery> ife = compileIfEvery(ord, ctx);
         Refresh rc = refresh.compile(ctx);
 
-        return new SamplingIfEvery(ife, policy, rc, ord.toList(ctx));
+        return new SamplingIfEvery(ife, ord.toList(ctx), policy, rc);
     }
 
-    private IfEvery compileIfEvery(AttributeOrder ord, ParserContext ctx) {
-        IfEvery ife = null;
-        IfEvery prev = null;
-        for (int i = ifevery.size() - 1; i >= 0; i--) {
-            ife = compileIfEvery(ifevery.get(i), ord, ctx, prev);
-            prev = ife;
+    private List<IfEvery> compileIfEvery(AttributeOrder ord,
+            ParserContext ctx) {
+        List<IfEvery> compIfevery = new ArrayList<>();
+        for (IfEveryAST ife : ifevery) {
+            IfEvery compIfe = compileIfEvery(ife, ord, ctx);
+            compIfevery.add(compIfe);
         }
-        return ife;
+        return Collections.unmodifiableList(compIfevery);
     }
 
     private IfEvery compileIfEvery(IfEveryAST ife, AttributeOrder ord,
-            ParserContext ctx, IfEvery prev) {
+            ParserContext ctx) {
         Expression cond = ife.getCondition()
                 .compile(DataType.BOOLEAN, ctx, ord);
         if (cond.equals(Constant.FALSE)) {
@@ -86,7 +88,7 @@ public final class SamplingIfEveryAST extends SamplingAST {
             }
         }
 
-        return new IfEvery(cond, value, ife.getEvery().getUnit(), prev);
+        return new IfEvery(cond, value, ife.getEvery().getUnit());
     }
 
 }

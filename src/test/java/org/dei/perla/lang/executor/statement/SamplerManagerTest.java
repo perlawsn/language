@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.query.expression.*;
@@ -11,9 +10,12 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
 /**
@@ -42,14 +44,13 @@ public class SamplerManagerTest {
         IfEvery ife = new IfEvery(
                 Constant.TRUE,
                 Constant.create(10, DataType.INTEGER),
-                ChronoUnit.MILLIS,
-                null
+                ChronoUnit.MILLIS
         );
         SamplingIfEvery sampling = new SamplingIfEvery(
-                ife,
+                Arrays.asList(new IfEvery[] { ife }),
+                Collections.emptyList(),
                 RatePolicy.STRICT,
-                Refresh.NEVER,
-                Collections.emptyList()
+                Refresh.NEVER
         );
         SelectionStatement query = new SelectionStatement(
                 null,
@@ -79,14 +80,13 @@ public class SamplerManagerTest {
         IfEvery ife = new IfEvery(
                 Constant.TRUE,
                 Constant.create(10, DataType.INTEGER),
-                ChronoUnit.MILLIS,
-                null
+                ChronoUnit.MILLIS
         );
         SamplingIfEvery sampling = new SamplingIfEvery(
-                ife,
+                Arrays.asList(new IfEvery[] { ife }),
+                Collections.emptyList(),
                 RatePolicy.STRICT,
-                Refresh.NEVER,
-                Collections.emptyList()
+                Refresh.NEVER
         );
         Expression exp = new Comparison(
                 ComparisonOperation.GT,
@@ -133,14 +133,13 @@ public class SamplerManagerTest {
         IfEvery ife = new IfEvery(
                 Constant.TRUE,
                 Constant.create(10, DataType.INTEGER),
-                ChronoUnit.MILLIS,
-                null
+                ChronoUnit.MILLIS
         );
         SamplingIfEvery sampling = new SamplingIfEvery(
-                ife,
+                Arrays.asList(new IfEvery[] { ife }),
+                Collections.emptyList(),
                 RatePolicy.STRICT,
-                Refresh.NEVER,
-                Collections.emptyList()
+                Refresh.NEVER
         );
         Expression exp = new Comparison(
                 ComparisonOperation.GT,

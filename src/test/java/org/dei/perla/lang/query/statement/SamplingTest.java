@@ -47,14 +47,20 @@ public class SamplingTest {
 
     @Test
     public void testSamplingIfEvery() {
-        IfEvery ife = new IfEvery(Constant.TRUE,
+        IfEvery ife = new IfEvery(
+                Constant.TRUE,
                 Constant.create(5, DataType.INTEGER),
-                ChronoUnit.SECONDS, null);
+                ChronoUnit.SECONDS
+        );
         Refresh refresh = new Refresh(Duration.ofMinutes(10));
 
-        SamplingIfEvery s = new SamplingIfEvery(ife,
-                RatePolicy.STRICT, refresh, atts);
-        assertThat(s.getIfEvery(), equalTo(ife));
+        SamplingIfEvery s = new SamplingIfEvery(
+                Arrays.asList(new IfEvery[] { ife }),
+                atts,
+                RatePolicy.STRICT,
+                refresh
+        );
+        assertThat(s.getIfEvery().get(0), equalTo(ife));
         assertThat(s.getRefresh(), equalTo(refresh));
         assertThat(s.getRatePolicy(),
                 equalTo(RatePolicy.STRICT));

@@ -32,7 +32,7 @@ public final class SamplerIfEvery implements Sampler {
     private final Fpc fpc;
     private final List<Attribute> attributes;
     private final QueryHandler<? super Sampling, Object[]> handler;
-    private final IfEvery ife;
+    private final List<IfEvery> ifevery;
 
     private final TaskHandler sampHandler = new SamplingHandler();
     private final TaskHandler ifeHandler = new IfEveryHandler();
@@ -51,16 +51,17 @@ public final class SamplerIfEvery implements Sampler {
     private Task sampTask = null;
     private Task evtTask = null;
 
-    protected SamplerIfEvery(SamplingIfEvery sampling, Fpc fpc,
+    protected SamplerIfEvery(
+            SamplingIfEvery sampling,
+            Fpc fpc,
             List<Attribute> attributes,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
-
         this.sampling = sampling;
         this.fpc = fpc;
         this.attributes = attributes;
         this.handler = handler;
-        this.ife = sampling.getIfEvery();
+        this.ifevery = sampling.getIfEvery();
 
         Refresh r = sampling.getRefresh();
         if (r != Refresh.NEVER) {
@@ -190,7 +191,7 @@ public final class SamplerIfEvery implements Sampler {
         public void data(Task task, Sample sample) {
             synchronized (SamplerIfEvery.this) {
                 if (status == SAMPLING) {
-                    Duration d = ife.run(sample.values());
+                    Duration d = IfEvery.evaluate(ifevery, sample.values());
                     if (d == rate) {
                         // Set the status back to sampling if the new sampling rate
                         // is the same as the old one
@@ -203,12 +204,13 @@ public final class SamplerIfEvery implements Sampler {
                     // SamplingHandler.complete method
 
                 } else if (status == INITIALIZING) {
-                    rate = ife.run(sample.values());
+                    rate = IfEvery.evaluate(ifevery, sample.values());
                     sampTask = fpc.get(sampling.getAttributes(), false, rate, sampHandler);
                     status = SAMPLING;
                 }
             }
         }
+
 
         @Override
         public void error(Task task, Throwable cause) {
