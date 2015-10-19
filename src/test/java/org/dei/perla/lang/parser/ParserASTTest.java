@@ -889,4 +889,78 @@ public class ParserASTTest {
         assertThat(oes, equalTo(OnEmptySelection.NOTHING));
     }
 
+    @Test
+    public void testFieldSelection() throws Exception {
+        ParserContext ctx = new ParserContext();
+
+        // Plain field selection
+        ParserAST p = getParser("temperature");
+        FieldSelectionAST fs = p.FieldSelection(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(fs, notNullValue());
+        AttributeReferenceAST ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("temperature"));
+        assertThat(ref.getType(), equalTo(DataType.ANY));
+        ConstantAST def = (ConstantAST) fs.getDefault();
+        assertThat(def, equalTo(ConstantAST.NULL));
+
+        // Explicit default null
+        p = getParser("temperature:integer default null");
+        fs = p.FieldSelection(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(fs, notNullValue());
+        ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("temperature"));
+        assertThat(ref.getType(), equalTo(DataType.INTEGER));
+        def = (ConstantAST) fs.getDefault();
+        assertThat(def, equalTo(ConstantAST.NULL));
+
+        // Default value
+        p = getParser("temperature default 5");
+        fs = p.FieldSelection(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(fs, notNullValue());
+        ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("temperature"));
+        assertThat(ref.getType(), equalTo(DataType.ANY));
+        def = (ConstantAST) fs.getDefault();
+        assertThat(def.getType(), equalTo(DataType.INTEGER));
+        assertThat(def.getValue(), equalTo(5));
+    }
+
+    @Test
+    public void testFieldSelectionList() throws Exception {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("temp, press:integer, hum default 10");
+        List<FieldSelectionAST> fsl = p.FieldSelectionList(ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(fsl, notNullValue());
+        assertThat(fsl.size(), equalTo(3));
+
+        FieldSelectionAST fs = fsl.get(0);
+        assertThat(fs, notNullValue());
+        AttributeReferenceAST ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("temp"));
+        assertThat(ref.getType(), equalTo(DataType.ANY));
+        ConstantAST def = (ConstantAST) fs.getDefault();
+        assertThat(def, equalTo(ConstantAST.NULL));
+
+        fs = fsl.get(1);
+        assertThat(fs, notNullValue());
+        ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("press"));
+        assertThat(ref.getType(), equalTo(DataType.INTEGER));
+        def = (ConstantAST) fs.getDefault();
+        assertThat(def, equalTo(ConstantAST.NULL));
+
+        fs = fsl.get(2);
+        assertThat(fs, notNullValue());
+        ref = (AttributeReferenceAST) fs.getField();
+        assertThat(ref.getId(), equalTo("hum"));
+        assertThat(ref.getType(), equalTo(DataType.ANY));
+        def = (ConstantAST) fs.getDefault();
+        assertThat(def.getType(), equalTo(DataType.INTEGER));
+        assertThat(def.getValue(), equalTo(10));
+    }
+
 }

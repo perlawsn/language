@@ -3,6 +3,7 @@ package org.dei.perla.lang.query.statement;
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.parser.FieldSelection;
 import org.dei.perla.lang.query.expression.*;
 import org.junit.Test;
 
@@ -38,7 +39,16 @@ public class SelectionStatementTest {
             new AttributeReference("humidity", DataType.INTEGER, 0);
 
     @Test
-    public void testSamplingQuery() throws Exception {
+    public void testFieldSelection() {
+        AttributeReference ref =
+                new AttributeReference("temp", DataType.INTEGER, 0);
+        FieldSelection fs = new FieldSelection(ref, 12);
+        assertThat(fs.getField(), equalTo(ref));
+        assertThat(fs.getDefault(), equalTo(12));
+    }
+
+    @Test
+    public void testSamplingQuery() {
         Errors err = new Errors();
         List<Expression> fields = new ArrayList<>();
         fields.add(tempField);

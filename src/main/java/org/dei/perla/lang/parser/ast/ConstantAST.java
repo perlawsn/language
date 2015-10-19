@@ -76,7 +76,13 @@ public final class ConstantAST extends ExpressionAST {
         }
 
         ConstantAST oc = (ConstantAST) o;
-        return oc.type == type && oc.value.equals(value);
+        if (type != oc.type) {
+            return false;
+        } else if (value == null || oc.value == null) {
+            return value == oc.value;
+        } else {
+            return value.equals(oc.value);
+        }
     }
 
 }

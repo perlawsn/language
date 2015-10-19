@@ -12,7 +12,7 @@ public final class Constant extends Expression {
 
     // CONSTANT NULL
     public static final Constant NULL =
-            new Constant(null, null);
+            new Constant(null, DataType.ANY);
 
     // CONSTANT LOGIC VALUES
     public static final Constant TRUE =

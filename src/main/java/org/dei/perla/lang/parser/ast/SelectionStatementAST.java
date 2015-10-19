@@ -1,10 +1,7 @@
 package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.parser.AttributeOrder;
-import org.dei.perla.lang.parser.OnEmptySelection;
-import org.dei.perla.lang.parser.ParserContext;
-import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.parser.*;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.statement.*;
 
@@ -119,10 +116,10 @@ public final class SelectionStatementAST extends StatementAST {
         Object[] def = new Object[fields.size()];
         for (int i = 0; i < fields.size(); i++) {
             FieldSelectionAST fs = fields.get(i);
-            Expression f = fs.getField().compile(DataType.ANY, ctx, selAtts);
-            fieldsComp.add(f);
-            Expression d = fs.getDefault().evalConstant(ctx);
-            def[i] = d;
+            FieldSelection fsComp = fs.compile(
+                    DataType.ANY, ctx, selAtts);
+            fieldsComp.add(fsComp.getField());
+            def[i] = fsComp.getDefault();
         }
 
         GroupBy groupByComp = compileGroupBy(ctx);
