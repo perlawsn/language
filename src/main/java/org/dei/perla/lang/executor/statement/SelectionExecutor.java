@@ -1,7 +1,6 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.*;
-import org.dei.perla.core.utils.AsyncUtils;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
@@ -42,7 +41,7 @@ public final class SelectionExecutor {
 
     private final Buffer buffer;
 
-    private final SamplerRunner sampler;
+    private final SamplerManager sampler;
     private final SamplerHandler sampHand = new SamplerHandler();
     private final Runnable selectRunnable = new SelectRunnable();
 
@@ -84,7 +83,7 @@ public final class SelectionExecutor {
 
         // TODO: forecast average buffer length
         buffer = new ArrayBuffer(query.getAttributes(), 512);
-        sampler = new SamplerRunner(query, fpc, sampHand);
+        sampler = new SamplerManager(query, fpc, sampHand);
 
         // Initialize EVERY data
         WindowSize every = query.getEvery();

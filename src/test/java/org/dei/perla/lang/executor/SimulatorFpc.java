@@ -115,6 +115,23 @@ public class SimulatorFpc implements Fpc {
     }
 
     /**
+     * Sets the value of a single attribute
+     */
+    public void setValue(Attribute att, Object value) {
+        lk.lock();
+        try {
+            int i = atts.indexOf(att);
+            if (i == -1) {
+                throw new RuntimeException(
+                        "Attribute '" + att + "' not found");
+            }
+            values[i] = value;
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    /**
      * Creates a new sample
      */
     private Object[] newSample() {

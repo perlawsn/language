@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Guido Rota 01/10/15.
  */
-public final class SamplerRunner {
+public final class SamplerManager {
 
     private static final int ERROR = 0;
     private static final int STOPPED = 1;
@@ -38,7 +38,7 @@ public final class SamplerRunner {
 
     private volatile int status = READY;
 
-    public SamplerRunner(SelectionStatement query, Fpc fpc,
+    public SamplerManager(SelectionStatement query, Fpc fpc,
             QueryHandler<? super Sampling, Object[]> handler) {
         this.sampling = query.getSampling();
         this.cond = query.getExecutionConditions();
@@ -96,8 +96,6 @@ public final class SamplerRunner {
                 executeIfSamplingError(as);
             }
         }
-
-        throw new RuntimeException("unimplemented");
     }
 
     /**
@@ -115,7 +113,7 @@ public final class SamplerRunner {
         bld.append("from FPC ").append(fpc.getId());
 
         AsyncUtils.runInNewThread(() -> {
-            synchronized (SamplerRunner.this) {
+            synchronized (SamplerManager.this) {
                 Exception e = new QueryException(bld.toString());
                 handler.error(sampling, e);
             }
@@ -174,7 +172,7 @@ public final class SamplerRunner {
 
         @Override
         public void error(Refresh source, Throwable cause) {
-            synchronized (SamplerRunner.this) {
+            synchronized (SamplerManager.this) {
                 if (status < RUNNING) {
                     return;
                 }
@@ -186,7 +184,7 @@ public final class SamplerRunner {
 
         @Override
         public void data(Refresh source, Void value) {
-            synchronized (SamplerRunner.this) {
+            synchronized (SamplerManager.this) {
                 List<Attribute> as = cond.getAttributes();
                 Task t = fpc.get(as, true, execIfTaskHand);
                 if (t == null) {
@@ -211,7 +209,7 @@ public final class SamplerRunner {
 
         @Override
         public void data(Task task, Sample sample) {
-            synchronized (SamplerRunner.this) {
+            synchronized (SamplerManager.this) {
                 if (status == INITIALIZING) {
                     status = RUNNING;
                     startExecIfRefresh(cond);
@@ -251,7 +249,7 @@ public final class SamplerRunner {
 
         @Override
         public void error(Task task, Throwable cause) {
-            synchronized (SamplerRunner.this) {
+            synchronized (SamplerManager.this) {
                 if (status < RUNNING) {
                     return;
                 }

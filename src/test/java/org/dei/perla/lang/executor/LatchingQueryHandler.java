@@ -18,6 +18,16 @@ public class LatchingQueryHandler<E, T>
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
 
+    public void reset() {
+        lk.lock();
+        try {
+            error = null;
+            dataCount = 0;
+        } finally {
+            lk.unlock();
+        }
+    }
+
     public void awaitCount(int count) throws InterruptedException {
         lk.lock();
         try {
