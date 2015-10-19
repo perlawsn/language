@@ -27,6 +27,7 @@ PARSER_BEGIN(ParserAST)
 
     import java.time.temporal.TemporalUnit;
     import java.time.temporal.ChronoUnit;
+    import java.util.Collections;
     import java.util.List;
     import java.util.ArrayList;
 
@@ -556,7 +557,11 @@ SetStatementAST SetParametersStament(ParserContext ctx):
             { ids.add(id); }
         )
     )*
-    { return new SetStatementAST(t, params, ids); }
+    {
+        params = Collections.unmodifiableList(params);
+        ids = Collections.unmodifiableList(ids);
+        return new SetStatementAST(t, params, ids);
+    }
 }
 
 SetParameterAST SetParameter(ParserContext ctx):
@@ -611,7 +616,7 @@ List<FieldDefinitionAST> FieldDefinitionList(ParserContext ctx) :
         { fields.add(f); }
     )*
     ")"
-    { return fields; }
+    { return Collections.unmodifiableList(fields); }
 }
 
 FieldDefinitionAST FieldDefinition(ParserContext ctx) :
@@ -640,7 +645,7 @@ FieldDefinitionAST FieldDefinition(ParserContext ctx) :
 InsertionStatementAST InsertionStatement(ParserContext ctx) :
 {
     String stream;
-    List<String> fl = new ArrayList<String>();
+    List<String> fl = Collections.emptyList();
     SelectionStatementAST sel;
 
     Token t;
@@ -672,7 +677,7 @@ List<String> FieldList() :
         { fl.add(s); }
     )*
     ")"
-    { return fl; }
+    { return Collections.unmodifiableList(fl); }
 }
 
 SelectionStatementAST SelectionStatement(ParserContext ctx) :
@@ -750,7 +755,7 @@ List<FieldSelectionAST> FieldSelectionList(ParserContext ctx) :
         fs = FieldSelection(ctx)
         { fsl.add(fs); }
     )*
-    { return fsl; }
+    { return Collections.unmodifiableList(fsl); }
 }
 
 FieldSelectionAST FieldSelection(ParserContext ctx) :
@@ -793,7 +798,10 @@ GroupByAST GroupByClause() :
         f = Identifier()
         { fs.add(f); }
     )*
-    { return new GroupByAST(t, fs); }
+    {
+        fs = Collections.unmodifiableList(fs);
+        return new GroupByAST(t, fs);
+    }
 }
 
 ExpressionAST HavingClause(ParserContext ctx) :
@@ -838,7 +846,7 @@ SamplingAST SamplingClause(ParserContext ctx) :
 {
     List<String> events;
 
-    List<IfEveryAST> ife;
+    List<IfEveryAST> ifevery;
     RatePolicy policy = RatePolicy.STRICT;
     RefreshAST refresh = RefreshAST.NEVER;
 
@@ -851,14 +859,14 @@ SamplingAST SamplingClause(ParserContext ctx) :
         { return new SamplingEventAST(t, events); }
         |
         (
-            ife = IfEveryClause(ctx)
+            ifevery = IfEveryClause(ctx)
             [
                 policy = RatePolicy()
             ]
             [
                 refresh = RefreshClause(ctx)
             ]
-            { return new SamplingIfEveryAST(t, ife, policy, refresh); }
+            { return new SamplingIfEveryAST(t, ifevery, policy, refresh); }
         )
     )
 }
@@ -880,7 +888,7 @@ List<String> OnEventClause() :
             { evs.add(e); }
         )*
     )
-    { return evs; }
+    { return Collections.unmodifiableList(evs); }
 }
 
 List<IfEveryAST> IfEveryClause(ParserContext ctx) :
@@ -911,7 +919,7 @@ List<IfEveryAST> IfEveryClause(ParserContext ctx) :
                 ifeList.add(ife);
             }
         )
-        { return ifeList; }
+        { return Collections.unmodifiableList(ifeList); }
     )
     |
     (
@@ -1039,7 +1047,7 @@ List<Attribute> SpecificationList() :
         a = Specification()
         { as.add(a); }
     )*
-    { return as; }
+    { return Collections.unmodifiableList(as); }
 }
 
 Attribute Specification() :
