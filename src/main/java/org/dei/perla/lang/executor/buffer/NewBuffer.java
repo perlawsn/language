@@ -13,4 +13,6 @@ public interface NewBuffer {
 
     public void add(Object[] sample);
 
+    public NewBufferView getView();
+
 }

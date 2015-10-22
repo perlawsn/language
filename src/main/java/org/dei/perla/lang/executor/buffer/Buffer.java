@@ -23,7 +23,7 @@ public interface Buffer {
     public void add(Object[] s);
 
     /**
-     * {@code unmodifiableView} returns an unmodifiable view of the {@code
+     * {@code getView} returns an unmodifiable view of the {@code
      * Buffer}.
      *
      * It is important to note that only a single unmodifiable buffer view can

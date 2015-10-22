@@ -70,11 +70,20 @@ public class NewArrayBufferTest {
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(2));
 
+        Object[] sample;
         for (int i = 0; i < 10; i++) {
-            buf.add(newSample());
+            sample = newSample();
+            sample[0] = i;
+            buf.add(sample);
         }
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(12));
+
+        NewBufferView view = buf.getView();
+        for (int i = 0; i < 10; i++) {
+            sample = view.get(i);
+            assertThat(sample[0], equalTo(10 - i - 1));
+        }
     }
 
     @Test
@@ -82,13 +91,23 @@ public class NewArrayBufferTest {
         int cap = 10;
         NewArrayBuffer buf = new NewArrayBuffer(atts, cap);
         assertThat(buf.capacity(), equalTo(cap));
+        Object[] sample;
         for (int i = 0; i < cap; i++) {
-            buf.add(newSample());
+            sample = newSample();
+            sample[0] = i;
+            buf.add(sample);
         }
         assertThat(buf.capacity(), equalTo(cap));
 
-        buf.add(newSample());
+        sample = newSample();
+        sample[0] = cap;
+        buf.add(sample);
         assertThat(buf.capacity(), equalTo(2 * cap));
+        NewBufferView view = buf.getView();
+        for (int i = 0; i < cap + 1; i++) {
+            sample = view.get(i);
+            assertThat(sample[0], equalTo(cap - i));
+        }
     }
 
 }

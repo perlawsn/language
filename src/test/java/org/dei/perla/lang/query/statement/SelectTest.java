@@ -62,7 +62,7 @@ public class SelectTest {
         b.add(new Object[]{
                 Instant.parse("2015-02-23T15:07:31.000Z"), 4, "4", 4.4f});
 
-        view = b.unmodifiableView();
+        view = b.getView();
     }
 
     @Test

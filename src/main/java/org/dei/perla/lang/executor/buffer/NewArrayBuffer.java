@@ -154,4 +154,9 @@ public class NewArrayBuffer implements NewBuffer {
         size++;
     }
 
+    @Override
+    public NewBufferView getView() {
+        return new NewArrayBufferView(data, head, tail, size);
+    }
+
 }
