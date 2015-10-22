@@ -84,8 +84,7 @@ public class NewArrayBuffer implements NewBuffer {
         if (size == data.length) {
             expand();
         }
-        head = next(head);
-        data[head] = sample;
+        insertSample(sample);
     }
 
     /**
@@ -122,7 +121,7 @@ public class NewArrayBuffer implements NewBuffer {
         }
 
         tail = 0;
-        head = size;
+        head = size - 1;
         data = newData;
     }
 
@@ -132,12 +131,19 @@ public class NewArrayBuffer implements NewBuffer {
      *
      * @param sample new sample to insert
      */
-    private void insertionSort(Object[] sample) {
-        int pos = next(head);
+    private void insertSample(Object[] sample) {
+        if (size == 0) {
+            data[head] = sample;
+            size++;
+            return;
+        }
+
         int prev = head;
+        head = next(head);
+        int pos = head;
         Instant sampleTs = (Instant) sample[tsIdx];
         Instant prevTs = (Instant) data[prev][tsIdx];
-        while (size != 0 && pos != tail &&
+        while (size != 0 && prev != tail &&
                 sampleTs.compareTo(prevTs) < 0) {
             data[pos] = data[prev];
             pos = prev;
@@ -145,6 +151,7 @@ public class NewArrayBuffer implements NewBuffer {
             prevTs = (Instant) data[prev][tsIdx];
         }
         data[pos] = sample;
+        size++;
     }
 
 }

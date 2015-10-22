@@ -28,8 +28,22 @@ public class NewArrayBufferTest {
                     Attribute.TIMESTAMP
             });
 
+    private Object[] newSample() {
+        return newSample(atts);
+    }
+
+    private Object[] newSample(List<Attribute> atts) {
+        Object[] sample = new Object[atts.size()];
+        int tsIdx = atts.indexOf(Attribute.TIMESTAMP);
+        if (tsIdx == -1) {
+            throw new RuntimeException("Missing timestamp attribute");
+        }
+        sample[tsIdx] = Instant.now();
+        return sample;
+    }
+
     @Test
-    public void testArrayBufferCreation() {
+    public void testCreation() {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf, notNullValue());
         assertThat(buf.size(), equalTo(0));
@@ -43,22 +57,38 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testArrayBufferInsertion() {
+    public void testInsertion() {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(0));
 
-        Object[] sample = new Object[3];
-        sample[2] = Instant.now();
-        buf.add(sample);
+        buf.add(newSample());
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(1));
 
-        sample = new Object[3];
-        sample[2] = Instant.now();
-        buf.add(sample);
+        buf.add(newSample());
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
-        assertThat(buf.size(), equalTo(1));
+        assertThat(buf.size(), equalTo(2));
+
+        for (int i = 0; i < 10; i++) {
+            buf.add(newSample());
+        }
+        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.size(), equalTo(12));
+    }
+
+    @Test
+    public void testExpand() {
+        int cap = 10;
+        NewArrayBuffer buf = new NewArrayBuffer(atts, cap);
+        assertThat(buf.capacity(), equalTo(cap));
+        for (int i = 0; i < cap; i++) {
+            buf.add(newSample());
+        }
+        assertThat(buf.capacity(), equalTo(cap));
+
+        buf.add(newSample());
+        assertThat(buf.capacity(), equalTo(2 * cap));
     }
 
 }
