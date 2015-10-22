@@ -57,7 +57,7 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testInsertion() {
+    public void testInsertion() throws InterruptedException {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(0));
@@ -79,7 +79,7 @@ public class NewArrayBufferTest {
         assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(12));
 
-        NewBufferView view = buf.getView();
+        NewBufferView view = buf.createView();
         for (int i = 0; i < 10; i++) {
             sample = view.get(i);
             assertThat(sample[0], equalTo(10 - i - 1));
@@ -87,7 +87,7 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testExpand() {
+    public void testExpand() throws InterruptedException {
         int cap = 10;
         NewArrayBuffer buf = new NewArrayBuffer(atts, cap);
         assertThat(buf.capacity(), equalTo(cap));
@@ -103,11 +103,16 @@ public class NewArrayBufferTest {
         sample[0] = cap;
         buf.add(sample);
         assertThat(buf.capacity(), equalTo(2 * cap));
-        NewBufferView view = buf.getView();
+        NewBufferView view = buf.createView();
         for (int i = 0; i < cap + 1; i++) {
             sample = view.get(i);
             assertThat(sample[0], equalTo(cap - i));
         }
+    }
+
+    @Test
+    public void testDeletion() {
+        throw new RuntimeException("unimplemented");
     }
 
 }

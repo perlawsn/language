@@ -13,6 +13,6 @@ public interface NewBuffer {
 
     public void add(Object[] sample);
 
-    public NewBufferView getView();
+    public NewBufferView createView() throws InterruptedException;
 
 }

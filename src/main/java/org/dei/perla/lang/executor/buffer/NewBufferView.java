@@ -7,4 +7,6 @@ public interface NewBufferView {
 
     public Object[] get(int i);
 
+    public void release();
+
 }

@@ -4,6 +4,9 @@ import org.dei.perla.core.fpc.Attribute;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A sample buffer backed by a circular array
@@ -16,6 +19,10 @@ public class NewArrayBuffer implements NewBuffer {
 
     private final List<Attribute> atts;
     private final int tsIdx;
+
+    private final Lock dataLk = new ReentrantLock();
+    private final Semaphore viewSem = new Semaphore(1);
+    private NewArrayBufferView view;
 
     private Object[][] data;
     private int head;
@@ -55,36 +62,55 @@ public class NewArrayBuffer implements NewBuffer {
     }
 
     public int size() {
-        return size;
-    }
-
-    public int capacity() {
-        return data.length;
-    }
-
-    protected int previous(int pos) {
-        if (pos == 0) {
-            return data.length;
-        } else {
-            return pos - 1;
+        dataLk.lock();
+        try {
+            return size;
+        } finally {
+            dataLk.unlock();
         }
     }
 
+    public int capacity() {
+        dataLk.lock();
+        try {
+            return data.length;
+        } finally {
+            dataLk.unlock();
+        }
+    }
+
+    protected static int previous(int capacity, int pos) {
+        return (capacity + pos + 1) % capacity;
+    }
+
+    protected int previous(int pos) {
+        return NewArrayBuffer.previous(data.length, pos);
+    }
+
+    protected static int next(int capacity, int pos) {
+        return (pos + 1) % capacity;
+    }
+
     protected int next(int pos) {
-        return (pos + 1) % data.length;
+        return NewArrayBuffer.next(data.length, pos);
     }
 
     @Override
     public void add(Object[] sample) {
-        if (sample == null || sample.length != atts.size() ||
-                sample[tsIdx] == null) {
-            throw new RuntimeException("Malformed sample");
-        }
+        dataLk.lock();
+        try {
+            if (sample == null || sample.length != atts.size() ||
+                    sample[tsIdx] == null) {
+                throw new RuntimeException("Malformed sample");
+            }
 
-        if (size == data.length) {
-            expand();
+            if (size == data.length) {
+                expand();
+            }
+            insertSample(sample);
+        } finally {
+            dataLk.unlock();
         }
-        insertSample(sample);
     }
 
     /**
@@ -155,8 +181,27 @@ public class NewArrayBuffer implements NewBuffer {
     }
 
     @Override
-    public NewBufferView getView() {
-        return new NewArrayBufferView(data, head, tail, size);
+    public NewBufferView createView() throws InterruptedException {
+        NewArrayBufferView newView;
+        dataLk.lock();
+        try {
+            newView = new NewArrayBufferView(this, data, head, tail, size);
+        } finally {
+            dataLk.unlock();
+        }
+        viewSem.acquire();
+        this.view = newView;
+        return newView;
+    }
+
+    protected void release(NewArrayBufferView view, int lastIdx) {
+        if (this.view != view) {
+            throw new IllegalStateException(
+                    "The view being released is not current"
+            );
+        }
+        this.view = null;
+        viewSem.release();
     }
 
 }
