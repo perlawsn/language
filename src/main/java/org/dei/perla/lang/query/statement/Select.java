@@ -19,8 +19,11 @@ public final class Select {
     private final Expression having;
     private final Object[] def;
 
-    public Select(List<Expression> fields, WindowSize upto,
-            GroupBy group, Expression having, Object[] def) {
+    public Select(List<Expression> fields,
+            WindowSize upto,
+            GroupBy group,
+            Expression having,
+            Object[] def) {
         this.fields = Collections.unmodifiableList(fields);
         this.upto = upto;
         this.group = group;

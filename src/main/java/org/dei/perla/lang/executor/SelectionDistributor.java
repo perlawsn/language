@@ -16,7 +16,7 @@ import java.util.*;
  *
  * @author Guido Rota 30/04/15.
  */
-public class SelectionDistributor {
+public final class SelectionDistributor {
 
     private static final int NEW = 0;
     private static final int RUNNING = 1;

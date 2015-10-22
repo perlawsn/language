@@ -24,6 +24,7 @@ public final class SelectionStatement implements Statement {
     private final List<Attribute> atts;
 
     /**
+     * SelectionStatement clause
      *
      * @param select
      * @param every
@@ -33,8 +34,12 @@ public final class SelectionStatement implements Statement {
      * @param terminate terminate condition. A WindowSize.ZERO value
      *                  indicates that the query never terminates.
      */
-    public SelectionStatement(Select select, WindowSize every, Sampling sampling,
-            Expression where, ExecutionConditions cond, WindowSize terminate) {
+    public SelectionStatement(Select select,
+            WindowSize every,
+            Sampling sampling,
+            Expression where,
+            ExecutionConditions cond,
+            WindowSize terminate) {
         this.select = select;
         this.every = every;
         this.sampling = sampling;
