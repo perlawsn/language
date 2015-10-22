@@ -47,7 +47,8 @@ public class NewArrayBufferTest {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf, notNullValue());
         assertThat(buf.size(), equalTo(0));
-        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.capacity(),
+                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
 
         int cap = 128;
         buf = new NewArrayBuffer(atts, cap);
@@ -59,15 +60,18 @@ public class NewArrayBufferTest {
     @Test
     public void testInsertion() throws InterruptedException {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
-        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.capacity(),
+                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(0));
 
         buf.add(newSample());
-        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.capacity(),
+                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(1));
 
         buf.add(newSample());
-        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.capacity(),
+                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(2));
 
         Object[] sample;
@@ -76,7 +80,8 @@ public class NewArrayBufferTest {
             sample[0] = i;
             buf.add(sample);
         }
-        assertThat(buf.capacity(), equalTo(NewArrayBuffer.DEFAULT_CAPACITY));
+        assertThat(buf.capacity(),
+                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(12));
 
         NewBufferView view = buf.createView();

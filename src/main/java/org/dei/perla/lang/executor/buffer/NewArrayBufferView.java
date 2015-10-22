@@ -6,25 +6,16 @@ package org.dei.perla.lang.executor.buffer;
 public class NewArrayBufferView implements NewBufferView {
 
     private final NewArrayBuffer parent;
-    private final Object[][] data;
-    private final int head;
-    private final int tail;
-    private final int size;
+    private final CircularArrayBuffer buffer;
 
     private boolean released = false;
     private int lastIdx = 0;
 
     protected NewArrayBufferView(
             NewArrayBuffer parent,
-            Object[][] data,
-            int head,
-            int tail,
-            int size) {
+            CircularArrayBuffer buffer) {
         this.parent = parent;
-        this.data = data;
-        this.head = head;
-        this.tail = tail;
-        this.size = size;
+        this.buffer = buffer;
     }
 
     public int size() {
@@ -33,7 +24,7 @@ public class NewArrayBufferView implements NewBufferView {
                     "Cannot access buffer view after release"
             );
         }
-        return size;
+        return buffer.size();
     }
 
     @Override
@@ -44,19 +35,10 @@ public class NewArrayBufferView implements NewBufferView {
             );
         }
 
-        if (i >= size) {
-            throw new IndexOutOfBoundsException();
-        }
-
         if (i > lastIdx) {
             lastIdx = i;
         }
-
-        int idx = head - i;
-        if (idx < 0) {
-            idx = data.length - idx;
-        }
-        return data[idx];
+        return buffer.get(i);
     }
 
     @Override
