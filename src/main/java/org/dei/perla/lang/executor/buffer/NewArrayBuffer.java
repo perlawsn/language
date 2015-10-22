@@ -12,33 +12,35 @@ import java.util.List;
  */
 public class NewArrayBuffer implements NewBuffer {
 
+    public static final int DEFAULT_CAPACITY = 64;
+
     private final List<Attribute> atts;
     private final int tsIdx;
 
     private Object[][] data;
     private int head;
     private int tail;
-    private int length;
+    private int size;
 
     /**
      * Creates a new buffere backed by a circular array
      */
     public NewArrayBuffer(List<Attribute> atts) {
-        this(atts, 64);
+        this(atts, DEFAULT_CAPACITY);
     }
 
     /**
      * Creates a new buffer backed by a circular array with user-defined
-     * initial size
+     * initial capacity
      *
-     * @param size initial size
+     * @param capacity initial capacity
      */
-    public NewArrayBuffer(List<Attribute> atts, int size) {
+    public NewArrayBuffer(List<Attribute> atts, int capacity) {
         this.atts = atts;
-        data = new Object[size][];
+        data = new Object[capacity][];
         head = 0;
         tail = 0;
-        length = 0;
+        size = 0;
         tsIdx = atts.indexOf(Attribute.TIMESTAMP);
         if (tsIdx == -1) {
             throw new IllegalArgumentException(
@@ -50,6 +52,14 @@ public class NewArrayBuffer implements NewBuffer {
     @Override
     public List<Attribute> getAttributes() {
         return atts;
+    }
+
+    public int size() {
+        return size;
+    }
+
+    public int capacity() {
+        return data.length;
     }
 
     protected int previous(int pos) {
@@ -66,7 +76,12 @@ public class NewArrayBuffer implements NewBuffer {
 
     @Override
     public void add(Object[] sample) {
-        if (length == data.length) {
+        if (sample == null || sample.length != atts.size() ||
+                sample[tsIdx] == null) {
+            throw new RuntimeException("Malformed sample");
+        }
+
+        if (size == data.length) {
             expand();
         }
         head = next(head);
@@ -86,7 +101,7 @@ public class NewArrayBuffer implements NewBuffer {
                     tail,
                     newData,
                     0,
-                    length
+                    size
             );
         } else {
             int copyLen = data.length - tail + 1;
@@ -107,7 +122,7 @@ public class NewArrayBuffer implements NewBuffer {
         }
 
         tail = 0;
-        head = length;
+        head = size;
         data = newData;
     }
 
@@ -122,7 +137,7 @@ public class NewArrayBuffer implements NewBuffer {
         int prev = head;
         Instant sampleTs = (Instant) sample[tsIdx];
         Instant prevTs = (Instant) data[prev][tsIdx];
-        while (length != 0 && pos != tail &&
+        while (size != 0 && pos != tail &&
                 sampleTs.compareTo(prevTs) < 0) {
             data[pos] = data[prev];
             pos = prev;
