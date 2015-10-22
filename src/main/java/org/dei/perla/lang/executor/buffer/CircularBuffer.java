@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Guido Rota 22/10/15.
  */
-public class CircularArrayBuffer {
+public class CircularBuffer {
 
     public static final int DEFAULT_CAPACITY = 64;
 
@@ -20,11 +20,11 @@ public class CircularArrayBuffer {
     private int tail;
     private int size;
 
-    public CircularArrayBuffer(List<Attribute> atts) {
+    public CircularBuffer(List<Attribute> atts) {
         this(atts, DEFAULT_CAPACITY);
     }
 
-    public CircularArrayBuffer(List<Attribute> atts, int capacity) {
+    public CircularBuffer(List<Attribute> atts, int capacity) {
         this.atts = atts;
         data = new Object[capacity][];
         head = 0;
@@ -39,7 +39,7 @@ public class CircularArrayBuffer {
     }
 
     // Copy constructor
-    private CircularArrayBuffer(
+    private CircularBuffer(
             List<Attribute> atts,
             int tsIdx,
             Object[][] data,
@@ -165,8 +165,28 @@ public class CircularArrayBuffer {
         size++;
     }
 
-    public CircularArrayBuffer createCopy() {
-        return new CircularArrayBuffer(atts, tsIdx, data, head, tail, size);
+    public void deleteLast(int count) {
+        if (count > size) {
+            throw new IndexOutOfBoundsException("Not enough elements");
+        }
+
+        // Just clear the buffer when all data must be deleted
+        if (count == size) {
+            clear();
+            return;
+        }
+
+        throw new RuntimeException("unimplemented");
+    }
+
+    public void clear() {
+        head = 0;
+        tail = 0;
+        size = 0;
+    }
+
+    public CircularBuffer createCopy() {
+        return new CircularBuffer(atts, tsIdx, data, head, tail, size);
     }
 
 }

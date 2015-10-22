@@ -1,30 +1,26 @@
 package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.junit.Test;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Guido Rota 22/10/15.
  */
 public class NewArrayBufferTest {
 
-    private static final Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static final Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[] {
-                    intAtt,
-                    floatAtt,
+                    Common.INT_ATTRIBUTE,
+                    Common.FLOAT_ATTRIBUTE,
                     Attribute.TIMESTAMP
             });
 
@@ -47,31 +43,17 @@ public class NewArrayBufferTest {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf, notNullValue());
         assertThat(buf.size(), equalTo(0));
-        assertThat(buf.capacity(),
-                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
-
-        int cap = 128;
-        buf = new NewArrayBuffer(atts, cap);
-        assertThat(buf, notNullValue());
-        assertThat(buf.size(), equalTo(0));
-        assertThat(buf.capacity(), equalTo(cap));
     }
 
     @Test
     public void testInsertion() throws InterruptedException {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
-        assertThat(buf.capacity(),
-                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(0));
 
         buf.add(newSample());
-        assertThat(buf.capacity(),
-                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(1));
 
         buf.add(newSample());
-        assertThat(buf.capacity(),
-                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(2));
 
         Object[] sample;
@@ -80,38 +62,12 @@ public class NewArrayBufferTest {
             sample[0] = i;
             buf.add(sample);
         }
-        assertThat(buf.capacity(),
-                equalTo(CircularArrayBuffer.DEFAULT_CAPACITY));
         assertThat(buf.size(), equalTo(12));
 
         NewBufferView view = buf.createView();
         for (int i = 0; i < 10; i++) {
             sample = view.get(i);
             assertThat(sample[0], equalTo(10 - i - 1));
-        }
-    }
-
-    @Test
-    public void testExpand() throws InterruptedException {
-        int cap = 10;
-        NewArrayBuffer buf = new NewArrayBuffer(atts, cap);
-        assertThat(buf.capacity(), equalTo(cap));
-        Object[] sample;
-        for (int i = 0; i < cap; i++) {
-            sample = newSample();
-            sample[0] = i;
-            buf.add(sample);
-        }
-        assertThat(buf.capacity(), equalTo(cap));
-
-        sample = newSample();
-        sample[0] = cap;
-        buf.add(sample);
-        assertThat(buf.capacity(), equalTo(2 * cap));
-        NewBufferView view = buf.createView();
-        for (int i = 0; i < cap + 1; i++) {
-            sample = view.get(i);
-            assertThat(sample[0], equalTo(cap - i));
         }
     }
 

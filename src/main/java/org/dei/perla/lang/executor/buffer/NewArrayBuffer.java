@@ -18,23 +18,13 @@ public class NewArrayBuffer implements NewBuffer {
     private final Semaphore viewSem = new Semaphore(1);
     private NewArrayBufferView view;
 
-    private CircularArrayBuffer buffer;
+    private CircularBuffer buffer;
 
     /**
-     * Creates a new buffere backed by a circular array
+     * Creates a new buffer backed by a circular array
      */
     public NewArrayBuffer(List<Attribute> atts) {
-        buffer = new CircularArrayBuffer(atts);
-    }
-
-    /**
-     * Creates a new buffer backed by a circular array with user-defined
-     * initial capacity
-     *
-     * @param capacity initial capacity
-     */
-    public NewArrayBuffer(List<Attribute> atts, int capacity) {
-        buffer = new CircularArrayBuffer(atts, capacity);
+        buffer = new CircularBuffer(atts);
     }
 
     @Override
@@ -46,15 +36,6 @@ public class NewArrayBuffer implements NewBuffer {
         dataLk.lock();
         try {
             return buffer.size();
-        } finally {
-            dataLk.unlock();
-        }
-    }
-
-    public int capacity() {
-        dataLk.lock();
-        try {
-            return buffer.capacity();
         } finally {
             dataLk.unlock();
         }

@@ -6,14 +6,14 @@ package org.dei.perla.lang.executor.buffer;
 public class NewArrayBufferView implements NewBufferView {
 
     private final NewArrayBuffer parent;
-    private final CircularArrayBuffer buffer;
+    private final CircularBuffer buffer;
 
     private boolean released = false;
     private int lastIdx = 0;
 
     protected NewArrayBufferView(
             NewArrayBuffer parent,
-            CircularArrayBuffer buffer) {
+            CircularBuffer buffer) {
         this.parent = parent;
         this.buffer = buffer;
     }
