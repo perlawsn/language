@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
@@ -24,16 +25,11 @@ import static org.hamcrest.Matchers.*;
  */
 public class ExecutionConditionsASTTest {
 
-    private static final Attribute intAtt =
-            Attribute.create("int", DataType.INTEGER);
-    private static final Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-    private static final Attribute stringAtt =
-            Attribute.create("string", DataType.STRING);
-
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[] {
-                    intAtt, floatAtt, stringAtt
+                    Common.INT_ATTRIBUTE,
+                    Common.FLOAT_ATTRIBUTE,
+                    Common.STRING_ATTRIBUTE
             });
 
     @Test

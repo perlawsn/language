@@ -2,6 +2,7 @@ package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.query.expression.Constant;
 import org.junit.Test;
 
@@ -24,16 +25,11 @@ public class SamplingTest {
     private static final Attribute alertAtt =
             Attribute.create("alert", DataType.BOOLEAN);
 
-    private static final Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static final Attribute boolAtt =
-            Attribute.create("boolean", DataType.BOOLEAN);
-
     private static final List<Attribute> atts;
     static {
         atts = Arrays.asList(new Attribute[] {
-                intAtt,
-                boolAtt
+                Common.INT_ATTRIBUTE,
+                Common.BOOL_ATTRIBUTE
         });
     }
 

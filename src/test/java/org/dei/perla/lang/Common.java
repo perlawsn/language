@@ -12,5 +12,9 @@ public class Common {
             Attribute.create("integer", DataType.INTEGER);
     public static final Attribute FLOAT_ATTRIBUTE =
             Attribute.create("float", DataType.FLOAT);
+    public static final Attribute STRING_ATTRIBUTE =
+            Attribute.create("string", DataType.STRING);
+    public static final Attribute BOOL_ATTRIBUTE =
+            Attribute.create("boolean", DataType.BOOLEAN);
 
 }

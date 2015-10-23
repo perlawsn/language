@@ -1,6 +1,5 @@
 package org.dei.perla.lang.query.expression;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.junit.Test;
 
@@ -151,25 +150,22 @@ public class MiscTest {
 
     @Test
     public void fieldTest() {
-        Attribute intAtt = Attribute.create("integer", DataType.INTEGER);
-        Attribute floatAtt = Attribute.create("float", DataType.FLOAT);
-        Attribute stringAtt = Attribute.create("string", DataType.STRING);
         Object[][] sample = new Object[][]{
                 {1, 2.3f, "test"},
                 {23, 2.4f, "tset"}
         };
 
-        Expression e = new AttributeReference(intAtt.getId(), intAtt.getType(), 0);
+        Expression e = new AttributeReference("integer", DataType.INTEGER, 0);
         assertThat(e.getType(), equalTo(DataType.INTEGER));
         assertThat(e.run(sample[0], null), equalTo(1));
         assertThat(e.run(sample[1], null), equalTo(23));
 
-        e = new AttributeReference(floatAtt.getId(), floatAtt.getType(), 1);
+        e = new AttributeReference("float", DataType.FLOAT, 1);
         assertThat(e.getType(), equalTo(DataType.FLOAT));
         assertThat(e.run(sample[0], null), equalTo(2.3f));
         assertThat(e.run(sample[1], null), equalTo(2.4f));
 
-        e = new AttributeReference(stringAtt.getId(), stringAtt.getType(), 2);
+        e = new AttributeReference("string", DataType.STRING, 2);
         assertThat(e.getType(), equalTo(DataType.STRING));
         assertThat(e.run(sample[0], null), equalTo("test"));
         assertThat(e.run(sample[1], null), equalTo("tset"));

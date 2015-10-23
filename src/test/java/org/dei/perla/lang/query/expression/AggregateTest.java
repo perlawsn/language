@@ -2,6 +2,7 @@ package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -22,13 +23,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class AggregateTest {
 
-    private static Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static Attribute stringAtt =
-            Attribute.create("string", DataType.STRING);
-    private static Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-
     private static final Expression intExpr =
             new AttributeReference("integer", DataType.INTEGER, 0);
     private static final Expression stringExpr =
@@ -42,9 +36,9 @@ public class AggregateTest {
     @BeforeClass
     public static void setupBuffer() {
         List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
-                intAtt,
-                stringAtt,
-                floatAtt,
+                Common.INT_ATTRIBUTE,
+                Common.STRING_ATTRIBUTE,
+                Common.FLOAT_ATTRIBUTE,
                 Attribute.TIMESTAMP
         });
         Buffer b = new ArrayBuffer(bufAtts, 10);

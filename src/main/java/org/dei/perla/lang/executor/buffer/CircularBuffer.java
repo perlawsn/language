@@ -157,15 +157,18 @@ public class CircularBuffer {
         head = next(head);
         int pos = head;
         Instant sampleTs = (Instant) sample[tsIdx];
-        Instant prevTs = (Instant) data[prev][tsIdx];
-        while (pos != tail &&
-                sampleTs.compareTo((Instant) data[prev][tsIdx]) < 0) {
+        Instant prevTs = timestamp(prev);
+        while (pos != tail && sampleTs.compareTo(timestamp(prev)) < 0) {
             data[pos] = data[prev];
             pos = prev;
             prev = previous(prev);
         }
         data[pos] = sample;
         size++;
+    }
+
+    private Instant timestamp(int idx) {
+        return (Instant) data[idx][tsIdx];
     }
 
     public void deleteLast(int count) {

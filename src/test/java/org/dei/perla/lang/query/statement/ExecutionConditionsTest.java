@@ -1,7 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.query.expression.Constant;
 import org.junit.Test;
 
@@ -20,20 +20,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class ExecutionConditionsTest {
 
-    private static final Attribute intAtt =
-            Attribute.create("integer", DataType.INTEGER);
-    private static final Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-
     @Test
     public void testSimple() {
         Set<Attribute> specs = new HashSet<>();
-        specs.add(intAtt);
-        specs.add(floatAtt);
+        specs.add(Common.INT_ATTRIBUTE);
+        specs.add(Common.FLOAT_ATTRIBUTE);
 
         List<Attribute> atts = new ArrayList<>();
-        atts.add(intAtt);
-        atts.add(floatAtt);
+        atts.add(Common.INT_ATTRIBUTE);
+        atts.add(Common.FLOAT_ATTRIBUTE);
 
         ExecutionConditions ec = new ExecutionConditions(specs, Constant.TRUE,
                 atts, Refresh.NEVER);

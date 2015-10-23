@@ -2,6 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.ast.NodeSpecificationsAST.NodeSpecificationsType;
 import org.junit.Test;
@@ -19,16 +20,11 @@ import static org.junit.Assert.*;
  */
 public class NodeSpecificationsASTTest {
 
-    private static final Attribute intAtt =
-            Attribute.create("int", DataType.INTEGER);
-    private static final Attribute floatAtt =
-            Attribute.create("float", DataType.FLOAT);
-    private static final Attribute stringAtt =
-            Attribute.create("string", DataType.STRING);
-
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[] {
-                    intAtt, floatAtt, stringAtt
+                    Common.INT_ATTRIBUTE,
+                    Common.FLOAT_ATTRIBUTE,
+                    Common.STRING_ATTRIBUTE
             });
 
     @Test
@@ -66,7 +62,10 @@ public class NodeSpecificationsASTTest {
     @Test
     public void testCompileSpecsDuplicate() {
         List<Attribute> dupAtts = Arrays.asList(new Attribute[] {
-                intAtt, intAtt, floatAtt, stringAtt
+                Common.INT_ATTRIBUTE,
+                Common.FLOAT_ATTRIBUTE,
+                Common.STRING_ATTRIBUTE,
+                Common.INT_ATTRIBUTE
         });
         NodeSpecificationsAST spec = new NodeSpecificationsAST(dupAtts);
         assertThat(spec.getType(), equalTo(NodeSpecificationsType.SPECS));
@@ -108,7 +107,7 @@ public class NodeSpecificationsASTTest {
 
         ParserContext ctx = new ParserContext();
         AttributeReferenceAST ref =
-                new AttributeReferenceAST("int", DataType.INTEGER);
+                new AttributeReferenceAST("integer", DataType.INTEGER);
         ctx.addAttributeReference(ref);
         ref = new AttributeReferenceAST("float", DataType.FLOAT);
         ctx.addAttributeReference(ref);
@@ -118,9 +117,9 @@ public class NodeSpecificationsASTTest {
         Set<Attribute> compAtts = spec.compile(ctx);
         assertFalse(ctx.hasErrors());
         assertThat(compAtts.size(), equalTo(3));
-        assertTrue(compAtts.contains(intAtt));
-        assertTrue(compAtts.contains(floatAtt));
-        assertTrue(compAtts.contains(stringAtt));
+        assertTrue(compAtts.contains(Common.INT_ATTRIBUTE));
+        assertTrue(compAtts.contains(Common.FLOAT_ATTRIBUTE));
+        assertTrue(compAtts.contains(Common.STRING_ATTRIBUTE));
     }
 
 }
