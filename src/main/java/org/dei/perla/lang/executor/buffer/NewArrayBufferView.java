@@ -51,7 +51,10 @@ public class NewArrayBufferView implements NewBufferView {
 
         released = true;
         if (parent != null) {
-            int toDelete = buffer.size() - lastIdx + 1;
+            int toDelete = 0;
+            if (lastIdx != -1) {
+                toDelete = buffer.size() - (lastIdx + 1);
+            }
             parent.release(this, toDelete);
         }
     }

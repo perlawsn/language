@@ -2,9 +2,7 @@ package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.fpc.Attribute;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,7 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class NewArrayBuffer implements NewBuffer {
 
     private final Lock dataLk = new ReentrantLock();
-    private Queue<NewBufferView> views = new LinkedList<>();
+    private boolean viewActive = false;
 
     private CircularBuffer buffer;
 
@@ -52,13 +50,14 @@ public class NewArrayBuffer implements NewBuffer {
     }
 
     @Override
-    public NewArrayBufferView createView() {
+    public NewArrayBufferView createView() throws UnreleasedViewException {
         dataLk.lock();
         try {
-            NewArrayBufferView newView =
-                    new NewArrayBufferView(this, buffer.createCopy());
-            views.add(newView);
-            return newView;
+            if (viewActive) {
+                throw new UnreleasedViewException();
+            }
+            viewActive = true;
+            return new NewArrayBufferView(this, buffer.createCopy());
         } finally {
             dataLk.unlock();
         }
@@ -67,10 +66,8 @@ public class NewArrayBuffer implements NewBuffer {
     protected void release(NewArrayBufferView view, int toDelete) {
         dataLk.lock();
         try {
-            NewBufferView storedView = views.poll();
-            if (storedView == view) {
-                buffer.deleteLast(toDelete);
-            }
+            buffer.deleteLast(toDelete);
+            viewActive = false;
         } finally {
             dataLk.unlock();
         }

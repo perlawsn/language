@@ -46,7 +46,7 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testInsertion() {
+    public void testInsertion() throws Exception {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf.size(), equalTo(0));
 
@@ -73,7 +73,7 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testViewRelease() {
+    public void testViewRelease() throws Exception {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf.size(), equalTo(0));
 
@@ -91,37 +91,49 @@ public class NewArrayBufferTest {
         sample = view.get(5);
         assertThat(sample[0], equalTo(4));
         view.release();
-        assertThat(buf.size(), equalTo(4));
+        assertThat(buf.size(), equalTo(6));
     }
 
     @Test
-    public void testMultipleViewRelease() {
+    public void testViewReleaseNoAccess() throws Exception {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
+        assertThat(buf.size(), equalTo(0));
 
-        Object[] sample;
         int count = 10;
         for (int i = 0; i < count; i++) {
-            sample = newSample();
-            sample[0] = i;
-            buf.add(sample);
+            buf.add(newSample());
         }
-        assertThat(buf.size(), equalTo(count));
+        assertThat(buf.size(), equalTo(10));
 
-        NewArrayBufferView view1 = buf.createView();
-        NewArrayBufferView view2 = buf.createView();
-
-        assertThat(view1.size(), equalTo(count));
-        sample = view1.get(5);
-        assertThat(sample[0], equalTo(4));
-        view1.release();
-        assertThat(buf.size(), equalTo(4));
-
-        assertThat(view2.size(), equalTo(4));
+        NewArrayBufferView view = buf.createView();
+        view.release();
+        assertThat(buf.size(), equalTo(10));
     }
 
     @Test
-    public void testDeletion() {
-        throw new RuntimeException("unimplemented");
+    public void testMultpleViewRelease() throws Exception {
+        NewArrayBuffer buf = new NewArrayBuffer(atts);
+        buf.add(newSample());
+        buf.add(newSample());
+        buf.add(newSample());
+        assertThat(buf.size(), equalTo(3));
+
+        NewArrayBufferView view = buf.createView();
+        view.get(1);
+        view.release();
+        assertThat(buf.size(), equalTo(2));
+
+        view = buf.createView();
+        view.get(0);
+        view.release();
+        assertThat(buf.size(), equalTo(1));
+    }
+
+    @Test(expected = UnreleasedViewException.class)
+    public void testDuplicateView() throws Exception {
+        NewArrayBuffer buf = new NewArrayBuffer(atts);
+        buf.createView();
+        buf.createView();
     }
 
 }
