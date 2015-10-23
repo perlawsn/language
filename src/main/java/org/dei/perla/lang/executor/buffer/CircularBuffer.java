@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.fpc.Attribute;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -194,6 +195,38 @@ public class CircularBuffer {
 
     public CircularBuffer createCopy() {
         return new CircularBuffer(atts, tsIdx, data, head, tail, size);
+    }
+
+    public CircularBuffer subBuffer(int count) {
+        if (count > data.length) {
+            throw new IndexOutOfBoundsException("Not enough elements");
+        } else if (count == 0) {
+            return newEmptyBuffer();
+        }
+
+        int newTail = advance(tail, data.length - count);
+        return new CircularBuffer(atts, tsIdx, data, head, newTail, count);
+    }
+
+    public CircularBuffer subBuffer(Duration d) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    public int samplesIn(Duration d) {
+        Instant target = timestamp(head).minus(d);
+        int i = 0;
+
+        int pos = head;
+        int count = 0;
+        while (count < size && timestamp(pos).compareTo(target) > 0) {
+            pos = previous(pos);
+            count++;
+        }
+        return count;
+    }
+
+    private CircularBuffer newEmptyBuffer() {
+        return new CircularBuffer(atts, tsIdx, null, 0, 0, 0);
     }
 
 }

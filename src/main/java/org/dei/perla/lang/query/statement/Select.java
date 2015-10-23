@@ -79,7 +79,7 @@ public final class Select {
     }
 
     private void selectBuffer(int upto, BufferView buf, List<Object[]> rs) {
-        for (int i = 0; i < upto && i < buf.length(); i++) {
+        for (int i = 0; i < upto && i < buf.size(); i++) {
             Object[] cur = buf.get(i);
             // HAVING CLAUSE
             LogicValue valid = (LogicValue) having.run(cur, buf);

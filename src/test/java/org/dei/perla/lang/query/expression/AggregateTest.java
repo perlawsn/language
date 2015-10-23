@@ -34,28 +34,28 @@ public class AggregateTest {
     private static BufferView nullView;
 
     @BeforeClass
-    public static void setupBuffer() {
+    public static void setupBuffer() throws Exception {
         List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
                 Common.INT_ATTRIBUTE,
                 Common.STRING_ATTRIBUTE,
                 Common.FLOAT_ATTRIBUTE,
                 Attribute.TIMESTAMP
         });
-        Buffer b = new ArrayBuffer(bufAtts, 10);
+        Buffer b = new ArrayBuffer(bufAtts);
         b.add(new Object[]{0, "test", 0.0f, Instant.now()});
         b.add(new Object[]{1, "test", 1.1f, Instant.now()});
         b.add(new Object[]{2, "test", 2.2f, Instant.now()});
         b.add(new Object[]{3, "test", 3.3f, Instant.now()});
         b.add(new Object[]{4, "test", 4.4f, Instant.now()});
-        view = b.unmodifiableView();
+        view = b.createView();
 
-        b = new ArrayBuffer(bufAtts, 10);
+        b = new ArrayBuffer(bufAtts);
         b.add(new Object[]{null, null, null, Instant.now()});
         b.add(new Object[]{1, "test", 1.1f, Instant.now()});
         b.add(new Object[]{2, "test", 2.2f, Instant.now()});
         b.add(new Object[]{3, "test", 3.3f, Instant.now()});
         b.add(new Object[]{null, null, null, Instant.now()});
-        nullView = b.unmodifiableView();
+        nullView = b.createView();
     }
 
     @Test

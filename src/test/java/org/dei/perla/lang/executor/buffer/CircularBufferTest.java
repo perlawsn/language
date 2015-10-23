@@ -4,6 +4,7 @@ import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.Common;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -25,16 +26,20 @@ public class CircularBufferTest {
             });
 
     private Object[] newSample() {
-        return newSample(atts);
+        return newSample(atts, Instant.now());
     }
 
-    private Object[] newSample(List<Attribute> atts) {
+    private Object[] newSample(Instant i) {
+        return newSample(atts, i);
+    }
+
+    private Object[] newSample(List<Attribute> atts, Instant i) {
         Object[] sample = new Object[atts.size()];
         int tsIdx = atts.indexOf(Attribute.TIMESTAMP);
         if (tsIdx == -1) {
             throw new RuntimeException("Missing timestamp attribute");
         }
-        sample[tsIdx] = Instant.now();
+        sample[tsIdx] = i;
         return sample;
     }
 
@@ -171,6 +176,22 @@ public class CircularBufferTest {
             outOfBound = e;
         }
         assertThat(outOfBound, notNullValue());
+    }
+
+    @Test
+    public void testSamplesIn() {
+        CircularBuffer buf = new CircularBuffer(atts);
+
+        int count = 5;
+        for (int i = 0; i < count; i++) {
+            buf.add(newSample(Instant.ofEpochMilli(i)));
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        for (int i = 0; i < count; i++) {
+            Duration d = Duration.ofMillis(i);
+            assertThat(buf.samplesIn(d), equalTo(i));
+        }
     }
 
 }

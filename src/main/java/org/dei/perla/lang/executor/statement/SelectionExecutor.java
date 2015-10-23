@@ -5,6 +5,7 @@ import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
+import org.dei.perla.lang.executor.buffer.UnreleasedViewException;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 import org.dei.perla.lang.query.statement.*;
@@ -81,8 +82,7 @@ public final class SelectionExecutor {
         this.fpc = fpc;
         this.handler = handler;
 
-        // TODO: forecast average buffer length
-        buffer = new ArrayBuffer(query.getAttributes(), 512);
+        buffer = new ArrayBuffer(query.getAttributes());
         sampler = new SamplerManager(query, fpc, sampHand);
 
         // Initialize EVERY data
@@ -365,30 +365,35 @@ public final class SelectionExecutor {
 
         @Override
         public void run() {
-            while (!Thread.interrupted() && status == RUNNING) {
-                // Execute data management section
-                BufferView view = buffer.unmodifiableView();
-                List<Object[]> rs = select.select(view);
+            try {
+                // TODO: fix!!
+                while (!Thread.interrupted() && status == RUNNING) {
+                    // Execute data management section
+                    BufferView view = buffer.createView();
+                    List<Object[]> rs = select.select(view);
 
-                synchronized (SelectionExecutor.this) {
-                    // Notify new records and check termination conditions.
-                    // the following operations are performed under lock to
-                    // guarantee precise TERMINATE AFTER semantics
-                    rs.forEach(r -> handler.data(query, r));
-                    view.release();
+                    synchronized (SelectionExecutor.this) {
+                        // Notify new records and check termination conditions.
+                        // the following operations are performed under lock to
+                        // guarantee precise TERMINATE AFTER semantics
+                        rs.forEach(r -> handler.data(query, r));
+                        view.release();
 
-                    // Check sample-based termination condition
-                    recordsProduced++;
-                    if (recordsToTermination != 0 &&
-                            recordsProduced == recordsToTermination) {
-                        stop();
-                    }
+                        // Check sample-based termination condition
+                        recordsProduced++;
+                        if (recordsToTermination != 0 &&
+                                recordsProduced == recordsToTermination) {
+                            stop();
+                        }
 
-                    // Check if a new selection was triggered while this was running
-                    if (triggered.decrementAndGet() == 0) {
-                        return;
+                        // Check if a new selection was triggered while this was running
+                        if (triggered.decrementAndGet() == 0) {
+                            return;
+                        }
                     }
                 }
+            } catch (UnreleasedViewException e) {
+                throw new RuntimeException(e);
             }
         }
 
