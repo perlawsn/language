@@ -103,7 +103,7 @@ public class ArrayBufferView implements BufferView {
 
     @Override
     public BufferView subView(Duration d) {
-        throw new RuntimeException("unimplemented");
+        return subView(samplesIn(d));
     }
 
 }

@@ -4,6 +4,7 @@ import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.Common;
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
@@ -25,16 +26,20 @@ public class ArrayBufferTest {
             });
 
     private Object[] newSample() {
-        return newSample(atts);
+        return newSample(atts, Instant.now());
     }
 
-    private Object[] newSample(List<Attribute> atts) {
+    private Object[] newSample(Instant ts) {
+        return newSample(atts, ts);
+    }
+
+    private Object[] newSample(List<Attribute> atts, Instant ts) {
         Object[] sample = new Object[atts.size()];
         int tsIdx = atts.indexOf(Attribute.TIMESTAMP);
         if (tsIdx == -1) {
             throw new RuntimeException("Missing timestamp attribute");
         }
-        sample[tsIdx] = Instant.now();
+        sample[tsIdx] = ts;
         return sample;
     }
 
@@ -134,6 +139,76 @@ public class ArrayBufferTest {
         ArrayBuffer buf = new ArrayBuffer(atts);
         buf.createView();
         buf.createView();
+    }
+
+    @Test
+    public void testSamplesIn() throws Exception {
+        ArrayBuffer buf = new ArrayBuffer(atts);
+
+        int count = 20;
+        for (int i = 0; i < count; i++) {
+            Instant ts = Instant.ofEpochMilli(i);
+            buf.add(newSample(ts));
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        int samplesIn;
+        BufferView view = buf.createView();
+        for (int i = 0; i < count + 1; i++) {
+            samplesIn = view.samplesIn(Duration.ofMillis(i));
+            assertThat(samplesIn, equalTo(i));
+        }
+        samplesIn = view.samplesIn(Duration.ofDays(1));
+        assertThat(samplesIn, equalTo(count));
+    }
+
+    @Test
+    public void testSubViewCount() throws Exception {
+        ArrayBuffer buf = new ArrayBuffer(atts);
+
+        Object[] sample;
+        int count = 20;
+        for (int i = 0; i < count; i++) {
+            sample = newSample();
+            sample[0] = i;
+            buf.add(sample);
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        BufferView view = buf.createView();
+        BufferView subView = view.subView(10);
+        assertThat(subView.size(), equalTo(10));
+        for (int i = 0; i < 10; i++) {
+            sample = subView.get(i);
+            assertThat(sample[0], equalTo(count - i - 1));
+        }
+        subView.release();
+        view.release();
+    }
+
+    @Test
+    public void testSubViewDuration() throws Exception {
+        ArrayBuffer buf = new ArrayBuffer(atts);
+
+        Object[] sample;
+        int count = 20;
+        for (int i = 0; i < count; i++) {
+            Instant ts = Instant.ofEpochMilli(i);
+            sample = newSample(ts);
+            sample[0] = i;
+            buf.add(sample);
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        BufferView view = buf.createView();
+        BufferView subView = view.subView(Duration.ofMillis(10));
+        assertThat(subView.size(), equalTo(10));
+        for (int i = 0; i < 10; i++) {
+            sample = subView.get(i);
+            assertThat(sample[0], equalTo(count - i - 1));
+        }
+        subView.release();
+        view.release();
     }
 
 }
