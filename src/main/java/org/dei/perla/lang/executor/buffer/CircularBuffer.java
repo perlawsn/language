@@ -209,7 +209,7 @@ public class CircularBuffer {
     }
 
     public CircularBuffer subBuffer(Duration d) {
-        throw new RuntimeException("unimplemented");
+        return subBuffer(samplesIn(d));
     }
 
     public int samplesIn(Duration d) {

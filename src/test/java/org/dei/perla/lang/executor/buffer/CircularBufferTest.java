@@ -192,6 +192,9 @@ public class CircularBufferTest {
             Duration d = Duration.ofMillis(i);
             assertThat(buf.samplesIn(d), equalTo(i));
         }
+
+        Duration d = Duration.ofMillis(count * 2);
+        assertThat(buf.samplesIn(d), equalTo(count));
     }
 
 }
