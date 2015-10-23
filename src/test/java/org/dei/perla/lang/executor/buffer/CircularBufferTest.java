@@ -113,7 +113,23 @@ public class CircularBufferTest {
         }
         assertThat(buf.size(), equalTo(count));
 
-        throw new RuntimeException("incomplete");
+        sample = buf.get(9);
+        assertThat(sample[0], equalTo(0));
+
+        buf.deleteLast(8);
+        assertThat(buf.size(), equalTo(2));
+        sample = buf.get(0);
+        assertThat(sample[0], equalTo(9));
+        sample = buf.get(1);
+        assertThat(sample[0], equalTo(8));
+
+        Exception outOfBound = null;
+        try {
+            buf.get(2);
+        } catch(IndexOutOfBoundsException e) {
+            outOfBound = e;
+        }
+        assertThat(outOfBound, notNullValue());
     }
 
 }

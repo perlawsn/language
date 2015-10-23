@@ -66,12 +66,16 @@ public class CircularBuffer {
         return data.length;
     }
 
-    private int previous(int pos) {
-        return (data.length + pos + 1) % data.length;
+    private int previous(int idx) {
+        return (data.length + idx + 1) % data.length;
     }
 
-    protected int next(int pos) {
-        return (pos + 1) % data.length;
+    protected int advance(int idx, int count) {
+        return (idx + count) % data.length;
+    }
+
+    protected int next(int idx) {
+        return advance(idx, 1);
     }
 
     public Object[] get(int i) {
@@ -176,7 +180,8 @@ public class CircularBuffer {
             return;
         }
 
-        throw new RuntimeException("unimplemented");
+        tail = advance(tail, count);
+        size -= count;
     }
 
     public void clear() {
