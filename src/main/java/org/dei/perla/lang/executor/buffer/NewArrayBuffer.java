@@ -2,8 +2,9 @@ package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.fpc.Attribute;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
+import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -15,8 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class NewArrayBuffer implements NewBuffer {
 
     private final Lock dataLk = new ReentrantLock();
-    private final Semaphore viewSem = new Semaphore(1);
-    private NewArrayBufferView view;
+    private Queue<NewBufferView> views = new LinkedList<>();
 
     private CircularBuffer buffer;
 
@@ -52,27 +52,28 @@ public class NewArrayBuffer implements NewBuffer {
     }
 
     @Override
-    public NewBufferView createView() throws InterruptedException {
-        NewArrayBufferView newView;
+    public NewArrayBufferView createView() {
         dataLk.lock();
         try {
-            newView = new NewArrayBufferView(this, buffer.createCopy());
+            NewArrayBufferView newView =
+                    new NewArrayBufferView(this, buffer.createCopy());
+            views.add(newView);
+            return newView;
         } finally {
             dataLk.unlock();
         }
-        viewSem.acquire();
-        this.view = newView;
-        return newView;
     }
 
-    protected void release(NewArrayBufferView view, int lastIdx) {
-        if (this.view != view) {
-            throw new IllegalStateException(
-                    "The view being released is not current"
-            );
+    protected void release(NewArrayBufferView view, int toDelete) {
+        dataLk.lock();
+        try {
+            NewBufferView storedView = views.poll();
+            if (storedView == view) {
+                buffer.deleteLast(toDelete);
+            }
+        } finally {
+            dataLk.unlock();
         }
-        this.view = null;
-        viewSem.release();
     }
 
 }

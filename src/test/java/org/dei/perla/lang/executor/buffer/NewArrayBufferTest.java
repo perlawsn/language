@@ -46,7 +46,7 @@ public class NewArrayBufferTest {
     }
 
     @Test
-    public void testInsertion() throws InterruptedException {
+    public void testInsertion() {
         NewArrayBuffer buf = new NewArrayBuffer(atts);
         assertThat(buf.size(), equalTo(0));
 
@@ -69,6 +69,54 @@ public class NewArrayBufferTest {
             sample = view.get(i);
             assertThat(sample[0], equalTo(10 - i - 1));
         }
+        view.release();
+    }
+
+    @Test
+    public void testViewRelease() {
+        NewArrayBuffer buf = new NewArrayBuffer(atts);
+        assertThat(buf.size(), equalTo(0));
+
+        Object[] sample;
+        int count = 10;
+        for (int i = 0; i < count; i++) {
+            sample = newSample();
+            sample[0] = i;
+            buf.add(sample);
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        NewArrayBufferView view = buf.createView();
+        assertThat(view.size(), equalTo(count));
+        sample = view.get(5);
+        assertThat(sample[0], equalTo(4));
+        view.release();
+        assertThat(buf.size(), equalTo(4));
+    }
+
+    @Test
+    public void testMultipleViewRelease() {
+        NewArrayBuffer buf = new NewArrayBuffer(atts);
+
+        Object[] sample;
+        int count = 10;
+        for (int i = 0; i < count; i++) {
+            sample = newSample();
+            sample[0] = i;
+            buf.add(sample);
+        }
+        assertThat(buf.size(), equalTo(count));
+
+        NewArrayBufferView view1 = buf.createView();
+        NewArrayBufferView view2 = buf.createView();
+
+        assertThat(view1.size(), equalTo(count));
+        sample = view1.get(5);
+        assertThat(sample[0], equalTo(4));
+        view1.release();
+        assertThat(buf.size(), equalTo(4));
+
+        assertThat(view2.size(), equalTo(4));
     }
 
     @Test

@@ -67,7 +67,7 @@ public class CircularBuffer {
     }
 
     private int previous(int idx) {
-        return (data.length + idx + 1) % data.length;
+        return (data.length + idx - 1) % data.length;
     }
 
     protected int advance(int idx, int count) {
@@ -158,12 +158,11 @@ public class CircularBuffer {
         int pos = head;
         Instant sampleTs = (Instant) sample[tsIdx];
         Instant prevTs = (Instant) data[prev][tsIdx];
-        while (size != 0 && prev != tail &&
-                sampleTs.compareTo(prevTs) < 0) {
+        while (pos != tail &&
+                sampleTs.compareTo((Instant) data[prev][tsIdx]) < 0) {
             data[pos] = data[prev];
             pos = prev;
             prev = previous(prev);
-            prevTs = (Instant) data[prev][tsIdx];
         }
         data[pos] = sample;
         size++;

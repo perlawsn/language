@@ -72,6 +72,38 @@ public class CircularBufferTest {
     }
 
     @Test
+    public void testOutOfOrderAdd() {
+        CircularBuffer buf = new CircularBuffer(atts);
+
+        Object[] sample = new Object[3];
+        sample[0] = 2;
+        sample[2] = Instant.ofEpochMilli(10);
+        buf.add(sample);
+
+        sample = new Object[3];
+        sample[0] = 0;
+        sample[2] = Instant.ofEpochMilli(30);
+        buf.add(sample);
+
+        sample = new Object[3];
+        sample[0] = 1;
+        sample[2] = Instant.ofEpochMilli(20);
+        buf.add(sample);
+
+        sample = new Object[3];
+        sample[0] = 3;
+        sample[2] = Instant.ofEpochMilli(5);
+        buf.add(sample);
+
+        assertThat(buf.size(), equalTo(4));
+
+        for (int i = 0; i < 4; i++) {
+            sample = buf.get(i);
+            assertThat(sample[0], equalTo(i));
+        }
+    }
+
+    @Test
     public void testExpand() {
         int cap = 10;
         Object[] sample;
@@ -97,6 +129,15 @@ public class CircularBufferTest {
             sample = buf.get(i);
             assertThat(sample[0], equalTo(cap - i));
         }
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testIndexOutOfBound() {
+        CircularBuffer buf = new CircularBuffer(atts);
+
+        buf.add(newSample());
+        buf.add(newSample());
+        buf.get(2);
     }
 
     @Test

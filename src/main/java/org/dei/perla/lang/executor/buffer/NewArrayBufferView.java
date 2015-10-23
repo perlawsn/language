@@ -9,7 +9,7 @@ public class NewArrayBufferView implements NewBufferView {
     private final CircularBuffer buffer;
 
     private boolean released = false;
-    private int lastIdx = 0;
+    private int lastIdx = -1;
 
     protected NewArrayBufferView(
             NewArrayBuffer parent,
@@ -51,7 +51,8 @@ public class NewArrayBufferView implements NewBufferView {
 
         released = true;
         if (parent != null) {
-            parent.release(this, lastIdx);
+            int toDelete = buffer.size() - lastIdx + 1;
+            parent.release(this, toDelete);
         }
     }
 
