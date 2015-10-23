@@ -1,11 +1,9 @@
 package org.dei.perla.lang.executor.buffer;
 
-import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.expression.LogicValue;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 /**

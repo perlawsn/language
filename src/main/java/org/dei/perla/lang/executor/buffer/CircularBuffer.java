@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
+ * Circular array-backed buffer
+ *
  * @author Guido Rota 22/10/15.
  */
 public class CircularBuffer {
@@ -21,10 +23,21 @@ public class CircularBuffer {
     private int tail;
     private int size;
 
+    /**
+     * Creates a new buffer with default capacity
+     *
+     * @param atts attribute structure of the samples stored in the buffer
+     */
     public CircularBuffer(List<Attribute> atts) {
         this(atts, DEFAULT_CAPACITY);
     }
 
+    /**
+     * Creates a new buffer with the specified capacity
+     *
+     * @param atts attribute structure of the samples stored in the buffer
+     * @param capacity initial capacity
+     */
     public CircularBuffer(List<Attribute> atts, int capacity) {
         this.atts = atts;
         data = new Object[capacity][];

@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.util.function.BiConsumer;
 
 /**
+ * An unmodifiable view over the content of a {@link Buffer}
+ *
  * @author Guido Rota 22/10/15.
  */
 public interface BufferView {
