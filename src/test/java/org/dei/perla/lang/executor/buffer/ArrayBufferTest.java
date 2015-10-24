@@ -43,6 +43,17 @@ public class ArrayBufferTest {
         return sample;
     }
 
+    private ArrayBuffer createBuffer(int count) {
+        ArrayBuffer buf = new ArrayBuffer(atts);
+        for (int i = 0; i < count; i++) {
+            Instant ts = Instant.ofEpochMilli(i);
+            Object[] sample = newSample(ts);
+            sample[0] = i;
+            buf.add(sample);
+        }
+        return buf;
+    }
+
     @Test
     public void testCreation() {
         ArrayBuffer buf = new ArrayBuffer(atts);
@@ -101,27 +112,18 @@ public class ArrayBufferTest {
 
     @Test
     public void testViewReleaseNoAccess() throws Exception {
-        ArrayBuffer buf = new ArrayBuffer(atts);
-        assertThat(buf.size(), equalTo(0));
-
         int count = 10;
-        for (int i = 0; i < count; i++) {
-            buf.add(newSample());
-        }
-        assertThat(buf.size(), equalTo(10));
+        ArrayBuffer buf = createBuffer(count);
+        assertThat(buf.size(), equalTo(count));
 
         ArrayBufferView view = buf.createView();
         view.release();
-        assertThat(buf.size(), equalTo(10));
+        assertThat(buf.size(), equalTo(count));
     }
 
     @Test
     public void testMultpleViewRelease() throws Exception {
-        ArrayBuffer buf = new ArrayBuffer(atts);
-        buf.add(newSample());
-        buf.add(newSample());
-        buf.add(newSample());
-        assertThat(buf.size(), equalTo(3));
+        ArrayBuffer buf = createBuffer(3);
 
         ArrayBufferView view = buf.createView();
         view.get(1);
@@ -143,13 +145,8 @@ public class ArrayBufferTest {
 
     @Test
     public void testSamplesIn() throws Exception {
-        ArrayBuffer buf = new ArrayBuffer(atts);
-
         int count = 20;
-        for (int i = 0; i < count; i++) {
-            Instant ts = Instant.ofEpochMilli(i);
-            buf.add(newSample(ts));
-        }
+        ArrayBuffer buf = createBuffer(count);
         assertThat(buf.size(), equalTo(count));
 
         int samplesIn;
@@ -164,22 +161,15 @@ public class ArrayBufferTest {
 
     @Test
     public void testSubViewCount() throws Exception {
-        ArrayBuffer buf = new ArrayBuffer(atts);
-
-        Object[] sample;
         int count = 20;
-        for (int i = 0; i < count; i++) {
-            sample = newSample();
-            sample[0] = i;
-            buf.add(sample);
-        }
+        ArrayBuffer buf = createBuffer(count);
         assertThat(buf.size(), equalTo(count));
 
         BufferView view = buf.createView();
         BufferView subView = view.subView(10);
         assertThat(subView.size(), equalTo(10));
         for (int i = 0; i < 10; i++) {
-            sample = subView.get(i);
+            Object[] sample = subView.get(i);
             assertThat(sample[0], equalTo(count - i - 1));
         }
         subView.release();
@@ -188,27 +178,56 @@ public class ArrayBufferTest {
 
     @Test
     public void testSubViewDuration() throws Exception {
-        ArrayBuffer buf = new ArrayBuffer(atts);
-
-        Object[] sample;
         int count = 20;
-        for (int i = 0; i < count; i++) {
-            Instant ts = Instant.ofEpochMilli(i);
-            sample = newSample(ts);
-            sample[0] = i;
-            buf.add(sample);
-        }
+        ArrayBuffer buf = createBuffer(count);
         assertThat(buf.size(), equalTo(count));
 
         BufferView view = buf.createView();
         BufferView subView = view.subView(Duration.ofMillis(10));
         assertThat(subView.size(), equalTo(10));
         for (int i = 0; i < 10; i++) {
-            sample = subView.get(i);
+            Object[] sample = subView.get(i);
             assertThat(sample[0], equalTo(count - i - 1));
         }
         subView.release();
         view.release();
+    }
+
+    @Test
+    public void testReleaseOrder() throws Exception {
+        int count = 20;
+        ArrayBuffer buf = createBuffer(count);
+        assertThat(buf.size(), equalTo(count));
+
+        ArrayBufferView view = buf.createView();
+        assertThat(view.size(), equalTo(count));
+
+        ArrayBufferView sub1 = view.subView(10);
+        assertThat(sub1.size(), equalTo(10));
+        ArrayBufferView sub2 = view.subView(5);
+        assertThat(sub2.size(), equalTo(5));
+
+        ArrayBufferView sub11 = sub1.subView(5);
+        assertThat(sub11.size(), equalTo(5));
+
+        // Releasing
+        sub11.release();
+        sub2.release();
+        sub1.release();
+        view.release();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testWrongReleaseOrder() throws Exception {
+        int count = 20;
+        ArrayBuffer buf = createBuffer(count);
+        assertThat(buf.size(), equalTo(count));
+
+        ArrayBufferView view = buf.createView();
+        ArrayBufferView sub1 = view.subView(10);
+        ArrayBufferView sub11 = sub1.subView(5);
+
+        sub1.release();
     }
 
 }

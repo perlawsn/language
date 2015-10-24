@@ -7,7 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * A sample buffer backed by a circular array
+ * {@link Buffer} implementation backed by a {@link CircularBuffer}
  *
  * @author Guido Rota 22/10/15.
  */

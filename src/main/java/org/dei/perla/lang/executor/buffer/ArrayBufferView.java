@@ -7,24 +7,42 @@ import java.time.Duration;
 import java.util.function.BiConsumer;
 
 /**
+ * {@link BufferView} implementation backed by a {@link CircularBuffer}
+ *
  * @author Guido Rota 22/10/15.
  */
 public class ArrayBufferView implements BufferView {
 
-    private final ArrayBuffer parent;
+    private final ArrayBuffer parentBuffer;
+    private final ArrayBufferView parentView;
     private final CircularBuffer buffer;
+
+    private int subViewCount = 0;
 
     private boolean released = false;
     private int lastIdx = -1;
 
-    private ArrayBufferView(CircularBuffer buffer) {
-        this(null, buffer);
+    private ArrayBufferView(
+            ArrayBufferView parent,
+            CircularBuffer buffer) {
+        if (parent == null) {
+            throw new IllegalArgumentException("parent cannot be null");
+        }
+
+        this.parentBuffer = null;
+        this.parentView = parent;
+        this.buffer = buffer;
     }
 
     protected ArrayBufferView(
             ArrayBuffer parent,
             CircularBuffer buffer) {
-        this.parent = parent;
+        if (parent == null) {
+            throw new IllegalArgumentException("parent cannot be null");
+        }
+
+        this.parentBuffer = parent;
+        this.parentView = null;
         this.buffer = buffer;
     }
 
@@ -57,16 +75,26 @@ public class ArrayBufferView implements BufferView {
             throw new IllegalStateException(
                     "Cannot access buffer view after release"
             );
+        } else if (subViewCount != 0) {
+            throw new IllegalStateException(
+                    "Sub-views have not been released"
+            );
         }
 
         released = true;
-        if (parent != null) {
+        if (parentBuffer != null) {
             int toDelete = 0;
             if (lastIdx != -1) {
                 toDelete = buffer.size() - (lastIdx + 1);
             }
-            parent.release(this, toDelete);
+            parentBuffer.release(this, toDelete);
+        } else {
+            parentView.releaseView();
         }
+    }
+
+    private void releaseView() {
+        subViewCount--;
     }
 
     @Override
@@ -97,8 +125,9 @@ public class ArrayBufferView implements BufferView {
     }
 
     @Override
-    public BufferView subView(int samples) {
-        return new ArrayBufferView(buffer.subBuffer(samples));
+    public ArrayBufferView subView(int samples) {
+        subViewCount++;
+        return new ArrayBufferView(this, buffer.subBuffer(samples));
     }
 
     @Override
