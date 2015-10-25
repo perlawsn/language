@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @author Guido Rota 22/10/15.
  */
-public class CircularBuffer {
+public final class CircularBuffer {
 
     public static final int DEFAULT_CAPACITY = 64;
 

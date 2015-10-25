@@ -68,7 +68,7 @@ public final class SelectionDistributor {
                 continue;
             }
 
-            SelectionExecutor se = new SelectionExecutor(query, handler, fpc);
+            SelectionExecutor se = new SelectionExecutor(query, fpc, handler);
             execs.add(se);
             managed.add(fpc);
             throw new RuntimeException("unimplemented");

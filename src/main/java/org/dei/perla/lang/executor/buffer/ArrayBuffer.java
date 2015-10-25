@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Guido Rota 22/10/15.
  */
-public class ArrayBuffer implements Buffer {
+public final class ArrayBuffer implements Buffer {
 
     private final Lock dataLk = new ReentrantLock();
     private boolean viewActive = false;

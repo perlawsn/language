@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
  *
  * @author Guido Rota 22/10/15.
  */
-public class ArrayBufferView implements BufferView {
+public final class ArrayBufferView implements BufferView {
 
     private final ArrayBuffer parentBuffer;
     private final ArrayBufferView parentView;
