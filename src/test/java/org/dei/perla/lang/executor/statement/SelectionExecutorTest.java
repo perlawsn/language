@@ -1,11 +1,13 @@
 package org.dei.perla.lang.executor.statement;
 
-import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.utils.Errors;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
-import org.dei.perla.lang.parser.Parser;
+import org.dei.perla.lang.parser.ParseException;
+import org.dei.perla.lang.parser.ParserAST;
+import org.dei.perla.lang.parser.ParserContext;
+import org.dei.perla.lang.parser.ast.SelectionStatementAST;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.junit.Test;
 
@@ -13,7 +15,7 @@ import java.io.StringReader;
 import java.time.Instant;
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 
 /**
@@ -38,6 +40,18 @@ public class SelectionExecutorTest {
         values = Collections.unmodifiableMap(m);
     }
 
+    private static SelectionStatement getParser(String query)
+            throws ParseException {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = new ParserAST(new StringReader(query));
+        SelectionStatementAST sa = p.SelectionStatement(ctx);
+        SelectionStatement s = sa.compile(ctx);
+        if (ctx.hasErrors()) {
+            throw new RuntimeException(ctx.getErrorDescription());
+        }
+        return s;
+    }
+
     private static final List<Attribute> atts = Arrays.asList(new Attribute[] {
             Attribute.TIMESTAMP,
             temp,
@@ -47,40 +61,29 @@ public class SelectionExecutorTest {
 
     @Test
     public void testSampleEvery() throws Exception {
-        throw new RuntimeException("unimplemented");
-//        SimulatorFpc fpc = new SimulatorFpc(values);
-//        Errors err = new Errors();
-//
-//        Parser p = new Parser(new StringReader(
-//                "every 1 samples " +
-//                        "select temperature, humidity " +
-//                        "sampling every 30 milliseconds "
-//        ));
-//
-//        SelectionStatement query = p.SelectionStatement(err);
-//        assertTrue(err.isEmpty());
-//        query = query.bind(atts);
-//        assertTrue(query.getWhere().isComplete());
-//        assertTrue(query.getExecutionConditions().isComplete());
-//        assertTrue(query.getSelect().isComplete());
-//
-//        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-//                new LatchingQueryHandler<>();
-//        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
-//        assertFalse(exec.isRunning());
-//        exec.start();
-//        fpc.awaitStarted();
-//        assertTrue(exec.isRunning());
-//        handler.awaitCount(10);
-//
-//        // Test stop
-//        assertTrue(exec.isRunning());
-//        exec.stop();
-//        fpc.awaitStopped();
-//        int count = handler.getDataCount();
-//        assertFalse(exec.isRunning());
-//        Thread.sleep(300);
-//        assertThat(handler.getDataCount(), equalTo(count));
+        SimulatorFpc fpc = new SimulatorFpc(values);
+
+        SelectionStatement query = getParser("every 1 samples " +
+                        "select temperature:integer, humidity:integer " +
+                        "sampling every 30 milliseconds ");
+
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
+                new LatchingQueryHandler<>();
+        SelectionExecutor exec = new SelectionExecutor(query, fpc, handler);
+        assertFalse(exec.isRunning());
+        exec.start();
+        fpc.awaitStarted();
+        assertTrue(exec.isRunning());
+        handler.awaitCount(10);
+
+        // Test stop
+        assertTrue(exec.isRunning());
+        exec.stop();
+        fpc.awaitStopped();
+        int count = handler.getDataCount();
+        assertFalse(exec.isRunning());
+        Thread.sleep(300);
+        assertThat(handler.getDataCount(), equalTo(count));
     }
 
     @Test

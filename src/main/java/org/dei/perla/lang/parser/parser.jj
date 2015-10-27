@@ -686,12 +686,12 @@ SelectionStatementAST SelectionStatement(ParserContext ctx) :
     List<FieldSelectionAST> fsl;
     GroupByAST gby = null;
     ExpressionAST having = ConstantAST.TRUE;
-    WindowSizeAST upto = null;
+    WindowSizeAST upto = WindowSizeAST.ONE;
     OnEmptySelection oes = OnEmptySelection.NOTHING;
     SamplingAST sampling;
     Select sel;
     ExpressionAST where = ConstantAST.TRUE;
-    ExecutionConditionsAST ec = null;
+    ExecutionConditionsAST ec = ExecutionConditionsAST.ALWAYS;
     WindowSizeAST terminate = null;
 
     Token t;

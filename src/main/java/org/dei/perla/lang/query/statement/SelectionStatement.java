@@ -20,7 +20,7 @@ public final class SelectionStatement implements Statement {
     private final WindowSize terminate;
 
     // List of attributes required to run the data management clauses and the
-    // where expression of the sampling clause
+    // having expression of the sampling clause
     private final List<Attribute> atts;
 
     /**
@@ -49,9 +49,13 @@ public final class SelectionStatement implements Statement {
         atts = Collections.emptyList();
     }
 
-    private SelectionStatement(Select select, List<Attribute> atts,
-            WindowSize every, Sampling sampling, Expression where,
-            ExecutionConditions cond, WindowSize terminate) {
+    private SelectionStatement(Select select,
+            List<Attribute> atts,
+            WindowSize every,
+            Sampling sampling,
+            Expression where,
+            ExecutionConditions cond,
+            WindowSize terminate) {
         this.select = select;
         this.atts = Collections.unmodifiableList(atts);
         this.every = every;

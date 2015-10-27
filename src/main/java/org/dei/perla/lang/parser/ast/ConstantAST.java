@@ -16,6 +16,8 @@ import org.dei.perla.lang.query.expression.LogicValue;
  */
 public final class ConstantAST extends ExpressionAST {
 
+    public static final ConstantAST ZERO =
+            new ConstantAST(0, DataType.INTEGER);
     public static final ConstantAST ONE =
             new ConstantAST(1, DataType.INTEGER);
 

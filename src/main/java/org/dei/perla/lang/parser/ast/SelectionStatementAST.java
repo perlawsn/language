@@ -127,7 +127,10 @@ public final class SelectionStatementAST extends StatementAST {
         Expression whereComp = where.compile(DataType.BOOLEAN, ctx, selAtts);
         WindowSize uptoComp = upto.compile(ctx);
         Sampling samplingComp = sampling.compile(ctx);
-        WindowSize terminateComp = terminate.compile(ctx);
+        WindowSize terminateComp = null;
+        if (terminate != null) {
+            terminateComp = terminate.compile(ctx);
+        }
 
         ExecutionConditions condComp = execCond.compile(ctx);
 

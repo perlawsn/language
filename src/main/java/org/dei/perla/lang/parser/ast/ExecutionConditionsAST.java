@@ -21,6 +21,13 @@ import java.util.Set;
  */
 public final class ExecutionConditionsAST extends NodeAST {
 
+    public static final ExecutionConditionsAST ALWAYS =
+            new ExecutionConditionsAST(
+                    ConstantAST.TRUE,
+                    NodeSpecificationsAST.ALL,
+                    RefreshAST.NEVER
+            );
+
     private final ExpressionAST cond;
     private final NodeSpecificationsAST specs;
     private final RefreshAST refresh;

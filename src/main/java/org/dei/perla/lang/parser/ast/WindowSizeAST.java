@@ -15,6 +15,11 @@ import java.time.temporal.TemporalUnit;
  */
 public final class WindowSizeAST extends NodeAST {
 
+    public final static WindowSizeAST ZERO =
+            new WindowSizeAST(ConstantAST.ZERO);
+    public final static WindowSizeAST ONE =
+            new WindowSizeAST(ConstantAST.ONE);
+
     private final WindowType type;
 
     // Sample-based window size
