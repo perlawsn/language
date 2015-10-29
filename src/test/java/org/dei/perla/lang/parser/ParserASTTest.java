@@ -235,6 +235,13 @@ public class ParserASTTest {
         assertThat(c.getValue(), equalTo(3));
         assertThat(w.getDurationUnit(), equalTo(ChronoUnit.SECONDS));
 
+        p = getParser("one");
+        w = p.WindowSize("", ctx);
+        assertFalse(ctx.hasErrors());
+        assertThat(w.getType(), equalTo(WindowSize.WindowType.SAMPLE));
+        c = (ConstantAST) w.getSamples();
+        assertThat(c.getValue(), equalTo(1));
+
         p = getParser("23 samples");
         w = p.WindowSize("", ctx);
         assertFalse(ctx.hasErrors());

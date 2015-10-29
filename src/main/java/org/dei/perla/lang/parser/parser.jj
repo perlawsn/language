@@ -1267,10 +1267,10 @@ WindowSizeAST WindowSize(String src, ParserContext ctx) :
     Token t;
 }
 {
-    <KEYWORD_ONE>
-    { ws = new WindowSizeAST(token, ConstantAST.ONE); }
-    |
     (
+        <KEYWORD_ONE>
+        { ws = new WindowSizeAST(token, ConstantAST.ONE); }
+        |
         value = Expression(ExpressionType.CONSTANT, src, ctx)
         { t = token; }
         (
