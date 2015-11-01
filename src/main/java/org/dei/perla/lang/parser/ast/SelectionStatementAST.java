@@ -1,5 +1,6 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.lang.parser.*;
 import org.dei.perla.lang.query.expression.Expression;
@@ -136,8 +137,14 @@ public final class SelectionStatementAST extends StatementAST {
 
         Select sel = new Select(fieldsComp, uptoComp, groupByComp,
                 havingComp, def);
-        return new SelectionStatement(sel, everyComp, samplingComp, whereComp,
-                condComp, terminateComp);
+
+        List<Attribute> compAttList = selAtts.toList(ctx);
+        if (!compAttList.contains(Attribute.TIMESTAMP)) {
+            compAttList = new ArrayList<>(compAttList);
+            compAttList.add(Attribute.TIMESTAMP);
+        }
+        return new SelectionStatement(sel, compAttList, everyComp,
+                samplingComp, whereComp, condComp, terminateComp);
     }
 
     private GroupBy compileGroupBy(ParserContext ctx) {

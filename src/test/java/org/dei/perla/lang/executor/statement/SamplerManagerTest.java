@@ -54,6 +54,7 @@ public class SamplerManagerTest {
         );
         SelectionStatement query = new SelectionStatement(
                 null,
+                Collections.emptyList(),
                 null,
                 sampling,
                 Constant.TRUE,
@@ -101,6 +102,7 @@ public class SamplerManagerTest {
         );
         SelectionStatement query = new SelectionStatement(
                 null,
+                Collections.emptyList(),
                 null,
                 sampling,
                 Constant.TRUE,
@@ -154,6 +156,7 @@ public class SamplerManagerTest {
         );
         SelectionStatement query = new SelectionStatement(
                 null,
+                Collections.emptyList(),
                 null,
                 sampling,
                 Constant.TRUE,

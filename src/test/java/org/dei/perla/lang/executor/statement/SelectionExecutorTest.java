@@ -63,7 +63,7 @@ public class SelectionExecutorTest {
     public void testSampleEvery() throws Exception {
         SimulatorFpc fpc = new SimulatorFpc(values);
 
-        SelectionStatement query = getParser("every one samples " +
+        SelectionStatement query = getParser("every one " +
                         "select temperature:integer, humidity:integer " +
                         "sampling every 30 milliseconds ");
 

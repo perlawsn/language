@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -70,7 +71,8 @@ public class SelectionStatementTest {
         });
         Sampling samp = new SamplingEvent(events);
 
-        SelectionStatement query = new SelectionStatement(sel, WindowSize.ONE, samp,
+        SelectionStatement query = new SelectionStatement(sel,
+                Collections.emptyList(), WindowSize.ONE, samp,
                 Constant.TRUE, ExecutionConditions.ALL_NODES, WindowSize.ZERO);
 
         assertThat(query.getSelect(), equalTo(sel));

@@ -24,32 +24,16 @@ public final class SelectionStatement implements Statement {
     private final List<Attribute> atts;
 
     /**
-     * SelectionStatement clause
+     * Creates an executable selection statement
      *
-     * @param select
+     * @param select select clause
      * @param every
      * @param sampling
      * @param where
      * @param cond
-     * @param terminate terminate condition. A WindowSize.ZERO value
-     *                  indicates that the query never terminates.
+     * @param terminate
      */
     public SelectionStatement(Select select,
-            WindowSize every,
-            Sampling sampling,
-            Expression where,
-            ExecutionConditions cond,
-            WindowSize terminate) {
-        this.select = select;
-        this.every = every;
-        this.sampling = sampling;
-        this.where = where;
-        this.cond = cond;
-        this.terminate = terminate;
-        atts = Collections.emptyList();
-    }
-
-    private SelectionStatement(Select select,
             List<Attribute> atts,
             WindowSize every,
             Sampling sampling,
