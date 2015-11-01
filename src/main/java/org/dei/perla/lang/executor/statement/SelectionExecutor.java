@@ -38,6 +38,7 @@ public final class SelectionExecutor {
     private final List<Attribute> selAtts;
     private final Expression where;
     private final WindowSize every;
+    private final WindowSize terminate;
     private final QueryHandler<? super SelectionStatement, Object[]> handler;
 
     private final Lock lk = new ReentrantLock();
@@ -46,6 +47,7 @@ public final class SelectionExecutor {
     private final Buffer buffer;
     private final SamplerManager sampMgr;
     private int everyCount;
+    private int terminateCount;
     private ScheduledFuture<?> everyThread;
 
     public SelectionExecutor(
@@ -57,6 +59,7 @@ public final class SelectionExecutor {
         selAtts = query.getAttributes();
         where = query.getWhere();
         every = query.getEvery();
+        terminate = query.getTerminate();
         this.handler = handler;
         buffer = new ArrayBuffer(selAtts);
         sampMgr = new SamplerManager(
@@ -75,6 +78,10 @@ public final class SelectionExecutor {
                         "Cannot restart SelectionExecutor");
             }
             status = RUNNING;
+            if (terminate != null &&
+                    terminate.getType() == WindowSize.WindowType.SAMPLE) {
+                terminateCount = terminate.getSamples();
+            }
             startEvery();
             sampMgr.start();
         } finally {
@@ -116,6 +123,7 @@ public final class SelectionExecutor {
                 everyThread = null;
             }
             sampMgr.stop();
+            status = STOPPED;
         } finally {
             lk.unlock();
         }
@@ -177,6 +185,18 @@ public final class SelectionExecutor {
                 res.forEach((r) -> handler.data(query, r));
             } finally {
                 lk.unlock();
+            }
+        }
+
+        private void checkTermination() {
+            if (terminate == null &&
+                    terminate.getType() != WindowSize.WindowType.SAMPLE) {
+                return;
+            }
+
+            terminateCount--;
+            if (terminateCount == 0) {
+                stop();
             }
         }
 
