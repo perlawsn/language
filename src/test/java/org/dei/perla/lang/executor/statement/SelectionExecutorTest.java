@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.Common;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.parser.ParseException;
@@ -30,16 +31,6 @@ public class SelectionExecutorTest {
     private static final Attribute alarm =
             Attribute.create("alarm", DataType.BOOLEAN);
 
-    private static final Map<Attribute, Object> values;
-    static {
-        Map<Attribute, Object> m = new HashMap<>();
-        m.put(Attribute.TIMESTAMP, Instant.now());
-        m.put(temp, 0);
-        m.put(hum, 0);
-        m.put(alarm, false);
-        values = Collections.unmodifiableMap(m);
-    }
-
     private static SelectionStatement getParser(String query)
             throws ParseException {
         ParserContext ctx = new ParserContext();
@@ -61,6 +52,10 @@ public class SelectionExecutorTest {
 
     @Test
     public void testSampleEvery() throws Exception {
+        Map<Attribute, Object> values = new HashMap<>();
+        values.put(Common.TEMP_INT, 24);
+        values.put(Common.HUM_INT, 12);
+        values.put(Attribute.TIMESTAMP, Instant.now());
         SimulatorFpc fpc = new SimulatorFpc(values);
 
         SelectionStatement query = getParser("every one " +

@@ -30,7 +30,7 @@ public final class SamplerIfEvery implements Sampler {
 
     private final SamplingIfEvery sampling;
     private final Fpc fpc;
-    private final List<Attribute> attributes;
+    private final List<Attribute> selAtts;
     private final QueryHandler<? super Sampling, Object[]> handler;
     private final List<IfEvery> ifevery;
 
@@ -54,12 +54,12 @@ public final class SamplerIfEvery implements Sampler {
     protected SamplerIfEvery(
             SamplingIfEvery sampling,
             Fpc fpc,
-            List<Attribute> attributes,
+            List<Attribute> selAtts,
             QueryHandler<? super Sampling, Object[]> handler)
             throws IllegalArgumentException {
         this.sampling = sampling;
         this.fpc = fpc;
-        this.attributes = attributes;
+        this.selAtts = selAtts;
         this.handler = handler;
         this.ifevery = sampling.getIfEvery();
 
@@ -82,12 +82,22 @@ public final class SamplerIfEvery implements Sampler {
             return;
         }
 
-        status = INITIALIZING;
         List<Attribute> as = sampling.getAttributes();
-        Task t = fpc.get(as, true, ifeHandler);
-        if (t == null) {
-            status = ERROR;
-            notifyErrorAsync(samplingErrorString(as));
+        if (as.size() == 0) {
+            status = SAMPLING;
+            rate = IfEvery.evaluate(ifevery, null);
+            sampTask = fpc.get(selAtts, false, rate, sampHandler);
+            if (sampTask == null) {
+                status = ERROR;
+                notifyErrorAsync(samplingErrorString(as));
+            }
+        } else {
+            status = INITIALIZING;
+            Task t = fpc.get(as, true, ifeHandler);
+            if (t == null) {
+                status = ERROR;
+                notifyErrorAsync(samplingErrorString(as));
+            }
         }
     }
 
@@ -205,7 +215,7 @@ public final class SamplerIfEvery implements Sampler {
 
                 } else if (status == INITIALIZING) {
                     rate = IfEvery.evaluate(ifevery, sample.values());
-                    sampTask = fpc.get(sampling.getAttributes(), false, rate, sampHandler);
+                    sampTask = fpc.get(selAtts, false, rate, sampHandler);
                     status = SAMPLING;
                 }
             }
@@ -238,7 +248,7 @@ public final class SamplerIfEvery implements Sampler {
         public void complete(Task task) {
             synchronized (SamplerIfEvery.this) {
                 if (status == NEW_RATE) {
-                    sampTask = fpc.get(attributes, false, rate, sampHandler);
+                    sampTask = fpc.get(selAtts, false, rate, sampHandler);
                     status = SAMPLING;
 
                 } else if (status == SAMPLING && task == sampTask) {
