@@ -2,7 +2,7 @@ package org.dei.perla.lang.query.expression;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -36,9 +36,9 @@ public class AggregateTest {
     @BeforeClass
     public static void setupBuffer() throws Exception {
         List<Attribute> bufAtts = Arrays.asList(new Attribute[]{
-                Common.INT_ATTRIBUTE,
-                Common.STRING_ATTRIBUTE,
-                Common.FLOAT_ATTRIBUTE,
+                CommonAttributes.INTEGER,
+                CommonAttributes.STRING,
+                CommonAttributes.FLOAT,
                 Attribute.TIMESTAMP
         });
         Buffer b = new ArrayBuffer(bufAtts);

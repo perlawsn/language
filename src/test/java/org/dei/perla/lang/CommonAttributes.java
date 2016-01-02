@@ -6,15 +6,15 @@ import org.dei.perla.core.fpc.DataType;
 /**
  * @author Guido Rota 22/10/15.
  */
-public class Common {
+public class CommonAttributes {
 
-    public static final Attribute INT_ATTRIBUTE =
+    public static final Attribute INTEGER =
             Attribute.create("integer", DataType.INTEGER);
-    public static final Attribute FLOAT_ATTRIBUTE =
+    public static final Attribute FLOAT =
             Attribute.create("float", DataType.FLOAT);
-    public static final Attribute STRING_ATTRIBUTE =
+    public static final Attribute STRING =
             Attribute.create("string", DataType.STRING);
-    public static final Attribute BOOL_ATTRIBUTE =
+    public static final Attribute BOOL =
             Attribute.create("boolean", DataType.BOOLEAN);
 
     public static final Attribute TEMP_INT =
@@ -29,5 +29,7 @@ public class Common {
             Attribute.create("humidity", DataType.INTEGER);
     public static final Attribute HUM_FLOAT =
             Attribute.create("humidity", DataType.FLOAT);
+    public static final Attribute ALARM_BOOL =
+            Attribute.create("alarm", DataType.BOOLEAN);
 
 }

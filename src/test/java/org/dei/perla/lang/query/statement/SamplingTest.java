@@ -2,7 +2,7 @@ package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.query.expression.Constant;
 import org.junit.Test;
 
@@ -28,8 +28,8 @@ public class SamplingTest {
     private static final List<Attribute> atts;
     static {
         atts = Arrays.asList(new Attribute[] {
-                Common.INT_ATTRIBUTE,
-                Common.BOOL_ATTRIBUTE
+                CommonAttributes.INTEGER,
+                CommonAttributes.BOOL
         });
     }
 

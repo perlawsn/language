@@ -2,7 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.query.expression.Constant;
 import org.dei.perla.lang.query.statement.ExecutionConditions;
@@ -27,9 +27,9 @@ public class ExecutionConditionsASTTest {
 
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[] {
-                    Common.INT_ATTRIBUTE,
-                    Common.FLOAT_ATTRIBUTE,
-                    Common.STRING_ATTRIBUTE
+                    CommonAttributes.INTEGER,
+                    CommonAttributes.FLOAT,
+                    CommonAttributes.STRING
             });
 
     @Test

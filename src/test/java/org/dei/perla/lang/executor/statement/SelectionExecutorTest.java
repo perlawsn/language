@@ -1,8 +1,7 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.executor.LatchingQueryHandler;
 import org.dei.perla.lang.executor.SimulatorFpc;
 import org.dei.perla.lang.parser.ParseException;
@@ -17,6 +16,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.*;
 
 /**
@@ -24,14 +24,7 @@ import static org.junit.Assert.*;
  */
 public class SelectionExecutorTest {
 
-    private static final Attribute temp =
-            Attribute.create("temperature", DataType.INTEGER);
-    private static final Attribute hum =
-            Attribute.create("humidity", DataType.INTEGER);
-    private static final Attribute alarm =
-            Attribute.create("alarm", DataType.BOOLEAN);
-
-    private static SelectionStatement getParser(String query)
+    private static SelectionStatement getStatement(String query)
             throws ParseException {
         ParserContext ctx = new ParserContext();
         ParserAST p = new ParserAST(new StringReader(query));
@@ -45,15 +38,15 @@ public class SelectionExecutorTest {
 
     private static final List<Attribute> atts = Arrays.asList(new Attribute[] {
             Attribute.TIMESTAMP,
-            temp,
-            hum,
-            alarm
+            CommonAttributes.TEMP_INT,
+            CommonAttributes.HUM_INT,
+            CommonAttributes.ALARM_BOOL
     });
 
-    private static final Map<Attribute, Object> createDefaultValues() {
+    private static Map<Attribute, Object> createDefaultValues() {
         Map<Attribute, Object> values = new HashMap<>();
-        values.put(Common.TEMP_INT, 24);
-        values.put(Common.HUM_INT, 12);
+        values.put(CommonAttributes.TEMP_INT, 24);
+        values.put(CommonAttributes.HUM_INT, 12);
         values.put(Attribute.TIMESTAMP, Instant.now());
 
         return values;
@@ -64,7 +57,7 @@ public class SelectionExecutorTest {
         Map<Attribute, Object> values = createDefaultValues();
         SimulatorFpc fpc = new SimulatorFpc(values);
 
-        SelectionStatement query = getParser("every one " +
+        SelectionStatement query = getStatement("every one " +
                         "select temperature:integer, humidity:integer " +
                         "sampling every 30 milliseconds ");
 
@@ -92,7 +85,7 @@ public class SelectionExecutorTest {
         Map<Attribute, Object> values = createDefaultValues();
         SimulatorFpc fpc = new SimulatorFpc(values);
 
-        SelectionStatement query = getParser("every 100 milliseconds " +
+        SelectionStatement query = getStatement("every 100 milliseconds " +
                         "select temperature:integer, humidity:integer " +
                         "sampling every 30 milliseconds ");
 
@@ -121,7 +114,7 @@ public class SelectionExecutorTest {
         Map<Attribute, Object> values = createDefaultValues();
         SimulatorFpc fpc = new SimulatorFpc(values);
 
-        SelectionStatement query = getParser("every one " +
+        SelectionStatement query = getStatement("every one " +
                         "select temperature:integer, humidity:integer " +
                         "sampling every 30 milliseconds " +
                         "terminate after 3 selections");
@@ -143,35 +136,25 @@ public class SelectionExecutorTest {
 
     @Test
     public void testTimedTerminateAfter() throws Exception {
-        throw new RuntimeException("unimplemented");
-//        SimulatorFpc fpc = new SimulatorFpc(values);
-//        Errors err = new Errors();
-//
-//        Parser p = new Parser(new StringReader(
-//                "every one " +
-//                        "select temperature, humidity " +
-//                        "sampling every 30 milliseconds " +
-//                        "terminate after 300 milliseconds"
-//        ));
-//
-//        SelectionStatement query = p.SelectionStatement(err);
-//        assertTrue(err.isEmpty());
-//        query = query.bind(atts);
-//        assertTrue(query.getWhere().isComplete());
-//        assertTrue(query.getExecutionConditions().isComplete());
-//        assertTrue(query.getSelect().isComplete());
-//
-//        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-//                new LatchingQueryHandler<>();
-//        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
-//        assertFalse(exec.isRunning());
-//        exec.start();
-//        fpc.awaitStarted();
-//        assertTrue(exec.isRunning());
-//
-//        Thread.sleep(400);
-//        assertFalse(exec.isRunning());
-//        assertThat(handler.getDataCount(), greaterThanOrEqualTo(8));
+        Map<Attribute, Object> values = createDefaultValues();
+        SimulatorFpc fpc = new SimulatorFpc(values);
+
+        SelectionStatement query = getStatement("every one " +
+                        "select temperature:integer, humidity:integer " +
+                        "sampling every 30 milliseconds " +
+                        "terminate after 300 milliseconds");
+
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
+                new LatchingQueryHandler<>();
+        SelectionExecutor exec = new SelectionExecutor(query, fpc, handler);
+        assertFalse(exec.isRunning());
+        exec.start();
+        fpc.awaitStarted();
+        assertTrue(exec.isRunning());
+
+        Thread.sleep(400);
+        assertFalse(exec.isRunning());
+        assertThat(handler.getDataCount(), greaterThanOrEqualTo(8));
     }
 
     @Test

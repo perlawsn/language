@@ -1,7 +1,7 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.query.expression.Constant;
 import org.junit.Test;
 
@@ -23,12 +23,12 @@ public class ExecutionConditionsTest {
     @Test
     public void testSimple() {
         Set<Attribute> specs = new HashSet<>();
-        specs.add(Common.INT_ATTRIBUTE);
-        specs.add(Common.FLOAT_ATTRIBUTE);
+        specs.add(CommonAttributes.INTEGER);
+        specs.add(CommonAttributes.FLOAT);
 
         List<Attribute> atts = new ArrayList<>();
-        atts.add(Common.INT_ATTRIBUTE);
-        atts.add(Common.FLOAT_ATTRIBUTE);
+        atts.add(CommonAttributes.INTEGER);
+        atts.add(CommonAttributes.FLOAT);
 
         ExecutionConditions ec = new ExecutionConditions(specs, Constant.TRUE,
                 atts, Refresh.NEVER);

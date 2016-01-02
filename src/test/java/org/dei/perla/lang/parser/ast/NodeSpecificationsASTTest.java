@@ -2,7 +2,7 @@ package org.dei.perla.lang.parser.ast;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.DataType;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.ast.NodeSpecificationsAST.NodeSpecificationsType;
 import org.junit.Test;
@@ -22,9 +22,9 @@ public class NodeSpecificationsASTTest {
 
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[] {
-                    Common.INT_ATTRIBUTE,
-                    Common.FLOAT_ATTRIBUTE,
-                    Common.STRING_ATTRIBUTE
+                    CommonAttributes.INTEGER,
+                    CommonAttributes.FLOAT,
+                    CommonAttributes.STRING
             });
 
     @Test
@@ -62,10 +62,10 @@ public class NodeSpecificationsASTTest {
     @Test
     public void testCompileSpecsDuplicate() {
         List<Attribute> dupAtts = Arrays.asList(new Attribute[] {
-                Common.INT_ATTRIBUTE,
-                Common.FLOAT_ATTRIBUTE,
-                Common.STRING_ATTRIBUTE,
-                Common.INT_ATTRIBUTE
+                CommonAttributes.INTEGER,
+                CommonAttributes.FLOAT,
+                CommonAttributes.STRING,
+                CommonAttributes.INTEGER
         });
         NodeSpecificationsAST spec = new NodeSpecificationsAST(dupAtts);
         assertThat(spec.getType(), equalTo(NodeSpecificationsType.SPECS));
@@ -117,9 +117,9 @@ public class NodeSpecificationsASTTest {
         Set<Attribute> compAtts = spec.compile(ctx);
         assertFalse(ctx.hasErrors());
         assertThat(compAtts.size(), equalTo(3));
-        assertTrue(compAtts.contains(Common.INT_ATTRIBUTE));
-        assertTrue(compAtts.contains(Common.FLOAT_ATTRIBUTE));
-        assertTrue(compAtts.contains(Common.STRING_ATTRIBUTE));
+        assertTrue(compAtts.contains(CommonAttributes.INTEGER));
+        assertTrue(compAtts.contains(CommonAttributes.FLOAT));
+        assertTrue(compAtts.contains(CommonAttributes.STRING));
     }
 
 }

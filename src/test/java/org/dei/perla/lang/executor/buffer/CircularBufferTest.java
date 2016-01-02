@@ -1,7 +1,7 @@
 package org.dei.perla.lang.executor.buffer;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.lang.Common;
+import org.dei.perla.lang.CommonAttributes;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -20,8 +20,8 @@ public class CircularBufferTest {
 
     private static final List<Attribute> atts =
             Arrays.asList(new Attribute[]{
-                    Common.INT_ATTRIBUTE,
-                    Common.FLOAT_ATTRIBUTE,
+                    CommonAttributes.INTEGER,
+                    CommonAttributes.FLOAT,
                     Attribute.TIMESTAMP
             });
 
