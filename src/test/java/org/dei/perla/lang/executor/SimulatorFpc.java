@@ -23,6 +23,8 @@ public class SimulatorFpc implements Fpc {
 
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
+    private final Condition pausedCond = lk.newCondition();
+    private volatile boolean samplingPaused = false;
 
     private final Map<Long, Integer> periods = new HashMap<>();
     private final Set<PeriodicSimTask> periodicTasks = new HashSet<>();
@@ -90,6 +92,20 @@ public class SimulatorFpc implements Fpc {
         try {
             periodicTasks.forEach(PeriodicSimTask::triggerError);
             asyncTasks.forEach(AsyncSimTask::triggerError);
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    public void pausePeriodicSampling() {
+        samplingPaused = true;
+    }
+
+    public void resumePeriodicSampling() {
+        samplingPaused = false;
+        lk.lock();
+        try {
+            pausedCond.signalAll();
         } finally {
             lk.unlock();
         }
@@ -397,6 +413,14 @@ public class SimulatorFpc implements Fpc {
         private void generateValues() {
             try {
                 while (true) {
+                    lk.lock();
+                    try {
+                        if (samplingPaused) {
+                            pausedCond.await();
+                        }
+                    } finally {
+                        lk.unlock();
+                    }
                     Sample r = pipeline.run(newSample());
                     handler.data(this, r);
                     Thread.sleep(periodMs);

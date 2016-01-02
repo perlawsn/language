@@ -182,6 +182,7 @@ public final class SelectionExecutor {
                 if (status != RUNNING) {
                     return;
                 }
+                checkTermination();
                 res.forEach((r) -> handler.data(query, r));
             } finally {
                 lk.unlock();
@@ -189,7 +190,7 @@ public final class SelectionExecutor {
         }
 
         private void checkTermination() {
-            if (terminate == null &&
+            if (terminate != null &&
                     terminate.getType() != WindowSize.WindowType.SAMPLE) {
                 return;
             }

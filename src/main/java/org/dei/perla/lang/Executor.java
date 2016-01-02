@@ -5,6 +5,9 @@ import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.parser.ParseException;
 import org.dei.perla.lang.parser.Parser;
+import org.dei.perla.lang.parser.ParserAST;
+import org.dei.perla.lang.parser.ParserContext;
+import org.dei.perla.lang.parser.ast.StatementAST;
 import org.dei.perla.lang.query.statement.*;
 
 import java.io.StringReader;
@@ -14,7 +17,7 @@ import java.io.StringReader;
  *
  * @author Guido Rota 07/07/15.
  */
-public class Executor {
+public final class Executor {
 
     private final PerLaSystem perla;
 
@@ -26,7 +29,7 @@ public class Executor {
             throws QueryException {
         Errors err = new Errors();
 
-        Statement s = null;
+        Statement s = parseQuery(query);
 
         if (s instanceof SelectionStatement) {
             SelectionStatement sel = (SelectionStatement) s;
@@ -48,6 +51,26 @@ public class Executor {
             throw new RuntimeException("Unknown statement type " +
                     s.getClass().getName());
         }
+    }
+
+    private Statement parseQuery(String query) throws QueryException {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = new ParserAST(new StringReader(query));
+        StatementAST ast;
+        try {
+            ast = p.Statement(ctx);
+        } catch(ParseException e) {
+            throw new QueryException("Cannot parse query", e);
+        }
+        if (ctx.hasErrors()) {
+            throw new QueryException(ctx.getErrorDescription());
+        }
+
+        Statement s = ast.compile(ctx);
+        if (ctx.hasErrors()) {
+            throw new QueryException(ctx.getErrorDescription());
+        }
+        return s;
     }
 
     private StatementTask executeSelection(SelectionStatement sel,

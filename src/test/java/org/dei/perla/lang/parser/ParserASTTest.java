@@ -217,13 +217,6 @@ public class ParserASTTest {
     }
 
     @Test
-    public void testSelectionsNumber() throws Exception {
-        ParserAST p = getParser("4 selections");
-        int s = p.SelectionsNumber();
-        assertThat(s, equalTo(4));
-    }
-
-    @Test
     public void testWindowSize() throws Exception {
         ParserContext ctx = new ParserContext();
 
@@ -968,6 +961,33 @@ public class ParserASTTest {
         def = (ConstantAST) fs.getDefault();
         assertThat(def.getType(), equalTo(DataType.INTEGER));
         assertThat(def.getValue(), equalTo(10));
+    }
+
+    @Test
+    public void testTerminateAfterTimed() throws Exception {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("terminate after 2 minutes");
+        WindowSizeAST tf = p.TerminateAfterClause(ctx);
+
+        assertFalse(ctx.hasErrors());
+        assertNotNull(tf);
+        assertThat(tf.getType(), equalTo(WindowType.TIME));
+        assertThat(tf.getDurationValue(),
+                equalTo(new ConstantAST(2, DataType.INTEGER)));
+        assertThat(tf.getDurationUnit(), equalTo(ChronoUnit.MINUTES));
+    }
+
+    @Test
+    public void testTerminateAfterSamples() throws Exception {
+        ParserContext ctx = new ParserContext();
+        ParserAST p = getParser("terminate after 13 selections");
+        WindowSizeAST tf = p.TerminateAfterClause(ctx);
+
+        assertFalse(ctx.hasErrors());
+        assertNotNull(tf);
+        assertThat(tf.getType(), equalTo(WindowType.SAMPLE));
+        assertThat(tf.getSamples(),
+                equalTo(new ConstantAST(13, DataType.INTEGER)));
     }
 
 }

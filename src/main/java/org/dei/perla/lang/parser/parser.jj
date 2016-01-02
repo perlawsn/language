@@ -1066,12 +1066,30 @@ Attribute Specification() :
 
 WindowSizeAST TerminateAfterClause(ParserContext ctx) :
 {
+    ExpressionAST value;
+    TemporalUnit unit;
     WindowSizeAST ws;
+
+    Token t;
 }
 {
     <KEYWORD_TERMINATE>
     <KEYWORD_AFTER>
-    ws = WindowSize("terminate after clause", ctx)
+    (
+        <KEYWORD_ONE>
+        { ws = new WindowSizeAST(token, ConstantAST.ONE); }
+        |
+        value = Expression(ExpressionType.CONSTANT, "terminate after", ctx)
+        { t = token; }
+        (
+
+            { ws = new WindowSizeAST(t, value); }
+            <KEYWORD_SELECTIONS>
+            |
+            unit = TimeUnit()
+            { ws = new WindowSizeAST(t, value, unit); }
+        )
+    )
     { return ws; }
 }
 
@@ -1244,18 +1262,6 @@ AggregateOperation AggregateOperation() :
     |
     <FUNCTION_SUM>
     { return AggregateOperation.SUM; }
-}
-
-int SelectionsNumber() :
-{
-    int value;
-}
-{
-    (
-        value = ConstantInteger()
-        <KEYWORD_SELECTIONS>
-        { return value; }
-    )
 }
 
 WindowSizeAST WindowSize(String src, ParserContext ctx) :
