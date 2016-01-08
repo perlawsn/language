@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.*;
 
@@ -159,151 +160,33 @@ public class SelectionExecutorTest {
 
     @Test
     public void testWhereSampling() throws Exception {
-        throw new RuntimeException("unimplemented");
-//        SimulatorFpc fpc = new SimulatorFpc(values);
-//        Errors err = new Errors();
-//
-//        Parser p = new Parser(new StringReader(
-//                "every one " +
-//                        "select temperature, humidity " +
-//                        "sampling every 30 milliseconds " +
-//                        "where temperature > 30 " +
-//                        "terminate after 1 selections"
-//        ));
-//
-//        SelectionStatement query = p.SelectionStatement(err);
-//        assertTrue(err.isEmpty());
-//        query = query.bind(atts);
-//        assertTrue(query.getWhere().isComplete());
-//        assertTrue(query.getExecutionConditions().isComplete());
-//        assertTrue(query.getSelect().isComplete());
-//
-//        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-//                new LatchingQueryHandler<>();
-//        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
-//        assertFalse(exec.isRunning());
-//        exec.start();
-//        fpc.awaitStarted();
-//        assertTrue(exec.isRunning());
-//
-//        Thread.sleep(100);
-//        assertThat(handler.getDataCount(), equalTo(0));
-//
-//        Map<Attribute, Object> v = new HashMap<>(values);
-//        v.put(temp, 35);
-//        fpc.setValues(v);
-//        handler.awaitCount(1);
-//        assertFalse(exec.isRunning());
-//        assertThat(handler.getDataCount(), equalTo(1));
-    }
+        Map<Attribute, Object> values = createDefaultValues();
+        SimulatorFpc fpc = new SimulatorFpc(values);
 
-    @Test
-    public void testExecuteIfTimedRefresh() throws Exception {
-        throw new RuntimeException("unimplemented");
-//        Map<Attribute, Object> v = new HashMap(values);
-//        v.put(temp, 20);
-//        SimulatorFpc fpc = new SimulatorFpc(values);
-//        Errors err = new Errors();
-//
-//        Parser p = new Parser(new StringReader(
-//                "every one " +
-//                        "select temperature, humidity " +
-//                        "sampling every 30 milliseconds " +
-//                        "execute if temperature > 30 " +
-//                        "refresh every 100 milliseconds"
-//        ));
-//
-//        SelectionStatement query = p.SelectionStatement(err);
-//        assertTrue(err.isEmpty());
-//        query = query.bind(atts);
-//        assertTrue(query.getWhere().isComplete());
-//        assertTrue(query.getExecutionConditions().isComplete());
-//        assertTrue(query.getSelect().isComplete());
-//
-//        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-//                new LatchingQueryHandler<>();
-//        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
-//        assertFalse(exec.isRunning());
-//        exec.start();
-//        assertTrue(exec.isRunning());
-//        Thread.sleep(400);
-//
-//        // Change fpc values and check if sampling starts
-//        assertTrue(exec.isPaused());
-//        assertThat(handler.getDataCount(), equalTo(0));
-//        v.put(temp, 40);
-//        fpc.setValues(v);
-//        handler.awaitCount(1);
-//        assertTrue(exec.isRunning());
-//        assertFalse(exec.isPaused());
-//        assertThat(handler.getDataCount(), greaterThan(0));
-//
-//        // Change fpc values and check if sampling pauses
-//        v.put(temp, 20);
-//        fpc.setValues(v);
-//        Thread.sleep(200);
-//        assertTrue(exec.isRunning());
-//        fpc.awaitStopped();
-//        assertTrue(exec.isPaused());
-//        int count = handler.getDataCount();
-//        Thread.sleep(200);
-//        assertThat(handler.getDataCount(), equalTo(count));
-    }
+        SelectionStatement query = getStatement("every one " +
+                        "select temperature:integer, humidity:integer " +
+                        "sampling every 30 milliseconds " +
+                        "where temperature > 30 " +
+                        "terminate after 1 selections"
+        );
 
-    @Test
-    public void testExecuteIfEventRefresh() throws Exception {
-        throw new RuntimeException("unimplemented");
-//        Map<Attribute, Object> v = new HashMap(values);
-//        v.put(temp, 20);
-//        SimulatorFpc fpc = new SimulatorFpc(values);
-//        Errors err = new Errors();
-//
-//        Parser p = new Parser(new StringReader(
-//                "every one " +
-//                        "select temperature, humidity " +
-//                        "sampling every 30 milliseconds " +
-//                        "execute if temperature > 30 " +
-//                        "refresh on event alarm"
-//        ));
-//
-//        SelectionStatement query = p.SelectionStatement(err);
-//        assertTrue(err.isEmpty());
-//        query = query.bind(atts);
-//        assertTrue(query.getWhere().isComplete());
-//        assertTrue(query.getExecutionConditions().isComplete());
-//        assertTrue(query.getSelect().isComplete());
-//
-//        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-//                new LatchingQueryHandler<>();
-//        SelectionExecutor exec = new SelectionExecutor(query, handler, fpc);
-//        assertFalse(exec.isRunning());
-//        exec.start();
-//        assertTrue(exec.isRunning());
-//        Thread.sleep(400);
-//
-//        // Change fpc values and check if sampling starts
-//        assertTrue(exec.isPaused());
-//        assertThat(handler.getDataCount(), equalTo(0));
-//        v.put(temp, 40);
-//        fpc.setValues(v);
-//        fpc.triggerEvent();
-//        handler.awaitCount(1);
-//        assertTrue(exec.isRunning());
-//        assertFalse(exec.isPaused());
-//        assertThat(handler.getDataCount(), greaterThan(0));
-//
-//
-//        // Change fpc values and check if sampling pauses
-//        v.put(temp, 20);
-//        fpc.setValues(v);
-//        fpc.triggerEvent();
-//        assertTrue(exec.isRunning());
-//        fpc.awaitPeriodicStopped();
-//        assertTrue(exec.isPaused());
-//        assertThat(fpc.countAsync(), equalTo(1));
-//        int count = handler.getDataCount();
-//        Thread.sleep(200);
-//        assertThat(handler.getDataCount(), equalTo(count));
+        LatchingQueryHandler<SelectionStatement, Object[]> handler =
+                new LatchingQueryHandler<>();
+        SelectionExecutor exec = new SelectionExecutor(query, fpc, handler);
+        assertFalse(exec.isRunning());
+        exec.start();
+        fpc.awaitStarted();
+        assertTrue(exec.isRunning());
+
+        Thread.sleep(100);
+        assertThat(handler.getDataCount(), equalTo(0));
+
+        Map<Attribute, Object> v = new HashMap<>(values);
+        v.put(CommonAttributes.TEMP_INT, 35);
+        fpc.setValues(v);
+        handler.awaitCount(1);
+        assertFalse(exec.isRunning());
+        assertThat(handler.getDataCount(), equalTo(1));
     }
 
 }
