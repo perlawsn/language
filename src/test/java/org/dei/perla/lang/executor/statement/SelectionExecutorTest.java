@@ -136,29 +136,6 @@ public class SelectionExecutorTest {
     }
 
     @Test
-    public void testTimedTerminateAfter() throws Exception {
-        Map<Attribute, Object> values = createDefaultValues();
-        SimulatorFpc fpc = new SimulatorFpc(values);
-
-        SelectionStatement query = getStatement("every one " +
-                        "select temperature:integer, humidity:integer " +
-                        "sampling every 30 milliseconds " +
-                        "terminate after 300 milliseconds");
-
-        LatchingQueryHandler<SelectionStatement, Object[]> handler =
-                new LatchingQueryHandler<>();
-        SelectionExecutor exec = new SelectionExecutor(query, fpc, handler);
-        assertFalse(exec.isRunning());
-        exec.start();
-        fpc.awaitStarted();
-        assertTrue(exec.isRunning());
-
-        Thread.sleep(400);
-        assertFalse(exec.isRunning());
-        assertThat(handler.getDataCount(), greaterThanOrEqualTo(8));
-    }
-
-    @Test
     public void testWhereSampling() throws Exception {
         Map<Attribute, Object> values = createDefaultValues();
         SimulatorFpc fpc = new SimulatorFpc(values);

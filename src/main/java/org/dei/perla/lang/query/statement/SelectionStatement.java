@@ -6,7 +6,6 @@ import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Guido Rota 04/03/15.

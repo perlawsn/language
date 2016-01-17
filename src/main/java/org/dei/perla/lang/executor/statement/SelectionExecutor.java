@@ -12,7 +12,6 @@ import org.dei.perla.lang.query.statement.Sampling;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.WindowSize;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -80,33 +79,15 @@ public final class SelectionExecutor {
                         "Cannot restart SelectionExecutor");
             }
             status = RUNNING;
-            if (terminate != null) {
-                setupTerminate(terminate);
+            if (terminate != null &&
+                    terminate.getType() == WindowSize.WindowType.SAMPLE) {
+                terminateCount = terminate.getSamples();
             }
             startEvery();
             sampMgr.start();
         } finally {
             lk.unlock();
         }
-    }
-
-    private void setupTerminate(WindowSize t) {
-        switch (t.getType()) {
-            case SAMPLE:
-                terminateCount = terminate.getSamples();
-                break;
-            case TIME:
-                Duration d = t.getDuration();
-                timer.schedule(
-                        this::stop,
-                        d.toMillis(),
-                        TimeUnit.MILLISECONDS
-                );
-                break;
-            default:
-                throw new RuntimeException("Unkown terminate after type");
-        }
-
     }
 
     private void startEvery() {
