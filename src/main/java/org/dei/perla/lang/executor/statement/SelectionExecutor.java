@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.lang.StatementHandler;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -39,13 +40,12 @@ public final class SelectionExecutor {
     private final Expression where;
     private final WindowSize every;
     private final WindowSize terminate;
-    private final QueryHandler<? super SelectionStatement, Object[]> handler;
+    private final StatementHandler<SelectionStatement> handler;
 
     private final Lock lk = new ReentrantLock();
     private int status = READY;
 
     private final Buffer buffer;
-    private final SamplerManager sampMgr;
     private int everyCount;
     private int terminateCount;
     private ScheduledFuture<?> everyThread;
@@ -53,7 +53,7 @@ public final class SelectionExecutor {
     public SelectionExecutor(
             SelectionStatement query,
             Fpc fpc,
-            QueryHandler<? super SelectionStatement, Object[]> handler) {
+            StatementHandler<SelectionStatement> handler) {
         this.fpc = fpc;
         this.query = query;
         selAtts = query.getAttributes();
@@ -62,11 +62,6 @@ public final class SelectionExecutor {
         terminate = query.getTerminate();
         this.handler = handler;
         buffer = new ArrayBuffer(selAtts);
-        sampMgr = new SamplerManager(
-                query,
-                fpc,
-                new SamplerHandler()
-        );
     }
 
     public void start() {
@@ -79,14 +74,21 @@ public final class SelectionExecutor {
                         "Cannot restart SelectionExecutor");
             }
             status = RUNNING;
-            if (terminate != null &&
-                    terminate.getType() == WindowSize.WindowType.SAMPLE) {
-                terminateCount = terminate.getSamples();
-            }
             startEvery();
-            sampMgr.start();
+            startTerminate();
         } finally {
             lk.unlock();
+        }
+    }
+
+    /**
+     * Manages only sample-based terminate clause. Time-base terminate clause
+     * is handled in the {@link SelectionManager}.
+     */
+    private void startTerminate() {
+        if (terminate != null &&
+                terminate.getType() == WindowSize.WindowType.SAMPLE) {
+            terminateCount = terminate.getSamples();
         }
     }
 
@@ -122,7 +124,6 @@ public final class SelectionExecutor {
                 everyThread.cancel(true);
                 everyThread = null;
             }
-            sampMgr.stop();
             status = STOPPED;
         } finally {
             lk.unlock();
@@ -162,6 +163,43 @@ public final class SelectionExecutor {
 
     }
 
+    protected void error(Sampling source, Throwable cause) {
+        throw new RuntimeException("unimplemented");
+    }
+
+    protected void data(Sampling source, Object[] sample) {
+        LogicValue valid = (LogicValue) where.run(sample, null);
+        if (!valid.toBoolean()) {
+            return;
+        }
+
+        lk.lock();
+        try {
+            buffer.add(sample);
+            if (every.getType() == WindowSize.WindowType.SAMPLE) {
+                triggerCountSampling();
+            }
+        } finally {
+            lk.unlock();
+        }
+    }
+
+    private void triggerCountSampling() {
+        everyCount--;
+        if (everyCount != 0) {
+            return;
+        }
+
+        try {
+            everyCount = every.getSamples();
+            BufferView view = buffer.createView();
+            exec.execute(new SelectionRunner(view));
+        } catch(UnreleasedViewException e) {
+            handler.error(query, e);
+            stop();
+        }
+    }
+
 
     /**
      * Selection runner
@@ -197,54 +235,6 @@ public final class SelectionExecutor {
 
             terminateCount--;
             if (terminateCount == 0) {
-                stop();
-            }
-        }
-
-    }
-
-
-    /**
-     * QueryHandler implementation for the sampler
-     */
-    private final class SamplerHandler implements
-            QueryHandler<Sampling, Object[]> {
-
-        @Override
-        public void error(Sampling source, Throwable cause) {
-            throw new RuntimeException("unimplemented");
-        }
-
-        @Override
-        public void data(Sampling source, Object[] sample) {
-            LogicValue valid = (LogicValue) where.run(sample, null);
-            if (!valid.toBoolean()) {
-                return;
-            }
-
-            lk.lock();
-            try {
-                buffer.add(sample);
-                if (every.getType() == WindowSize.WindowType.SAMPLE) {
-                    triggerCountSampling();
-                }
-            } finally {
-                lk.unlock();
-            }
-        }
-
-        private void triggerCountSampling() {
-            everyCount--;
-            if (everyCount != 0) {
-                return;
-            }
-
-            try {
-                everyCount = every.getSamples();
-                BufferView view = buffer.createView();
-                exec.execute(new SelectionRunner(view));
-            } catch(UnreleasedViewException e) {
-                handler.error(query, e);
                 stop();
             }
         }

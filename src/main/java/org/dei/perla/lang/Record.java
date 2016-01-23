@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor;
+package org.dei.perla.lang;
 
 import org.dei.perla.core.fpc.Attribute;
 
