@@ -135,15 +135,15 @@ public final class SelectionStatementAST extends StatementAST {
 
         ExecutionConditions condComp = execCond.compile(ctx);
 
-        Select sel = new Select(fieldsComp, uptoComp, groupByComp,
-                havingComp, def);
+        Select sel = new Select(fieldsComp, everyComp, uptoComp, havingComp,
+                def);
 
         List<Attribute> compAttList = selAtts.toList(ctx);
         if (!compAttList.contains(Attribute.TIMESTAMP)) {
             compAttList = new ArrayList<>(compAttList);
             compAttList.add(Attribute.TIMESTAMP);
         }
-        return new SelectionStatement(sel, compAttList, everyComp,
+        return new SelectionStatement(sel, compAttList, groupByComp,
                 samplingComp, whereComp, condComp, terminateComp);
     }
 

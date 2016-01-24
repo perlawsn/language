@@ -14,19 +14,19 @@ import java.util.List;
 public final class Select {
 
     private final List<Expression> fields;
+    private final WindowSize every;
     private final WindowSize upto;
-    private final GroupBy group;
     private final Expression having;
     private final Object[] def;
 
     public Select(List<Expression> fields,
+            WindowSize every,
             WindowSize upto,
-            GroupBy group,
             Expression having,
             Object[] def) {
         this.fields = Collections.unmodifiableList(fields);
+        this.every = every;
         this.upto = upto;
-        this.group = group;
         this.having = having;
         this.def = def;
     }
@@ -35,12 +35,12 @@ public final class Select {
         return fields;
     }
 
-    public WindowSize getUpTo() {
-        return upto;
+    public WindowSize getEvery() {
+        return every;
     }
 
-    public GroupBy getGroupBy() {
-        return group;
+    public WindowSize getUpTo() {
+        return upto;
     }
 
     public Expression getHaving() {

@@ -1,14 +1,13 @@
 package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.executor.buffer.UnreleasedViewException;
-import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.expression.LogicValue;
 import org.dei.perla.lang.query.statement.Sampling;
+import org.dei.perla.lang.query.statement.Select;
 import org.dei.perla.lang.query.statement.SelectionStatement;
 import org.dei.perla.lang.query.statement.WindowSize;
 
@@ -24,6 +23,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class SelectionExecutor {
 
+    private static final String DROPPING_RECORD_ERROR =
+            "Dropping record, previous selection is still in progress. Reduce" +
+                    " frequency in EVERY clause to avoid this error";
+
     private static final int READY = 0;
     private static final int RUNNING = 1;
     private static final int STOPPED = 2;
@@ -33,32 +36,24 @@ public final class SelectionExecutor {
     private static final ExecutorService exec =
             Executors.newCachedThreadPool();
 
-    private final Fpc fpc;
-    private final SelectionStatement query;
-    private final List<Attribute> selAtts;
-    private final Expression where;
+    private final Select select;
     private final WindowSize every;
-    private final WindowSize terminate;
-    private final QueryHandler<SelectionStatement, Object[]> handler;
+    private final QueryHandler<Select, Object[]> handler;
 
     private final Lock lk = new ReentrantLock();
     private int status = READY;
 
     private final Buffer buffer;
+
     private int everyCount;
-    private int terminateCount;
     private ScheduledFuture<?> everyThread;
 
     public SelectionExecutor(
-            SelectionStatement query,
-            Fpc fpc,
-            QueryHandler<SelectionStatement, Object[]> handler) {
-        this.fpc = fpc;
-        this.query = query;
-        selAtts = query.getAttributes();
-        where = query.getWhere();
-        every = query.getEvery();
-        terminate = query.getTerminate();
+            Select select,
+            List<Attribute> selAtts,
+            QueryHandler<Select, Object[]> handler) {
+        this.select = select;
+        every = select.getEvery();
         this.handler = handler;
         buffer = new ArrayBuffer(selAtts);
     }
@@ -74,20 +69,8 @@ public final class SelectionExecutor {
             }
             status = RUNNING;
             startEvery();
-            startTerminate();
         } finally {
             lk.unlock();
-        }
-    }
-
-    /**
-     * Manages only sample-based terminate clause. Time-base terminate clause
-     * is handled in the {@link SelectionManager}.
-     */
-    private void startTerminate() {
-        if (terminate != null &&
-                terminate.getType() == WindowSize.WindowType.SAMPLE) {
-            terminateCount = terminate.getSamples();
         }
     }
 
@@ -153,7 +136,11 @@ public final class SelectionExecutor {
                 BufferView view = buffer.createView();
                 exec.execute(new SelectionRunner(view));
             } catch (UnreleasedViewException e) {
-                handler.error(query, e);
+                QueryException qe = new QueryException(
+                        DROPPING_RECORD_ERROR,
+                        e
+                );
+                handler.error(select, qe);
                 stop();
             } finally {
                 lk.unlock();
@@ -165,7 +152,7 @@ public final class SelectionExecutor {
     protected void error(Sampling source, Throwable cause) {
         lk.lock();
         try {
-            handler.error(query, cause);
+            handler.error(select, cause);
             stop();
         } finally {
             lk.unlock();
@@ -173,11 +160,6 @@ public final class SelectionExecutor {
     }
 
     protected void data(Sampling source, Object[] sample) {
-        LogicValue valid = (LogicValue) where.run(sample, null);
-        if (!valid.toBoolean()) {
-            return;
-        }
-
         lk.lock();
         try {
             buffer.add(sample);
@@ -200,7 +182,11 @@ public final class SelectionExecutor {
             BufferView view = buffer.createView();
             exec.execute(new SelectionRunner(view));
         } catch(UnreleasedViewException e) {
-            handler.error(query, e);
+            QueryException qe = new QueryException(
+                    DROPPING_RECORD_ERROR,
+                    e
+            );
+            handler.error(select, qe);
             stop();
         }
     }
@@ -218,30 +204,17 @@ public final class SelectionExecutor {
         }
 
         public void run() {
-            List<Object[]> res = query.select(view);
+            List<Object[]> res = select.select(view);
             view.release();
             lk.lock();
             try {
                 if (status != RUNNING) {
                     return;
                 }
-                checkTermination();
 
-                res.forEach((r) -> handler.data(query, r));
+                res.forEach((r) -> handler.data(select, r));
             } finally {
                 lk.unlock();
-            }
-        }
-
-        private void checkTermination() {
-            if (terminate != null &&
-                    terminate.getType() != WindowSize.WindowType.SAMPLE) {
-                return;
-            }
-
-            terminateCount--;
-            if (terminateCount == 0) {
-                stop();
             }
         }
 

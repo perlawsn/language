@@ -1,7 +1,6 @@
 package org.dei.perla.lang.query.statement;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.lang.executor.buffer.BufferView;
 import org.dei.perla.lang.query.expression.Expression;
 
 import java.util.Collections;
@@ -13,10 +12,10 @@ import java.util.List;
 public final class SelectionStatement implements Statement {
 
     private final Select select;
-    private final WindowSize every;
+    private final GroupBy groupBy;
     private final Sampling sampling;
     private final Expression where;
-    private final ExecutionConditions cond;
+    private final ExecutionConditions execCond;
     private final WindowSize terminate;
 
     // List of attributes required to run the data management clauses and the
@@ -26,26 +25,25 @@ public final class SelectionStatement implements Statement {
     /**
      * Creates an executable selection statement
      *
-     * @param select select clause
-     * @param every
-     * @param sampling
-     * @param where
-     * @param cond
-     * @param terminate
+     * @param select selection clause
+     * @param sampling sampling clause
+     * @param where where clause
+     * @param cond execution execution condition clause
+     * @param terminate terminate after clause
      */
     public SelectionStatement(Select select,
             List<Attribute> atts,
-            WindowSize every,
+            GroupBy groupBy,
             Sampling sampling,
             Expression where,
-            ExecutionConditions cond,
+            ExecutionConditions execCond,
             WindowSize terminate) {
         this.select = select;
+        this.groupBy = groupBy;
         this.atts = Collections.unmodifiableList(atts);
-        this.every = every;
         this.sampling = sampling;
         this.where = where;
-        this.cond = cond;
+        this.execCond = execCond;
         this.terminate = terminate;
     }
 
@@ -57,8 +55,8 @@ public final class SelectionStatement implements Statement {
         return select;
     }
 
-    public WindowSize getEvery() {
-        return every;
+    public GroupBy getGroupBy() {
+        return groupBy;
     }
 
     public Sampling getSampling() {
@@ -70,15 +68,11 @@ public final class SelectionStatement implements Statement {
     }
 
     public ExecutionConditions getExecutionConditions() {
-        return cond;
+        return execCond;
     }
 
     public WindowSize getTerminate() {
         return terminate;
-    }
-
-    public List<Object[]> select(BufferView buffer) {
-        return select.select(buffer);
     }
 
 }
