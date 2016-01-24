@@ -2,7 +2,6 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.Fpc;
-import org.dei.perla.lang.StatementHandler;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -40,7 +39,7 @@ public final class SelectionExecutor {
     private final Expression where;
     private final WindowSize every;
     private final WindowSize terminate;
-    private final StatementHandler<SelectionStatement> handler;
+    private final QueryHandler<SelectionStatement, Object[]> handler;
 
     private final Lock lk = new ReentrantLock();
     private int status = READY;
@@ -53,7 +52,7 @@ public final class SelectionExecutor {
     public SelectionExecutor(
             SelectionStatement query,
             Fpc fpc,
-            StatementHandler<SelectionStatement> handler) {
+            QueryHandler<SelectionStatement, Object[]> handler) {
         this.fpc = fpc;
         this.query = query;
         selAtts = query.getAttributes();
@@ -227,6 +226,7 @@ public final class SelectionExecutor {
                     return;
                 }
                 checkTermination();
+
                 res.forEach((r) -> handler.data(query, r));
             } finally {
                 lk.unlock();
