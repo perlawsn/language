@@ -14,7 +14,7 @@
         <dependency>
             <groupId>org.dei.perla</groupId>
             <artifactId>perla-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

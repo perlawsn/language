@@ -141,7 +141,7 @@ public final class SelectionExecutor {
 
 
     /**
-     * Every runner
+     * Time-base EVERY runner
      */
     private final class EveryRunner implements Runnable {
 
@@ -164,7 +164,13 @@ public final class SelectionExecutor {
     }
 
     protected void error(Sampling source, Throwable cause) {
-        throw new RuntimeException("unimplemented");
+        lk.lock();
+        try {
+            handler.error(query, cause);
+            stop();
+        } finally {
+            lk.unlock();
+        }
     }
 
     protected void data(Sampling source, Object[] sample) {
