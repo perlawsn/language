@@ -504,6 +504,8 @@ TOKEN :
     < #HEXADECIMAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
     |
     < IDENTIFIER: ( <LITERAL> | <UNDERSCORE>) ( <DIGIT> | <LITERAL> | <UNDERSCORE> )* >
+    |
+	< METHOD: ( <IDENTIFIER> "." <IDENTIFIER> )+ >
 }
 
 /*
@@ -1172,13 +1174,16 @@ ConstantAST Constant() :
         |
         value = ConstantString()
         { return new ConstantAST(token, DataType.STRING, value); }
-        |
+      |
         LOOKAHEAD(1)
         value = ConstantInteger()
         { return new ConstantAST(token, DataType.INTEGER, value); }
         |
+        LOOKAHEAD(1)
         value = ConstantFloat()
         { return new ConstantAST(token, DataType.FLOAT, value); }
+        
+
     )
 }
 
@@ -1654,6 +1659,10 @@ ExpressionAST PrimaryExpression(ExpressionType type, String src, ParserContext c
     Token t = null;
 }
 {
+  LOOKAHEAD(2)
+  e = ReflectionMethod(ctx)
+	{ return e; }
+	|
     e = Constant()
     { return e; }
     |
@@ -1749,5 +1758,23 @@ ExpressionAST Aggregate(ExpressionType type, String src, ParserContext ctx) :
         )
     )
     { return new AggregateAST(t, op, operand, ws, filter); }
+}
+
+MethodAST ReflectionMethod(ParserContext ctx) :
+{
+	String methodName;
+}
+{
+	methodName = Method()
+	{ return MethodAST.create(methodName, ctx); }
+}
+
+String Method() :
+{
+    Token value;
+}
+{
+    value = <METHOD>
+    { return value.image; }
 }
 
