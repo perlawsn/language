@@ -11,7 +11,7 @@ import org.dei.perla.lang.parser.Token;
 import org.dei.perla.lang.parser.TypeVariable;
 import org.dei.perla.lang.parser.ast.ExpressionAST;
 import org.dei.perla.lang.query.expression.Expression;
-import org.dei.perla.lang.query.statement.MethodExp;
+import org.dei.perla.lang.query.expression.MethodExp;
 
 /*
  * A function requested by the user
