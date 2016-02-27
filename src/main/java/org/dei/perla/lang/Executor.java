@@ -25,32 +25,34 @@ public final class Executor {
         this.perla = perla;
     }
 
+    public StatementTask execute(Statement s, StatementHandler h) throws QueryException{
+    	 if (s instanceof SelectionStatement) {
+             SelectionStatement sel = (SelectionStatement) s;
+             return executeSelection(sel, h);
+
+         } else if (s instanceof CreationStatement) {
+             CreationStatement cre = (CreationStatement) s;
+             return executeCreation(cre, h);
+
+         } else if (s instanceof InsertionStatement) {
+             InsertionStatement ins = (InsertionStatement) s;
+             return executeInsertion(ins, h);
+
+         } else if (s instanceof SetStatement) {
+             SetStatement set = (SetStatement) s;
+             return executeSet(set, h);
+
+         } else {
+             throw new RuntimeException("Unknown statement type " +
+                     s.getClass().getName());
+         }
+    }
+    
     public StatementTask execute(String query, StatementHandler h)
             throws QueryException {
         Errors err = new Errors();
-
         Statement s = parseQuery(query);
-
-        if (s instanceof SelectionStatement) {
-            SelectionStatement sel = (SelectionStatement) s;
-            return executeSelection(sel, h);
-
-        } else if (s instanceof CreationStatement) {
-            CreationStatement cre = (CreationStatement) s;
-            return executeCreation(cre, h);
-
-        } else if (s instanceof InsertionStatement) {
-            InsertionStatement ins = (InsertionStatement) s;
-            return executeInsertion(ins, h);
-
-        } else if (s instanceof SetStatement) {
-            SetStatement set = (SetStatement) s;
-            return executeSet(set, h);
-
-        } else {
-            throw new RuntimeException("Unknown statement type " +
-                    s.getClass().getName());
-        }
+        return execute(s, h);
     }
 
     private Statement parseQuery(String query) throws QueryException {
