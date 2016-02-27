@@ -1,4 +1,4 @@
-package org.dei.perla.lang.query.statement;
+package org.dei.perla.lang.query.expression;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
