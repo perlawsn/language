@@ -55,7 +55,8 @@ public class SelectionExecutorTest {
 
     @Test
     public void testSampleEvery() throws Exception {
-        Map<Attribute, Object> values = createDefaultValues();
+
+    	Map<Attribute, Object> values = createDefaultValues();
         SimulatorFpc fpc = new SimulatorFpc(values);
 
         SelectionStatement query = getStatement("every one " +
@@ -76,6 +77,7 @@ public class SelectionExecutorTest {
         exec.stop();
         fpc.awaitStopped();
         int count = handler.getDataCount();
+        System.out.println("Valore: "+count);
         assertFalse(exec.isRunning());
         Thread.sleep(300);
         assertThat(handler.getDataCount(), equalTo(count));

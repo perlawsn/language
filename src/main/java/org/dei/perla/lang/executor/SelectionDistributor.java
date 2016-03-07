@@ -55,7 +55,7 @@ public final class SelectionDistributor {
 
     private void distribute() {
         Collection<Fpc> fpcs;
-
+        fpcs = registry.getAll();
         if (ec.getSpecifications().isEmpty()) {
             fpcs = registry.getAll();
         } else {
@@ -71,7 +71,7 @@ public final class SelectionDistributor {
             SelectionExecutor se = new SelectionExecutor(query, fpc, handler);
             execs.add(se);
             managed.add(fpc);
-            throw new RuntimeException("unimplemented");
+            se.start();
         }
     }
 

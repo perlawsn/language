@@ -2,6 +2,7 @@ package org.dei.perla.lang.executor.statement;
 
 import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.core.fpc.Fpc;
+import org.dei.perla.lang.SelectionStatementHandler;
 import org.dei.perla.lang.executor.buffer.ArrayBuffer;
 import org.dei.perla.lang.executor.buffer.Buffer;
 import org.dei.perla.lang.executor.buffer.BufferView;
@@ -69,7 +70,8 @@ public final class SelectionExecutor {
         );
     }
 
-    public void start() {
+
+	public void start() {
         lk.lock();
         try {
             if (status == RUNNING) {

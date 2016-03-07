@@ -24,6 +24,7 @@ public class SimulatorFpc implements Fpc {
     private final Lock lk = new ReentrantLock();
     private final Condition cond = lk.newCondition();
     private final Condition pausedCond = lk.newCondition();
+    private int id=0;
     private volatile boolean samplingPaused = false;
 
     private final Map<Long, Integer> periods = new HashMap<>();
@@ -42,7 +43,17 @@ public class SimulatorFpc implements Fpc {
             this.values[i++] = e.getValue();
         }
     }
-
+   
+    public SimulatorFpc(Map<Attribute, Object> values,int id) {
+    	this.id=id;
+        this.values = new Object[values.size()];
+        atts = new ArrayList<>();
+        int i = 0;
+        for (Map.Entry<Attribute, Object> e : values.entrySet()) {
+            atts.add(e.getKey());
+            this.values[i++] = e.getValue();
+        }
+    }
     /**
      * Convenience method for adding a period to the period map
      *
@@ -264,7 +275,7 @@ public class SimulatorFpc implements Fpc {
 
     @Override
     public int getId() {
-        return 0;
+        return id;
     }
 
     @Override

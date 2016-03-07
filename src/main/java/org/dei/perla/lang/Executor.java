@@ -3,8 +3,9 @@ package org.dei.perla.lang;
 import org.dei.perla.core.PerLaSystem;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.executor.QueryException;
+import org.dei.perla.lang.executor.SelectionQueryTask;
+import org.dei.perla.lang.executor.statement.QueryHandler;
 import org.dei.perla.lang.parser.ParseException;
-import org.dei.perla.lang.parser.Parser;
 import org.dei.perla.lang.parser.ParserAST;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.ast.StatementAST;
@@ -77,8 +78,19 @@ public final class Executor {
 
     private StatementTask executeSelection(SelectionStatement sel,
             StatementHandler h) {
-        throw new RuntimeException("unimplemented");
-    }
+    	
+    /*	List<Attribute> required = sel.getExecutionConditions().getAttributes();
+        Collection<Fpc> fpcs = perla.getRegistry().getAll();//required, new ArrayList<Attribute>());
+        List<SelectionExecutor> execs = new ArrayList<SelectionExecutor>(fpcs.size());
+        SelectionExecutor e;
+        SelectionDistributor sd;
+        LatchingQueryHandler<Object, Object[]> ssh; */
+        SelectionQueryTask sqt = new SelectionQueryTask(sel, perla.getRegistry(),(QueryHandler)  h);
+        StatementTask st = new SelectionStatementTask(sqt);
+        return st;
+      }
+    	
+    
 
     private StatementTask executeCreation(CreationStatement cre,
             StatementHandler h) {
