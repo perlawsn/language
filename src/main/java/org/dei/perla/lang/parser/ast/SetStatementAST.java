@@ -1,9 +1,17 @@
 package org.dei.perla.lang.parser.ast;
 
+import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
+import org.dei.perla.lang.parser.AttributeOrder;
 import org.dei.perla.lang.parser.ParserContext;
 import org.dei.perla.lang.parser.Token;
+import org.dei.perla.lang.query.expression.Constant;
+import org.dei.perla.lang.query.expression.Expression;
+import org.dei.perla.lang.query.statement.SetParameter;
+import org.dei.perla.lang.query.statement.SetStatement;
 import org.dei.perla.lang.query.statement.Statement;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +44,18 @@ public final class SetStatementAST extends StatementAST {
 
     @Override
     public Statement compile(ParserContext ctx) {
-        throw new RuntimeException("unimplemented");
+    	List<SetParameter> paramsSet = new ArrayList<SetParameter>(params.size());
+    	List<Integer> idsSet = new ArrayList<Integer>(ids);
+    	for(SetParameterAST p: params){
+    		Expression value = p.getValue().compile(DataType.ANY, ctx, new AttributeOrder());
+    		if(!(value instanceof Constant))
+    			ctx.addError("Set parameter expression must be constant");
+    		else {
+    			SetParameter pp = new SetParameter(p.getAttributeId(), value);
+    			paramsSet.add(pp);
+    		}
+    	}
+        return new SetStatement(paramsSet, idsSet);
     }
 
 }

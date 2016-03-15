@@ -52,7 +52,6 @@ public final class Executor {
     
     public StatementTask execute(String query, StatementHandler h)
             throws QueryException {
-        Errors err = new Errors();
         Statement s = parseQuery(query);
         return execute(s, h);
     }
@@ -100,7 +99,8 @@ public final class Executor {
 
     private StatementTask executeSet(SetStatement set,
             StatementHandler h) {
-        throw new RuntimeException("unimplemented");
+        StatementTask setTask = new SetTask(set, perla.getRegistry());
+        return setTask;
     }
 
 }
