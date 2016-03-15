@@ -3,7 +3,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.dei.perla.core.fpc.Attribute;
 import org.dei.perla.lang.*;
 import org.dei.perla.lang.executor.Record;
 import org.dei.perla.lang.query.statement.SelectionStatement;
@@ -14,31 +17,30 @@ public class BaseHandler extends Observable implements StatementHandler{
 	private ArrayList<Observer> observers;
 	private int count=0;
 	private int id;
+	private final Lock lk = new ReentrantLock();
 	
 	public BaseHandler(int i) {
 		id=i;
 	}
 
-	@Override
+
 	public synchronized void data(Statement s, Object r) {
 		count++;
-		System.out.println("Get data queryn: "+this.id+" samplen :"+this.count);
 		if(s instanceof SelectionStatement){
 			
 			for(Object o:(Object[])r){
 				 Class<? extends Object> d;
 				 d=o.getClass();
 				 d.cast(o);
-			     System.out.println(o);
+				 System.out.println("Get data queryn: "+this.id+" samplen :"+this.count+" value :"+o+"type :"+o.getClass().getSimpleName());
 			     }
 		}else
 		{
 			System.out.println("Not implemented");
 		}
-		System.out.println("Finish queryn: "+this.id+" samplen :"+this.count);
 	}
 
-	@Override
+
 	public void complete(Statement s) {
 		// TODO Auto-generated method stub
 		
@@ -65,12 +67,14 @@ public class BaseHandler extends Observable implements StatementHandler{
 		
 	}
 
-	@Override
+
 	public void data(Statement s, Record r) {
-		System.out.println(s.toString()+" "+r.toString());
+		for(Object a:r.getValues()){
+			System.out.println(a.toString()+"\n");
+		}
 		
 	}
-	@Override
+
 	public void data(Statement s, Object[] r) {
 		// TODO Auto-generated method stub
 		System.out.println(s.toString()+" "+r.toString());

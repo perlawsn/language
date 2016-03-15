@@ -29,7 +29,7 @@ public class QueryMenager implements Observer{
 		 System.out.println("ready");
 	 }
 	
-	public void addQuery(String s){
+	public synchronized void addQuery(String s){
 		id++;
 		BaseHandler b= new BaseHandler(id);
 		System.out.println(id);

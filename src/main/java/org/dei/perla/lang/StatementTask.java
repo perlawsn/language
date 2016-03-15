@@ -9,5 +9,8 @@ import org.dei.perla.lang.executor.statement.SelectionExecutor;
  */
 public interface StatementTask {
 
+	void stop();
+	
+	boolean isRunning();
 
 }

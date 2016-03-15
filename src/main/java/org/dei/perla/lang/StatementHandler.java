@@ -10,19 +10,12 @@ import org.dei.perla.lang.query.statement.Statement;
  *
  * @author Guido Rota 07/07/15.
  */
-public interface StatementHandler extends QueryHandler<Statement, Object> {
+public interface StatementHandler extends QueryHandler<Statement, Record> {
 
-   
-    public void data(Statement s, Record r);
-    
-    @Override
-    public void data(Statement s, Object r);
-    
-    public void complete(Statement s);
 
-    @Override
-    public void error(Statement s, Throwable cause);
+	@Override
+	void data(Statement stat, Record record);
 
-	void data(Statement s, Object[] r);
+
 
 }
