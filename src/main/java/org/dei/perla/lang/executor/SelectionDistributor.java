@@ -110,6 +110,7 @@ public final class SelectionDistributor {
         @Override
         public void data(Refresh source, Void value) {
             synchronized (SelectionDistributor.this) {
+            	
                 distribute();
             }
         }

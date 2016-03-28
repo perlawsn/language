@@ -29,10 +29,10 @@ public final class SetManager {
 	}
 	 
 	public synchronized void start() {
-	        if (status != NEW) {
+/*	        if (status != NEW) {
 	            throw new IllegalStateException("Cannot start, " +
 	        "SetManager has already been started");
-	    }
+	    }*/
 	    distribute();
 	    status = RUNNING;
 	}

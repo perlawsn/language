@@ -2,6 +2,7 @@ package org.dei.perla.lang;
 
 import org.dei.perla.core.PerLaSystem;
 import org.dei.perla.core.utils.Errors;
+import org.dei.perla.lang.database.DatabaseClass;
 import org.dei.perla.lang.executor.CreationQueryTask;
 import org.dei.perla.lang.executor.QueryException;
 import org.dei.perla.lang.executor.SelectionQueryTask;
@@ -13,6 +14,7 @@ import org.dei.perla.lang.parser.ast.StatementAST;
 import org.dei.perla.lang.query.statement.*;
 
 import java.io.StringReader;
+import java.sql.SQLException;
 
 /**
  * Main entry point for the execution of PerLa queries
@@ -53,6 +55,31 @@ public final class Executor {
     public StatementTask execute(String query, StatementHandler h)
             throws QueryException {
         Statement s = parseQuery(query);
+        SelectionStatement sels  = (SelectionStatement)s;
+            
+        
+        return execute(s, h);
+    }
+    
+    public StatementTask execute(String query, StatementHandler h, String tableName)
+            throws QueryException {
+        Statement s = parseQuery(query);
+        SelectionStatement sels  = (SelectionStatement)s;
+        /*
+         * CREO LA TABELLA
+         */
+        DatabaseClass db=new DatabaseClass();
+        try {
+			db.connect();
+			db.createTable(sels.getAttributes(), tableName );
+			db.closeConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
+        
         return execute(s, h);
     }
 
@@ -62,6 +89,7 @@ public final class Executor {
         StatementAST ast;
         try {
             ast = p.Statement(ctx);
+            
         } catch(ParseException e) {
             throw new QueryException("Cannot parse query", e);
         }
@@ -70,9 +98,13 @@ public final class Executor {
         }
 
         Statement s = ast.compile(ctx);
+        
         if (ctx.hasErrors()) {
             throw new QueryException(ctx.getErrorDescription());
         }
+        
+        
+        
         return s;
     }
 

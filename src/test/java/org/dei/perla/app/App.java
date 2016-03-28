@@ -115,7 +115,7 @@ public class App
                 "having temp_c>10"+
                 "up to 5 samples"+
                 "terminate after 1 minutes" );
-      
+      //qm.addQuery("SET period = 10 ON 0");
       /*   qm.addQuery("every one " +
               "select sum ( temp_c:float , 2 seconds ) " +
               "sampling every 500 milliseconds " +
@@ -128,10 +128,11 @@ public class App
                  "select temp_c:float " +
                  "sampling every 10 milliseconds " +
                  "terminate after 50 selections" ); 
-       qm.addQuery("every one " +
+      */
+       /*qm.addQuery("every one " +
                "select period:integer, temp_c:float " +
                "sampling every 10 milliseconds " +
-               "terminate after 50 selections" );*/
+               "terminate after 50 selections" );
      
        /*    qm.addQuery("every one " +
                "select avg( temp_c:float , 1 seconds )" +
