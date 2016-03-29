@@ -1,5 +1,9 @@
 package org.dei.perla.lang.database;
 
+/*
+ * Created by Francesco Filipazzi 28/03/2016
+ */
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,11 +40,11 @@ public class DatabaseClass {
 		
 		if (con!=null){
 			con.close();
-			this.con = DriverManager.getConnection(hostAddr, "root", "pass");
+			this.con = DriverManager.getConnection(hostAddr, "root", "francesco89");
 			this.cmd=con.createStatement();
 			}
 			else{
-				this.con = DriverManager.getConnection(hostAddr, "root", "pass");
+				this.con = DriverManager.getConnection(hostAddr, "root", "francesco89");
 				this.cmd=con.createStatement();
 				System.out.println(con.toString());
 			}
