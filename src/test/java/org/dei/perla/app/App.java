@@ -32,6 +32,7 @@ public class App
 	private static final String descPath2 ="fpc_descriptor.xml";
 	private static final String descPath3 ="fpc_descriptor2.xml";
 	private static final String descPath4 ="example.xml";
+	private static final String descPath5 ="slope_sensor.xml";
     private static final List<Plugin> plugins;
     static {
         List<Plugin> ps = new ArrayList<>();
@@ -90,8 +91,9 @@ public class App
         */
     //    }
      try {
-			system.injectDescriptor(new FileInputStream(descPath4));
-			system.injectDescriptor(new FileInputStream(descPath4));
+
+			system.injectDescriptor(new FileInputStream(descPath5));
+
 		//	system.injectDescriptor(new FileInputStream(descPath));
 			//system.injectDescriptor(new FileInputStream(descPath1));
 			//system.injectDescriptor(new FileInputStream(descPath1));
@@ -113,8 +115,9 @@ public class App
                 "select temp_c:float " +
                 "sampling every 500 milliseconds " +
                 "terminate after 1 minutes" );*/
+
       qm.addQuery("every 3 samples " +
-                "select sum( temp_c:float , 4 seconds ) " +             
+                "select avg( temperature:float , 4 seconds ) " +             
                 "sampling every 1 seconds "     		  
     		  );
       /*     qm.addQuery("every 1 samples " +

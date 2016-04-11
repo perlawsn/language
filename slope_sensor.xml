@@ -16,25 +16,25 @@
 	<channels>
 		<sim:channel id="simulator">
 			<sim:generator id="measures">
-				<sim:field name="temperature" qualifier="dynamic"
+				<sim:field name="temperature" strategy="dynamic"
           			type="float" min="-20" max="20"/>
-				<sim:field name="humidity" qualifier="dynamic"
+				<sim:field name="humidity" strategy="dynamic"
           			type="float" min="10" max="90"/>
-          		<sim:field name="snow_depth" qualifier="dynamic"
+          		<sim:field name="snow_depth" strategy="dynamic"
           			type="float" min="0" max="300"/>
-          		<sim:field name="snow_density" qualifier="dynamic"
+          		<sim:field name="snow_density" strategy="dynamic"
           			type="float" min="50" max="900"/>
 			</sim:generator>
 			<sim:generator id="snow_condition">
-          		<sim:field name="snow_depth" qualifier="dynamic"
+          		<sim:field name="snow_depth" strategy="dynamic"
           			type="float" min="0" max="300"/>
-          		<sim:field name="snow_density" qualifier="dynamic"
+          		<sim:field name="snow_density" strategy="dynamic"
           			type="float" min="50" max="900"/>
 			</sim:generator>
 						<sim:generator id="enviroment_condition">
-				<sim:field name="temperature" qualifier="dynamic"
+				<sim:field name="temperature" strategy="dynamic"
           			type="float" min="-20" max="20"/>
-				<sim:field name="humidity" qualifier="dynamic"
+				<sim:field name="humidity" strategy="dynamic"
           			type="float" min="10" max="90"/>
 			</sim:generator>
 		</sim:channel>
@@ -75,7 +75,7 @@
 			<start>
 				<i:var name="period" type="sampling-period"/>
 				<i:set variable="period" field="period" value="${param['period']}"/>
-				<i:submit request="temperature-request" channel="simulator">
+				<i:submit request="measures-request" channel="simulator">
 					<i:param name="period" variable="period"/>
 				</i:submit>
 			</start>
@@ -87,21 +87,11 @@
 				</i:submit>
 			</stop>
 			<on message="measures-msg" variable="result">
-				<i:put expression="${result.temperature}" attribute="temp_c" />
+				<i:put expression="${result.temperature}" attribute="temperature" />
 				<i:put expression="${result.humidity}" attribute="humidity" />
 				<i:put expression="${result.snow_depth}" attribute="snow_depth" />
 				<i:put expression="${result.snow_density}" attribute="snow_density" />
 				<i:put expression="${result.position}" attribute="position" />
-				<i:emit />
-			</on>
-			<on message="environmental_condition-msg" variable="result">
-				<i:put expression="${result.temperature}" attribute="temp_c" />
-				<i:put expression="${result.humidity}" attribute="humidity" />
-				<i:emit />
-			</on>
-			<on message="snow_condition-msg" variable="result">
-				<i:put expression="${result.snow_depth}" attribute="snow_depth" />
-				<i:put expression="${result.snow_density}" attribute="snow_density" />
 				<i:emit />
 			</on>
 		</periodic>
