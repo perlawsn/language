@@ -16,6 +16,6 @@ public interface StatementHandler extends QueryHandler<Statement, Record> {
 	@Override
 	void data(Statement stat, Record record);
 
-
+	void complete();
 
 }

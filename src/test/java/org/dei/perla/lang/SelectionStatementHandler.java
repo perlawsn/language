@@ -16,4 +16,6 @@ public class SelectionStatementHandler implements QueryHandler<Statement, Record
     @Override
     public void error(Statement s, Throwable cause) {  }
 
+
+
 }

@@ -37,7 +37,9 @@ public final class WindowSizeAST extends NodeAST {
     public WindowSizeAST(Token t, ExpressionAST samples) {
         super(t);
         type = WindowType.SAMPLE;
+        
         this.samples = samples;
+        
         value = null;
         unit = null;
     }

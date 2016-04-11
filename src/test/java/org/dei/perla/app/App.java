@@ -29,6 +29,9 @@ public class App
 {
 	private static final String descPath ="simulator.xml";
 	private static final String descPath1 ="simulator2.xml";
+	private static final String descPath2 ="fpc_descriptor.xml";
+	private static final String descPath3 ="fpc_descriptor2.xml";
+	private static final String descPath4 ="example.xml";
     private static final List<Plugin> plugins;
     static {
         List<Plugin> ps = new ArrayList<>();
@@ -53,7 +56,7 @@ public class App
     private static  SimulatorFpc fpc;
     private static PerLaSystem system;
     private static QueryMenager qm;
-    private static Executor ex;
+  //  private static Executor ex;system.injectDescriptor(new FileInputStream(descPath));
     
     
     public static void main( String[] args )
@@ -87,11 +90,12 @@ public class App
         */
     //    }
      try {
-			//system.injectDescriptor(new FileInputStream(descPath));
-			system.injectDescriptor(new FileInputStream(descPath));
-
-
-			
+			system.injectDescriptor(new FileInputStream(descPath4));
+			system.injectDescriptor(new FileInputStream(descPath4));
+		//	system.injectDescriptor(new FileInputStream(descPath));
+			//system.injectDescriptor(new FileInputStream(descPath1));
+			//system.injectDescriptor(new FileInputStream(descPath1));
+		//system.injectDescriptor(new FileInputStream(descPath3));
 			
 		} catch (FileNotFoundException | FpcCreationException e1) {
 			// TODO Auto-generated catch block
@@ -109,14 +113,16 @@ public class App
                 "select temp_c:float " +
                 "sampling every 500 milliseconds " +
                 "terminate after 1 minutes" );*/
-      qm.addQuery("every one " +
-                "select avg ( temp_c:float , 2 seconds ) " +
-                "sampling every 500 milliseconds " +
-                "having temp_c>10"+
-                "up to 5 samples"+
-                "terminate after 1 minutes" );
-      //qm.addQuery("SET period = 10 ON 0");
-      /*   qm.addQuery("every one " +
+      qm.addQuery("every 3 samples " +
+                "select sum( temp_c:float , 4 seconds ) " +             
+                "sampling every 1 seconds "     		  
+    		  );
+      /*     qm.addQuery("every 1 samples " +
+              "select temp_c:float " +             
+              "sampling every 500 milliseconds "     		  
+  		  );
+      qm.addQuery("SET period = 10 ON 0");
+        qm.addQuery("every one " +
               "select sum ( temp_c:float , 2 seconds ) " +
               "sampling every 500 milliseconds " +
               "terminate after 1 minutes" );
