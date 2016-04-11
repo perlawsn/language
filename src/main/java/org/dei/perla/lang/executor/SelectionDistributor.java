@@ -1,4 +1,4 @@
-package org.dei.perla.lang.executor;
+	package org.dei.perla.lang.executor;
 
 import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.registry.Registry;
@@ -21,8 +21,6 @@ public final class SelectionDistributor {
     private static final int NEW = 0;
     private static final int RUNNING = 1;
     private static final int STOPPED = 2;
-
-    private final String name;
     private final SelectionStatement query;
     private final ExecutionConditions ec;
     private final QueryHandler<? super SelectionStatement, Object[]> handler;
@@ -33,10 +31,9 @@ public final class SelectionDistributor {
     private final List<SelectionExecutor> execs = new ArrayList<>();
     private final Set<Fpc> managed = new HashSet<>();
 
-    protected SelectionDistributor(String name, SelectionStatement query,
+    protected SelectionDistributor(SelectionStatement query,
             QueryHandler<? super SelectionStatement, Object[]> handler,
             Registry registry) {
-        this.name = name;
         this.query = query;
         ec = query.getExecutionConditions();
         this.handler = handler;

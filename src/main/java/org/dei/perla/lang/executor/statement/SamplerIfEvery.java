@@ -265,7 +265,11 @@ public final class SamplerIfEvery implements Sampler {
             if (status >= STOPPED) {
                 return;
             }
-
+            String s="SAMPLES: ";
+            for(Object o:sample.values()){
+            	s = s.concat(o+" ");
+            }
+            System.out.println(s);
             handler.data(sampling, sample.values());
         }
 
@@ -315,6 +319,7 @@ public final class SamplerIfEvery implements Sampler {
                 }
             }
         }
+
 
     }
 

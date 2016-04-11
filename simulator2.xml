@@ -7,13 +7,20 @@
 	<attributes>
 		<attribute id="temp_c" type="float" permission="read-only"/>
 		<attribute id="period" type="integer" permission="write-only"/>
+		<attribute id="prova" type="integer" permission="read-write"/>
 	</attributes>
 
 	<channels>
 		<sim:channel id="simulator">
 			<sim:generator id="temperature">
-				<sim:field name="temperature" strategy="dynamic"
-					type="float" min="1" max="20" increment="0.3"/>
+				<sim:field name="temperature" strategy="step"
+					type="float" min="1" max="10" increment="0.3"/>
+			</sim:generator>
+		</sim:channel>
+		<sim:channel id="simulator">
+			<sim:generator id="provag">
+				<sim:field name="provag" strategy="step"
+					type="float" min="1" max="10" increment="0.3"/>
 			</sim:generator>
 		</sim:channel>
 	</channels>
@@ -25,16 +32,22 @@
 		<sim:message id="sampling-period">
 			<sim:field name="period" type="integer"/>
 		</sim:message>
+			<sim:message id="prova-msg">
+			<sim:field name="provag" type="integer"/>
+		</sim:message>
 	</messages>
 
 	<requests>
 		<sim:request id="temperature-request" generator="temperature"/>
+		<sim:request id="prova-request" generator="provag"/>
 	</requests>
 
 	<operations>
 		<periodic id="all-periodic">
 			<start>
 				<i:var name="period" type="sampling-period"/>
+				<i:set variable="period" field="period" value="${param['period']}"/>
+				<i:var name="prova" type="sampling-period"/>
 				<i:set variable="period" field="period" value="${param['period']}"/>
 				<i:submit request="temperature-request" channel="simulator">
 					<i:param name="period" variable="period"/>

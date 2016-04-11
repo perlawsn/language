@@ -44,14 +44,16 @@ public class QueryMenager implements Observer{
 		/*
 		 * PASSO IL NOME DELLA TABELLA AD UN APPOSITO COSTRUTTORE
 		 */
-		BaseHandler b= new BaseHandler(id, tableName);
+	//	BaseHandler b= new BaseHandler(id, tableName);
+		BaseHandler b= new BaseHandler(id);
 		System.out.println(id);
 		
 		try {
 		/*
 		 * HO SDOPPIATO IL METODO EXECUTE
 		 */
-			queries.add(exec.execute(s, b, tableName));
+			//queries.add(exec.execute(s, b, tableName));
+			queries.add(exec.execute(s, b));
 		} catch (QueryException e) {
 			e.printStackTrace();
 		}

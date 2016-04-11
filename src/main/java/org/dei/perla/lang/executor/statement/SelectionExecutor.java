@@ -226,6 +226,7 @@ public final class SelectionExecutor {
 
             lk.lock();
             try {
+            	System.out.println("Sam"+sample[0]);
                 buffer.add(sample);
                 if (every.getType() == WindowSize.WindowType.SAMPLE) {
                     triggerCountSampling();
@@ -243,6 +244,7 @@ public final class SelectionExecutor {
 
             try {
                 everyCount = every.getSamples();
+                
                 BufferView view = buffer.createView();
                 exec.execute(new SelectionRunner(view));
             } catch(UnreleasedViewException e) {
@@ -250,6 +252,7 @@ public final class SelectionExecutor {
                 stop();
             }
         }
+
 
     }
 

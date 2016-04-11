@@ -8,5 +8,6 @@ public interface QueryHandler<E, T> {
     public void error(E source, Throwable cause);
 
     public void data(E source, T value);
+    
 
 }

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device type="Slope sensor"
+	xmlns="http://perla.dei.org/device"
+	xmlns:i="http://perla.dei.org/device/instructions"
+	xmlns:sim="http://perla.dei.org/channel/simulator">
+
+	<attributes>
+		<attribute id="temperature" type="float" permission="read-only"/>
+		<attribute id="humidity" type="float" permission="read-only"/>
+		<attribute id="snow_depth" type="float" permission="read-only"/>
+		<attribute id="snow_density" type="float" permission="read-only"/>
+		<attribute id="position" type="string" access="static" value="pista1"/>
+		<attribute id="period" type="integer" permission="write-only"/>
+	</attributes>
+
+	<channels>
+		<sim:channel id="simulator">
+			<sim:generator id="measures">
+				<sim:field name="temperature" qualifier="dynamic"
+          			type="float" min="-20" max="20"/>
+				<sim:field name="humidity" qualifier="dynamic"
+          			type="float" min="10" max="90"/>
+          		<sim:field name="snow_depth" qualifier="dynamic"
+          			type="float" min="0" max="300"/>
+          		<sim:field name="snow_density" qualifier="dynamic"
+          			type="float" min="50" max="900"/>
+			</sim:generator>
+			<sim:generator id="snow_condition">
+          		<sim:field name="snow_depth" qualifier="dynamic"
+          			type="float" min="0" max="300"/>
+          		<sim:field name="snow_density" qualifier="dynamic"
+          			type="float" min="50" max="900"/>
+			</sim:generator>
+						<sim:generator id="enviroment_condition">
+				<sim:field name="temperature" qualifier="dynamic"
+          			type="float" min="-20" max="20"/>
+				<sim:field name="humidity" qualifier="dynamic"
+          			type="float" min="10" max="90"/>
+			</sim:generator>
+		</sim:channel>
+	</channels>
+
+	<messages>
+		<sim:message id="measures-msg">
+			<sim:field name="temperature" type="float"/>
+			<sim:field name="humidity" type="float"/>
+			<sim:field name="snow_depth" type="float"/>
+			<sim:field name="snow_density" type="float"/>
+			<sim:field name="position" type="string"/>
+		</sim:message>
+		<sim:message id="position-msg">
+			<sim:field name="position" type="string"/>
+		</sim:message>
+		<sim:message id="snow_condition-msg">
+			<sim:field name="snow_depth" type="float"/>
+			<sim:field name="snow_density" type="float"/>
+		</sim:message>
+		<sim:message id="environmental_condition-msg">
+			<sim:field name="temperature" type="float"/>
+			<sim:field name="humidity" type="float"/>
+		</sim:message>
+		<sim:message id="sampling-period">
+			<sim:field name="period" type="integer"/>
+		</sim:message>
+	</messages>
+
+	<requests>
+		<sim:request id="measures-request" generator="measures"/>
+		<sim:request id="snow_condition-request" generator="snow_condition"/>
+		<sim:request id="environment-request" generator="enviroment_condition"/>
+	</requests>
+
+	<operations>
+		<periodic id="all-periodic">
+			<start>
+				<i:var name="period" type="sampling-period"/>
+				<i:set variable="period" field="period" value="${param['period']}"/>
+				<i:submit request="temperature-request" channel="simulator">
+					<i:param name="period" variable="period"/>
+				</i:submit>
+			</start>
+			<stop>
+				<i:var name="period" type="sampling-period"/>
+				<i:set variable="period" field="period" value="0"/>
+				<i:submit request="measures-request" channel="simulator">
+					<i:param name="period" variable="period"/>
+				</i:submit>
+			</stop>
+			<on message="measures-msg" variable="result">
+				<i:put expression="${result.temperature}" attribute="temp_c" />
+				<i:put expression="${result.humidity}" attribute="humidity" />
+				<i:put expression="${result.snow_depth}" attribute="snow_depth" />
+				<i:put expression="${result.snow_density}" attribute="snow_density" />
+				<i:put expression="${result.position}" attribute="position" />
+				<i:emit />
+			</on>
+			<on message="environmental_condition-msg" variable="result">
+				<i:put expression="${result.temperature}" attribute="temp_c" />
+				<i:put expression="${result.humidity}" attribute="humidity" />
+				<i:emit />
+			</on>
+			<on message="snow_condition-msg" variable="result">
+				<i:put expression="${result.snow_depth}" attribute="snow_depth" />
+				<i:put expression="${result.snow_density}" attribute="snow_density" />
+				<i:emit />
+			</on>
+		</periodic>
+	</operations>
+
+</device>

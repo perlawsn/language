@@ -1,11 +1,15 @@
-package org.dei.perla.lang;
+	package org.dei.perla.lang;
 
 import org.dei.perla.core.PerLaSystem;
 import org.dei.perla.core.utils.Errors;
 import org.dei.perla.lang.database.DatabaseClass;
-import org.dei.perla.lang.executor.CreationQueryTask;
+import org.dei.perla.lang.executor.CreationManager;
+
+import org.dei.perla.lang.executor.InsertionManager;
 import org.dei.perla.lang.executor.QueryException;
-import org.dei.perla.lang.executor.SelectionQueryTask;
+import org.dei.perla.lang.executor.SelectionManager;
+
+import org.dei.perla.lang.executor.SetManager;
 import org.dei.perla.lang.executor.statement.QueryHandler;
 import org.dei.perla.lang.parser.ParseException;
 import org.dei.perla.lang.parser.ParserAST;
@@ -15,6 +19,9 @@ import org.dei.perla.lang.query.statement.*;
 
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Main entry point for the execution of PerLa queries
@@ -24,9 +31,19 @@ import java.sql.SQLException;
 public final class Executor {
 
     private final PerLaSystem perla;
-
+    private Map<String,List<Statement>> queries;
+    private CreationManager cm;
+    private SelectionManager sm;
+    private InsertionManager im;
+    private SetManager setm;
+    
     public Executor(PerLaSystem perla) {
         this.perla = perla;
+        this.queries= new HashMap<String,List<Statement>>();
+        this.cm = new CreationManager(perla.getRegistry());
+        this.sm= new SelectionManager(perla.getRegistry());
+        this.im= new InsertionManager();
+        this.setm = new SetManager(perla.getRegistry());
     }
 
     public StatementTask execute(Statement s, StatementHandler h) throws QueryException{
@@ -67,7 +84,7 @@ public final class Executor {
         SelectionStatement sels  = (SelectionStatement)s;
         /*
          * CREO LA TABELLA
-         */
+        
         DatabaseClass db=new DatabaseClass();
         try {
 			db.connect();
@@ -78,12 +95,12 @@ public final class Executor {
 			e.printStackTrace();
 		}
         
-        
+         */
         
         return execute(s, h);
     }
 
-    private Statement parseQuery(String query) throws QueryException {
+    public Statement parseQuery(String query) throws QueryException {
         ParserContext ctx = new ParserContext();
         ParserAST p = new ParserAST(new StringReader(query));
         StatementAST ast;
@@ -110,29 +127,26 @@ public final class Executor {
 
     private StatementTask executeSelection(SelectionStatement sel,
             StatementHandler h) {
-        SelectionQueryTask sqt = new SelectionQueryTask(sel, perla.getRegistry(), h);
-        return new SelectionStatementTask(sqt);
+    	return sm.insertQuery(sel, h);
       }
     	
     
 
     private StatementTask executeCreation(CreationStatement cre,
             StatementHandler h) {
-      //  CreationQueryTask cqt = new CreationQueryTask(cre,perla.getRegistry(),h);
-      //  StatementTask st = new CreationStatementTask(cqt);
-      //  return st;
-    	 throw new RuntimeException("unimplemented");
+    	return cm.insertQuery(cre, h);
     }
 
     private StatementTask executeInsertion(InsertionStatement ins,
             StatementHandler h) {
-        throw new RuntimeException("unimplemented");
+        return im.insertQuery(ins, h);
     }
 
     private StatementTask executeSet(SetStatement set,
             StatementHandler h) {
-        StatementTask setTask = new SetTask(set, perla.getRegistry());
-        return setTask;
+    	return setm.insertQuery(set, h);
+       /* StatementTask setTask = new SetTask(set, perla.getRegistry());
+        return setTask;*/
     }
 
 }

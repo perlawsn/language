@@ -82,12 +82,16 @@ public class BaseHandler extends Observable implements StatementHandler{
 
 
 	public void data(Statement s, Record r) {
-		
+		 Class<? extends Object> d;
+		 d=r.getValues().getClass();
+		 d.cast(r.getValues());
+		 for(Object o: r.getValues())
+		System.out.println(this.id+" "+o );
 		/*
 		 * QUANDO ARRIVANO I DATI COSTRUISCO LA QUERY E LI INSERISCO NEL DATABASE
 		 * Per controllare l'inserimento vai sulla riga di comando di mysql
 		 * scrivi SELECT * FROM nometabella che ti compare nella console di eclipse
-		 */
+		
 		
 		if (db==null){
 		db=new DatabaseClass();
@@ -127,6 +131,7 @@ public class BaseHandler extends Observable implements StatementHandler{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		 */
 	}
 
 	public void data(Statement s, Object[] r) {
@@ -135,6 +140,15 @@ public class BaseHandler extends Observable implements StatementHandler{
 		
 		
 	}
+
+	@Override
+	public void complete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 
 
 }

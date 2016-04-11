@@ -25,19 +25,20 @@ public final class SetExecutor {
     private int status = READY;
 	
     Task task;
-    private SetHandler setHandler;
+    private TaskHandler setHandler;
     
-	public SetExecutor(SetStatement set, Fpc fpc){
-		this.set = set;
-		this.fpc = fpc;
-		this.setHandler = new SetHandler();
-	}
 	
-	public void start() {
+	public SetExecutor(SetStatement query, Fpc fpc, TaskHandler handler) {
+		this.set = query;
+		this.fpc = fpc;
+		this.setHandler = handler;
+	}
+
+	public Task start() {
         lk.lock();
         try {
             if (status == RUNNING) {
-                return;
+                return task;
             } else if (status == STOPPED) {
                 throw new IllegalStateException(
                         "Cannot restart SelectionExecutor");
@@ -53,6 +54,7 @@ public final class SetExecutor {
         } finally {
             lk.unlock();
         }
+        return task;
     }
 	
 
@@ -89,28 +91,5 @@ public final class SetExecutor {
 	            lk.unlock();
 	        }
 	    }
-
-	private class SetHandler implements TaskHandler {
-		@Override
-		public void complete(Task task) {
-		            return;
-		    }
-
-        @Override
-        public void data(Task task, Sample sample) {
-	         return;
-        }
-
-
-        @Override
-        public void error(Task task, Throwable cause) {
-            synchronized (SetExecutor.this) {
-                if (!isRunning()) {
-                    return;
-                }
-                System.out.println("Set of attributes failed" + cause);
-            }
-        }
-	}
 	
 }
