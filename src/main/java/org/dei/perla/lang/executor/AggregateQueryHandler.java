@@ -137,6 +137,7 @@ public class AggregateQueryHandler extends SelectionQueryHandler{
                 try {
                     for(Object[] value:res){
             		r= new Record(sel.getAttributes(), value);
+            		System.out.println("prova");
             		h.data(sel,r);
                     }
                 } finally {

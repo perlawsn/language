@@ -7,8 +7,10 @@
 	<attributes>
 		<attribute id="temperature" type="float" permission="read-only"/>
 		<attribute id="humidity" type="float" permission="read-only"/>
-		<attribute id="snow_depth" type="float" permission="read-only"/>
-		<attribute id="snow_density" type="float" permission="read-only"/>
+		<attribute id="wind_speed" type="float" permission="read-only"/>
+		<attribute id="wind_direction" type="float" permission="read-only"/>
+		<attribute id="rain" type="float" permission="read-only"/>
+		<attribute id="snow_fall" type="float" permission="read-only"/>
 		<attribute id="position" type="string" access="static" value="pista1"/>
 		<attribute id="period" type="integer" permission="write-only"/>
 	</attributes>
@@ -20,15 +22,19 @@
           			type="float" min="-20" max="20"/>
 				<sim:field name="humidity" strategy="dynamic"
           			type="float" min="10" max="90"/>
-          		<sim:field name="snow_depth" strategy="dynamic"
-          			type="float" min="0" max="300"/>
-          		<sim:field name="snow_density" strategy="dynamic"
-          			type="float" min="50" max="900"/>
+          		<sim:field name="wind_speed" strategy="dynamic"
+          			type="float" min="0" max="120"/>
+          		<sim:field name="wind_direction" strategy="dynamic"
+          			type="float" min="0" max="360"/>
+			<sim:field name="rain" strategy="dynamic"
+          			type="float" min="0" max="200"/>
+			<sim:field name="snow_fall" strategy="dynamic"
+          			type="float" min="0" max="200"/>
 			</sim:generator>
 			<sim:generator id="snow_condition">
-          		<sim:field name="snow_depth" strategy="dynamic"
+          		<sim:field name="wind_speed" strategy="dynamic"
           			type="float" min="0" max="300"/>
-          		<sim:field name="snow_density" strategy="dynamic"
+          		<sim:field name="wind_direction" strategy="dynamic"
           			type="float" min="50" max="900"/>
 			</sim:generator>
 						<sim:generator id="enviroment_condition">
@@ -44,16 +50,18 @@
 		<sim:message id="measures-msg">
 			<sim:field name="temperature" type="float"/>
 			<sim:field name="humidity" type="float"/>
-			<sim:field name="snow_depth" type="float"/>
-			<sim:field name="snow_density" type="float"/>
+			<sim:field name="wind_speed" type="float"/>
+			<sim:field name="wind_direction" type="float"/>
+			<sim:field name="rain" type="float"/>
+			<sim:field name="snow_fall" type="float"/>
 			<sim:field name="position" type="string"/>
 		</sim:message>
 		<sim:message id="position-msg">
 			<sim:field name="position" type="string"/>
 		</sim:message>
 		<sim:message id="snow_condition-msg">
-			<sim:field name="snow_depth" type="float"/>
-			<sim:field name="snow_density" type="float"/>
+			<sim:field name="wind_speed" type="float"/>
+			<sim:field name="wind_direction" type="float"/>
 		</sim:message>
 		<sim:message id="environmental_condition-msg">
 			<sim:field name="temperature" type="float"/>
@@ -89,8 +97,10 @@
 			<on message="measures-msg" variable="result">
 				<i:put expression="${result.temperature}" attribute="temperature" />
 				<i:put expression="${result.humidity}" attribute="humidity" />
-				<i:put expression="${result.snow_depth}" attribute="snow_depth" />
-				<i:put expression="${result.snow_density}" attribute="snow_density" />
+				<i:put expression="${result.wind_speed}" attribute="wind_speed" />
+				<i:put expression="${result.wind_direction}" attribute="wind_direction" />
+				<i:put expression="${result.rain}" attribute="rain" />
+				<i:put expression="${result.snow_fall}" attribute="snow_fall" />
 				<i:put expression="${result.position}" attribute="position" />
 				<i:emit />
 			</on>
