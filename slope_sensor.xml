@@ -23,19 +23,19 @@
           		<sim:field name="snow_depth" strategy="dynamic"
           			type="float" min="0" max="300"/>
           		<sim:field name="snow_density" strategy="dynamic"
-          			type="float" min="50" max="900"/>
+          			type="float" min="0" max="1"/>
 			</sim:generator>
 			<sim:generator id="snow_condition">
           		<sim:field name="snow_depth" strategy="dynamic"
           			type="float" min="0" max="300"/>
           		<sim:field name="snow_density" strategy="dynamic"
-          			type="float" min="50" max="900"/>
+          			type="float" min="0" max="1"/>
 			</sim:generator>
 						<sim:generator id="enviroment_condition">
 				<sim:field name="temperature" strategy="dynamic"
           			type="float" min="-20" max="20"/>
 				<sim:field name="humidity" strategy="dynamic"
-          			type="float" min="10" max="90"/>
+          			type="float" min="0" max="1"/>
 			</sim:generator>
 		</sim:channel>
 	</channels>

@@ -11,6 +11,7 @@
 		<attribute id="wind_direction" type="float" permission="read-only"/>
 		<attribute id="rain" type="float" permission="read-only"/>
 		<attribute id="snow_fall" type="float" permission="read-only"/>
+		<attribute id="visibility" type="float" permission="read-only"/>
 		<attribute id="position" type="string" access="static" value="pista1"/>
 		<attribute id="period" type="integer" permission="write-only"/>
 	</attributes>
@@ -30,6 +31,8 @@
           			type="float" min="0" max="200"/>
 			<sim:field name="snow_fall" strategy="dynamic"
           			type="float" min="0" max="200"/>
+          	<sim:field name="visibility" strategy="dynamic"
+          			type="float" min="0" max="100"/>
 			</sim:generator>
 			<sim:generator id="snow_condition">
           		<sim:field name="wind_speed" strategy="dynamic"
@@ -54,6 +57,7 @@
 			<sim:field name="wind_direction" type="float"/>
 			<sim:field name="rain" type="float"/>
 			<sim:field name="snow_fall" type="float"/>
+			<sim:field name="visibility" type="float"/>
 			<sim:field name="position" type="string"/>
 		</sim:message>
 		<sim:message id="position-msg">
@@ -101,6 +105,7 @@
 				<i:put expression="${result.wind_direction}" attribute="wind_direction" />
 				<i:put expression="${result.rain}" attribute="rain" />
 				<i:put expression="${result.snow_fall}" attribute="snow_fall" />
+				<i:put expression="${result.visibility}" attribute="visibility" />
 				<i:put expression="${result.position}" attribute="position" />
 				<i:emit />
 			</on>
