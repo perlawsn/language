@@ -104,12 +104,17 @@ public final class CircularBuffer {
         return data[idx];
     }
 
-    public void add(Object[] sample) {
+    public  synchronized void add(Object[] sample) {
         if (sample == null || sample.length != atts.size() ||
                 sample[tsIdx] == null) {
             throw new RuntimeException("Malformed sample");
         }
-
+        if(head == data.length-1){
+        	for(int i=0;i<size;i++)
+        		data[i]=data[tail+i];
+        	head=size-1;
+        	tail=0;
+        }
         if (size == data.length) {
             expand();
         }
