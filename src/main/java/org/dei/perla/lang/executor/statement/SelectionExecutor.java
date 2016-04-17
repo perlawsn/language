@@ -226,7 +226,7 @@ public final class SelectionExecutor {
 
             lk.lock();
             try {
-            	System.out.println("Sam"+sample[0]);
+            //	System.out.println("Sam"+sample[0]);
                 buffer.add(sample);
                 if (every.getType() == WindowSize.WindowType.SAMPLE) {
                     triggerCountSampling();

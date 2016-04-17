@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.dei.perla.core.fpc.Attribute;
+import org.dei.perla.core.fpc.DataType;
 import org.dei.perla.core.registry.Registry;
 import org.dei.perla.lang.StatementHandler;
 import org.dei.perla.lang.StatementTask;
 import org.dei.perla.lang.query.expression.Aggregate;
 import org.dei.perla.lang.query.expression.AttributeReference;
+import org.dei.perla.lang.query.expression.AvgAggregate;
 import org.dei.perla.lang.query.expression.Expression;
 import org.dei.perla.lang.query.statement.Select;
 import org.dei.perla.lang.query.statement.SelectionStatement;
@@ -57,6 +59,9 @@ public final class SelectionManager {
 			WindowSize ws= sel.getEvery();
 			for(int i=0;i<sel.getSelect().getFields().size();i++){
 				a = sel.getAttributes().get(i);
+				if(sel.getSelect().getFields().get(i) instanceof AvgAggregate)
+				ar = new AttributeReference(a.getId(), DataType.FLOAT,i);
+				else
 				ar = new AttributeReference(a.getId(), a.getType(),i);
 				fields.add(ar);
 			}
@@ -71,7 +76,8 @@ public final class SelectionManager {
 					sel.getWhere(),
 					sel.getExecutionConditions(),
 					sel.getTerminate());
-			if(sel.getEvery().getSamples()>0){
+			
+			/*if(sel.getEvery().getSamples()>0){
 				ws = new WindowSize(sel.getEvery().getSamples()*fpcs);
 				sel= new SelectionStatement(sel.getSelect(), 
 						sel.getAttributes(), 
@@ -80,7 +86,7 @@ public final class SelectionManager {
 						sel.getWhere(),
 						sel.getExecutionConditions(),
 						sel.getTerminate());
-			}
+			}*/
 			AggregateQueryHandler sqh = new AggregateQueryHandler(sel,h,tmp);
 			query.add(sel);
 			qhandler.add(sqh);
@@ -104,21 +110,6 @@ public final class SelectionManager {
 		return key;
 	}
 
-	public void compute(SelectionStatement source, Object[] value){
-		Record rec=new Record(source.getAttributes(), value);		
-		for(Expression e:source.getSelect().getFields()){
-			if(e instanceof Aggregate){
-				computeAggregate(source,value);
-			}
-		}
-		//this.handler.data(source, rec);
-		
-	}
-	
-	private void computeAggregate(SelectionStatement source, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	private void clean(int i){
 		distributors.remove(i);

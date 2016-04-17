@@ -1,15 +1,14 @@
 package org.dei.perla.app;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import org.dei.perla.core.*;
+
+
+import org.dei.perla.core.PerLaSystem;
+import org.dei.perla.core.Plugin;
 import org.dei.perla.core.channel.http.HttpChannelPlugin;
 import org.dei.perla.core.channel.simulator.SimulatorChannelPlugin;
 import org.dei.perla.core.channel.simulator.SimulatorMapperFactory;
@@ -18,9 +17,8 @@ import org.dei.perla.core.fpc.Fpc;
 import org.dei.perla.core.fpc.FpcCreationException;
 import org.dei.perla.core.message.json.JsonMapperFactory;
 import org.dei.perla.core.message.urlencoded.UrlEncodedMapperFactory;
-import org.dei.perla.core.registry.DuplicateDeviceIDException;
-import org.dei.perla.lang.*;
-import org.dei.perla.lang.executor.SimulatorFpc;
+
+
 /**
  * Hello world!
  *
@@ -43,28 +41,57 @@ public class App
         ps.add(new SimulatorChannelPlugin());
         plugins = Collections.unmodifiableList(ps);
     }
-    
+    public final static String cdtString = new String(
+    		"CREATE CONCEPT Icy WHEN temperature: < -5 "+
+    		"AND snow_density > 0.30 "+
+    		"EVALUATED ON 'EVERY 30 m SELECT temperature, snow_density "+
+    		"SAMPLING EVERY 10 m "+
+    		"EXECUTE IF EXISTS (temperature) OR EXISTS (snow_density)' "+
+    		"CREATE CONCEPT Soft WHEN temperature BETWEEN -5 AND 6 "+
+    		"AND snow_density < 0.12 "+
+    		"EVALUATED ON 'EVERY 30 m SELECT temperature, snow_density "+
+    		"SAMPLING EVERY 10 m "+
+    		"EXECUTE IF EXISTS (temperature) OR EXISTS (snow_density)' "+
+    		"CREATE CONCEPT Slushy WHEN temperature > 8 "+
+    		"AND snow_density BETWEEN 0.12 AND 0.29 "+
+    		"EVALUATED ON 'EVERY 3 0m SELECT temperature, snow_density "+
+    		"SAMPLING EVERY 10 mh "+
+    		"EXECUTE IF EXISTS (temperature) OR EXISTS (snow_density)' "+
+    		"CREATE CONCEPT LOW WHEN snow_depth < 10 cm "+
+    		"EVALUATED ON 'EVERY ONE SELECT snow_depth "+
+    		"SAMPLING EVERY 1 d EXECUTE IF EXISTS (snow_dept)' "+
+    		
+    		"CREATE CONCEPT Rain WHEN rainfall_level > 5ml "+
+    		"EVALUATED ON 'EVERY 30 m SELECT rainfall_level "+
+    		"SAMPLING IF (rainfall_level < 2 ml) EVERY 30 m "+
+    		"ELSE every 10 m "+
+    		"REFRESH EVERY 30 m EXECUTE IF EXISTS(rainfall_level)' "+
+    		"CREATE CONCEPT Snow WHEN snowfall_level > 5 ml "+
+    		"EVALUATED ON 'EVERY 30 m SELECT snowfall_level "+
+    		"SAMPLING IF (snowfall_level < 2 ml) EVERY 30 m "+
+    		"ELSE every 10 m "+
+    		"REFRESH EVERY 30 m EXECUTE IF EXISTS(snowfall_level)' "+
+    		"CREATE CONCEPT Fog WHEN fog > 0.5 "+
+    		"EVALUATED ON 'EVERY 30 m SELECT fog "+
+    		"SAMPLING IF (fog > 20 meters) EVERY 30 m ELSE every 10 m "+
+    		"REFRESH EVERY 30 m EXECUTE IF EXISTS(fog)'. "
+    		);
+	
 
 
-    private static Map<Attribute, Object> createDefaultValues() {
-        Map<Attribute, Object> values = new HashMap<>();
-        values.put(CommonAttributes.TEMP_INT, 24);
-        values.put(CommonAttributes.HUM_INT, 12);
-        values.put(Attribute.TIMESTAMP, Instant.now());
 
-        return values;
-    }
-    private static  SimulatorFpc fpc;
     private static PerLaSystem system;
     private static QueryMenager qm;
   //  private static Executor ex;system.injectDescriptor(new FileInputStream(descPath));
+
     
-    
-    public static void main( String[] args )
+    public static void main( String[] args ) 
     {
+
+
         system= new PerLaSystem(plugins);
         qm = new QueryMenager(system);
-        Map<Attribute, Object> values = createDefaultValues();
+
         int i;
 
         Random r;
@@ -90,35 +117,38 @@ public class App
 		}
         */
     //    }
-     try {
 
-			system.injectDescriptor(new FileInputStream(descPath5));
+
+			try {
+				system.injectDescriptor(new FileInputStream(descPath5));
+			} catch (FileNotFoundException | FpcCreationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		//	system.injectDescriptor(new FileInputStream(descPath));
 			//system.injectDescriptor(new FileInputStream(descPath1));
 			//system.injectDescriptor(new FileInputStream(descPath1));
 		//system.injectDescriptor(new FileInputStream(descPath3));
 			
-		} catch (FileNotFoundException | FpcCreationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+
      
      
        
         for(Fpc f : system.getRegistry().getAll()) {
-        	System.out.println("id: "+f.getId()+"\n");
+        	System.out.println("id:  "+f.getId()+"\n");
         	for(Attribute a: f.getAttributes())
-        		System.out.println("id: "+a.getId()+" type:"+a.getType()+"\n");
+        		System.out.println("id:  "+a.getId()+" type: "+a.getType()+"\n");
         }
         /*     qm.addQuery("every one " +
                 "select temp_c:float " +
                 "sampling every 500 milliseconds " +
                 "terminate after 1 minutes" );*/
 
-      qm.addQuery("every 3 samples " +
-                "select avg( temperature:float , 4 seconds ) " +             
-                "sampling every 1 seconds "     		  
+      qm.addQuery("every 500 seconds " +
+                "select avg( temperature:float , 4 samples ), avg( cacca:float, 30 seconds) " +             
+                "sampling every 1 seconds  "+
+                "execute if position = 'pista1' "
     		  );
       /*     qm.addQuery("every 1 samples " +
               "select temp_c:float " +             

@@ -53,7 +53,7 @@ public final class Select {
 
     public List<Object[]> select(BufferView buffer) {
         List<Object[]> rs = new ArrayList<>();
-        System.out.println("INSELECT 1");
+        //System.out.println("INSELECT 1");
         // UPTO CLAUSE
         int ut;
         switch (upto.getType()) {
@@ -67,7 +67,7 @@ public final class Select {
                 throw new RuntimeException(
                         "Unexpected upto WindowSize type " + upto.getType());
         }
-
+       // System.out.println(ut+"WindowSize type " + 	upto.getType());
         selectBuffer(ut, buffer, rs);
 
         if (def.length > 0 && rs.isEmpty()) {
@@ -79,15 +79,15 @@ public final class Select {
     }
 
     private void selectBuffer(int upto, BufferView buf, List<Object[]> rs) {
-        System.out.println("INSELECT 2");
-    		System.out.print("Select.selectBuffer "+"upto:"+upto);
+       // System.out.println("INSELECT 2");
+    	/*	System.out.print("Select.selectBuffer "+"upto:"+upto);
     		System.out.print(" buf "+ buf.size()+" : ");
     		for(int i=0;i<buf.size();i++)
     			System.out.print(" "+buf.get(i).length);
     		System.out.print(" rs: ");
     		for(int i=0;i<rs.size();i++)
     			System.out.print(" "+rs.get(i));
-    		System.out.println("");
+    		System.out.println("");*/
         for (int i = 0; i < upto && i < buf.size(); i++) {
         	
             Object[] cur = buf.get(i);

@@ -43,8 +43,8 @@ public class AggregateQueryHandler extends SelectionQueryHandler{
 
 	@Override
 	public void error(SelectionStatement source, Throwable cause) {
-		// TODO Auto-generated method stub
-		
+		System.out.println(source.toString());
+		System.out.println(cause.getMessage());		
 	}
 
 	@Override
@@ -134,11 +134,20 @@ public class AggregateQueryHandler extends SelectionQueryHandler{
                 Record r;
                 view.release();
                 lk.lock();
+                float f=0;
                 try {
                     for(Object[] value:res){
             		r= new Record(sel.getAttributes(), value);
-            		System.out.println("prova");
+            	//	System.out.println("prova");
+            		try{
+            			String s;
+            			for(int i=0;i<r.getValues().length;i++)
+            				 System.out.println(r.getFields().get(i).getId()+" "+r.getValues()[i]);	
             		h.data(sel,r);
+            		}
+            		catch(Exception e){
+            			System.out.println(e.toString());
+            		}
                     }
                 } finally {
                     lk.unlock();

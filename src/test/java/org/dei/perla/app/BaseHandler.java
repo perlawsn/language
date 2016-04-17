@@ -8,7 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.dei.perla.core.fpc.Attribute;
-import org.dei.perla.lang.*;
+import org.dei.perla.lang.StatementHandler;
 import org.dei.perla.lang.database.DatabaseClass;
 import org.dei.perla.lang.executor.Record;
 import org.dei.perla.lang.query.statement.SelectionStatement;
