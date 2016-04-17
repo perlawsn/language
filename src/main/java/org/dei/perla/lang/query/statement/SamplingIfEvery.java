@@ -52,5 +52,13 @@ public final class SamplingIfEvery implements Sampling {
     public Refresh getRefresh() {
         return refresh;
     }
+    
+    public String toString(){
+    	StringBuffer s = new StringBuffer("SAMPLING ");
+    	ifevery.forEach(f -> s.append(f.toString() + " "));
+    	if(refresh != Refresh.NEVER)
+    		s.append("REFRESH " + refresh.toString());
+    	return s.toString();
+    }
 
 }

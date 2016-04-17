@@ -76,4 +76,7 @@ public final class IfEvery {
                 "case (probable parser bug");
     }
 
+    public String toString(){
+    	return "IF ( " + cond + ") EVERY " + value + unit;
+    }
 }

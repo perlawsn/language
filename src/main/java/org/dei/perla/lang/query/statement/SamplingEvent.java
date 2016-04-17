@@ -22,4 +22,7 @@ public final class SamplingEvent implements Sampling {
         return events;
     }
 
+    public String toString(){
+    	return "SAMPLING ON EVENT " + events;
+    }
 }

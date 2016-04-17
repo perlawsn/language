@@ -65,4 +65,11 @@ public final class ExecutionConditions {
         return refresh;
     }
 
+    public String toString(){
+    	if(this == ExecutionConditions.ALL_NODES)
+    		return "EXECUTE IF ALL NODES";
+    	else {
+    		return "EXECUTE IF REQUIRE " + specs.toString() + ((refresh == Refresh.NEVER)? "" : refresh.toString());
+    	}
+    }
 }

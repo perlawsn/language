@@ -81,4 +81,7 @@ public final class SelectionStatement implements Statement {
         return select.select(buffer);
     }
 
+    public String toString(){
+    	return select.toString() + " " + sampling.toString() + " " + cond.toString();
+    }
 }

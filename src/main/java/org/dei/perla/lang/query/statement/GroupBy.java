@@ -31,4 +31,10 @@ public final class GroupBy {
         return fields;
     }
 
+    public String toString(){
+    	if(fields == null)
+    		return "GROUP BY NONE";
+    	else 
+    		return "GROUP BY " + fields;
+    }
 }

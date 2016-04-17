@@ -149,7 +149,7 @@ public final class SelectionStatementAST extends StatementAST {
 
     private GroupBy compileGroupBy(ParserContext ctx) {
         if (groupBy == null) {
-            return null;
+            return GroupBy.NONE;
         }
 
         Set<String> selFields = fields.parallelStream()

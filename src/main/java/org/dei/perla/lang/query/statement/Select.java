@@ -104,5 +104,18 @@ public final class Select {
             rs.add(out);
         }
     }
+    
+    public String toString(){
+    	StringBuffer s = new StringBuffer("SELECT ");
+    	for(int i=0; i < fields.size() - 1; i++){
+			s.append(fields.get(i).toString());
+			s.append(", ");
+		}
+		int lastElement = fields.size()-1;
+		s.append(fields.get(lastElement).toString());
+		if(group != GroupBy.NONE)
+			s.append(" " + group.toString());
+		return s.toString();
+    }
 
 }

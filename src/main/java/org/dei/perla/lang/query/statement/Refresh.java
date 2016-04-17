@@ -57,4 +57,13 @@ public final class Refresh {
         return type;
     }
 
+    public String toString(){
+    	if(type == RefreshType.TIME)
+    		return d.toString();
+    	else if(type == RefreshType.EVENT)
+    		return events.toString();
+    	else if (this == Refresh.NEVER)
+    		return "NEVER";
+    	return " ";
+    }
 }
